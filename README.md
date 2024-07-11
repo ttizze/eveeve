@@ -46,7 +46,12 @@ EveEve（Everyone Translate Everything）は、インターネットに公開さ
    cd eveeve
    bun run install
    ```
-3. 環境変数を設定します：
+3. supabaseを設定します：
+   ```
+   bun supabase start
+   bun supabase db reset
+   ```
+4. 環境変数を設定します：
    ```
    touch server/.dev.vars
    # .dev.varsに以下の内容を記述します
@@ -67,7 +72,8 @@ EveEve（Everyone Translate Everything）は、インターネットに公開さ
 
 ## 貢献方法
 翻訳、プログラミング、デザイン、ドキュメンテーションなど、あらゆる形の貢献を歓迎します。現在特に以下の分野での貢献を求めています：
-- chrome拡張機能の開発
+- remix-authでの認証認可システムの実装
+- prismaでのデータベース管理
 - FastAPIへの移行検討と自然言語処理機能の拡充
 - 複数フォーマット対応の実装
 - 文字サイズや色の変更機能

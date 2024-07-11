@@ -1,46 +1,8 @@
-import { json, type ActionFunctionArgs } from '@remix-run/cloudflare'
-import { z } from 'zod'
-import { parseWithZod } from '@conform-to/zod'
+
+
 import { displayContent } from '../utils/articleUtils'
 
-const translationSchema = z.object({
-  url: z.string().url(),
-  title: z.string(),
-  numberedContent: z.string(),
-  extractedNumberedElements: z
-    .string()
-    .transform(str => JSON.parse(str))
-    .pipe(
-      z.array(
-        z.object({
-          number: z.number(),
-          text: z.string(),
-        }),
-      ),
-    ),
-})
-export type TranslationActionData = {
-  success: boolean
-  message?: string
-  error?: string
-}
-
-export type TranslationActionArgs = z.infer<typeof translationSchema>
-
-export async function action({ request }: ActionFunctionArgs) {
-  const formData = await request.formData()
-
-  const submission = parseWithZod(formData, { schema: translationSchema })
-
-  if (submission.status !== 'success') {
-    return json({ sresult: submission.reply() })
-  }
-
-  const { title, extractedNumberedElements, url } = submission.value
-
-  return json(await translate(title, extractedNumberedElements, url))
-}
-const MAX_CHUNK_SIZE = 30000
+const MAX_CHUNK_SIZE = 20000
 
 function splitNumberedElements(
   elements: { number: number; text: string }[],
