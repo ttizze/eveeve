@@ -1,0 +1,20 @@
+{
+  "scripts": {
+    "start": "bun run start:server & bun run start:web",
+    "start:server": "cd server && bun run dev",
+    "start:web": "cd web && bun run dev",
+    "check": "bun run check:server & bun run check:web",
+    "check:web": "cd web && bun run check",
+    "check:server": "cd server && bun run check",
+    "update-package": "bunx taze -w",
+    "install": "bun run install:server & bun run install:web",
+    "install:server": "cd server && bun i",
+    "install:web": "cd web && bun i"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.8.3"
+  }
+}
