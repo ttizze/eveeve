@@ -33,8 +33,7 @@ EveEve（Everyone Translate Everything）は、インターネットに公開さ
   - 現在: Hono（API用）
   - 将来的に: FastAPI（自然言語処理タスク用に移行を検討中）
 - フロントエンド: 
-   - 現在: React (Remix SPAモード)
-   - 将来: React (Remix SSRモード)
+   - React (Remix SSRモード)
 - 翻訳エンジン: Gemini（現在はコンテキスト長のメリットからこれのみを使用）
 
 ## 使用方法
@@ -49,15 +48,19 @@ EveEve（Everyone Translate Everything）は、インターネットに公開さ
    ```
 3. 環境変数を設定します：
    ```
-   export OPENAI_API_KEY=your_openai_api_key
+   touch server/.dev.vars
+   # .dev.varsに以下の内容を記述します
+   GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
+   SUPABASE_URL="YOUR_SUPABASE_URL"
+   SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
+
+   touch web/.env
+   # .envに以下の内容を記述します
+   VITE_PUBLIC_API_BASE_URL="http://localhost:8787"
    ```
 4. バックエンドサービス（API）を起動します：
    ```
    bun run start
-   ```
-5. 別のターミナルでフロントエンドを起動します：
-   ```
-   bun run dev
    ```
 6. ブラウザで `http://localhost:5173` にアクセスして、eveeve を使用開始します。
 
