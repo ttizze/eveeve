@@ -10,31 +10,6 @@ app.use('*', cors())
 
 app.get('/', c => c.text('Hello World!!'))
 app.route('/api/translate', translate)
-app.post('/api/fetch-url', async c => {
-  const { url } = await c.req.json()
-  try {
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
-        Referer: 'https://www.google.com',
-      },
-    })
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch the URL: ${response.status} ${response.statusText}`,
-      )
-    }
-    const html = await response.text()
-    return c.json({ html })
-  } catch (error) {
-    console.error('Fetch URL error:', error)
-    return c.json(
-      { error: error.message, status: error.status || 500 },
-      error.status || 500,
-    )
-  }
-})
 
 app.post('/api/save-article', async (c: Context) => {
   const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_ANON_KEY)

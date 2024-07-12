@@ -1,6 +1,30 @@
-
-
+import { json, type ActionFunctionArgs } from '@remix-run/cloudflare'
+import { z } from 'zod'
 import { displayContent } from '../utils/articleUtils'
+
+const translationSchema = z.object({
+  url: z.string().url(),
+  title: z.string(),
+  numberedContent: z.string(),
+  extractedNumberedElements: z
+    .string()
+    .transform(str => JSON.parse(str))
+    .pipe(
+      z.array(
+        z.object({
+          number: z.number(),
+          text: z.string(),
+        }),
+      ),
+    ),
+})
+export type TranslationActionData = {
+  success: boolean
+  message?: string
+  error?: string
+}
+
+export type TranslationActionArgs = z.infer<typeof translationSchema>
 
 const MAX_CHUNK_SIZE = 20000
 

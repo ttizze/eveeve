@@ -1,4 +1,5 @@
 import { Readability } from "@mozilla/readability";
+
 export const extractArticle = (html: string): { content: string; title: string } => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
