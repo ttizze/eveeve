@@ -7,8 +7,8 @@ services:
     name: remix
     env: node
     plan: free
-    buildCommand: npm ci --production=false && npm run build && npm prune --production
-    startCommand: npx prisma migrate deploy && npm run start
+    buildCommand: bun i && bun run build
+    startCommand: npx prisma migrate deploy && bun run start
     healthCheckPath: /healthcheck
     envVars:
       - key: DATABASE_URL
@@ -18,4 +18,4 @@ services:
       - key: SESSION_SECRET
         generateValue: true
       - key: NODE_ENV #required so NODE_ENV is set in build env
-        value: production
+        value: productiona
