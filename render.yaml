@@ -2,7 +2,6 @@ databases:
   - name: remixdb
     plan: free
 
-# Exported from Render on 2024-07-13T13:20:50Z
 services:
 - type: web
   name: eveeve
@@ -10,15 +9,11 @@ services:
   repo: https://github.com/ttizze/eveeve
   branch: feature/render
   plan: free
-  buildCommand: bun i && bun run build
-  startCommand: npx prisma migrate deploy && bun run start
-  healthCheckPath: /healthcheck
+  buildCommand: bun run install-and-build
+  startCommand: bun run start
+  rootDir: web
   envVars:
     - key: DATABASE_URL
       fromDatabase:
         name: remixdb
         property: connectionString
-    - key: SESSION_SECRET
-      generateValue: true
-    - key: NODE_ENV #required so NODE_ENV is set in build env
-      value: production
