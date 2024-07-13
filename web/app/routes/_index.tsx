@@ -1,5 +1,5 @@
-import type { ActionFunctionArgs, MetaFunction } from "@remix-run/cloudflare";
-import { json  } from "@remix-run/cloudflare";
+import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
+import { json  } from "@remix-run/node";
 import { json as reactJson, Form, useActionData, useNavigation, Link, type ClientActionFunctionArgs } from "@remix-run/react";
 import { useForm, getFormProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
@@ -8,12 +8,6 @@ import { extractArticle, displayContent } from "../utils/articleUtils";
 import { addNumbersToContent } from "../utils/addNumbersToContent";
 import { extractNumberedElements } from "../utils/extractNumberedElements";
 import { translate } from "./translation";
-
-type ServerActionData = {
-	result: { status: string };
-	url: string;
-	html: string;
-};
 
 export const meta: MetaFunction = () => {
 	return [
@@ -34,7 +28,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
     const submission = parseWithZod(formData, { schema: urlSchema });
     if (submission.status !== "success") {
-      return json({ result: submission.reply(), url: "", html: "" });
+      return json({ result: submission.reply(), url: "", html: "", title: "", numberedContent: "", extractedNumberedElements: "", translationResult: "" });
     }
     const response = await fetch(submission.value.url, {
       headers: {
@@ -46,26 +40,17 @@ export async function action({ request }: ActionFunctionArgs) {
       throw new Error(`Failed to fetch the URL: ${response.status} ${response.statusText}`);
     }
     const html = await response.text();
-    return json({ result: submission.reply(), url: submission.value.url, html });
+		const { content, title } = extractArticle(html);
+		const numberedContent = addNumbersToContent(content);
+		console.log("numberedContent", numberedContent);
+		const extractedNumberedElements = extractNumberedElements(numberedContent);
+		console.log("extractedNumberedElements", extractedNumberedElements);
+    return json({ result: submission.reply(), url: submission.value.url, html, title, numberedContent, extractedNumberedElements });
 }
 
-export const clientAction = async ({
-	serverAction,
-}: ClientActionFunctionArgs) => {
-	const data = await serverAction() as ServerActionData;
-	const { content, title } = extractArticle(data.html);
-	const numberedContent = addNumbersToContent(content);
-	const extractedNumberedElements = extractNumberedElements(numberedContent);
-  const translationResult = await translate(title,numberedContent, extractedNumberedElements, data.url);
-	return reactJson({
-		...data,
-		processedData: { title, numberedContent, extractedNumberedElements },
-		translationResult,
-	});
-};
 
 export default function Index() {
-	const actionData = useActionData<typeof clientAction>();
+	const actionData = useActionData<typeof action>();
 	const navigation = useNavigation();
 
 	const [form, field] = useForm({
@@ -103,7 +88,7 @@ export default function Index() {
 						to={`/reader/${encodeURIComponent(actionData.url)}`}
 						className="text-blue-500 hover:underline"
 					>
-					<h2>{actionData.processedData.title}</h2>
+					<h2>{actionData.title}</h2>
 					</Link>
 				</div>
 			)}

@@ -1,4 +1,6 @@
-import DOMPurify from "dompurify";
+import DOMPurify from "isomorphic-dompurify";
+import { JSDOM } from "jsdom";
+const { Node } = new JSDOM().window;
 
 export function shouldProcessElement(element: Element): boolean {
 	const htmlElement = element as HTMLElement;
@@ -38,7 +40,7 @@ export function shouldProcessElement(element: Element): boolean {
 
 export function addNumbersToContent(content: string): string {
 	const sanitizedContent = DOMPurify.sanitize(content);
-	const doc = new DOMParser().parseFromString(sanitizedContent, "text/html");
+	const doc = new JSDOM(sanitizedContent);
 	let currentNumber = 1;
 
 	function processNode(node: Node) {
@@ -63,9 +65,9 @@ export function addNumbersToContent(content: string): string {
 		}
 	}
 
-	Array.from(doc.body.childNodes).forEach(processNode);
+	Array.from(doc.window.document.body.childNodes).forEach(processNode);
 
-	return Array.from(doc.body.childNodes)
+	return Array.from(doc.window.document.body.childNodes)
 		.map((node) =>
 			node.nodeType === Node.ELEMENT_NODE
 				? (node as Element).outerHTML

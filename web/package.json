@@ -4,21 +4,18 @@
   "type": "module",
   "scripts": {
     "build": "remix vite:build",
+    "install-and-build": "bun install && bun run build",
     "deploy": "bun run build && wrangler pages deploy",
     "dev": "remix vite:dev",
-    "start": "wrangler pages dev ./build/client",
+    "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc",
-    "typegen": "wrangler types",
-    "preview": "bun run build && wrangler pages dev",
-    "cf-typegen": "wrangler types"
+    "preview": "bun run build && wrangler pages dev"
   },
   "dependencies": {
     "@conform-to/react": "^1.1.5",
     "@conform-to/zod": "^1.1.5",
     "@google/generative-ai": "^0.14.1",
     "@mozilla/readability": "^0.5.0",
-    "@remix-run/cloudflare": "^2.9.2",
-    "@remix-run/cloudflare-pages": "^2.9.2",
     "@remix-run/react": "^2.9.2",
     "@supabase/supabase-js": "^2.44.3",
     "@tailwindcss/typography": "^0.5.7",
@@ -26,12 +23,12 @@
     "html-react-parser": "^5.1.10",
     "htmlparser2": "^9.1.0",
     "isbot": "^4.1.0",
+    "isomorphic-dompurify": "^2.13.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.1",
-    "@cloudflare/workers-types": "^4.20240620.0",
     "@remix-run/dev": "^2.9.2",
     "@remix-run/testing": "^2.10.2",
     "@testing-library/jest-dom": "^6.4.6",

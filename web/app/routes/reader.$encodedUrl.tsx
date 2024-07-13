@@ -1,5 +1,5 @@
 import { useLoaderData,useParams } from "@remix-run/react";
-import {json, type  LoaderFunctionArgs } from "@remix-run/cloudflare";
+import {json, type  LoaderFunctionArgs } from "@remix-run/node";
 import parse from "html-react-parser";
 
 type Article = {
