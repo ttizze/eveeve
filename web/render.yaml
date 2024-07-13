@@ -1,0 +1,21 @@
+databases:
+  - name: remixdb
+    plan: free
+
+services:
+  - type: web
+    name: remix
+    env: node
+    plan: free
+    buildCommand: npm ci --production=false && npm run build && npm prune --production
+    startCommand: npx prisma migrate deploy && npm run start
+    healthCheckPath: /healthcheck
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: remixdb
+          property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: NODE_ENV #required so NODE_ENV is set in build env
+        value: production
