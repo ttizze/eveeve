@@ -10,10 +10,9 @@ services:
   repo: https://github.com/ttizze/eveeve
   branch: feature/render
   plan: free
-  region: singapore
-  buildCommand: bun run install-and-build
-  startCommand: bun run start
-  rootDir: web
+  buildCommand: bun i && bun run build
+  startCommand: npx prisma migrate deploy && bun run start
+  healthCheckPath: /healthcheck
   envVars:
     - key: DATABASE_URL
       fromDatabase:
