@@ -1,14 +1,6 @@
-# Exported from Render on 2024-07-13T13:22:37Z
 databases:
-- name: remixdb
-  databaseName: remixdb_9yoe
-  user: remixdb_9yoe_user
-  plan: free
-  region: oregon
-  ipAllowList:
-  - source: 0.0.0.0/0
-    description: everywhere
-  postgresMajorVersion: "16"
+  - name: remixdb
+    plan: free
 
 # Exported from Render on 2024-07-13T13:20:50Z
 services:
@@ -22,12 +14,12 @@ services:
   buildCommand: bun run install-and-build
   startCommand: bun run start
   rootDir: web
-  envVars:
-    - key: DATABASE_URL
-      fromDatabase:
-        name: remixdb
-        property: connectionString
-    - key: SESSION_SECRET
-      generateValue: true
-    - key: NODE_ENV #required so NODE_ENV is set in build env
-      value: production
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: remixdb
+          property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: NODE_ENV #required so NODE_ENV is set in build env
+        value: production
