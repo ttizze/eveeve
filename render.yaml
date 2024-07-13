@@ -1,6 +1,7 @@
 databases:
   - name: remixdb
     plan: free
+    region: singapore
 
 services:
 - type: web
@@ -9,6 +10,7 @@ services:
   repo: https://github.com/ttizze/eveeve
   branch: feature/render
   plan: free
+  region: singapore
   buildCommand: bun run install-and-build
   startCommand: npx prisma migrate deploy && bun run start
   rootDir: web
