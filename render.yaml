@@ -18,4 +18,4 @@ services:
       - key: SESSION_SECRET
         generateValue: true
       - key: NODE_ENV #required so NODE_ENV is set in build env
-        value: productiona
+        value: production
