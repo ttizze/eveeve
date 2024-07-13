@@ -14,12 +14,12 @@ services:
   buildCommand: bun run install-and-build
   startCommand: bun run start
   rootDir: web
-    envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: remixdb
-          property: connectionString
-      - key: SESSION_SECRET
-        generateValue: true
-      - key: NODE_ENV #required so NODE_ENV is set in build env
-        value: production
+  envVars:
+    - key: DATABASE_URL
+      fromDatabase:
+        name: remixdb
+        property: connectionString
+    - key: SESSION_SECRET
+      generateValue: true
+    - key: NODE_ENV #required so NODE_ENV is set in build env
+      value: production
