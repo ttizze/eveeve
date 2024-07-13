@@ -10,7 +10,7 @@ services:
   branch: feature/render
   plan: free
   buildCommand: bun run install-and-build
-  startCommand: bun run start
+  startCommand: npx prisma migrate deploy && bun run start
   rootDir: web
   envVars:
     - key: DATABASE_URL
