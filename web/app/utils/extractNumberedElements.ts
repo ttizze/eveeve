@@ -1,12 +1,13 @@
+import { JSDOM } from "jsdom";
+
 export function extractNumberedElements(
 	content: string,
 ): Array<{ number: number; text: string }> {
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(content, "text/html");
+	const doc = new JSDOM(content);
 	const numberedElements: Array<{ number: number; text: string }> = [];
 
 	function traverseNodes(node: Node) {
-		if (node.nodeType === Node.ELEMENT_NODE) {
+		if (node.nodeType === 1) {
 			const element = node as Element;
 			const dataNumber = element.getAttribute("data-number");
 
@@ -21,7 +22,7 @@ export function extractNumberedElements(
 		}
 	}
 
-	doc.body.childNodes.forEach(traverseNodes);
+	doc.window.document.body.childNodes.forEach(traverseNodes);
 
 	return numberedElements.sort((a, b) => a.number - b.number);
 }

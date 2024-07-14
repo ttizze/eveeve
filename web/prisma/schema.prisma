@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int             @id @default(autoincrement())
+  email        String          @unique
+  password     String
+  name         String
+  plan         String          @default("free")
+  totalPoints  Int             @default(0) @map("total_points")
+  isAI         Boolean         @default(false) @map("is_ai")
+  provider      String          @default("Credentials")
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+  apiUsages    ApiUsage[]
+  translations TranslateText[]
+  votes        Vote[]
+
+  @@map("users")
+}
+
+model Page {
+  id             Int             @id @default(autoincrement())
+  url            String          @unique @db.VarChar(255)
+  createdAt      DateTime        @default(now()) @map("created_at")
+  pageVersions   PageVersion[]
+  sourceTexts    SourceText[]
+  translateTexts TranslateText[]
+
+  @@map("pages")
+}
+
+model TranslationStatus {
+  id            Int         @id @default(autoincrement())
+  pageVersionId Int         @map("page_version_id")
+  language      String
+  status        String      @default("pending")
+  pageVersion   PageVersion @relation(fields: [pageVersionId], references: [id])
+
+  @@unique([pageVersionId, language])
+  @@map("translation_status")
+}
+
+model PageVersion {
+  id                Int                 @id @default(autoincrement())
+  url               String
+  title             String
+  content           String
+  contentHash       Bytes               @map("content_hash")
+  pageId            Int                 @map("page_id")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  page              Page                @relation(fields: [pageId], references: [id])
+  sourceTexts       SourceText[]
+  translationStatus TranslationStatus[]
+
+  @@unique([url, createdAt])
+  @@map("page_versions")
+}
+
+model SourceText {
+  id             Int             @id @default(autoincrement())
+  text           String
+  textHash       Bytes           @map("text_hash")
+  pageId         Int             @map("page_id")
+  pageVersionId  Int             @map("page_version_id")
+  page           Page            @relation(fields: [pageId], references: [id])
+  pageVersion    PageVersion     @relation(fields: [pageVersionId], references: [id])
+  translateTexts TranslateText[]
+
+  @@unique([textHash, pageId])
+  @@index([textHash])
+  @@map("source_texts")
+}
+
+model TranslateText {
+  id           Int        @id @default(autoincrement())
+  language     String
+  text         String
+  sourceTextId Int        @map("source_text_id")
+  pageId       Int        @map("page_id")
+  userId       Int        @map("user_id")
+  point        Int        @default(0)
+  editCount    Int        @default(0) @map("edit_count")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  page         Page       @relation(fields: [pageId], references: [id])
+  sourceText   SourceText @relation(fields: [sourceTextId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
+  votes        Vote[]
+
+  @@map("translate_texts")
+}
+
+model Vote {
+  id              Int           @id @default(autoincrement())
+  userId          Int           @map("user_id")
+  translateTextId Int           @map("translate_text_id")
+  voteValue       Int           @map("vote_value")
+  translateText   TranslateText @relation(fields: [translateTextId], references: [id])
+  user            User          @relation(fields: [userId], references: [id])
+
+  @@map("votes")
+}
+
+model ApiUsage {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  dateTime   DateTime @map("date_time")
+  amountUsed Int      @map("amount_used")
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@map("api_usage")
+}
