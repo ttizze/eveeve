@@ -3,6 +3,7 @@ import { prisma } from "./prisma";
 
 export async function getOrCreateSourceTextId(
 	text: string,
+	number: number,
 	pageId: number,
 	pageVersionId: number,
 ): Promise<number> {
@@ -14,14 +15,16 @@ export async function getOrCreateSourceTextId(
 	try {
 		const sourceText = await prisma.sourceText.upsert({
 			where: {
-				textHash_pageId: {
+				textHash_pageVersionId_number: {
 					textHash,
-					pageId,
+					pageVersionId,
+					number,
 				},
 			},
 			update: {},
 			create: {
 				text,
+				number,
 				textHash,
 				pageId,
 				pageVersionId,
