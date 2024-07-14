@@ -25,7 +25,7 @@ const formStrategy = new FormStrategy(async ({ form }) => {
   const user = await prisma.user.findUnique({ where: { email: String(email) } })
 
   if (!user) {
-    throw new AuthorizationError()
+    throw new AuthorizationError('User not found')
   }
 
   if (!user.password) {
@@ -34,7 +34,7 @@ const formStrategy = new FormStrategy(async ({ form }) => {
   const passwordsMatch = await bcrypt.compare(String(password), user.password)
 
   if (!passwordsMatch) {
-    throw new AuthorizationError()
+    throw new AuthorizationError('Invalid password')
   }
 
   const { password: _, ...userWithoutPassword } = user

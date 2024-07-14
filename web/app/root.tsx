@@ -6,7 +6,15 @@ import {
 	ScrollRestoration,
 } from "@remix-run/react";
 import "./tailwind.css";
+import { json } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { authenticator } from "./utils/auth.server";
+import { Header } from "./components/Header";
 
+export async function loader({ request }: LoaderFunctionArgs) {
+  const user = await authenticator.isAuthenticated(request);
+  return json({ user });
+}
 export function Layout({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en">
@@ -17,6 +25,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 				<Links />
 			</head>
 			<body>
+				<Header />
 				{children}
 				<ScrollRestoration />
 				<Scripts />

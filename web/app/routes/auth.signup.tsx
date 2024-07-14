@@ -2,11 +2,16 @@
 import { ActionFunctionArgs, LoaderFunctionArgs, json } from '@remix-run/node'
 import { Link, useActionData, Form } from '@remix-run/react'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
-import { GoogleForm } from './components/GoogleForm'
+import { GoogleForm } from '../components/GoogleForm'
 import { parseWithZod } from '@conform-to/zod'
 import { z } from 'zod'
 import { authenticator } from '../utils/auth.server'
 import { createUser } from '../utils/signup.server'
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "~/components/ui/card";
+import { Alert, AlertDescription } from "~/components/ui/alert";
 
 
 const signUpSchema = z.object({
@@ -82,57 +87,59 @@ const SignUpPage = () => {
   })
 
   return (
-    <div>
-      <div>
+    <div className="container mx-auto max-w-md py-8">
+    <Card>
+      <CardHeader>
+        <CardTitle>Create an account</CardTitle>
+      </CardHeader>
+      <CardContent>
         <Form method="post" {...getFormProps(form)}>
-          <h2>Create an account</h2>
-          {actionData?.result?.status === 'error' && (
-            <div className="text-red-500">
-              {JSON.stringify(actionData?.result)}
-            </div>
+          {actionData?.result?.status === "error" && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertDescription>
+                {JSON.stringify(actionData?.result)}
+              </AlertDescription>
+            </Alert>
           )}
-          <div>
-            <label htmlFor={name.id}>Name</label>
-            <input
-              {...getInputProps(name, { type: 'text' })}
-              className="w-full p-2 border rounded"
-            />
-            {name.errors && <p className="text-red-500">{name.errors}</p>}
-          </div>
-          <div className="mt-4">
-            <label htmlFor={email.id}>Email</label>
-            <input
-              {...getInputProps(email, { type: 'email' })}
-              className="w-full p-2 border rounded"
-            />
-            {email.errors && <p className="text-red-500">{email.errors}</p>}
-          </div>
-          <div className="mt-4">
-            <label htmlFor={password.id}>Password</label>
-            <input
-              {...getInputProps(password, { type: 'password' })}
-              className="w-full p-2 border rounded"
-            />
-            {password.errors && <p className="text-red-500">{password.errors}</p>}
-          </div>
-          <div>
-            <button type="submit"
-              name="_action"
-              value="SignUp"
-            >
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor={name.id}>Name</Label>
+              <Input {...getInputProps(name, { type: "text" })} />
+              {name.errors && (
+                <p className="text-sm text-red-500">{name.errors}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor={email.id}>Email</Label>
+              <Input {...getInputProps(email, { type: "email" })} />
+              {email.errors && (
+                <p className="text-sm text-red-500">{email.errors}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor={password.id}>Password</Label>
+              <Input {...getInputProps(password, { type: "password" })} />
+              {password.errors && (
+                <p className="text-sm text-red-500">{password.errors}</p>
+              )}
+            </div>
+            <Button type="submit" name="_action" value="SignUp" className="w-full">
               Create an account
-            </button>
+            </Button>
           </div>
         </Form>
+      </CardContent>
+      <CardFooter className="flex flex-col space-y-4">
         <GoogleForm />
-      </div>
-      <p>
-        Already have an account?
-        <Link to="/auth/login">
-          <span>Sign In</span>
-        </Link>
-      </p>
-    </div>
+        <p className="text-sm text-center">
+          Already have an account?{" "}
+          <Link to="/auth/login" className="text-blue-600 hover:underline">
+            Sign In
+          </Link>
+        </p>
+      </CardFooter>
+    </Card>
+  </div>
   )
 }
 

@@ -26,10 +26,6 @@ const urlSchema = z.object({
 	url: z.string().url("有効なURLを入力してください"),
 });
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const user = await authenticator.isAuthenticated(request);
-  return json({ user });
-}
 
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData();
@@ -69,7 +65,6 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Index() {
-	const { user } = useLoaderData<typeof loader>();
 	const actionData = useActionData<typeof action>();
 	const navigation = useNavigation();
 
@@ -82,26 +77,7 @@ export default function Index() {
 
 	return (
 		<div className="font-sans p-4">
-			<h1 className="text-3xl">EveEve</h1>
-			{user ? (
-				<div>
-					<p>ようこそ、{user.name}さん！</p>
-					<Link to="/auth/logout" className="text-blue-500 hover:underline">
-					ログアウト
-				</Link>
-				</div>
-      ) : (
-        <div>
-          <Link to="/auth/login" className="text-blue-500 hover:underline mr-4">
-            ログイン
-          </Link>
-          <Link to="/auth/signup" className="text-blue-500 hover:underline">
-            サインアップ
-          </Link>
-        </div>
-      )}
 			<Form method="post" {...getFormProps(form)}>
-				
 				<input
 					type="url"
 					name="url"
