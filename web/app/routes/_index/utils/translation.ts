@@ -108,7 +108,7 @@ async function getOrCreateTranslations(
 	const untranslatedElements: { number: number; text: string }[] = [];
 	const sourceTextsId = await Promise.all(
 		elements.map((element) =>
-			getOrCreateSourceTextId(element.text, pageId, pageVersionId),
+			getOrCreateSourceTextId(element.text, element.number, pageId, pageVersionId),
 		),
 	);
 
@@ -188,6 +188,7 @@ async function translateUntranslatedElements(
 
 			const sourceTextId = await getOrCreateSourceTextId(
 				sourceText,
+				translation.number,
 				pageId,
 				pageVersionId,
 			);

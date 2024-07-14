@@ -66,6 +66,7 @@ model PageVersion {
 model SourceText {
   id             Int             @id @default(autoincrement())
   text           String
+  number         Int
   textHash       Bytes           @map("text_hash")
   pageId         Int             @map("page_id")
   pageVersionId  Int             @map("page_version_id")
@@ -73,7 +74,7 @@ model SourceText {
   pageVersion    PageVersion     @relation(fields: [pageVersionId], references: [id])
   translateTexts TranslateText[]
 
-  @@unique([textHash, pageId])
+  @@unique([textHash, pageVersionId, number])
   @@index([textHash])
   @@map("source_texts")
 }
