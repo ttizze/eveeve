@@ -9,7 +9,12 @@ import { addNumbersToContent } from "./utils/addNumbersToContent";
 import { extractArticle } from "./utils/articleUtils";
 import { fetchWithRetry } from "./utils/fetchWithRetry";
 import { translate } from "./utils/translation";
-import { authenticator } from "../../utils/auth.server";
+import { Button } from "~/components/ui/button"
+import { Input } from "~/components/ui/input"
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "~/components/ui/card"
+import { Alert, AlertDescription } from "~/components/ui/alert"
+import { getSession, commitSession } from "~/utils/session.server";
+
 
 export const meta: MetaFunction = () => {
 	return [
@@ -26,10 +31,6 @@ const urlSchema = z.object({
 	url: z.string().url("有効なURLを入力してください"),
 });
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const user = await authenticator.isAuthenticated(request);
-  return json({ user });
-}
 
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData();
@@ -69,7 +70,6 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Index() {
-	const { user } = useLoaderData<typeof loader>();
 	const actionData = useActionData<typeof action>();
 	const navigation = useNavigation();
 
@@ -81,57 +81,47 @@ export default function Index() {
 	});
 
 	return (
-		<div className="font-sans p-4">
-			<h1 className="text-3xl">EveEve</h1>
-			{user ? (
-				<div>
-					<p>ようこそ、{user.name}さん！</p>
-					<Link to="/auth/logout" className="text-blue-500 hover:underline">
-					ログアウト
-				</Link>
-				</div>
-      ) : (
-        <div>
-          <Link to="/auth/login" className="text-blue-500 hover:underline mr-4">
-            ログイン
-          </Link>
-          <Link to="/auth/signup" className="text-blue-500 hover:underline">
-            サインアップ
-          </Link>
-        </div>
-      )}
-			<Form method="post" {...getFormProps(form)}>
-				
-				<input
-					type="url"
-					name="url"
-					placeholder="URLを入力"
-					required
-					className="border p-2"
-				/>
-				<button
-					type="submit"
-					disabled={navigation.state === "submitting"}
-					className="bg-blue-500 text-white p-2 ml-2"
-				>
-					{navigation.state === "submitting" ? "処理中..." : "翻訳を開始"}
-				</button>
-			</Form>
-			{actionData?.result.status === "error" && (
-				<ul className="text-red-500 mt-2" id={field.url.errorId}>
-					{field.url.errors}
-				</ul>
-			)}
-			{actionData?.result.status === "success" && (
-				<div>
-					<Link
-						to={`/reader/${encodeURIComponent(actionData.url)}`}
-						className="text-blue-500 hover:underline"
-					>
-						<h2>{actionData.title}</h2>
-					</Link>
-				</div>
-			)}
-		</div>
+		<div className="container mx-auto max-w-2xl py-8">
+      <Card>
+          <Form method="post" {...getFormProps(form)} className="space-y-4">
+            <div className="flex space-x-2">
+              <Input
+                type="url"
+                name="url"
+                placeholder="URLを入力"
+                required
+                className="flex-grow"
+              />
+              <Button
+                type="submit"
+                disabled={navigation.state === "submitting"}
+              >
+                {navigation.state === "submitting" ? "処理中..." : "翻訳を開始"}
+              </Button>
+            </div>
+          </Form>
+          
+          {actionData?.result.status === "error" && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertDescription>
+                <ul id={field.url.errorId}>
+                  {field.url.errors}
+                </ul>
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {actionData?.result.status === "success" && (
+            <div className="mt-4">
+              <Link
+                to={`/reader/${encodeURIComponent(actionData.url)}`}
+                className="text-blue-500 hover:underline"
+              >
+                <h2 className="text-xl font-semibold">{actionData.title}</h2>
+              </Link>
+            </div>
+          )}
+      </Card>
+    </div>
 	);
 }

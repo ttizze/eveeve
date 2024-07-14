@@ -18,12 +18,28 @@ model User {
   provider      String          @default("Credentials")
   createdAt    DateTime        @default(now()) @map("created_at")
   updatedAt    DateTime        @updatedAt @map("updated_at")
+  userReadHistory UserReadHistory[]
   apiUsages    ApiUsage[]
   translations TranslateText[]
   votes        Vote[]
 
   @@map("users")
 }
+model UserReadHistory {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  pageVersionId    Int      @map("page_version_id")
+  readAt            DateTime @default(now()) @map("read_at")
+  lastReadDataNumber Int       @default(0) @map("last_read_data_number")
+  user              User     @relation(fields: [userId], references: [id])
+  pageVersion      PageVersion     @relation(fields: [pageVersionId], references: [id])
+
+  @@unique([userId, pageVersionId])
+  @@index([userId])
+  @@index([pageVersionId])
+  @@map("user_read_history")
+}
+
 
 model Page {
   id             Int             @id @default(autoincrement())
@@ -58,6 +74,7 @@ model PageVersion {
   page              Page                @relation(fields: [pageId], references: [id])
   sourceTexts       SourceText[]
   translationStatus TranslationStatus[]
+  userReadHistory   UserReadHistory[]
 
   @@unique([url, createdAt])
   @@map("page_versions")

@@ -1,7 +1,6 @@
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
-  MetaFunction,
 } from '@remix-run/node'
 import { Link } from '@remix-run/react'
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
@@ -10,10 +9,14 @@ import { z } from 'zod'
 import { authenticator } from '../utils/auth.server'
 import { json } from '@remix-run/node'
 import { useActionData, Form } from '@remix-run/react'
-import { GoogleForm } from './components/GoogleForm'
-export const meta: MetaFunction = () => {
-  return [{ title: 'New Remix App login' }]
-}
+import { GoogleForm } from '../components/GoogleForm'
+import { Button } from "~/components/ui/button"
+import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "~/components/ui/card"
+import { Alert, AlertDescription } from "~/components/ui/alert"
+import { Separator } from "~/components/ui/separator"
+
 
 
 const loginSchema = z.object({
@@ -32,24 +35,26 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.clone().formData()
   const action = String(formData.get('_action'))
   const submission = parseWithZod(formData, { schema: loginSchema })
-
-  if (submission.status !== "success") {
-    return json({ result: submission.reply() })
-  }
-
-  switch (action) {
-    case 'SignIn':
-  return authenticator.authenticate('user-pass', request, {
-    successRedirect: '/',
-        failureRedirect: '/auth/login',
-      })
-    case 'SignInWithGoogle':
-      return authenticator.authenticate('google', request, {
-        successRedirect: '/',
-        failureRedirect: '/auth/login',
-      })
-    default:
-      return json({ result: { message: 'Invalid action' } })
+  try {
+    switch (action) {
+      case 'SignIn':
+        if (submission.status !== "success") {
+          return json({ result: submission.reply() })
+        }
+          return authenticator.authenticate('user-pass', request, {
+            successRedirect: '/',
+            failureRedirect: '/auth/login',
+          })
+      case 'SignInWithGoogle':
+        return authenticator.authenticate('google', request, {
+            successRedirect: '/',
+            failureRedirect: '/auth/login',
+          })
+      default:
+        return json({ result: { status: 'error', message: 'Invalid action' } })
+    }
+  } catch (error) {
+    return json({ result: { status: 'error', message: error } })
   }
 }
 
@@ -63,44 +68,56 @@ const LoginPage = () => {
   })
 
   return (
-    <div>
-      <div>
-        <Form method="post" {...getFormProps(form)}>
-          <h2>Login</h2>
-          <div>
-            <label htmlFor={email.id}>Email</label>
-            <input
-              {...getInputProps(email, { type: 'email' })}
-              className="w-full p-2 border rounded"
-            />
-            {email.errors && <p className="text-red-500">{email.errors}</p>}
+    <div className="container mx-auto max-w-md py-8">
+      <Card>
+        <CardHeader>
+          <CardTitle>Login</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form method="post" {...getFormProps(form)}>
+            {lastSubmission?.result?.status === 'error' && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>
+                  {JSON.stringify(lastSubmission.result)}
+                </AlertDescription>
+              </Alert>
+            )}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor={email.id}>Email</Label>
+                <Input {...getInputProps(email, { type: 'email' })} />
+                {email.errors && <p className="text-sm text-red-500">e{email.errors}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor={password.id}>Password</Label>
+                <Input {...getInputProps(password, { type: 'password' })} />
+                {password.errors && <p className="text-sm text-red-500">{password.errors}</p>}
+              </div>
+              <Button
+                type="submit"
+                name="_action"
+                value="SignIn"
+                className="w-full"
+              >
+                Login
+              </Button>
+            </div>
+          </Form>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-4">
+          <Separator className="my-4" />
+          <div className="text-center text-sm text-gray-500 my-2">
+            Or continue with
           </div>
-          <div className="mt-4">
-            <label htmlFor={password.id}>Password</label>
-            <input
-              {...getInputProps(password, { type: 'password' })}
-              className="w-full p-2 border rounded"
-            />
-            {password.errors && <p className="text-red-500">{password.errors}</p>}
-          </div>
-          <div>
-            <button
-              type="submit"
-              name="_action"
-              value="SignIn"
-            >
-              Login
-            </button>
-          </div>
-        </Form>
-        <GoogleForm />
-      </div>
-      <p>
-        Don't have an account?
-        <Link to="/auth/signup">
-          <span>Sign Up</span>
-        </Link>
-      </p>
+          <GoogleForm />
+          <p className="text-sm text-center mt-4">
+            Don't have an account?{" "}
+            <Link to="/auth/signup" className="text-blue-600 hover:underline">
+              Sign Up
+            </Link>
+          </p>
+        </CardFooter>
+      </Card>
     </div>
   )
 }
