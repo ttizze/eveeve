@@ -54,13 +54,13 @@ model PageVersion {
   title             String
   content           String              @db.Text
   contentHash       Bytes               @map("content_hash")
-  fetchedAt         DateTime            @default(now())
+  createdAt         DateTime            @default(now()) @map("created_at")
   pageId            Int                 @map("page_id")
   page              Page                @relation(fields: [pageId], references: [id])
   translationStatus TranslationStatus[]
   sourceTexts       SourceText[]
 
-  @@unique([url, fetchedAt])
+  @@unique([url, createdAt])
   @@map("page_versions")
 }
 
@@ -71,8 +71,8 @@ model SourceText {
   textHash         Bytes            @map("text_hash")
   pageId           Int              @map("page_id")
   page             Page             @relation(fields: [pageId], references: [id])
-  webPageVersionId Int              @map("web_page_version_id")
-  webPageVersion   PageVersion[]
+  pageVersionId    Int              @map("page_version_id")
+  pageVersion      PageVersion      @relation(fields: [pageVersionId], references: [id])
 
   translateTexts TranslateText[]
 

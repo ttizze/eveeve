@@ -49,6 +49,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	const extractedNumberedElements = extractNumberedElements(numberedContent);
 	console.log("extractedNumberedElements", extractedNumberedElements);
 	const translationStatus = await translate(
+		"ja",
 		title,
 		numberedContent,
 		extractedNumberedElements,

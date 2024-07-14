@@ -9,11 +9,7 @@
     "dev": "remix vite:dev",
     "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc",
-    "check": "bunx @biomejs/biome check --write .",
-    "db:seed": "prisma db seed"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "check": "bunx @biomejs/biome check --write ."
   },
   "dependencies": {
     "@conform-to/react": "^1.1.5",

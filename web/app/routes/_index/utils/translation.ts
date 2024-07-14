@@ -5,8 +5,51 @@ import { getOrCreateSourceTextId } from "../../../utils/sourceTextService";
 import { getOrCreateTranslationStatus } from "../../../utils/translationStatus";
 import type { NumberedElement } from "../types";
 import { getGeminiModelResponse } from "./gemini";
+import { getOrCreateAIUser } from "../../../utils/userService";
 
 const MAX_CHUNK_SIZE = 20000;
+
+
+export async function translate(
+  targetLanguage: string,
+  title: string,
+  numberedContent: string,
+  numberedElements: NumberedElement[],
+  url: string,
+): Promise<string> {
+  const allTranslations: NumberedElement[] = [];
+  const pageId = await getOrCreatePageId(url || "");
+  const pageVersionId = await getOrCreatePageVersionId(
+    url,
+    title,
+    numberedContent,
+    pageId,
+  );
+
+  const translationStatus = await getOrCreateTranslationStatus(
+    pageVersionId,
+    targetLanguage,
+  );
+
+  if (translationStatus.status === "completed") {
+    return translationStatus.status;
+  }
+
+  const chunks = splitNumberedElements(numberedElements);
+  for (const chunk of chunks) {
+    const translations = await getOrCreateTranslations(
+      chunk,
+      targetLanguage,
+      pageId,
+      pageVersionId,
+      title,
+    );
+    allTranslations.push(...translations);
+  }
+  console.log("allTranslations", allTranslations);
+
+  return translationStatus.status;
+}
 
 function splitNumberedElements(
 	elements: NumberedElement[],
@@ -34,47 +77,6 @@ function splitNumberedElements(
 	return chunks;
 }
 
-export async function translate(
-	title: string,
-	numberedContent: string,
-	numberedElements: NumberedElement[],
-	url: string,
-): Promise<string> {
-	const allTranslations: NumberedElement[] = [];
-	const targetLanguage = "ja";
-	const pageId = await getOrCreatePageId(url || "");
-	const pageVersionId = await getOrCreatePageVersionId(
-		url,
-		title,
-		numberedContent,
-		pageId,
-	);
-
-	const translationStatus = await getOrCreateTranslationStatus(
-		pageVersionId,
-		targetLanguage,
-	);
-
-	if (translationStatus.status === "completed") {
-		return translationStatus.status;
-	}
-
-	const chunks = splitNumberedElements(numberedElements);
-	for (const chunk of chunks) {
-		const translations = await getOrCreateTranslations(
-			chunk,
-			targetLanguage,
-			pageId,
-			pageVersionId,
-			title,
-		);
-		allTranslations.push(...translations);
-	}
-	console.log("allTranslations", allTranslations);
-
-	return translationStatus.status;
-}
-
 export function extractTranslations(
 	text: string,
 ): { number: number; text: string }[] {
@@ -99,14 +101,14 @@ async function getOrCreateTranslations(
 	elements: { number: number; text: string }[],
 	targetLanguage: string,
 	pageId: number,
-	webPageVersionId: number,
+	pageVersionId: number,
 	title: string,
 ): Promise<{ number: number; text: string }[]> {
 	const translations: { number: number; text: string }[] = [];
 	const untranslatedElements: { number: number; text: string }[] = [];
 	const sourceTextsId = await Promise.all(
 		elements.map((element) =>
-			getOrCreateSourceTextId(element.text, pageId, webPageVersionId),
+			getOrCreateSourceTextId(element.text, pageId, pageVersionId),
 		),
 	);
 
@@ -140,7 +142,7 @@ async function getOrCreateTranslations(
 			untranslatedElements,
 			targetLanguage,
 			pageId,
-			webPageVersionId,
+			pageVersionId,
 			title,
 		);
 		translations.push(...newTranslations);
@@ -153,14 +155,15 @@ async function translateUntranslatedElements(
 	untranslatedElements: { number: number; text: string }[],
 	targetLanguage: string,
 	pageId: number,
-	webPageVersionId: number,
+	pageVersionId: number,
 	title: string,
 ): Promise<{ number: number; text: string }[]> {
 	const source_text = untranslatedElements
 		.map((el) => JSON.stringify(el))
 		.join("\n");
-
+  const model = "gemini-1.5-pro-latest";
 	const translatedText = await getGeminiModelResponse(
+    model,
 		title,
 		source_text,
 		targetLanguage,
@@ -168,7 +171,7 @@ async function translateUntranslatedElements(
 
 	const extractedTranslations = extractTranslations(translatedText);
 
-	const systemUserId = 1; // TODO: システムユーザーIDの取得方法を改善する
+	const systemUserId = await getOrCreateAIUser(model);
 
 	await Promise.all(
 		extractedTranslations.map(async (translation) => {
@@ -186,7 +189,7 @@ async function translateUntranslatedElements(
 			const sourceTextId = await getOrCreateSourceTextId(
 				sourceText,
 				pageId,
-				webPageVersionId,
+				pageVersionId,
 			);
 
 			await prisma.translateText.create({

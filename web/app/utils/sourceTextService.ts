@@ -4,7 +4,7 @@ import { prisma } from "./prisma";
 export async function getOrCreateSourceTextId(
 	text: string,
 	pageId: number,
-	webPageVersionId: number,
+	pageVersionId: number,
 ): Promise<number> {
 	const textHash = Buffer.from(
 		createHash("sha256").update(text).digest("hex"),
@@ -24,7 +24,7 @@ export async function getOrCreateSourceTextId(
 				text,
 				textHash,
 				pageId,
-				webPageVersionId,
+				pageVersionId,
 			},
 		});
 
