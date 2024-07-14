@@ -28,11 +28,7 @@ EveEve（Everyone Translate Everything）は、インターネットに公開さ
 このプロジェクトでは、インターネット上で公開されているテキストを対象としています。ただし、著作権法を遵守し、適切な許可なく著作物を使用しないよう細心の注意を払ってください｡
 
 ## システム構成
-- バックエンド: 
-  - 現在: Hono（API用）
-  - 将来的に: Remix
-- フロントエンド: 
-   - React (Remix SSRモード)
+- React (Remix SSRモード)
 - 翻訳エンジン: Gemini（現在はコンテキスト長のメリットからこれのみを使用）
 
 ## 使用方法
@@ -43,39 +39,32 @@ EveEve（Everyone Translate Everything）は、インターネットに公開さ
 2. 必要な依存関係をインストールします：
    ```
    cd eveeve
-   bun run install
+   cd web
+   bun i
    ```
-3. supabaseを設定します：
+3. 環境変数ファイルを作成し、必要な値を設定します：
    ```
-   cd server
-   bun supabase start
-   bun supabase db reset
+   cp .env.example .env
    ```
-4. 環境変数を設定します：
+   `.env` ファイルを開き、以下の変数を適切な値に設定してください：
+   - SESSION_SECRET
+4. dockerを起動します：
    ```
-   touch server/.dev.vars
-   # .dev.varsに以下の内容を記述します
-   GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
-   SUPABASE_URL="YOUR_SUPABASE_URL"
-   SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
-
-   touch web/.env
-   # .envに以下の内容を記述します
-   VITE_PUBLIC_API_BASE_URL="http://localhost:8787"
+   docker compose up -d
    ```
-4. 起動します：
+5. dbの設定を行います：
    ```
-   bun run start
+   bunx prisma migrate dev
+   ```
+6. 起動します：
+   ```
+   bun run dev
    ```
 6. ブラウザで `http://localhost:5173` にアクセスして、eveeve を使用開始します。
 
 
 ## 貢献方法
 翻訳、プログラミング、デザイン、ドキュメンテーションなど、あらゆる形の貢献を歓迎します。現在特に以下の分野での貢献を求めています：
-- Remixへのバックエンドの移行
-- 全体設計の壁打ち
-- remix-authでの認証認可システムの実装
-- prismaでのデータベース管理
 - 複数フォーマット対応の実装
 - 文字サイズや色の変更機能
 
@@ -85,12 +74,6 @@ EveEve（Everyone Translate Everything）は、インターネットに公開さ
 - 現在はLLMによる機械翻訳のみをサポートしており、人間によるレビュー機能はありません。
 - 出力フォーマットは現在限られています。
 - 長文テキストの処理に制限があります。
-
-## アーキテクチャに関する注記
-現在のアーキテクチャは、APIはHonoを使用して実装され、フロントエンドのRemixとは分離されています。
-他プロジェクトで使用していたHonoを流用したためです。全てをRemixへ移行する予定です。
-デプロイ先としてCloudflareを使用しています。
-しかし将来的にはRenderに移行する予定です。
 
 ## ライセンス
 このプロジェクトはMITライセンスの下で公開されています。詳細はLICENSEファイルをご覧ください。

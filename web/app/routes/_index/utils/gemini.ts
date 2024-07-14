@@ -13,7 +13,7 @@ export async function getGeminiModelResponse(
 	target_language: string,
 ) {
 	const genAI = new GoogleGenerativeAI(
-		import.meta.env.VITE_GEMINI_API_KEY ?? "",
+		import.meta.env.GEMINI_API_KEY ?? "",
 	);
 	const safetySetting = [
 		{
