@@ -5,6 +5,7 @@ import { FormStrategy } from 'remix-auth-form'
 import { GoogleStrategy } from 'remix-auth-google'
 import { prisma } from './prisma'
 import { sessionStorage } from './session.server'
+import { c } from 'node_modules/vite/dist/node/types.d-aGj9QkWt'
 
 const SESSION_SECRET = process.env.SESSION_SECRET
 
@@ -60,12 +61,15 @@ const googleStrategy = new GoogleStrategy<User>(
     callbackURL: `${process.env.CLIENT_URL}/api/auth/callback/google`,
   },
   async ({ profile }) => {
+    console.log('Profile:', profile)
     const user = await prisma.user.findUnique({
       where: { email: profile.emails[0].value },
     })
     if (user) {
+      console.log('User found:', user)
       return user
     }
+    console.log('User not found:', user)
     const newUser = await prisma.user.create({
       data: {
         email: profile.emails[0].value || '',
@@ -74,6 +78,7 @@ const googleStrategy = new GoogleStrategy<User>(
         provider: 'google',
       },
     })
+    console.log('New user created:', newUser)
     return newUser
   },
 )
