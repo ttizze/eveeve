@@ -2,8 +2,13 @@ import type { LoaderFunctionArgs } from '@remix-run/node'
 import { authenticator } from '../utils/auth.server'
 
 export const loader = ({ request }: LoaderFunctionArgs) => {
-  return authenticator.authenticate('google', request, {
-    successRedirect: '/',
-    failureRedirect: '/auth/login',
-  })
+  try {
+    return  authenticator.authenticate('google', request, {
+      successRedirect: '/',
+      failureRedirect: '/auth/login',
+    })
+  } catch (error) {
+    console.error('Google authentication error:', error)
+    return new Response('Authentication failed', { status: 500 })
+  }
 }

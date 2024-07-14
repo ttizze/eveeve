@@ -63,21 +63,17 @@ const googleStrategy = new GoogleStrategy<User>(
     const user = await prisma.user.findUnique({
       where: { email: profile.emails[0].value },
     })
-
     if (user) {
       return user
     }
-
     const newUser = await prisma.user.create({
       data: {
-        id: Number(profile.id),
         email: profile.emails[0].value || '',
         password: '',
         name: profile.displayName,
         provider: 'google',
       },
     })
-
     return newUser
   },
 )
