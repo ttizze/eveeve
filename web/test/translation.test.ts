@@ -1,48 +1,48 @@
-import { test, expect, vi } from 'vitest'
-import { action } from '../app/routes/_index/utils/translation'
-import { createRemixStub } from '@remix-run/testing'
+import { createRemixStub } from "@remix-run/testing";
+import { expect, test, vi } from "vitest";
+import { action } from "../app/routes/_index/utils/translation";
 
 // モックの translateAndDisplayContent 関数
-vi.mock('./translation', () => ({
-  translateAndDisplayContent: vi
-    .fn()
-    .mockResolvedValue({ translatedContent: 'Translated content' }),
-}))
+vi.mock("./translation", () => ({
+	translateAndDisplayContent: vi
+		.fn()
+		.mockResolvedValue({ translatedContent: "Translated content" }),
+}));
 
-test('translation action with valid data', async () => {
-  const remixStub = createRemixStub([
-    {
-      id: 'root',
-      path: '/',
-      action: action,
-    },
-  ])
+test("translation action with valid data", async () => {
+	const remixStub = createRemixStub([
+		{
+			id: "root",
+			path: "/",
+			action: action,
+		},
+	]);
 
-  const formData = new FormData()
-  formData.append('title', 'Test Title')
-  formData.append('numberedContent', 'Numbered content')
-  formData.append(
-    'numberedElements',
-    JSON.stringify([{ number: 1, text: 'Element 1' }]),
-  )
-  formData.append('url', 'https://example.com')
-})
+	const formData = new FormData();
+	formData.append("title", "Test Title");
+	formData.append("numberedContent", "Numbered content");
+	formData.append(
+		"numberedElements",
+		JSON.stringify([{ number: 1, text: "Element 1" }]),
+	);
+	formData.append("url", "https://example.com");
+});
 
-test('translation action with invalid data', async () => {
-  const remixStub = createRemixStub([
-    {
-      id: 'root',
-      path: '/',
-      action: action,
-    },
-  ])
+test("translation action with invalid data", async () => {
+	const remixStub = createRemixStub([
+		{
+			id: "root",
+			path: "/",
+			action: action,
+		},
+	]);
 
-  const formData = new FormData()
-  formData.append('title', 'Test Title')
-  // numberedContent is missing
-  formData.append(
-    'numberedElements',
-    JSON.stringify([{ number: 1, text: 'Element 1' }]),
-  )
-  formData.append('url', 'https://example.com')
-})
+	const formData = new FormData();
+	formData.append("title", "Test Title");
+	// numberedContent is missing
+	formData.append(
+		"numberedElements",
+		JSON.stringify([{ number: 1, text: "Element 1" }]),
+	);
+	formData.append("url", "https://example.com");
+});

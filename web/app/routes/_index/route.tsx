@@ -1,19 +1,23 @@
+import { getFormProps, useForm } from "@conform-to/react";
+import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Form, useActionData, useNavigation, Link } from "@remix-run/react";
-import { useForm, getFormProps } from "@conform-to/react";
-import { parseWithZod } from "@conform-to/zod";
+import { Form, Link, useActionData, useNavigation } from "@remix-run/react";
 import { z } from "zod";
-import { extractArticle } from "./utils/articleUtils";
-import { addNumbersToContent } from "./utils/addNumbersToContent";
 import { extractNumberedElements } from "../../utils/extractNumberedElements";
-import { translate } from "./utils/translation";
+import { addNumbersToContent } from "./utils/addNumbersToContent";
+import { extractArticle } from "./utils/articleUtils";
 import { fetchWithRetry } from "./utils/fetchWithRetry";
+import { translate } from "./utils/translation";
 
 export const meta: MetaFunction = () => {
 	return [
 		{ title: "EveEve" },
-		{ name: "description", content: "EveEveは、インターネット上のテキストを翻訳できるオープンソースプロジェクトです。" },
+		{
+			name: "description",
+			content:
+				"EveEveは、インターネット上のテキストを翻訳できるオープンソースプロジェクトです。",
+		},
 	];
 };
 
@@ -29,17 +33,37 @@ export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData();
 	const submission = parseWithZod(formData, { schema: urlSchema });
 	if (submission.status !== "success") {
-		return json({ result: submission.reply(), url: "", html: "", title: "", numberedContent: "", extractedNumberedElements: "", translationResult: "" });
+		return json({
+			result: submission.reply(),
+			url: "",
+			html: "",
+			title: "",
+			numberedContent: "",
+			extractedNumberedElements: "",
+			translationResult: "",
+		});
 	}
 	const html = await fetchWithRetry(submission.value.url);
 	const { content, title } = extractArticle(html);
 	const numberedContent = addNumbersToContent(content);
-	const extractedNumberedElements = extractNumberedElements(numberedContent)
-	console.log('extractedNumberedElements', extractedNumberedElements)
-	const translationStatus = await translate(title, numberedContent, extractedNumberedElements, submission.value.url);
-	return json({ result: submission.reply(), url: submission.value.url, html, title, numberedContent, extractedNumberedElements, translationStatus });
+	const extractedNumberedElements = extractNumberedElements(numberedContent);
+	console.log("extractedNumberedElements", extractedNumberedElements);
+	const translationStatus = await translate(
+		title,
+		numberedContent,
+		extractedNumberedElements,
+		submission.value.url,
+	);
+	return json({
+		result: submission.reply(),
+		url: submission.value.url,
+		html,
+		title,
+		numberedContent,
+		extractedNumberedElements,
+		translationStatus,
+	});
 }
-
 
 export default function Index() {
 	const actionData = useActionData<typeof action>();
@@ -72,7 +96,9 @@ export default function Index() {
 				</button>
 			</Form>
 			{actionData?.result.status === "error" && (
-				<ul className="text-red-500 mt-2" id={field.url.errorId}>{field.url.errors}</ul>
+				<ul className="text-red-500 mt-2" id={field.url.errorId}>
+					{field.url.errors}
+				</ul>
 			)}
 			{actionData?.result.status === "success" && (
 				<div>
