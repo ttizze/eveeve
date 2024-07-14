@@ -70,16 +70,21 @@ const googleStrategy = new GoogleStrategy<User>(
       return user
     }
     console.log('User not found:', user)
-    const newUser = await prisma.user.create({
-      data: {
-        email: profile.emails[0].value || '',
-        password: '',
-        name: profile.displayName,
-        provider: 'google',
-      },
-    })
-    console.log('New user created:', newUser)
-    return newUser
+    try {
+      const newUser = await prisma.user.create({
+        data: {
+          email: profile.emails[0].value || '',
+          password: '',
+          name: profile.displayName,
+          provider: 'google',
+        },
+      })
+      console.log('New user created:', newUser)
+      return newUser
+    } catch (error) {
+      console.error('Error creating new user:', error)
+      throw new Error('Error creating new user')
+    }
   },
 )
 
