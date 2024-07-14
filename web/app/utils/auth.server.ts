@@ -5,7 +5,6 @@ import { FormStrategy } from 'remix-auth-form'
 import { GoogleStrategy } from 'remix-auth-google'
 import { prisma } from './prisma'
 import { sessionStorage } from './session.server'
-import { c } from 'node_modules/vite/dist/node/types.d-aGj9QkWt'
 
 const SESSION_SECRET = process.env.SESSION_SECRET
 
@@ -29,6 +28,9 @@ const formStrategy = new FormStrategy(async ({ form }) => {
     throw new AuthorizationError()
   }
 
+  if (!user.password) {
+    throw new AuthorizationError('User has no password set.')
+  }
   const passwordsMatch = await bcrypt.compare(String(password), user.password)
 
   if (!passwordsMatch) {
