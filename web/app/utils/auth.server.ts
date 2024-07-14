@@ -61,25 +61,20 @@ const googleStrategy = new GoogleStrategy<User>(
     callbackURL: `${process.env.CLIENT_URL}/api/auth/callback/google`,
   },
   async ({ profile }) => {
-    console.log('Profile:', profile)
     const user = await prisma.user.findUnique({
       where: { email: profile.emails[0].value },
     })
     if (user) {
-      console.log('User found:', user)
       return user
     }
-    console.log('User not found:', user)
     try {
       const newUser = await prisma.user.create({
         data: {
           email: profile.emails[0].value || '',
-          password: '',
           name: profile.displayName,
           provider: 'google',
         },
       })
-      console.log('New user created:', newUser)
       return newUser
     } catch (error) {
       console.error('Error creating new user:', error)

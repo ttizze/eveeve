@@ -10,7 +10,7 @@ datasource db {
 model User {
   id           Int             @id @default(autoincrement())
   email        String          @unique
-  password     String
+  password     String?
   name         String
   plan         String          @default("free")
   totalPoints  Int             @default(0) @map("total_points")
