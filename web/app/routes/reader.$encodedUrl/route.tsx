@@ -12,7 +12,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 	}
 	const latestPageVersion = await prisma.pageVersion.findFirst({
 		where: { url: decodeURIComponent(encodedUrl) },
-		orderBy: { fetchedAt: "desc" },
+		orderBy: { createdAt: "desc" },
 		include: {
 			sourceTexts: {
 				include: {

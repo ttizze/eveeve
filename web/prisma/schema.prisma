@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,36 +10,38 @@ datasource db {
 model User {
   id           Int             @id @default(autoincrement())
   email        String          @unique
+  password     String
   name         String
   plan         String          @default("free")
   totalPoints  Int             @default(0) @map("total_points")
   isAI         Boolean         @default(false) @map("is_ai")
+  provider      String          @default("Credentials")
   createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+  apiUsages    ApiUsage[]
   translations TranslateText[]
   votes        Vote[]
-  apiUsages    ApiUsage[]
 
   @@map("users")
 }
 
 model Page {
-  id                Int                 @id @default(autoincrement())
-  url               String              @unique @db.VarChar(255)
-  sourceTexts       SourceText[]
-  translateTexts    TranslateText[]
-  pageVersions      PageVersion[]
-  createdAt         DateTime            @default(now()) @map("created_at")
+  id             Int             @id @default(autoincrement())
+  url            String          @unique @db.VarChar(255)
+  createdAt      DateTime        @default(now()) @map("created_at")
+  pageVersions   PageVersion[]
+  sourceTexts    SourceText[]
+  translateTexts TranslateText[]
 
   @@map("pages")
 }
 
-
 model TranslationStatus {
-  id             Int         @id @default(autoincrement())
-  pageVersionId  Int         @map("page_version_id")
-  language       String
-  status         String      @default("pending") // e.g., "pending", "in_progress", "completed"
-  pageVersion    PageVersion @relation(fields: [pageVersionId], references: [id])
+  id            Int         @id @default(autoincrement())
+  pageVersionId Int         @map("page_version_id")
+  language      String
+  status        String      @default("pending")
+  pageVersion   PageVersion @relation(fields: [pageVersionId], references: [id])
 
   @@unique([pageVersionId, language])
   @@map("translation_status")
@@ -52,28 +51,26 @@ model PageVersion {
   id                Int                 @id @default(autoincrement())
   url               String
   title             String
-  content           String              @db.Text
+  content           String
   contentHash       Bytes               @map("content_hash")
-  createdAt         DateTime            @default(now()) @map("created_at")
   pageId            Int                 @map("page_id")
+  createdAt         DateTime            @default(now()) @map("created_at")
   page              Page                @relation(fields: [pageId], references: [id])
-  translationStatus TranslationStatus[]
   sourceTexts       SourceText[]
+  translationStatus TranslationStatus[]
 
   @@unique([url, createdAt])
   @@map("page_versions")
 }
 
-
 model SourceText {
-  id               Int              @id @default(autoincrement())
-  text             String
-  textHash         Bytes            @map("text_hash")
-  pageId           Int              @map("page_id")
-  page             Page             @relation(fields: [pageId], references: [id])
-  pageVersionId    Int              @map("page_version_id")
-  pageVersion      PageVersion      @relation(fields: [pageVersionId], references: [id])
-
+  id             Int             @id @default(autoincrement())
+  text           String
+  textHash       Bytes           @map("text_hash")
+  pageId         Int             @map("page_id")
+  pageVersionId  Int             @map("page_version_id")
+  page           Page            @relation(fields: [pageId], references: [id])
+  pageVersion    PageVersion     @relation(fields: [pageVersionId], references: [id])
   translateTexts TranslateText[]
 
   @@unique([textHash, pageId])
@@ -91,8 +88,8 @@ model TranslateText {
   point        Int        @default(0)
   editCount    Int        @default(0) @map("edit_count")
   createdAt    DateTime   @default(now()) @map("created_at")
-  sourceText   SourceText @relation(fields: [sourceTextId], references: [id])
   page         Page       @relation(fields: [pageId], references: [id])
+  sourceText   SourceText @relation(fields: [sourceTextId], references: [id])
   user         User       @relation(fields: [userId], references: [id])
   votes        Vote[]
 
@@ -104,8 +101,8 @@ model Vote {
   userId          Int           @map("user_id")
   translateTextId Int           @map("translate_text_id")
   voteValue       Int           @map("vote_value")
-  user            User          @relation(fields: [userId], references: [id])
   translateText   TranslateText @relation(fields: [translateTextId], references: [id])
+  user            User          @relation(fields: [userId], references: [id])
 
   @@map("votes")
 }
@@ -119,4 +116,3 @@ model ApiUsage {
 
   @@map("api_usage")
 }
-
