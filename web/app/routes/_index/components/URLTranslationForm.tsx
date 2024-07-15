@@ -7,12 +7,10 @@ import {
 	useNavigation,
 	useSubmit,
 } from "@remix-run/react";
-import { useState } from "react";
 import { z } from "zod";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { TranslationLanguageSelect } from "./TranslationLanguageSelect";
 
 const urlTranslationSchema = z.object({
 	url: z.string().url("有効なURLを入力してください"),
@@ -21,7 +19,6 @@ const urlTranslationSchema = z.object({
 
 export function URLTranslationForm() {
 	const navigation = useNavigation();
-	const [targetLanguage, setTargetLanguage] = useState("ja");
 	const submit = useSubmit();
 
 	const actionData = useActionData<{
@@ -53,11 +50,6 @@ export function URLTranslationForm() {
 						placeholder="翻訳したいWebページのURLを入力"
 						required
 						className="flex-grow"
-					/>
-					<input type="hidden" name="targetLanguage" value={targetLanguage} />
-					<TranslationLanguageSelect
-						value={targetLanguage}
-						onChange={setTargetLanguage}
 					/>
 					<Button type="submit" disabled={navigation.state === "submitting"}>
 						{navigation.state === "submitting" ? "翻訳中..." : "翻訳開始"}

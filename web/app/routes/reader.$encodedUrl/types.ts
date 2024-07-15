@@ -1,43 +1,23 @@
-import type { Vote } from "@prisma/client";
+import type { TranslateText, Vote } from "@prisma/client";
 
-export interface TranslationData {
-  id: number;
-  text: string;
-  point: number;
-  userName: string;
-  userVoteStatus: 'upvoted' | 'downvoted' | 'not_voted';
-}
+// UserVoteは既存のVoteタイプを基に定義
+export type UserVote = Pick<Vote, "id" | "isUpvote" | "updatedAt">;
+
+// TranslationDataはTranslateTextを基に、必要なフィールドを選択し拡張
+export type TranslationData = Pick<TranslateText, "id" | "text" | "point"> & {
+	userName: string;
+	userVote: UserVote | null;
+};
 
 export interface SourceTextTranslations {
-  number: number;
-  translations: TranslationData[];
+	number: number;
+	translations: TranslationData[];
 }
 
 export interface LoaderData {
-  title: string;
-  url: string;
-  content: string;
-  translations: SourceTextTranslations[];
-  userId: number | null;
+	title: string;
+	url: string;
+	content: string;
+	translations: SourceTextTranslations[];
+	userId: number | null;
 }
-
-export interface TranslateText {
-  id: number;
-  text: string;
-  point: number;
-  votes: Vote[];
-  user: { name: string };
-}
-
-export interface SourceText {
-  number: number;
-  translateTexts: TranslateText[];
-}
-
-export interface PageVersion {
-  title: string;
-  url: string;
-  content: string;
-  sourceTexts: SourceText[];
-}
-

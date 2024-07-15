@@ -119,6 +119,8 @@ model Vote {
   userId          Int           @map("user_id")
   translateTextId Int           @map("translate_text_id")
   isUpvote        Boolean       @map("is_upvote")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
   translateText   TranslateText @relation(fields: [translateTextId], references: [id])
   user            User          @relation(fields: [userId], references: [id])
 
