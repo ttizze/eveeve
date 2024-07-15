@@ -5,16 +5,20 @@ import {
 	Scripts,
 	ScrollRestoration,
 } from "@remix-run/react";
-import "./tailwind.css";
+import tailwind from "~/tailwind.css?url";
 import type { User } from "@prisma/client";
 import { json } from "@remix-run/node";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Header } from "./components/Header";
 import { authenticator } from "./utils/auth.server";
+import type { LinksFunction } from "@remix-run/node";
 
 type UserWithoutPassword = Omit<User, "password">;
 
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: tailwind },
+];
 export interface RootLoaderData {
 	user: UserWithoutPassword | null;
 }
@@ -25,7 +29,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	return json<RootLoaderData>({ user: safeUser });
 }
 export function Layout({ children }: { children: React.ReactNode }) {
-	const { user } = useLoaderData<RootLoaderData>();
+  const data = useLoaderData<typeof loader>();
+  const user = data?.user as UserWithoutPassword | null;
 
 	return (
 		<html lang="en">

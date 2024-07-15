@@ -6,7 +6,7 @@ import { extractNumberedElements } from "../../utils/extractNumberedElements";
 import {
 	URLTranslationForm,
 	urlTranslationSchema,
-} from "../components/URLTranslationForm";
+} from "./components/URLTranslationForm";
 import { addNumbersToContent } from "./utils/addNumbersToContent";
 import { extractArticle } from "./utils/articleUtils";
 import { fetchWithRetry } from "./utils/fetchWithRetry";
