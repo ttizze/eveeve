@@ -1,6 +1,6 @@
 import type { User } from "@prisma/client";
 import { json } from "@remix-run/node";
-import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import type { LinksFunction } from "@remix-run/node";
 import {
 	Links,
@@ -11,11 +11,9 @@ import {
 } from "@remix-run/react";
 import { useLoaderData } from "@remix-run/react";
 import tailwind from "~/tailwind.css?url";
+import { commitSession, getSession } from "~/utils/session.server";
 import { Header } from "./components/Header";
 import { authenticator } from "./utils/auth.server";
-import { getSession, commitSession } from "~/utils/session.server";
-import { redirect } from "@remix-run/node";
-import { Form } from "@remix-run/react";
 
 type UserWithoutPassword = Omit<User, "password">;
 
@@ -40,10 +38,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			headers: {
 				"Set-Cookie": await commitSession(session),
 			},
-		}
+		},
 	);
 }
-
 
 export async function action({ request }: ActionFunctionArgs) {
 	const session = await getSession(request.headers.get("Cookie"));
@@ -54,15 +51,14 @@ export async function action({ request }: ActionFunctionArgs) {
 		session.set("language", language);
 	}
 
-
-  return json(
-    { success: true },
-    {
-      headers: {
-        "Set-Cookie": await commitSession(session),
-      },
-    }
-  );
+	return json(
+		{ success: true },
+		{
+			headers: {
+				"Set-Cookie": await commitSession(session),
+			},
+		},
+	);
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -78,7 +74,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 				<Links />
 			</head>
 			<body>
-				<Header user={user as UserWithoutPassword | null} language={data.language}/>
+				<Header
+					user={user as UserWithoutPassword | null}
+					language={data.language}
+				/>
 				{children}
 				<ScrollRestoration />
 				<Scripts />
