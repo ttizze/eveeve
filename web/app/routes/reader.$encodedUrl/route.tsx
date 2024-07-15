@@ -10,8 +10,12 @@ import { TranslatedContent } from "./components/TranslatedContent";
 import type { TranslationData } from "./types";
 import { fetchLatestPageVersionWithTranslations } from "./utils";
 import { handleAddTranslationAction, handleVoteAction } from "./utils/actions";
+import { getSession } from "~/utils/session.server";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+	const session = await getSession(request.headers.get("Cookie"));
+	const language = session.get("language") || "ja";
+
 	const { encodedUrl } = params;
 	if (!encodedUrl) {
 		throw new Response("Missing URL parameter", { status: 400 });
@@ -21,6 +25,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const pageData = await fetchLatestPageVersionWithTranslations(
 		decodeURIComponent(encodedUrl),
 		userId ?? 0,
+		language,
 	);
 
 	if (!pageData) {

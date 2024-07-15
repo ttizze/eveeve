@@ -4,6 +4,7 @@ import type { LoaderData, SourceTextTranslations } from "./types";
 export async function fetchLatestPageVersionWithTranslations(
 	url: string,
 	userId: number | null,
+	language: string,
 ): Promise<LoaderData | null> {
 	const pageVersion = await prisma.pageVersion.findFirst({
 		where: { url },
@@ -16,7 +17,7 @@ export async function fetchLatestPageVersionWithTranslations(
 				select: {
 					number: true,
 					translateTexts: {
-						where: { language: "ja" },
+						where: { language },
 						select: {
 							id: true,
 							text: true,

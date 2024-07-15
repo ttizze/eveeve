@@ -1,11 +1,11 @@
 import { Edit, Plus, X } from "lucide-react";
+import { Save, Trash } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 import { useClickOutside } from "../hooks/useClickOutside";
 import type { TranslationData } from "../types";
 import { VoteButtons } from "./VoteButtons";
-import { Save, Trash } from "lucide-react";
 
 interface TranslationProps {
 	translations: TranslationData[];
@@ -69,7 +69,9 @@ export function Translation({
 			lang={targetLanguage}
 			className="notranslate mt-2 p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200 group relative"
 		>
-			<div className="text-lg font-medium text-gray-800">{bestTranslation.text}</div>
+			<div className="text-lg font-medium text-gray-800">
+				{bestTranslation.text}
+			</div>
 			<Button
 				variant="outline"
 				size="sm"
@@ -83,17 +85,22 @@ export function Translation({
 			</Button>
 			{isExpanded && (
 				<div className="">
-						<VoteButtons
-							translation={bestTranslation}
-							onVote={handleVote}
-							userId={userId}
-						/>
+					<VoteButtons
+						translation={bestTranslation}
+						onVote={handleVote}
+						userId={userId}
+					/>
 					{alternativeTranslations.length > 0 && (
 						<div className=" rounded-md">
-							<p className="font-semibold text-gray-600 mb-2">Other translations:</p>
+							<p className="font-semibold text-gray-600 mb-2">
+								Other translations:
+							</p>
 							<div className="space-y-3">
 								{alternativeTranslations.map((alt) => (
-									<div key={alt.id} className="p-2 bg-gray-50 rounded border border-gray-200">
+									<div
+										key={alt.id}
+										className="p-2 bg-gray-50 rounded border border-gray-200"
+									>
 										<div className="text-sm text-gray-700 mb-2">{alt.text}</div>
 										<VoteButtons
 											translation={alt}
@@ -114,7 +121,11 @@ export function Translation({
 									onClick={() => setIsEditing(!isEditing)}
 									className="text-blue-600 hover:bg-blue-50"
 								>
-                  {isEditing ? <X className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
+									{isEditing ? (
+										<X className="h-4 w-4" />
+									) : (
+										<Edit className="h-4 w-4" />
+									)}
 								</Button>
 							</div>
 							{isEditing && (

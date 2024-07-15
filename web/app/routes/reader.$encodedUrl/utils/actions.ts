@@ -5,8 +5,8 @@ export async function handleVoteAction(formData: FormData, userId: number) {
 	const translateTextId = Number(formData.get("translateTextId"));
 	const isUpvote = formData.get("isUpvote") === "true";
 
-	await prisma.$transaction(async (prisma) => {
-		const existingVote = await prisma.vote.findUnique({
+	await prisma.$transaction(async (tx) => {
+		const existingVote = await tx.vote.findUnique({
 			where: {
 				translateTextId_userId: { translateTextId, userId },
 			},
@@ -14,26 +14,26 @@ export async function handleVoteAction(formData: FormData, userId: number) {
 
 		if (existingVote) {
 			if (existingVote.isUpvote === isUpvote) {
-				await prisma.vote.delete({ where: { id: existingVote.id } });
-				await prisma.translateText.update({
+				await tx.vote.delete({ where: { id: existingVote.id } });
+				await tx.translateText.update({
 					where: { id: translateTextId },
 					data: { point: { increment: isUpvote ? -1 : 1 } },
 				});
 			} else {
-				await prisma.vote.update({
+				await tx.vote.update({
 					where: { id: existingVote.id },
 					data: { isUpvote },
 				});
-				await prisma.translateText.update({
+				await tx.translateText.update({
 					where: { id: translateTextId },
 					data: { point: { increment: isUpvote ? 2 : -2 } },
 				});
 			}
 		} else {
-			await prisma.vote.create({
+			await tx.vote.create({
 				data: { userId, translateTextId, isUpvote },
 			});
-			await prisma.translateText.update({
+			await tx.translateText.update({
 				where: { id: translateTextId },
 				data: { point: { increment: isUpvote ? 1 : -1 } },
 			});
