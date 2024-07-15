@@ -24,7 +24,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 				},
 			},
 		},
-	
 	});
 	if (!latestPageVersion) {
 		throw new Response("Failed to fetch article", { status: 500 });
@@ -36,7 +35,9 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 	// 翻訳テキストを適用
 	console.log("latestPageVersion.sourceTexts", latestPageVersion.sourceTexts);
 	const translatedElements = numberedElements.map((element) => {
-		const sourceText = latestPageVersion.sourceTexts.find(st => st.text === element.text);
+		const sourceText = latestPageVersion.sourceTexts.find(
+			(st) => st.text === element.text,
+		);
 		if (sourceText && sourceText.translateTexts.length > 0) {
 			return {
 				...element,

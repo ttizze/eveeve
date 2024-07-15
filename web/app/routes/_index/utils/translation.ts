@@ -3,52 +3,51 @@ import { getOrCreatePageVersionId } from "../../../utils/pageVersionService";
 import { prisma } from "../../../utils/prisma";
 import { getOrCreateSourceTextId } from "../../../utils/sourceTextService";
 import { getOrCreateTranslationStatus } from "../../../utils/translationStatus";
+import { getOrCreateAIUser } from "../../../utils/userService";
 import type { NumberedElement } from "../types";
 import { getGeminiModelResponse } from "./gemini";
-import { getOrCreateAIUser } from "../../../utils/userService";
 
 const MAX_CHUNK_SIZE = 20000;
 
-
 export async function translate(
-  targetLanguage: string,
-  title: string,
-  numberedContent: string,
-  numberedElements: NumberedElement[],
-  url: string,
+	targetLanguage: string,
+	title: string,
+	numberedContent: string,
+	numberedElements: NumberedElement[],
+	url: string,
 ): Promise<string> {
-  const allTranslations: NumberedElement[] = [];
-  const pageId = await getOrCreatePageId(url || "");
-  const pageVersionId = await getOrCreatePageVersionId(
-    url,
-    title,
-    numberedContent,
-    pageId,
-  );
+	const allTranslations: NumberedElement[] = [];
+	const pageId = await getOrCreatePageId(url || "");
+	const pageVersionId = await getOrCreatePageVersionId(
+		url,
+		title,
+		numberedContent,
+		pageId,
+	);
 
-  const translationStatus = await getOrCreateTranslationStatus(
-    pageVersionId,
-    targetLanguage,
-  );
+	const translationStatus = await getOrCreateTranslationStatus(
+		pageVersionId,
+		targetLanguage,
+	);
 
-  if (translationStatus.status === "completed") {
-    return translationStatus.status;
-  }
+	if (translationStatus.status === "completed") {
+		return translationStatus.status;
+	}
 
-  const chunks = splitNumberedElements(numberedElements);
-  for (const chunk of chunks) {
-    const translations = await getOrCreateTranslations(
-      chunk,
-      targetLanguage,
-      pageId,
-      pageVersionId,
-      title,
-    );
-    allTranslations.push(...translations);
-  }
-  console.log("allTranslations", allTranslations);
+	const chunks = splitNumberedElements(numberedElements);
+	for (const chunk of chunks) {
+		const translations = await getOrCreateTranslations(
+			chunk,
+			targetLanguage,
+			pageId,
+			pageVersionId,
+			title,
+		);
+		allTranslations.push(...translations);
+	}
+	console.log("allTranslations", allTranslations);
 
-  return translationStatus.status;
+	return translationStatus.status;
 }
 
 function splitNumberedElements(
@@ -108,7 +107,12 @@ async function getOrCreateTranslations(
 	const untranslatedElements: { number: number; text: string }[] = [];
 	const sourceTextsId = await Promise.all(
 		elements.map((element) =>
-			getOrCreateSourceTextId(element.text, element.number, pageId, pageVersionId),
+			getOrCreateSourceTextId(
+				element.text,
+				element.number,
+				pageId,
+				pageVersionId,
+			),
 		),
 	);
 
@@ -161,9 +165,9 @@ async function translateUntranslatedElements(
 	const source_text = untranslatedElements
 		.map((el) => JSON.stringify(el))
 		.join("\n");
-  const model = "gemini-1.5-pro-latest";
+	const model = "gemini-1.5-pro-latest";
 	const translatedText = await getGeminiModelResponse(
-    model,
+		model,
 		title,
 		source_text,
 		targetLanguage,
