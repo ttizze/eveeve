@@ -3,7 +3,6 @@ import {
 	HarmBlockThreshold,
 	HarmCategory,
 } from "@google/generative-ai";
-import { FunctionDeclarationSchemaType } from "@google/generative-ai";
 import { generateSystemMessage } from "./generateGeminiMessage";
 
 export async function getGeminiModelResponse(
@@ -12,9 +11,7 @@ export async function getGeminiModelResponse(
 	source_text: string,
 	target_language: string,
 ) {
-	const genAI = new GoogleGenerativeAI(
-		import.meta.env.GEMINI_API_KEY ?? "",
-	);
+	const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ?? "");
 	const safetySetting = [
 		{
 			category: HarmCategory.HARM_CATEGORY_HARASSMENT,

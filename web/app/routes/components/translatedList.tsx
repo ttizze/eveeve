@@ -1,7 +1,5 @@
-import { useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/node";
-import { prisma } from "../../utils/prisma";
 import type { Page } from "@prisma/client";
+import { useLoaderData } from "@remix-run/react";
 
 interface LoaderData {
 	pageList: Page[];

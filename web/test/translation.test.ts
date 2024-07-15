@@ -1,5 +1,5 @@
 import { createRemixStub } from "@remix-run/testing";
-import { expect, test, vi } from "vitest";
+import { test, vi } from "vitest";
 import { action } from "../app/routes/_index/utils/translation";
 
 // モックの translateAndDisplayContent 関数
