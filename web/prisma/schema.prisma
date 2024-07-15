@@ -118,10 +118,11 @@ model Vote {
   id              Int           @id @default(autoincrement())
   userId          Int           @map("user_id")
   translateTextId Int           @map("translate_text_id")
-  voteValue       Int           @map("vote_value")
+  isUpvote        Boolean       @map("is_upvote")
   translateText   TranslateText @relation(fields: [translateTextId], references: [id])
   user            User          @relation(fields: [userId], references: [id])
 
+  @@unique([translateTextId, userId])
   @@map("votes")
 }
 
