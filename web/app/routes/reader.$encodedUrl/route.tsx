@@ -1,9 +1,7 @@
 import { type LoaderFunctionArgs, json } from "@remix-run/node";
 import { useLoaderData, useParams } from "@remix-run/react";
-import parse from "html-react-parser";
-import { extractNumberedElements } from "../../utils/extractNumberedElements";
 import { prisma } from "../../utils/prisma";
-import { displayContent } from "./utils/create";
+import { TranslatedContent } from "./components/TranslatedContent";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { encodedUrl } = params;
@@ -18,7 +16,10 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 				include: {
 					translateTexts: {
 						where: { language: "ja" },
-						orderBy: { createdAt: "desc" },
+						orderBy: [
+							{ point: "desc" },
+							{ createdAt: "desc" }
+						],
 						take: 1,
 					},
 				},
@@ -29,42 +30,24 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 		throw new Response("Failed to fetch article", { status: 500 });
 	}
 
-	// コンテンツから番号付き要素を抽出
-	const numberedElements = extractNumberedElements(latestPageVersion.content);
+	const translations = latestPageVersion.sourceTexts.map((sourceText) => ({
+		number: sourceText.number,
+		text: sourceText.translateTexts[0]?.text,
+	}));
 
-	// 翻訳テキストを適用
-	console.log("latestPageVersion.sourceTexts", latestPageVersion.sourceTexts);
-	const translatedElements = numberedElements.map((element) => {
-		const sourceText = latestPageVersion.sourceTexts.find(
-			(st) => st.text === element.text,
-		);
-		if (sourceText && sourceText.translateTexts.length > 0) {
-			return {
-				...element,
-				text: sourceText.translateTexts[0].text,
-			};
-		}
-		return element;
-	});
-
-	// 翻訳されたコンテンツを生成
-	const translatedContent = await displayContent(
-		latestPageVersion.content,
-		translatedElements,
-	);
-
-	return json({
-		title: latestPageVersion.title,
-		url: latestPageVersion.url,
-		content: translatedContent,
-	});
+  return json({
+    title: latestPageVersion.title,
+    url: latestPageVersion.url,
+    content: latestPageVersion.content,
+    translations,
+  });
 };
 
 export default function ReaderView() {
 	const { encodedUrl } = useParams();
-	const article = useLoaderData<typeof loader>();
+	const { title, url, content, translations } = useLoaderData<typeof loader>();
 
-	if (!article) {
+	if (!title || !url || !content || !translations) {
 		return <div>Loading...</div>;
 	}
 
@@ -73,7 +56,7 @@ export default function ReaderView() {
 	return (
 		<div className="container mx-auto px-4 py-8">
 			<article className="prose lg:prose-xl">
-				<h1>{article.title}</h1>
+				<h1>{title}</h1>
 				<p>
 					<a
 						href={originalUrl}
@@ -84,7 +67,7 @@ export default function ReaderView() {
 						Original Article
 					</a>
 				</p>
-				<div>{parse(article.content)}</div>
+				<TranslatedContent content={content} translations={translations} targetLanguage="ja" />
 			</article>
 		</div>
 	);
