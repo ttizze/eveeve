@@ -3,7 +3,7 @@ import { prisma } from "./prisma";
 export async function updateUserReadHistory(
 	userId: number,
 	pageVersionId: number,
-	number: number,
+	lastReadDataNumber: number,
 ) {
 	await prisma.userReadHistory.upsert({
 		where: {
@@ -13,13 +13,13 @@ export async function updateUserReadHistory(
 			},
 		},
 		update: {
-			lastReadDataNumber: number,
+			lastReadDataNumber: lastReadDataNumber,
 			readAt: new Date(),
 		},
 		create: {
 			userId: userId,
 			pageVersionId: pageVersionId,
-			lastReadDataNumber: number,
+			lastReadDataNumber: lastReadDataNumber,
 		},
 	});
 }

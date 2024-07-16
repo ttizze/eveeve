@@ -16,6 +16,7 @@ model User {
   totalPoints  Int             @default(0) @map("total_points")
   isAI         Boolean         @default(false) @map("is_ai")
   provider      String          @default("Credentials")
+  geminiApiKey  String?         @map("gemini_api_key")
   createdAt    DateTime        @default(now()) @map("created_at")
   updatedAt    DateTime        @updatedAt @map("updated_at")
   userReadHistory UserReadHistory[]

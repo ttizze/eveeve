@@ -1,17 +1,11 @@
 import type { PageVersion } from "@prisma/client";
-import { useLoaderData, useMatches } from "@remix-run/react";
-import type { RootLoaderData } from "~/root"; // root.tsxからインポート
-
+import { useLoaderData } from "@remix-run/react";
 interface LoaderData {
 	pageVersionList: PageVersion[];
 }
 
-export function TranslatedList() {
+export function TranslatedList(language: string) {
 	const { pageVersionList } = useLoaderData<LoaderData>();
-	const matches = useMatches();
-	const rootData = matches[0].data as RootLoaderData;
-	const language = rootData.language;
-
 	return (
 		<div>
 			<h2>Translated List (Language: {language})</h2>

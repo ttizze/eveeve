@@ -1,7 +1,4 @@
-export type NumberedElement = {
-	number: number;
-	text: string;
-};
+import { z } from "zod";
 
 export type TranslationStatus = "pending" | "in_progress" | "completed";
 
@@ -11,3 +8,7 @@ export interface TranslationStatusRecord {
 	language: string;
 	status: TranslationStatus;
 }
+
+export const geminiApiKeySchema = z.object({
+	geminiApiKey: z.string().min(1, "API key is required"),
+});

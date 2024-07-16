@@ -6,12 +6,12 @@ import {
 	SelectValue,
 } from "~/components/ui/select";
 
-type Language = {
+type TargetLanguage = {
 	code: string;
 	name: string;
 };
 
-const languages: Language[] = [
+const targetLanguages: TargetLanguage[] = [
 	{ code: "ja", name: "日本語" },
 	{ code: "en", name: "English" },
 	{ code: "zh", name: "中文" },
@@ -20,22 +20,22 @@ const languages: Language[] = [
 	{ code: "fr", name: "Français" },
 ];
 
-type TranslationLanguageSelectProps = {
+type TargetLanguageSelectProps = {
 	value: string;
 	onChange: (value: string) => void;
 };
 
-export function TranslationLanguageSelect({
+export function TargetLanguageSelect({
 	value,
 	onChange,
-}: TranslationLanguageSelectProps) {
+}: TargetLanguageSelectProps) {
 	return (
 		<Select value={value} onValueChange={onChange}>
 			<SelectTrigger className="w-[180px]">
 				<SelectValue placeholder="翻訳言語を選択" />
 			</SelectTrigger>
 			<SelectContent>
-				{languages.map((lang) => (
+				{targetLanguages.map((lang) => (
 					<SelectItem key={lang.code} value={lang.code}>
 						{lang.name}
 					</SelectItem>

@@ -42,3 +42,19 @@ export async function getGeminiModelResponse(
 	);
 	return result.response.text();
 }
+
+export async function validateGeminiApiKey(apiKey: string): Promise<boolean> {
+	try {
+		const genAI = new GoogleGenerativeAI(apiKey);
+		const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+		const result = await model.generateContent("Hello, World!");
+		const response = await result.response;
+		const text = response.text();
+
+		return text.length > 0;
+	} catch (error) {
+		console.error("Gemini API key validation failed:", error);
+		return false;
+	}
+}

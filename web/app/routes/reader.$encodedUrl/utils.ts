@@ -1,11 +1,14 @@
 import { prisma } from "../../utils/prisma";
-import type { LoaderData, SourceTextTranslations } from "./types";
+import type {
+	LatestPageVersionWithTranslations,
+	SourceTextTranslations,
+} from "./types";
 
 export async function fetchLatestPageVersionWithTranslations(
 	url: string,
 	userId: number | null,
 	language: string,
-): Promise<LoaderData | null> {
+): Promise<LatestPageVersionWithTranslations | null> {
 	const pageVersion = await prisma.pageVersion.findFirst({
 		where: { url },
 		orderBy: { createdAt: "desc" },

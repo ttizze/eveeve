@@ -4,12 +4,12 @@ import { Button } from "~/components/ui/button";
 
 export const GoogleForm = () => {
 	return (
-		<Form method="POST" className="w-full">
+		<Form method="POST" className="w-full ">
 			<Button
 				type="submit"
-				name="_action"
+				name="intent"
 				value="SignInWithGoogle"
-				variant="outline"
+				variant="secondary"
 				className="w-full"
 			>
 				<FaGoogle className="mr-2 h-4 w-4" />
