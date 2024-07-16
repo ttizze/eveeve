@@ -1,68 +1,62 @@
-import type { User } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import { Form, useSubmit } from "@remix-run/react";
-import { TranslationLanguageSelect } from "./TranslationLanguageSelect";
-
-type UserWithoutPassword = Omit<User, "password">;
+import { LogIn, LogOut } from "lucide-react"; // Lucide アイコンをインポート
+import { ModeToggle } from "~/components/dark-mode-toggle";
+import type { SafeUser } from "../types";
+import { TargetLanguageSelect } from "./TargetLanguageSelect";
+import { Button } from "./ui/button";
 
 interface HeaderProps {
-	user: UserWithoutPassword | null;
-	language: string;
+	safeUser: SafeUser | null;
+	targetLanguage: string;
 }
 
-export function Header({ user, language }: HeaderProps) {
+export function Header({ safeUser, targetLanguage }: HeaderProps) {
 	const submit = useSubmit();
 
-	const handleLanguageChange = (newLanguage: string) => {
+	const handleTargetLanguageChange = (newTargetLanguage: string) => {
 		const formData = new FormData();
-		formData.append("language", newLanguage);
+		formData.append("targetLanguage", newTargetLanguage);
 		submit(formData, { method: "post" });
 	};
 
 	return (
-		<header className="bg-white shadow-sm">
+		<header className="shadow-sm mb-10">
 			<div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
 				<Link to="/">
-					<h1 className="text-3xl font-bold text-gray-900">EveEve</h1>
+					<h1 className="text-3xl font-bold ">EveEve</h1>
 				</Link>
-				<div className="flex items-center space-x-4">
-					<Form method="post">
-						<TranslationLanguageSelect
-							value={language}
-							onChange={handleLanguageChange}
-						/>
-					</Form>
-					<nav>
-						{user ? (
-							<div className="flex items-center space-x-4">
-								<span className="text-gray-700">
-									ようこそ、{user.name}さん！
-								</span>
+				<Form method="post" className="flex items-center space-x-4">
+					<TargetLanguageSelect
+						value={targetLanguage}
+						onChange={handleTargetLanguageChange}
+					/>
+					<nav className="flex items-center space-x-4">
+						<ModeToggle />
+						{safeUser ? (
+							<>
+								<span className="text-gray-700">Hello, {safeUser.name}!!</span>
 								<Link
 									to="/auth/logout"
-									className="text-blue-600 hover:text-blue-800 font-medium"
+									className="text-gray-600 hover:text-gray-800"
+									title="Logout"
 								>
-									ログアウト
+									<LogOut className="w-6 h-6" />
 								</Link>
-							</div>
+							</>
 						) : (
-							<div className="space-x-4">
-								<Link
-									to="/auth/login"
-									className="text-blue-600 hover:text-blue-800 font-medium"
-								>
-									ログイン
-								</Link>
-								<Link
-									to="/auth/signup"
-									className="text-blue-600 hover:text-blue-800 font-medium"
-								>
-									サインアップ
-								</Link>
-							</div>
+							<Button
+								type="submit"
+								name="intent"
+								value="SignInWithGoogle"
+								variant="outline"
+								size="icon"
+							>
+								<LogIn className="w-5 h-5" />
+							</Button>
 						)}
 					</nav>
-				</div>
+				</Form>
 			</div>
 		</header>
 	);

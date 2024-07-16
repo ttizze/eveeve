@@ -1,4 +1,5 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
 import {
@@ -9,20 +10,19 @@ import {
 	CardTitle,
 } from "~/components/ui/card";
 import { authenticator } from "../utils/auth.server";
-
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-	const user = await authenticator.isAuthenticated(request, {
+	const safeUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/auth/login",
 	});
 
-	return user;
+	return json({ safeUser });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
 	return await authenticator.logout(request, { redirectTo: "/" });
 };
 export default function Logout() {
-	const user = useLoaderData<typeof loader>();
+	const { safeUser } = useLoaderData<typeof loader>();
 	return (
 		<div className="container mx-auto max-w-md py-8">
 			<Card>
@@ -33,9 +33,9 @@ export default function Logout() {
 				</CardHeader>
 				<CardContent>
 					<p className="text-center mb-4">
-						<span className="font-semibold">{user.name}</span>
+						<span className="font-semibold">{safeUser.name}</span>
 					</p>
-					<p className="text-center text-sm text-gray-600 mb-4">
+					<p className="text-center text-sm text-gray-60 mb-4">
 						Are you sure you want to logout?
 					</p>
 				</CardContent>

@@ -14,7 +14,7 @@ export interface SourceTextTranslations {
 	translations: TranslationData[];
 }
 
-export interface LoaderData {
+export interface LatestPageVersionWithTranslations {
 	title: string;
 	url: string;
 	content: string;

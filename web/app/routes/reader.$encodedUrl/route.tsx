@@ -5,12 +5,12 @@ import {
 } from "@remix-run/node";
 import { useLoaderData, useParams } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
+import { getSession } from "~/utils/session.server";
 import { authenticator } from "../../utils/auth.server";
 import { TranslatedContent } from "./components/TranslatedContent";
 import type { TranslationData } from "./types";
 import { fetchLatestPageVersionWithTranslations } from "./utils";
 import { handleAddTranslationAction, handleVoteAction } from "./utils/actions";
-import { getSession } from "~/utils/session.server";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const session = await getSession(request.headers.get("Cookie"));

@@ -26,10 +26,10 @@ const loginSchema = z.object({
 });
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-	const user = await authenticator.isAuthenticated(request, {
+	const safeUser = await authenticator.isAuthenticated(request, {
 		successRedirect: "/",
 	});
-	return user;
+	return json({ safeUser });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {

@@ -5,11 +5,13 @@ import { getOrCreateSourceTextId } from "../../../utils/sourceTextService";
 import { getOrCreateTranslationStatus } from "../../../utils/translationStatus";
 import { getOrCreateAIUser } from "../../../utils/userService";
 import type { NumberedElement } from "../types";
+import { updateUserReadHistory } from "./../../../utils/userReadHistory";
 import { getGeminiModelResponse } from "./gemini";
 
-const MAX_CHUNK_SIZE = 20000;
+const MAX_CHUNK_SIZE = 30000;
 
 export async function translate(
+	userId: number,
 	targetLanguage: string,
 	title: string,
 	numberedContent: string,
@@ -29,6 +31,7 @@ export async function translate(
 		pageVersionId,
 		targetLanguage,
 	);
+	await updateUserReadHistory(userId, pageVersionId, 0);
 
 	if (translationStatus.status === "completed") {
 		return translationStatus.status;

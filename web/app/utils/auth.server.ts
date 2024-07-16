@@ -1,8 +1,8 @@
-import type { User } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { Authenticator, AuthorizationError } from "remix-auth";
 import { FormStrategy } from "remix-auth-form";
 import { GoogleStrategy } from "remix-auth-google";
+import type { SafeUser } from "../types";
 import { prisma } from "./prisma";
 import { sessionStorage } from "./session.server";
 
@@ -12,7 +12,7 @@ if (!SESSION_SECRET) {
 	throw new Error("SESSION_SECRET is not defined");
 }
 
-const authenticator = new Authenticator<Omit<User, "password">>(sessionStorage);
+const authenticator = new Authenticator<SafeUser>(sessionStorage);
 
 const formStrategy = new FormStrategy(async ({ form }) => {
 	const email = form.get("email");
@@ -39,14 +39,13 @@ const formStrategy = new FormStrategy(async ({ form }) => {
 		throw new AuthorizationError("Invalid password");
 	}
 
-	const { password: _, ...userWithoutPassword } = user;
-
-	return userWithoutPassword;
+	const { password: _, geminiApiKey: __, ...safeUser } = user;
+	return safeUser;
 });
 
 authenticator.use(formStrategy, "user-pass");
 
-const googleStrategy = new GoogleStrategy<User>(
+const googleStrategy = new GoogleStrategy<SafeUser>(
 	{
 		clientID: process.env.GOOGLE_CLIENT_ID || "",
 		clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
@@ -57,7 +56,8 @@ const googleStrategy = new GoogleStrategy<User>(
 			where: { email: profile.emails[0].value },
 		});
 		if (user) {
-			return user;
+			const { password, geminiApiKey, ...safeUser } = user;
+			return safeUser as SafeUser;
 		}
 		try {
 			const newUser = await prisma.user.create({
