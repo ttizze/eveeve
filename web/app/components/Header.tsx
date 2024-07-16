@@ -35,7 +35,6 @@ export function Header({ safeUser, targetLanguage }: HeaderProps) {
 						<ModeToggle />
 						{safeUser ? (
 							<>
-								<span className="text-gray-700">Hello, {safeUser.name}!!</span>
 								<Link
 									to="/auth/logout"
 									className="text-gray-600 hover:text-gray-800"

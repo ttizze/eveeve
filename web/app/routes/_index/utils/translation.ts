@@ -2,15 +2,25 @@ import { getOrCreatePageId } from "../../../utils/pageService";
 import { getOrCreatePageVersionId } from "../../../utils/pageVersionService";
 import { prisma } from "../../../utils/prisma";
 import { getOrCreateSourceTextId } from "../../../utils/sourceTextService";
-import { getOrCreateTranslationStatus } from "../../../utils/translationStatus";
 import { getOrCreateAIUser } from "../../../utils/userService";
-import type { NumberedElement } from "../types";
 import { updateUserReadHistory } from "./../../../utils/userReadHistory";
 import { getGeminiModelResponse } from "./gemini";
+import { updatePageVersionTranslationInfoTranslationStatusAndTranslationProgress, getOrCreatePageVersionTranslationInfo } from "./../../../utils/pageVersionTranslationInfo";
+import Queue, { type Queue as QueueType } from "bull";
+import { updatePageVersionTranslationInfoTitle } from "../../../utils/pageVersionTranslationInfo";
+const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
+const createUserTranslationQueue = (userId: number) =>
+	new Queue(`translation-user-${userId}`, REDIS_URL);
+const userTranslationQueues: { [userId: number]: QueueType } = {};
 
 const MAX_CHUNK_SIZE = 30000;
+export type NumberedElement = {
+	number: number;
+	text: string;
+};
 
 export async function translate(
+	geminiApiKey: string,
 	userId: number,
 	targetLanguage: string,
 	title: string,
@@ -18,7 +28,6 @@ export async function translate(
 	numberedElements: NumberedElement[],
 	url: string,
 ): Promise<string> {
-	const allTranslations: NumberedElement[] = [];
 	const pageId = await getOrCreatePageId(url || "");
 	const pageVersionId = await getOrCreatePageVersionId(
 		url,
@@ -27,30 +36,59 @@ export async function translate(
 		pageId,
 	);
 
-	const translationStatus = await getOrCreateTranslationStatus(
+	const pageVersionTranslationInfo = await getOrCreatePageVersionTranslationInfo(
 		pageVersionId,
-		targetLanguage,
+		targetLanguage
 	);
 	await updateUserReadHistory(userId, pageVersionId, 0);
 
-	if (translationStatus.status === "completed") {
-		return translationStatus.status;
+	if (pageVersionTranslationInfo.translationStatus === "completed") {
+		return pageVersionTranslationInfo.translationStatus;
 	}
 
-	const chunks = splitNumberedElements(numberedElements);
-	for (const chunk of chunks) {
-		const translations = await getOrCreateTranslations(
-			chunk,
-			targetLanguage,
-			pageId,
-			pageVersionId,
-			title,
-		);
-		allTranslations.push(...translations);
-	}
-	console.log("allTranslations", allTranslations);
+	const userTranslationQueue = setupUserQueue(userId, geminiApiKey);
+	await userTranslationQueue.add({
+		pageId,
+		pageVersionId,
+		targetLanguage,
+		title,
+		numberedElements,
+	});
 
-	return translationStatus.status;
+	return pageVersionTranslationInfo.translationStatus;
+}
+
+export function setupUserQueue(userId: number, geminiApiKey: string) {
+	if (userTranslationQueues[userId]) {
+		return userTranslationQueues[userId];
+	}
+	const userTranslationQueue = createUserTranslationQueue(userId);
+	userTranslationQueue.process(async (job) => {
+		const { pageId, pageVersionId, targetLanguage, title, numberedElements } =
+			job.data;
+		try {
+			const chunks = splitNumberedElements(numberedElements);
+      const totalChunks = chunks.length;
+      for (let i = 0; i < chunks.length; i++) {
+        await getOrCreateTranslations(
+          geminiApiKey,
+          chunks[i],
+          targetLanguage,
+          pageId,
+          pageVersionId,
+          title,
+        );
+        const progress = ((i + 1) / totalChunks) * 100;
+        await updatePageVersionTranslationInfoTranslationStatusAndTranslationProgress(pageVersionId, targetLanguage,  "in_progress", progress);
+      }
+			await updatePageVersionTranslationInfoTranslationStatusAndTranslationProgress(pageVersionId, targetLanguage,  "completed", 100);
+		} catch (error) {
+			console.error("Background translation job failed:", error);
+			await updatePageVersionTranslationInfoTranslationStatusAndTranslationProgress(pageVersionId, targetLanguage, "failed", 0);
+		}
+	});
+	userTranslationQueues[userId] = userTranslationQueue;
+	return userTranslationQueue;
 }
 
 function splitNumberedElements(
@@ -100,6 +138,7 @@ export function extractTranslations(
 }
 
 async function getOrCreateTranslations(
+	geminiApiKey: string,
 	elements: { number: number; text: string }[],
 	targetLanguage: string,
 	pageId: number,
@@ -122,7 +161,7 @@ async function getOrCreateTranslations(
 	const existingTranslations = await prisma.translateText.findMany({
 		where: {
 			sourceTextId: { in: sourceTextsId },
-			language: targetLanguage,
+			targetLanguage,
 		},
 		orderBy: [{ point: "desc" }, { createdAt: "desc" }],
 	});
@@ -146,6 +185,7 @@ async function getOrCreateTranslations(
 	});
 	if (untranslatedElements.length > 0) {
 		const newTranslations = await translateUntranslatedElements(
+			geminiApiKey,
 			untranslatedElements,
 			targetLanguage,
 			pageId,
@@ -159,6 +199,7 @@ async function getOrCreateTranslations(
 }
 
 async function translateUntranslatedElements(
+	geminiApiKey: string,
 	untranslatedElements: { number: number; text: string }[],
 	targetLanguage: string,
 	pageId: number,
@@ -170,6 +211,7 @@ async function translateUntranslatedElements(
 		.join("\n");
 	const model = "gemini-1.5-pro-latest";
 	const translatedText = await getGeminiModelResponse(
+		geminiApiKey,
 		model,
 		title,
 		source_text,
@@ -177,6 +219,7 @@ async function translateUntranslatedElements(
 	);
 
 	const extractedTranslations = extractTranslations(translatedText);
+  await  updatePageVersionTranslationInfoTitle(pageVersionId, targetLanguage, extractedTranslations[0].text);
 
 	const systemUserId = await getOrCreateAIUser(model);
 
@@ -187,8 +230,8 @@ async function translateUntranslatedElements(
 			)?.text;
 
 			if (!sourceText) {
-				console.error(
-					`Source text not found for translation number ${translation.number}`,
+        console.error(
+          `Source text not found for translation number ${translation.number}`,
 				);
 				return;
 			}
@@ -199,10 +242,9 @@ async function translateUntranslatedElements(
 				pageId,
 				pageVersionId,
 			);
-
 			await prisma.translateText.create({
 				data: {
-					language: targetLanguage,
+					targetLanguage,
 					text: translation.text,
 					sourceTextId,
 					pageId,

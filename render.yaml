@@ -19,3 +19,8 @@ services:
       fromDatabase:
         name: remixdb
         property: connectionString
+
+services:
+  - type: redis
+    name: eveeve-redis
+    ipAllowList: []

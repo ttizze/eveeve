@@ -53,15 +53,17 @@ model Page {
   @@map("pages")
 }
 
-model TranslationStatus {
+model PageVersionTranslationInfo {
   id            Int         @id @default(autoincrement())
   pageVersionId Int         @map("page_version_id")
-  language      String
-  status        String      @default("pending")
+  targetLanguage      String      @map("target_language")
+  translationTitle         String      @map("translation_title")
+  translationStatus        String      @default("pending") @map("translation_status")
+  translationProgress      Int          @default(0) @map("translation_progress")
   pageVersion   PageVersion @relation(fields: [pageVersionId], references: [id])
 
-  @@unique([pageVersionId, language])
-  @@map("translation_status")
+  @@unique([pageVersionId, targetLanguage])
+  @@map("page_version_translation_info")
 }
 
 model PageVersion {
@@ -74,7 +76,7 @@ model PageVersion {
   createdAt         DateTime            @default(now()) @map("created_at")
   page              Page                @relation(fields: [pageId], references: [id])
   sourceTexts       SourceText[]
-  translationStatus TranslationStatus[]
+  pageVersionTranslationInfo PageVersionTranslationInfo[]
   userReadHistory   UserReadHistory[]
 
   @@unique([url, createdAt])
@@ -99,7 +101,7 @@ model SourceText {
 
 model TranslateText {
   id           Int        @id @default(autoincrement())
-  language     String
+  targetLanguage     String
   text         String
   sourceTextId Int        @map("source_text_id")
   pageId       Int        @map("page_id")
