@@ -6,12 +6,13 @@ import {
 import { generateSystemMessage } from "./generateGeminiMessage";
 
 export async function getGeminiModelResponse(
+	geminiApiKey: string,
 	model: string,
 	title: string,
 	source_text: string,
 	target_language: string,
 ) {
-	const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ?? "");
+	const genAI = new GoogleGenerativeAI(geminiApiKey);
 	const safetySetting = [
 		{
 			category: HarmCategory.HARM_CATEGORY_HARASSMENT,

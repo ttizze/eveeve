@@ -39,11 +39,11 @@ export function URLTranslationForm() {
 						/>
 						<div id={fields.url.errorId}>{fields.url.errors}</div>
 					</div>
-					<Button type="submit" disabled={navigation.state === "submitting"}>
+					<Button type="submit" name="intent" value="translateUrl" disabled={navigation.state === "submitting"}>
 						{navigation.state === "submitting" ? (
 							<LoadingSpinner />
 						) : (
-							<Languages className="w-4 h-4 " color="black" />
+							<Languages className="w-4 h-4 "  />
 						)}
 					</Button>
 				</div>

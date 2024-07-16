@@ -24,6 +24,9 @@ import { fetchWithRetry } from "./utils/fetchWithRetry";
 import { validateGeminiApiKey } from "./utils/gemini";
 import { translate } from "./utils/translation";
 import { geminiApiKeySchema } from "./types";
+import type { UserReadHistoryItem } from "./types";
+
+import { UserReadHistoryList } from "./components/UserReadHistoryList";
 
 export const meta: MetaFunction = () => {
 	return [
@@ -36,21 +39,41 @@ export const meta: MetaFunction = () => {
 	];
 };
 
+
 export async function loader({ request }: LoaderFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request);
 	const session = await getSession(request.headers.get("Cookie"));
 	const targetLanguage = session.get("targetLanguage") || "ja";
 
 	let hasGeminiApiKey = false;
+	let userReadHistory: UserReadHistoryItem[] = [];
 	if (safeUser) {
 		const dbUser = await prisma.user.findUnique({ where: { id: safeUser.id } });
 		hasGeminiApiKey = !!dbUser?.geminiApiKey;
-	}
 
-	return typedjson({ safeUser, targetLanguage, hasGeminiApiKey });
+		
+    userReadHistory = await prisma.userReadHistory.findMany({
+      where: { userId: safeUser.id },
+      include: {
+        pageVersion: {
+          include: {
+            page: true,
+            pageVersionTranslationInfo: {
+              where: { targetLanguage }
+            }
+          }
+        }
+      },
+      orderBy: { readAt: 'desc' },
+      take: 10
+    });
+  }
+
+	return typedjson({ safeUser, targetLanguage, hasGeminiApiKey, userReadHistory });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+
 	const formData = await request.clone().formData();
 	switch (formData.get("intent")) {
 		case "SignInWithGoogle":
@@ -93,6 +116,13 @@ export async function action({ request }: ActionFunctionArgs) {
 			if (submission.status !== "success") {
 				return submission.reply();
 			}
+			const dbUser = await prisma.user.findUnique({ where: { id: safeUser.id } });
+			const geminiApiKey = dbUser?.geminiApiKey;
+			if (!geminiApiKey) {
+				return submission.reply({
+					formErrors: ["Gemini API key is not set"],
+				});
+			}
 			const html = await fetchWithRetry(submission.value.url);
 			const { content, title } = extractArticle(html);
 			const numberedContent = addNumbersToContent(content);
@@ -101,6 +131,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			const session = await getSession(request.headers.get("Cookie"));
 			const targetLanguage = session.get("targetLanguage") || "ja";
 			await translate(
+				geminiApiKey,
 				safeUser.id,
 				targetLanguage,
 				title,
@@ -113,8 +144,9 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 }
 export default function Index() {
-	const { safeUser, targetLanguage, hasGeminiApiKey } =
-		useTypedLoaderData<typeof loader>();
+  const { safeUser, targetLanguage, hasGeminiApiKey, userReadHistory } =
+    useTypedLoaderData<typeof loader>();
+
 
 	return (
 		<div>
@@ -136,6 +168,11 @@ export default function Index() {
 							</div>
 						</div>
 					)}
+					{safeUser && hasGeminiApiKey && (
+          <div className="mt-8">
+            <UserReadHistoryList userReadHistory={userReadHistory} />
+          </div>
+        )}
 				</div>
 			</div>
 		</div>
