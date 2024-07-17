@@ -9,7 +9,7 @@ services:
   runtime: node
   repo: https://github.com/ttizze/eveeve
   branch: feature/render
-  plan: free
+  plan: starter
   region: singapore
   buildCommand: bun run install-and-build
   startCommand: bunx prisma migrate deploy && bunx prisma generate && bun run start
@@ -20,7 +20,8 @@ services:
         name: remixdb
         property: connectionString
 
-services:
-  - type: redis
-    name: eveeve-redis
-    ipAllowList: []
+- type: redis
+  name: eveeve-redis
+  plan: free
+  region: singapore
+  ipAllowList: []
