@@ -9,7 +9,7 @@ import { GoogleForm } from "~/components/GoogleForm";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
-import { geminiApiKeySchema } from "../../translate/types";
+import { geminiApiKeySchema } from "../types";
 interface GoogleSignInAndGeminiApiKeyFormProps {
 	isLoggedIn: boolean;
 	hasGeminiApiKey: boolean;

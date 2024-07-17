@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { prisma } from "./prisma";
+import { prisma } from "../utils/prisma";
 
 export async function getOrCreateSourceTextId(
 	text: string,

@@ -8,39 +8,57 @@ datasource db {
 }
 
 model User {
-  id           Int             @id @default(autoincrement())
-  email        String          @unique
-  password     String?
-  name         String
-  plan         String          @default("free")
-  totalPoints  Int             @default(0) @map("total_points")
-  isAI         Boolean         @default(false) @map("is_ai")
-  provider      String          @default("Credentials")
-  geminiApiKey  String?         @map("gemini_api_key")
-  createdAt    DateTime        @default(now()) @map("created_at")
-  updatedAt    DateTime        @updatedAt @map("updated_at")
-  userReadHistory UserReadHistory[]
-  apiUsages    ApiUsage[]
-  translations TranslateText[]
-  votes        Vote[]
+  id                    Int                     @id @default(autoincrement())
+  email                 String                  @unique
+  name                  String
+  image                 String
+  plan                  String                  @default("free")
+  totalPoints           Int                     @default(0) @map("total_points")
+  isAI                  Boolean                 @default(false) @map("is_ai")
+  provider              String                  @default("Credentials")
+  geminiApiKey          String?                 @map("gemini_api_key")
+  createdAt             DateTime                @default(now()) @map("created_at")
+  updatedAt             DateTime                @updatedAt @map("updated_at")
+  userReadHistory       UserReadHistory[]
+  apiUsages             ApiUsage[]
+  translations          TranslateText[]
+  votes                 Vote[]
+  userAITranslationInfo UserAITranslationInfo[]
 
   @@map("users")
 }
+
+model UserAITranslationInfo {
+  id                    Int         @id @default(autoincrement())
+  userId                Int         @map("user_id")
+  pageVersionId         Int         @map("page_version_id")
+  targetLanguage        String      @map("target_language")
+  aiTranslationStatus   String      @default("pending") @map("ai_translation_status")
+  aiTranslationProgress Int         @default(0) @map("ai_translation_progress")
+  lastTranslatedAt      DateTime    @default(now()) @map("last_translated_at")
+  user                  User        @relation(fields: [userId], references: [id])
+  pageVersion           PageVersion @relation(fields: [pageVersionId], references: [id])
+
+  @@unique([userId, pageVersionId, targetLanguage])
+  @@index([userId])
+  @@index([pageVersionId])
+  @@map("user_translation_history")
+}
+
 model UserReadHistory {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @map("user_id")
-  pageVersionId    Int      @map("page_version_id")
-  readAt            DateTime @default(now()) @map("read_at")
-  lastReadDataNumber Int       @default(0) @map("last_read_data_number")
-  user              User     @relation(fields: [userId], references: [id])
-  pageVersion      PageVersion     @relation(fields: [pageVersionId], references: [id])
+  id                 Int         @id @default(autoincrement())
+  userId             Int         @map("user_id")
+  pageVersionId      Int         @map("page_version_id")
+  readAt             DateTime    @default(now()) @map("read_at")
+  lastReadDataNumber Int         @default(0) @map("last_read_data_number")
+  user               User        @relation(fields: [userId], references: [id])
+  pageVersion        PageVersion @relation(fields: [pageVersionId], references: [id])
 
   @@unique([userId, pageVersionId])
   @@index([userId])
   @@index([pageVersionId])
   @@map("user_read_history")
 }
-
 
 model Page {
   id             Int             @id @default(autoincrement())
@@ -54,32 +72,31 @@ model Page {
 }
 
 model PageVersionTranslationInfo {
-  id            Int         @id @default(autoincrement())
-  pageVersionId Int         @map("page_version_id")
-  targetLanguage      String      @map("target_language")
-  translationTitle         String      @map("translation_title")
-  translationStatus        String      @default("pending") @map("translation_status")
-  translationProgress      Int          @default(0) @map("translation_progress")
-  pageVersion   PageVersion @relation(fields: [pageVersionId], references: [id])
+  id               Int         @id @default(autoincrement())
+  pageVersionId    Int         @map("page_version_id")
+  targetLanguage   String      @map("target_language")
+  translationTitle String      @map("translation_title")
+  pageVersion      PageVersion @relation(fields: [pageVersionId], references: [id])
 
   @@unique([pageVersionId, targetLanguage])
   @@map("page_version_translation_info")
 }
 
 model PageVersion {
-  id                Int                 @id @default(autoincrement())
-  url               String
-  title             String
-  content           String
-  contentHash       Bytes               @map("content_hash")
-  pageId            Int                 @map("page_id")
-  createdAt         DateTime            @default(now()) @map("created_at")
-  page              Page                @relation(fields: [pageId], references: [id])
-  sourceTexts       SourceText[]
+  id                         Int                          @id @default(autoincrement())
+  url                        String
+  title                      String
+  content                    String
+  contentHash                Bytes                        @map("content_hash")
+  pageId                     Int                          @map("page_id")
+  createdAt                  DateTime                     @default(now()) @map("created_at")
+  page                       Page                         @relation(fields: [pageId], references: [id])
+  sourceTexts                SourceText[]
   pageVersionTranslationInfo PageVersionTranslationInfo[]
-  userReadHistory   UserReadHistory[]
+  userReadHistory            UserReadHistory[]
+  userAITranslationInfo      UserAITranslationInfo[]
 
-  @@unique([url, createdAt])
+  @@unique([url, contentHash])
   @@map("page_versions")
 }
 
@@ -100,19 +117,19 @@ model SourceText {
 }
 
 model TranslateText {
-  id           Int        @id @default(autoincrement())
-  targetLanguage     String
-  text         String
-  sourceTextId Int        @map("source_text_id")
-  pageId       Int        @map("page_id")
-  userId       Int        @map("user_id")
-  point        Int        @default(0)
-  editCount    Int        @default(0) @map("edit_count")
-  createdAt    DateTime   @default(now()) @map("created_at")
-  page         Page       @relation(fields: [pageId], references: [id])
-  sourceText   SourceText @relation(fields: [sourceTextId], references: [id])
-  user         User       @relation(fields: [userId], references: [id])
-  votes        Vote[]
+  id             Int        @id @default(autoincrement())
+  targetLanguage String
+  text           String
+  sourceTextId   Int        @map("source_text_id")
+  pageId         Int        @map("page_id")
+  userId         Int        @map("user_id")
+  point          Int        @default(0)
+  editCount      Int        @default(0) @map("edit_count")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  page           Page       @relation(fields: [pageId], references: [id])
+  sourceText     SourceText @relation(fields: [sourceTextId], references: [id])
+  user           User       @relation(fields: [userId], references: [id])
+  votes          Vote[]
 
   @@map("translate_texts")
 }

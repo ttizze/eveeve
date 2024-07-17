@@ -1,4 +1,4 @@
-import { prisma } from "./prisma";
+import { prisma } from "../utils/prisma";
 
 export async function updateUserReadHistory(
 	userId: number,

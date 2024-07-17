@@ -4,29 +4,31 @@ import type {
 	LoaderFunctionArgs,
 	MetaFunction,
 } from "@remix-run/node";
-import { json } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { z } from "zod";
 import { Header } from "~/components/Header";
 import { authenticator } from "~/utils/auth.server";
 import { getSession } from "~/utils/session.server";
-import { extractNumberedElements } from "../../utils/extractNumberedElements";
+import { extractNumberedElements } from "../../libs/extractNumberedElements";
 import { prisma } from "../../utils/prisma";
+import { geminiApiKeySchema } from "../translate/types";
+import {
+	type UserAITranslationInfoItem,
+	UserAITranslationInfoSchema,
+} from "../translate/types";
 import { GoogleSignInAndGeminiApiKeyForm } from "./components/GoogleSignInAndGeminiApiKeyForm";
 import {
 	URLTranslationForm,
 	urlTranslationSchema,
 } from "./components/URLTranslationForm";
+import { translate } from "./libs/translation";
 import { addNumbersToContent } from "./utils/addNumbersToContent";
 import { extractArticle } from "./utils/articleUtils";
 import { fetchWithRetry } from "./utils/fetchWithRetry";
 import { validateGeminiApiKey } from "./utils/gemini";
-import { translate } from "./utils/translation";
-import { geminiApiKeySchema } from "./types";
-import type { UserReadHistoryItem } from "./types";
 
-import { UserReadHistoryList } from "./components/UserReadHistoryList";
+import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
 
 export const meta: MetaFunction = () => {
 	return [
@@ -39,41 +41,61 @@ export const meta: MetaFunction = () => {
 	];
 };
 
-
 export async function loader({ request }: LoaderFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request);
 	const session = await getSession(request.headers.get("Cookie"));
 	const targetLanguage = session.get("targetLanguage") || "ja";
 
 	let hasGeminiApiKey = false;
-	let userReadHistory: UserReadHistoryItem[] = [];
+	let userAITranslationInfo: UserAITranslationInfoItem[] = [];
+
 	if (safeUser) {
 		const dbUser = await prisma.user.findUnique({ where: { id: safeUser.id } });
 		hasGeminiApiKey = !!dbUser?.geminiApiKey;
 
-		
-    userReadHistory = await prisma.userReadHistory.findMany({
-      where: { userId: safeUser.id },
-      include: {
-        pageVersion: {
-          include: {
-            page: true,
-            pageVersionTranslationInfo: {
-              where: { targetLanguage }
-            }
-          }
-        }
-      },
-      orderBy: { readAt: 'desc' },
-      take: 10
-    });
-  }
+		const rawTranslationInfo = await prisma.userAITranslationInfo.findMany({
+			where: {
+				userId: safeUser.id,
+				targetLanguage,
+			},
+			include: {
+				pageVersion: {
+					select: {
+						title: true,
+						page: {
+							select: {
+								url: true,
+							},
+						},
+						pageVersionTranslationInfo: {
+							where: {
+								targetLanguage,
+							},
+						},
+					},
+				},
+			},
+			orderBy: {
+				lastTranslatedAt: "desc",
+			},
+			take: 10,
+		});
 
-	return typedjson({ safeUser, targetLanguage, hasGeminiApiKey, userReadHistory });
+		// Validate and transform data
+		userAITranslationInfo = z
+			.array(UserAITranslationInfoSchema)
+			.parse(rawTranslationInfo);
+	}
+
+	return typedjson({
+		safeUser,
+		targetLanguage,
+		hasGeminiApiKey,
+		userAITranslationInfo,
+	});
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-
 	const formData = await request.clone().formData();
 	switch (formData.get("intent")) {
 		case "SignInWithGoogle":
@@ -116,7 +138,9 @@ export async function action({ request }: ActionFunctionArgs) {
 			if (submission.status !== "success") {
 				return submission.reply();
 			}
-			const dbUser = await prisma.user.findUnique({ where: { id: safeUser.id } });
+			const dbUser = await prisma.user.findUnique({
+				where: { id: safeUser.id },
+			});
 			const geminiApiKey = dbUser?.geminiApiKey;
 			if (!geminiApiKey) {
 				return submission.reply({
@@ -144,9 +168,8 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 }
 export default function Index() {
-  const { safeUser, targetLanguage, hasGeminiApiKey, userReadHistory } =
-    useTypedLoaderData<typeof loader>();
-
+	const { safeUser, targetLanguage, hasGeminiApiKey, userAITranslationInfo } =
+		useTypedLoaderData<typeof loader>();
 
 	return (
 		<div>
@@ -169,10 +192,13 @@ export default function Index() {
 						</div>
 					)}
 					{safeUser && hasGeminiApiKey && (
-          <div className="mt-8">
-            <UserReadHistoryList userReadHistory={userReadHistory} />
-          </div>
-        )}
+						<div className="mt-8">
+							<UserAITranslationStatus
+								userAITranslationInfo={userAITranslationInfo}
+								targetLanguage={targetLanguage}
+							/>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>

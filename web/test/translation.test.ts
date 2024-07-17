@@ -1,6 +1,6 @@
 import { createRemixStub } from "@remix-run/testing";
 import { test, vi } from "vitest";
-import { action } from "../app/routes/_index/utils/translation";
+import { action } from "../app/routes/_index/libs/translation";
 
 // モックの translateAndDisplayContent 関数
 vi.mock("./translation", () => ({

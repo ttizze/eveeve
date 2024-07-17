@@ -5,7 +5,7 @@ export const loader = ({ request }: LoaderFunctionArgs) => {
 	try {
 		return authenticator.authenticate("google", request, {
 			successRedirect: "/",
-			failureRedirect: "/auth/login",
+			failureRedirect: "/",
 		});
 	} catch (error) {
 		console.error("Google authentication error:", error);
