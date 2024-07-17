@@ -19,7 +19,6 @@ interface GoogleSignInAndGeminiApiKeyFormProps {
 export function GoogleSignInAndGeminiApiKeyForm({
 	isLoggedIn,
 	hasGeminiApiKey,
-	error,
 }: GoogleSignInAndGeminiApiKeyFormProps) {
 	const lastResult = useActionData<SubmissionResult>();
 	const [form, { geminiApiKey }] = useForm({

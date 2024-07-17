@@ -5,30 +5,13 @@ import type {
 	MetaFunction,
 } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { typedjson, useTypedLoaderData } from "remix-typedjson";
-import { z } from "zod";
-import { Header } from "~/components/Header";
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import { authenticator } from "~/utils/auth.server";
-import { getSession } from "~/utils/session.server";
-import { extractNumberedElements } from "../../libs/extractNumberedElements";
-import { prisma } from "../../utils/prisma";
-import { geminiApiKeySchema } from "../translate/types";
-import {
-	type UserAITranslationInfoItem,
-	UserAITranslationInfoSchema,
-} from "../translate/types";
+import { validateGeminiApiKey } from "~/utils/gemini";
+import { prisma } from "~/utils/prisma";
 import { GoogleSignInAndGeminiApiKeyForm } from "./components/GoogleSignInAndGeminiApiKeyForm";
-import {
-	URLTranslationForm,
-	urlTranslationSchema,
-} from "./components/URLTranslationForm";
-import { translate } from "./libs/translation";
-import { addNumbersToContent } from "./utils/addNumbersToContent";
-import { extractArticle } from "./utils/articleUtils";
-import { fetchWithRetry } from "./utils/fetchWithRetry";
-import { validateGeminiApiKey } from "./utils/gemini";
-
-import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
+import { geminiApiKeySchema } from "./types";
 
 export const meta: MetaFunction = () => {
 	return [
@@ -43,163 +26,67 @@ export const meta: MetaFunction = () => {
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request);
-	const session = await getSession(request.headers.get("Cookie"));
-	const targetLanguage = session.get("targetLanguage") || "ja";
-
-	let hasGeminiApiKey = false;
-	let userAITranslationInfo: UserAITranslationInfoItem[] = [];
-
 	if (safeUser) {
 		const dbUser = await prisma.user.findUnique({ where: { id: safeUser.id } });
-		hasGeminiApiKey = !!dbUser?.geminiApiKey;
-
-		const rawTranslationInfo = await prisma.userAITranslationInfo.findMany({
-			where: {
-				userId: safeUser.id,
-				targetLanguage,
-			},
-			include: {
-				pageVersion: {
-					select: {
-						title: true,
-						page: {
-							select: {
-								url: true,
-							},
-						},
-						pageVersionTranslationInfo: {
-							where: {
-								targetLanguage,
-							},
-						},
-					},
-				},
-			},
-			orderBy: {
-				lastTranslatedAt: "desc",
-			},
-			take: 10,
-		});
-
-		// Validate and transform data
-		userAITranslationInfo = z
-			.array(UserAITranslationInfoSchema)
-			.parse(rawTranslationInfo);
+		if (dbUser?.geminiApiKey) {
+			return redirect("/translate");
+		}
 	}
-
-	return typedjson({
-		safeUser,
-		targetLanguage,
-		hasGeminiApiKey,
-		userAITranslationInfo,
-	});
+	return json({ safeUser, hasGeminiApiKey: false });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-	const formData = await request.clone().formData();
+	const clone = request.clone();
+	const formData = await clone.formData();
 	switch (formData.get("intent")) {
 		case "SignInWithGoogle":
 			return authenticator.authenticate("google", request, {
 				successRedirect: "/",
-				failureRedirect: "/auth/login",
+				failureRedirect: "/",
 			});
 
 		case "saveGeminiApiKey": {
-			const safeUser = await authenticator.isAuthenticated(request);
-			if (!safeUser) {
-				return redirect("/auth/login");
-			}
+			const user = await authenticator.isAuthenticated(request, {
+				failureRedirect: "/",
+			});
 			const submission = parseWithZod(formData, { schema: geminiApiKeySchema });
 			if (submission.status !== "success") {
 				return submission.reply();
 			}
-			const geminiApiKey = formData.get("geminiApiKey") as string;
-			const isValid = await validateGeminiApiKey(geminiApiKey);
+			const isValid = await validateGeminiApiKey(submission.value.geminiApiKey);
 			if (!isValid) {
 				return submission.reply({
 					formErrors: ["Gemini API key validation failed"],
 				});
 			}
 			await prisma.user.update({
-				where: { id: safeUser.id },
+				where: { id: user.id },
 				data: { geminiApiKey: submission.value.geminiApiKey },
 			});
-			return submission.reply();
+			return redirect("/translate");
 		}
 
-		case "translateUrl": {
-			const safeUser = await authenticator.isAuthenticated(request);
-			if (!safeUser) {
-				return redirect("/auth/login");
-			}
-			const submission = parseWithZod(formData, {
-				schema: urlTranslationSchema,
-			});
-			if (submission.status !== "success") {
-				return submission.reply();
-			}
-			const dbUser = await prisma.user.findUnique({
-				where: { id: safeUser.id },
-			});
-			const geminiApiKey = dbUser?.geminiApiKey;
-			if (!geminiApiKey) {
-				return submission.reply({
-					formErrors: ["Gemini API key is not set"],
-				});
-			}
-			const html = await fetchWithRetry(submission.value.url);
-			const { content, title } = extractArticle(html);
-			const numberedContent = addNumbersToContent(content);
-			const extractedNumberedElements =
-				extractNumberedElements(numberedContent);
-			const session = await getSession(request.headers.get("Cookie"));
-			const targetLanguage = session.get("targetLanguage") || "ja";
-			await translate(
-				geminiApiKey,
-				safeUser.id,
-				targetLanguage,
-				title,
-				numberedContent,
-				extractedNumberedElements,
-				submission.value.url,
-			);
-			return submission.reply();
-		}
+		default:
+			return null;
 	}
 }
+
 export default function Index() {
-	const { safeUser, targetLanguage, hasGeminiApiKey, userAITranslationInfo } =
-		useTypedLoaderData<typeof loader>();
+	const { safeUser } = useLoaderData<typeof loader>();
 
 	return (
 		<div>
-			<Header safeUser={safeUser} targetLanguage={targetLanguage} />
 			<div className="container mx-auto max-w-2xl min-h-50 py-10">
-				<div className="relative">
-					<div
-						className={`${!safeUser || !hasGeminiApiKey ? "opacity-30 pointer-events-none" : ""}`}
-					>
-						<URLTranslationForm />
-					</div>
-					{(!safeUser || !hasGeminiApiKey) && (
-						<div className="absolute inset-0 flex items-center justify-center  bg-opacity-70">
-							<div className="w-full max-w-md">
-								<GoogleSignInAndGeminiApiKeyForm
-									isLoggedIn={!!safeUser}
-									hasGeminiApiKey={hasGeminiApiKey}
-								/>
-							</div>
-						</div>
-					)}
-					{safeUser && hasGeminiApiKey && (
-						<div className="mt-8">
-							<UserAITranslationStatus
-								userAITranslationInfo={userAITranslationInfo}
-								targetLanguage={targetLanguage}
-							/>
-						</div>
-					)}
-				</div>
+				<h1 className="text-2xl font-bold text-center">
+					Everyone Translate Everything
+				</h1>
+				<p className="text-sm text-gray-500 text-center">
+					EveEveは、インターネット上のテキストを翻訳できるオープンソースプロジェクトです。
+				</p>
+				<GoogleSignInAndGeminiApiKeyForm
+					isLoggedIn={!!safeUser}
+					hasGeminiApiKey={false}
+				/>
 			</div>
 		</div>
 	);

@@ -1,6 +1,6 @@
 import { Link } from "@remix-run/react";
 import { Form, useSubmit } from "@remix-run/react";
-import { LogIn, LogOut } from "lucide-react"; // Lucide アイコンをインポート
+import { LogIn, LogOut } from "lucide-react";
 import { ModeToggle } from "~/components/dark-mode-toggle";
 import type { SafeUser } from "../types";
 import { TargetLanguageSelect } from "./TargetLanguageSelect";

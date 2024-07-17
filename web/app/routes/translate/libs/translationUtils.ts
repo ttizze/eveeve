@@ -1,10 +1,10 @@
 import { getOrCreatePageVersionTranslationInfo } from "../../../libs/pageVersionTranslationInfo";
 import { getOrCreateSourceTextId } from "../../../libs/sourceTextService";
 import { getOrCreateAIUser } from "../../../libs/userService";
+import { getGeminiModelResponse } from "../../../utils/gemini";
 import { prisma } from "../../../utils/prisma";
 import { AI_MODEL, MAX_CHUNK_SIZE } from "../constants";
 import type { NumberedElement } from "../types";
-import { getGeminiModelResponse } from "../utils/gemini";
 
 export function splitNumberedElements(
 	elements: NumberedElement[],

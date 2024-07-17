@@ -4,12 +4,21 @@ import type { SubmissionResult } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form } from "@remix-run/react";
 import { useActionData } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 import { Save } from "lucide-react";
+import { ExternalLink, Key } from "lucide-react";
 import { GoogleForm } from "~/components/GoogleForm";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "~/components/ui/tooltip";
 import { geminiApiKeySchema } from "../../translate/types";
+
 interface GoogleSignInAndGeminiApiKeyFormProps {
 	isLoggedIn: boolean;
 	hasGeminiApiKey: boolean;
@@ -52,6 +61,31 @@ export function GoogleSignInAndGeminiApiKeyForm({
 				)}
 				{isLoggedIn && !hasGeminiApiKey && (
 					<Form method="post" {...getFormProps(form)}>
+						<div className="text-center mb-4">
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Link
+											to="https://aistudio.google.com/app/apikey"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="inline-flex items-center gap-2 text-blue-500 hover:text-blue-600 transition-colors"
+										>
+											<Button variant="outline" size="sm" className="gap-2">
+												<Key className="w-4 h-4" />
+												<span className="sr-only md:not-sr-only md:inline">
+													Get API Key
+												</span>
+												<ExternalLink className="w-4 h-4" />
+											</Button>
+										</Link>
+									</TooltipTrigger>
+									<TooltipContent>
+										Create your Gemini API Key at Google AI Studio
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+						</div>
 						<div className="space-y-2 flex items-center">
 							<div className="w-full">
 								<Input
