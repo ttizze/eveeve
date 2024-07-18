@@ -1,6 +1,4 @@
-import bcrypt from "bcryptjs";
-import { Authenticator, AuthorizationError } from "remix-auth";
-import { FormStrategy } from "remix-auth-form";
+import { Authenticator } from "remix-auth";
 import { GoogleStrategy } from "remix-auth-google";
 import type { SafeUser } from "../types";
 import { prisma } from "./prisma";
@@ -14,37 +12,6 @@ if (!SESSION_SECRET) {
 
 const authenticator = new Authenticator<SafeUser>(sessionStorage);
 
-const formStrategy = new FormStrategy(async ({ form }) => {
-	const email = form.get("email");
-	const password = form.get("password");
-
-	if (!(email && password)) {
-		throw new Error("Invalid Request");
-	}
-
-	const user = await prisma.user.findUnique({
-		where: { email: String(email) },
-	});
-
-	if (!user) {
-		throw new AuthorizationError("User not found");
-	}
-
-	if (!user.password) {
-		throw new AuthorizationError("User has no password set.");
-	}
-	const passwordsMatch = await bcrypt.compare(String(password), user.password);
-
-	if (!passwordsMatch) {
-		throw new AuthorizationError("Invalid password");
-	}
-
-	const { password: _, geminiApiKey: __, ...safeUser } = user;
-	return safeUser;
-});
-
-authenticator.use(formStrategy, "user-pass");
-
 const googleStrategy = new GoogleStrategy<SafeUser>(
 	{
 		clientID: process.env.GOOGLE_CLIENT_ID || "",
@@ -56,7 +23,7 @@ const googleStrategy = new GoogleStrategy<SafeUser>(
 			where: { email: profile.emails[0].value },
 		});
 		if (user) {
-			const { password, geminiApiKey, ...safeUser } = user;
+			const { geminiApiKey, ...safeUser } = user;
 			return safeUser as SafeUser;
 		}
 		try {
@@ -64,6 +31,7 @@ const googleStrategy = new GoogleStrategy<SafeUser>(
 				data: {
 					email: profile.emails[0].value || "",
 					name: profile.displayName,
+					image: profile.photos[0].value,
 					provider: "google",
 				},
 			});

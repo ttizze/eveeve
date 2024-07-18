@@ -2,8 +2,10 @@ import {
 	GoogleGenerativeAI,
 	HarmBlockThreshold,
 	HarmCategory,
+	FunctionDeclarationSchemaType,
 } from "@google/generative-ai";
 import { generateSystemMessage } from "./generateGeminiMessage";
+const MAX_RETRIES = 3;
 
 export async function getGeminiModelResponse(
 	geminiApiKey: string,
@@ -36,14 +38,50 @@ export async function getGeminiModelResponse(
 		safetySettings: safetySetting,
 		generationConfig: {
 			responseMimeType: "application/json",
+			responseSchema: {
+				type: FunctionDeclarationSchemaType.ARRAY,
+				items: {
+					type: FunctionDeclarationSchemaType.OBJECT,
+					properties: {
+						number: {
+							type: FunctionDeclarationSchemaType.INTEGER,
+						},
+						text: {
+							type: FunctionDeclarationSchemaType.STRING,
+						},
+					},
+					required: ["number", "text"],
+				},
+			},
 		},
 	});
-	const result = await modelConfig.generateContent(
-		generateSystemMessage(title, source_text, target_language),
-	);
-	return result.response.text();
-}
+	let lastError: Error | null = null;
 
+	for (let retryCount = 0; retryCount < MAX_RETRIES; retryCount++) {
+		try {
+			const result = await modelConfig.generateContent(
+				generateSystemMessage(title, source_text, target_language),
+			);
+			console.log("result", result.response.text());
+			return result.response.text();
+		} catch (error: unknown) {
+			const typedError = error as Error;
+			console.error(
+				`Translation attempt ${retryCount + 1} failed:`,
+				typedError,
+			);
+			lastError = typedError;
+
+			if (retryCount < MAX_RETRIES - 1) {
+				const delay = 1000 * (retryCount + 1);
+				console.log(`Retrying in ${delay / 100} seconds...`);
+				await new Promise((resolve) => setTimeout(resolve, delay));
+			}
+		}
+	}
+	console.error("Max retries reached. Translation failed.");
+	throw lastError || new Error("Translation failed after max retries");
+}
 export async function validateGeminiApiKey(apiKey: string): Promise<boolean> {
 	try {
 		const genAI = new GoogleGenerativeAI(apiKey);
