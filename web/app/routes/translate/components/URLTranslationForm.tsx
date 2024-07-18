@@ -6,13 +6,7 @@ import { z } from "zod";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-
-const urlTranslationSchema = z.object({
-	url: z
-		.string()
-		.min(1, { message: "URLを入力してください" })
-		.url("有効なURLを入力してください"),
-});
+import { urlTranslationSchema } from "../types";
 
 export function URLTranslationForm() {
 	const navigation = useNavigation();

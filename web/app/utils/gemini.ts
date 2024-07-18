@@ -2,10 +2,10 @@ import {
 	GoogleGenerativeAI,
 	HarmBlockThreshold,
 	HarmCategory,
+	FunctionDeclarationSchemaType,
 } from "@google/generative-ai";
 import { generateSystemMessage } from "./generateGeminiMessage";
 const MAX_RETRIES = 3;
-const RETRY_DELAY = 5000;
 
 export async function getGeminiModelResponse(
 	geminiApiKey: string,
@@ -38,6 +38,21 @@ export async function getGeminiModelResponse(
 		safetySettings: safetySetting,
 		generationConfig: {
 			responseMimeType: "application/json",
+			responseSchema: {
+				type: FunctionDeclarationSchemaType.ARRAY,
+				items: {
+					type: FunctionDeclarationSchemaType.OBJECT,
+					properties: {
+						number: {
+							type: FunctionDeclarationSchemaType.INTEGER,
+						},
+						text: {
+							type: FunctionDeclarationSchemaType.STRING,
+						},
+					},
+					required: ["number", "text"],
+				},
+			},
 		},
 	});
 	let lastError: Error | null = null;
@@ -59,7 +74,7 @@ export async function getGeminiModelResponse(
 
 			if (retryCount < MAX_RETRIES - 1) {
 				const delay = 1000 * (retryCount + 1);
-				console.log(`Retrying in ${delay / 1000} seconds...`);
+				console.log(`Retrying in ${delay / 100} seconds...`);
 				await new Promise((resolve) => setTimeout(resolve, delay));
 			}
 		}

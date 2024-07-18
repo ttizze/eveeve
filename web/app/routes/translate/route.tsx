@@ -98,7 +98,6 @@ export async function action({ request }: ActionFunctionArgs) {
 	const { content, title } = extractArticle(html);
 	const numberedContent = addNumbersToContent(content);
 	const extractedNumberedElements = extractNumberedElements(numberedContent);
-	console.log("extractedNumberedElements", extractedNumberedElements);
 	const session = await getSession(request.headers.get("Cookie"));
 	const targetLanguage = session.get("targetLanguage") || "ja";
 
@@ -135,10 +134,6 @@ export default function TranslatePage() {
 					<URLTranslationForm />
 				</div>
 				<div>
-					<UserAITranslationStatus
-						userAITranslationInfo={userAITranslationInfo}
-						targetLanguage={targetLanguage}
-					/>
 				</div>
 			</div>
 		</div>

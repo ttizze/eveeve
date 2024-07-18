@@ -14,7 +14,10 @@ export async function getOrCreateUserAITranslationInfo(
 					targetLanguage,
 				},
 			},
-			update: {},
+			update: {
+				aiTranslationStatus: "pending",
+				aiTranslationProgress: 0,
+			},
 			create: {
 				userId,
 				pageVersionId,

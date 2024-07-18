@@ -32,22 +32,35 @@ export function splitNumberedElements(
 	return chunks;
 }
 
-export function extractTranslations(jsonString: string): NumberedElement[] {
+export function extractTranslations(
+	text: string,
+): { number: number; text: string }[] {
 	try {
-		const parsedData = JSON.parse(jsonString);
-
-		if (Array.isArray(parsedData)) {
-			return parsedData.map((item) => ({
-				number: Number(item.number),
-				text: String(item.text),
-			}));
+		// まず、文字列をJSONとしてパースしてみる
+		const parsed = JSON.parse(text);
+		if (Array.isArray(parsed)) {
+			return parsed;
 		}
-		console.error("Parsed data is not an array");
-		return [];
 	} catch (error) {
-		console.error("Failed to parse JSON:", error);
-		return [];
+		console.warn("Failed to parse JSON, falling back to regex parsing", error);
 	}
+
+	const translations: { number: number; text: string }[] = [];
+	const regex =
+		/{\s*"number"\s*:\s*(\d+)\s*,\s*"text"\s*:\s*"((?:\\.|[^"\\])*)"\s*}/g;
+	let match: RegExpExecArray | null;
+
+	while (true) {
+		match = regex.exec(text);
+		if (match === null) break;
+
+		translations.push({
+			number: Number.parseInt(match[1], 10),
+			text: match[2],
+		});
+	}
+
+	return translations;
 }
 
 export async function getOrCreateTranslations(
@@ -123,6 +136,7 @@ async function translateUntranslatedElements(
 	const source_text = untranslatedElements
 		.map((el) => JSON.stringify(el))
 		.join("\n");
+	console.log("untranslatedText", source_text);
 	const translatedText = await getGeminiModelResponse(
 		geminiApiKey,
 		AI_MODEL,
@@ -132,6 +146,7 @@ async function translateUntranslatedElements(
 	);
 
 	const extractedTranslations = extractTranslations(translatedText);
+	console.log("extractedNowTranslations", extractedTranslations);
 	await getOrCreatePageVersionTranslationInfo(
 		pageVersionId,
 		targetLanguage,

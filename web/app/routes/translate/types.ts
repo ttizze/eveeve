@@ -4,6 +4,13 @@ export const geminiApiKeySchema = z.object({
 	geminiApiKey: z.string().min(1, "API key is required"),
 });
 
+export const urlTranslationSchema = z.object({
+	url: z
+		.string()
+		.min(1, { message: "URLを入力してください" })
+		.url("有効なURLを入力してください"),
+});
+
 export const PageVersionTranslationInfoSchema = z.object({
 	id: z.number(),
 	pageVersionId: z.number(),

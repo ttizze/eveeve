@@ -60,10 +60,20 @@ export async function processTranslationJob(
 ) {
 	const { pageId, pageVersionId, targetLanguage, title, numberedElements } =
 		job.data;
+	await updateUserAITranslationInfo(
+		userId,
+		pageVersionId,
+		targetLanguage,
+		"in_progress",
+		0,
+	);
 	try {
 		const chunks = splitNumberedElements(numberedElements);
 		const totalChunks = chunks.length;
 		for (let i = 0; i < chunks.length; i++) {
+			console.log(`Processing chunk ${i + 1} of ${totalChunks}`);
+			console.log("Chunk content:", JSON.stringify(chunks[i], null, 2));
+
 			await getOrCreateTranslations(
 				geminiApiKey,
 				chunks[i],
