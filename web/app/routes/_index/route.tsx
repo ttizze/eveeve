@@ -12,6 +12,8 @@ import { validateGeminiApiKey } from "~/utils/gemini";
 import { prisma } from "~/utils/prisma";
 import { GoogleSignInAndGeminiApiKeyForm } from "./components/GoogleSignInAndGeminiApiKeyForm";
 import { geminiApiKeySchema } from "./types";
+import { Header } from "~/components/Header";
+import { typedjson, useTypedLoaderData } from "remix-typedjson";
 
 export const meta: MetaFunction = () => {
 	return [
@@ -29,10 +31,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	if (safeUser) {
 		const dbUser = await prisma.user.findUnique({ where: { id: safeUser.id } });
 		if (dbUser?.geminiApiKey) {
-			return redirect("/translate");
+			redirect("/translate");
 		}
 	}
-	return json({ safeUser, hasGeminiApiKey: false });
+	return typedjson({ safeUser, hasGeminiApiKey: false });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -72,10 +74,12 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Index() {
-	const { safeUser } = useLoaderData<typeof loader>();
+	const { safeUser } = useTypedLoaderData<typeof loader>();
+	const targetLanguage = window.navigator.language || "ja";
 
 	return (
 		<div>
+				<Header safeUser={safeUser} targetLanguage={targetLanguage} />
 			<div className="container mx-auto max-w-2xl min-h-50 py-10">
 				<h1 className="text-2xl font-bold text-center">
 					Everyone Translate Everything
