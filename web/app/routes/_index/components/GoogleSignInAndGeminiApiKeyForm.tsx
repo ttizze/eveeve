@@ -18,7 +18,8 @@ import {
 	TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { geminiApiKeySchema } from "../../translate/types";
-
+import { useNavigation } from "@remix-run/react";
+import { LoadingSpinner } from "~/components/LoadingSpinner";
 interface GoogleSignInAndGeminiApiKeyFormProps {
 	isLoggedIn: boolean;
 	hasGeminiApiKey: boolean;
@@ -31,6 +32,8 @@ export function GoogleSignInAndGeminiApiKeyForm({
 	error,
 }: GoogleSignInAndGeminiApiKeyFormProps) {
 	const lastResult = useActionData<SubmissionResult>();
+	const navigation = useNavigation();
+
 	const [form, { geminiApiKey }] = useForm({
 		id: "gemini-api-key-form",
 		lastResult,
@@ -102,8 +105,9 @@ export function GoogleSignInAndGeminiApiKeyForm({
 								name="intent"
 								value="saveGeminiApiKey"
 								size="icon"
+								disabled={navigation.state === "submitting"}
 							>
-								<Save className="w-4 h-4" />
+								{navigation.state === "submitting" ? <LoadingSpinner/> : <Save className="w-4 h-4" />}
 							</Button>
 						</div>
 						<div id={geminiApiKey.errorId} className="text-red-500 text-center">
