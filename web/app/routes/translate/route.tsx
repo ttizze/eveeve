@@ -1,8 +1,8 @@
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { useRevalidator } from "@remix-run/react";
+import { useEffect } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { z } from "zod";
 import { Header } from "~/components/Header";
@@ -14,7 +14,6 @@ import {
 	URLTranslationForm,
 	urlTranslationSchema,
 } from "./components/URLTranslationForm";
-import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
 import { translate } from "./libs/translation";
 import {
 	type UserAITranslationInfoItem,
@@ -23,7 +22,6 @@ import {
 import { addNumbersToContent } from "./utils/addNumbersToContent";
 import { extractArticle } from "./utils/extractArticle";
 import { fetchWithRetry } from "./utils/fetchWithRetry";
-import { useRevalidator } from "@remix-run/react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
@@ -115,17 +113,17 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function TranslatePage() {
-  const { safeUser, targetLanguage, userAITranslationInfo } =
-    useTypedLoaderData<typeof loader>();
-    const revalidator = useRevalidator();
+	const { safeUser, targetLanguage, userAITranslationInfo } =
+		useTypedLoaderData<typeof loader>();
+	const revalidator = useRevalidator();
 
-    useEffect(() => {
-      const intervalId = setInterval(() => {
-        revalidator.revalidate();
-      }, 5000);
-  
-      return () => clearInterval(intervalId);
-    }, [revalidator]);
+	useEffect(() => {
+		const intervalId = setInterval(() => {
+			revalidator.revalidate();
+		}, 5000);
+
+		return () => clearInterval(intervalId);
+	}, [revalidator]);
 	return (
 		<div>
 			<Header safeUser={safeUser} targetLanguage={targetLanguage} />
@@ -133,8 +131,7 @@ export default function TranslatePage() {
 				<div className="pb-4">
 					<URLTranslationForm />
 				</div>
-				<div>
-				</div>
+				<div></div>
 			</div>
 		</div>
 	);

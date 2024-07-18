@@ -1,17 +1,17 @@
+import { useForm } from "@conform-to/react";
+import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Link } from "@remix-run/react";
+import { Form } from "@remix-run/react";
+import { useNavigation } from "@remix-run/react";
+import { RotateCcw } from "lucide-react";
+import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Progress } from "~/components/ui/progress";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import type { UserAITranslationInfoItem } from "../types";
-import { Button } from "~/components/ui/button";
-import { Form } from "@remix-run/react";
-import { useNavigation } from "@remix-run/react";
-import { LoadingSpinner } from "~/components/LoadingSpinner";
-import { RotateCcw } from 'lucide-react';
 import { urlTranslationSchema } from "../types";
-import { useForm } from "@conform-to/react";
-import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 
 type UserAITranslationStatusProps = {
 	userAITranslationInfo: UserAITranslationInfoItem[];
@@ -22,7 +22,6 @@ export function UserAITranslationStatus({
 	userAITranslationInfo = [],
 	targetLanguage,
 }: UserAITranslationStatusProps) {
-
 	const navigation = useNavigation();
 	const [form, fields] = useForm({
 		id: "url-re-translation-form",
@@ -55,9 +54,13 @@ export function UserAITranslationStatus({
 				<ScrollArea className="h-[300px]">
 					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
 						{userAITranslationInfo.map((item) => {
-							const translationInfo = item.pageVersion.pageVersionTranslationInfo?.[0];
+							const translationInfo =
+								item.pageVersion.pageVersionTranslationInfo?.[0];
 							return (
-								<Card key={item.id} className="flex flex-col hover:shadow-md transition-shadow duration-200">
+								<Card
+									key={item.id}
+									className="flex flex-col hover:shadow-md transition-shadow duration-200"
+								>
 									<CardHeader>
 										<CardTitle className="text-sm truncate flex flex-col h-10">
 											{item.pageVersion.title}
@@ -93,7 +96,11 @@ export function UserAITranslationStatus({
 												View
 											</Link>
 											<Form method="post">
-												<input type="hidden" name="url" value={item.pageVersion.page.url} />
+												<input
+													type="hidden"
+													name="url"
+													value={item.pageVersion.page.url}
+												/>
 												<Button
 													type="submit"
 													name="intent"
