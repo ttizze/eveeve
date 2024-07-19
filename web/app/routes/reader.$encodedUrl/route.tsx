@@ -3,8 +3,10 @@ import {
 	type LoaderFunctionArgs,
 	json,
 } from "@remix-run/node";
-import { useLoaderData, useParams } from "@remix-run/react";
+import { useParams } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
+import { typedjson, useTypedLoaderData } from "remix-typedjson";
+import { Header } from "~/components/Header";
 import { getSession } from "~/utils/session.server";
 import { authenticator } from "../../utils/auth.server";
 import { TranslatedContent } from "./components/TranslatedContent";
@@ -14,32 +16,32 @@ import { handleAddTranslationAction, handleVoteAction } from "./utils/actions";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const session = await getSession(request.headers.get("Cookie"));
-	const language = session.get("language") || "ja";
+	const targetLanguage = session.get("targetLanguage") || "ja";
 
 	const { encodedUrl } = params;
 	if (!encodedUrl) {
 		throw new Response("Missing URL parameter", { status: 400 });
 	}
-	const user = await authenticator.isAuthenticated(request);
-	const userId = user?.id;
+	const safeUser = await authenticator.isAuthenticated(request);
+	const safeUserId = safeUser?.id;
 	const pageData = await fetchLatestPageVersionWithTranslations(
 		decodeURIComponent(encodedUrl),
-		userId ?? 0,
-		language,
+		safeUserId ?? 0,
+		targetLanguage,
 	);
 
 	if (!pageData) {
 		throw new Response("Failed to fetch article", { status: 500 });
 	}
 
-	return json(pageData);
+	return typedjson({ pageData, safeUser, targetLanguage });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-	const user = await authenticator.isAuthenticated(request);
-	const userId = user?.id;
+	const safeUser = await authenticator.isAuthenticated(request);
+	const safeUserId = safeUser?.id;
 
-	if (!userId) {
+	if (!safeUserId) {
 		return json({ error: "User not authenticated" }, { status: 401 });
 	}
 
@@ -48,9 +50,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 	switch (action) {
 		case "vote":
-			return handleVoteAction(formData, userId);
+			return handleVoteAction(formData, safeUserId);
 		case "addTranslation":
-			return handleAddTranslationAction(formData, userId);
+			return handleAddTranslationAction(formData, safeUserId);
 		default:
 			return json({ error: "Invalid action" }, { status: 400 });
 	}
@@ -58,11 +60,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function ReaderView() {
 	const { encodedUrl } = useParams();
-	const { title, url, content, translations, userId } =
-		useLoaderData<typeof loader>();
+	const { pageData, safeUser, targetLanguage } =
+		useTypedLoaderData<typeof loader>();
 	const fetcher = useFetcher();
 
-	if (!title || !url || !content || !translations) {
+	if (!pageData) {
 		return <div>Loading...</div>;
 	}
 
@@ -89,33 +91,37 @@ export default function ReaderView() {
 		);
 	};
 	return (
-		<div className="container mx-auto px-4 py-8">
-			<article className="prose lg:prose-xl mx-auto max-w-3xl">
-				<h1 className="text-center">{title}</h1>
-				<p>
-					<a
-						href={originalUrl}
-						target="_blank"
-						rel="noopener noreferrer"
-						className="text-blue-500 hover:underline"
-					>
-						Original Article
-					</a>
-				</p>
-				<TranslatedContent
-					content={content}
-					translations={
-						translations as Array<{
-							number: number;
-							translations: TranslationData[];
-						}>
-					}
-					targetLanguage="ja"
-					onVote={handleVote}
-					onAdd={handleAddTranslation}
-					userId={userId ?? null}
-				/>
-			</article>
+		<div>
+			<Header safeUser={safeUser} targetLanguage={targetLanguage} />
+			<div className="container mx-auto px-4 py-8">
+				<article className="prose dark:prose-invert lg:prose-xl mx-auto max-w-3xl">
+					<h1>{pageData.title}</h1>
+					<p>
+						<a
+							href={originalUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-blue-500 hover:underline"
+						>
+							Original Article
+						</a>
+					</p>
+					<hr />
+					<TranslatedContent
+						content={pageData.content}
+						translations={
+							pageData.translations as Array<{
+								number: number;
+								translations: TranslationData[];
+							}>
+						}
+						targetLanguage="ja"
+						onVote={handleVote}
+						onAdd={handleAddTranslation}
+						userId={safeUser?.id ?? null}
+					/>
+				</article>
+			</div>
 		</div>
 	);
 }

@@ -2,7 +2,6 @@ import { getOrCreatePageVersionTranslationInfo } from "../../../libs/pageVersion
 import { getOrCreateSourceTextId } from "../../../libs/sourceTextService";
 import { getOrCreateAIUser } from "../../../libs/userService";
 import { getGeminiModelResponse } from "../../../utils/gemini";
-import { getVertexAIModelResponse } from "../../../utils/vertexai";
 import { prisma } from "../../../utils/prisma";
 import { AI_MODEL, MAX_CHUNK_SIZE } from "../constants";
 import type { NumberedElement } from "../types";
@@ -137,7 +136,6 @@ async function translateUntranslatedElements(
 	const source_text = untranslatedElements
 		.map((el) => JSON.stringify(el))
 		.join("\n");
-	console.log("untranslatedText", source_text);
 	const translatedText = await getGeminiModelResponse(
 		geminiApiKey,
 		AI_MODEL,
@@ -147,7 +145,6 @@ async function translateUntranslatedElements(
 	);
 
 	const extractedTranslations = extractTranslations(translatedText);
-	console.log("extractedNowTranslations", extractedTranslations);
 	await getOrCreatePageVersionTranslationInfo(
 		pageVersionId,
 		targetLanguage,

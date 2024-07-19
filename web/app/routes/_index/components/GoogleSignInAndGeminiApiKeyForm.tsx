@@ -5,9 +5,11 @@ import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form } from "@remix-run/react";
 import { useActionData } from "@remix-run/react";
 import { Link } from "@remix-run/react";
+import { useNavigation } from "@remix-run/react";
 import { Save } from "lucide-react";
 import { ExternalLink, Key } from "lucide-react";
 import { GoogleForm } from "~/components/GoogleForm";
+import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
@@ -18,8 +20,6 @@ import {
 	TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { geminiApiKeySchema } from "../../translate/types";
-import { useNavigation } from "@remix-run/react";
-import { LoadingSpinner } from "~/components/LoadingSpinner";
 interface GoogleSignInAndGeminiApiKeyFormProps {
 	isLoggedIn: boolean;
 	hasGeminiApiKey: boolean;
@@ -107,7 +107,11 @@ export function GoogleSignInAndGeminiApiKeyForm({
 								size="icon"
 								disabled={navigation.state === "submitting"}
 							>
-								{navigation.state === "submitting" ? <LoadingSpinner/> : <Save className="w-4 h-4" />}
+								{navigation.state === "submitting" ? (
+									<LoadingSpinner />
+								) : (
+									<Save className="w-4 h-4" />
+								)}
 							</Button>
 						</div>
 						<div id={geminiApiKey.errorId} className="text-red-500 text-center">

@@ -1,3 +1,4 @@
+import parse from "html-react-parser";
 import { Edit, Plus, X } from "lucide-react";
 import { Save, Trash } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
@@ -70,7 +71,7 @@ export function Translation({
 			className="notranslate mt-2 p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200 group relative"
 		>
 			<div className="text-lg font-medium text-gray-800">
-				{bestTranslation.text}
+				{parse(bestTranslation.text.replace(/(\r\n|\n|\\n)/g, "<br />"))}
 			</div>
 			<Button
 				variant="outline"

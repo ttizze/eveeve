@@ -6,8 +6,17 @@ import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { urlTranslationSchema } from "../types";
+import { AIModelSelector } from "./AIModelSelector";
 
-export function URLTranslationForm() {
+export function URLTranslationForm({
+	hasGeminiApiKey,
+	hasOpenAIApiKey,
+	hasClaudeApiKey,
+}: {
+	hasGeminiApiKey: boolean;
+	hasOpenAIApiKey: boolean;
+	hasClaudeApiKey: boolean;
+}) {
 	const navigation = useNavigation();
 
 	const [form, fields] = useForm({
@@ -23,15 +32,20 @@ export function URLTranslationForm() {
 	return (
 		<div className="space-y-4">
 			<Form method="post" {...getFormProps(form)} className="space-y-4">
-				<div className="flex space-x-2">
-					<div className="flex-col flex-grow">
+				<div className="flex">
+					<div className="flex-col flex-grow w-full">
 						<Input
-							className="bg-gray-800 text-white"
+							className="bg-gray-800 text-white w-full"
 							placeholder="https://example.com"
 							{...getInputProps(fields.url, { type: "url" })}
 						/>
 						<div id={fields.url.errorId}>{fields.url.errors}</div>
 					</div>
+					<AIModelSelector
+						hasGeminiApiKey={hasGeminiApiKey}
+						hasOpenAIApiKey={hasOpenAIApiKey}
+						hasClaudeApiKey={hasClaudeApiKey}
+					/>
 					<Button
 						type="submit"
 						name="intent"

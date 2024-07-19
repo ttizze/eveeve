@@ -1,6 +1,5 @@
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
 import { useRevalidator } from "@remix-run/react";
 import { useEffect } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
@@ -14,6 +13,7 @@ import {
 	URLTranslationForm,
 	urlTranslationSchema,
 } from "./components/URLTranslationForm";
+import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
 import { translate } from "./libs/translation";
 import {
 	type UserAITranslationInfoItem,
@@ -22,16 +22,24 @@ import {
 import { addNumbersToContent } from "./utils/addNumbersToContent";
 import { extractArticle } from "./utils/extractArticle";
 import { fetchWithRetry } from "./utils/fetchWithRetry";
-import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/",
 	});
+	let hasGeminiApiKey = false;
+	let hasOpenAIApiKey = false;
+	let hasClaudeApiKey = false;
 
 	const dbUser = await prisma.user.findUnique({ where: { id: safeUser.id } });
-	if (!dbUser?.geminiApiKey) {
-		redirect("/");
+	if (dbUser?.geminiApiKey) {
+		hasGeminiApiKey = true;
+	}
+	if (dbUser?.openAIApiKey) {
+		hasOpenAIApiKey = true;
+	}
+	if (dbUser?.claudeApiKey) {
+		hasClaudeApiKey = true;
 	}
 
 	const session = await getSession(request.headers.get("Cookie"));
@@ -74,6 +82,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		safeUser,
 		targetLanguage,
 		userAITranslationInfo,
+		hasGeminiApiKey,
+		hasOpenAIApiKey,
+		hasClaudeApiKey,
 	});
 }
 
@@ -94,7 +105,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 
 	const html = await fetchWithRetry(submission.value.url);
-	const { content, title } = extractArticle(html);
+	const { content, title } = extractArticle(html, submission.value.url);
 	const numberedContent = addNumbersToContent(content);
 	const extractedNumberedElements = extractNumberedElements(numberedContent);
 	const session = await getSession(request.headers.get("Cookie"));
@@ -114,8 +125,14 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function TranslatePage() {
-	const { safeUser, targetLanguage, userAITranslationInfo } =
-		useTypedLoaderData<typeof loader>();
+	const {
+		safeUser,
+		targetLanguage,
+		userAITranslationInfo,
+		hasGeminiApiKey,
+		hasOpenAIApiKey,
+		hasClaudeApiKey,
+	} = useTypedLoaderData<typeof loader>();
 	const revalidator = useRevalidator();
 
 	useEffect(() => {
@@ -127,15 +144,22 @@ export default function TranslatePage() {
 	}, [revalidator]);
 	return (
 		<div>
-			<Header safeUser={safeUser} targetLanguage={targetLanguage} />
+			<Header safeUser={safeUser} />
 			<div className="container mx-auto max-w-2xl min-h-50 py-10">
 				<div className="pb-4">
-					<URLTranslationForm />
+					<URLTranslationForm
+						hasGeminiApiKey={hasGeminiApiKey}
+						hasOpenAIApiKey={hasOpenAIApiKey}
+						hasClaudeApiKey={hasClaudeApiKey}
+					/>
 				</div>
 				<div>
 					<h2 className="text-2xl font-bold">Translation history</h2>
 					<div>
-						<UserAITranslationStatus userAITranslationInfo={userAITranslationInfo} targetLanguage={targetLanguage} />
+						<UserAITranslationStatus
+							userAITranslationInfo={userAITranslationInfo}
+							targetLanguage={targetLanguage}
+						/>
 					</div>
 				</div>
 			</div>

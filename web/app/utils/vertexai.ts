@@ -1,9 +1,4 @@
-import {
-	FunctionDeclarationSchemaType,
-	HarmBlockThreshold,
-	HarmCategory,
-	VertexAI,
-} from "@google-cloud/vertexai";
+import { VertexAI } from "@google-cloud/vertexai";
 import { generateSystemMessage } from "../utils/generateGeminiMessage";
 
 export async function getVertexAIModelResponse(

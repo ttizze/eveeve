@@ -17,6 +17,8 @@ model User {
   isAI                  Boolean                 @default(false) @map("is_ai")
   provider              String                  @default("Credentials")
   geminiApiKey          String?                 @map("gemini_api_key")
+  openAIApiKey          String?                 @map("openai_api_key")
+  claudeApiKey          String?                 @map("claude_api_key")
   createdAt             DateTime                @default(now()) @map("created_at")
   updatedAt             DateTime                @updatedAt @map("updated_at")
   userReadHistory       UserReadHistory[]
@@ -24,6 +26,7 @@ model User {
   translations          TranslateText[]
   votes                 Vote[]
   userAITranslationInfo UserAITranslationInfo[]
+  customAIModels        CustomAIModel[]
 
   @@map("users")
 }
@@ -156,4 +159,18 @@ model ApiUsage {
   user       User     @relation(fields: [userId], references: [id])
 
   @@map("api_usage")
+}
+
+
+model CustomAIModel {
+  id        String   @id @default(cuid())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  name      String
+  apiKey    String
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, name])
 }

@@ -1,4 +1,3 @@
-import type { Job } from "bull";
 import { getOrCreatePageId } from "../../../libs/pageService";
 import { getOrCreatePageVersionId } from "../../../libs/pageVersion";
 import {
@@ -11,7 +10,6 @@ import {
 	getOrCreateTranslations,
 	splitNumberedElements,
 } from "./translationUtils";
-import { setupUserQueue } from "./userTranslationqueueService";
 
 export async function translate(
 	geminiApiKey: string,
@@ -41,7 +39,15 @@ export async function translate(
 		return userAITranslationHistory.aiTranslationStatus;
 	}
 
-	await processTranslation(geminiApiKey, userId, pageId, pageVersionId, targetLanguage, title, numberedElements);
+	await processTranslation(
+		geminiApiKey,
+		userId,
+		pageId,
+		pageVersionId,
+		targetLanguage,
+		title,
+		numberedElements,
+	);
 
 	return userAITranslationHistory.aiTranslationStatus;
 }
@@ -67,7 +73,6 @@ export async function processTranslation(
 		const totalChunks = chunks.length;
 		for (let i = 0; i < chunks.length; i++) {
 			console.log(`Processing chunk ${i + 1} of ${totalChunks}`);
-			console.log("Chunk content:", JSON.stringify(chunks[i], null, 2));
 
 			await getOrCreateTranslations(
 				geminiApiKey,
