@@ -22,6 +22,7 @@ import {
 import { addNumbersToContent } from "./utils/addNumbersToContent";
 import { extractArticle } from "./utils/extractArticle";
 import { fetchWithRetry } from "./utils/fetchWithRetry";
+import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
@@ -131,7 +132,12 @@ export default function TranslatePage() {
 				<div className="pb-4">
 					<URLTranslationForm />
 				</div>
-				<div></div>
+				<div>
+					<h2 className="text-2xl font-bold">Translation history</h2>
+					<div>
+						<UserAITranslationStatus userAITranslationInfo={userAITranslationInfo} targetLanguage={targetLanguage} />
+					</div>
+				</div>
 			</div>
 		</div>
 	);

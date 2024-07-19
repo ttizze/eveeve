@@ -2,6 +2,7 @@ import { getOrCreatePageVersionTranslationInfo } from "../../../libs/pageVersion
 import { getOrCreateSourceTextId } from "../../../libs/sourceTextService";
 import { getOrCreateAIUser } from "../../../libs/userService";
 import { getGeminiModelResponse } from "../../../utils/gemini";
+import { getVertexAIModelResponse } from "../../../utils/vertexai";
 import { prisma } from "../../../utils/prisma";
 import { AI_MODEL, MAX_CHUNK_SIZE } from "../constants";
 import type { NumberedElement } from "../types";
@@ -150,7 +151,7 @@ async function translateUntranslatedElements(
 	await getOrCreatePageVersionTranslationInfo(
 		pageVersionId,
 		targetLanguage,
-		extractedTranslations[0].text,
+		extractedTranslations[1].text,
 	);
 
 	const systemUserId = await getOrCreateAIUser(AI_MODEL);
