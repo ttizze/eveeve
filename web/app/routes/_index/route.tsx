@@ -1,15 +1,17 @@
+import { parseWithZod } from "@conform-to/zod";
 import type {
 	ActionFunctionArgs,
 	LoaderFunctionArgs,
 	MetaFunction,
 } from "@remix-run/node";
-import { Form } from "@remix-run/react";
-import { FaDiscord, FaGithub } from "react-icons/fa"; // react-iconsをインストールしてください
+import { redirect } from "@remix-run/node";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
+import { authenticator } from "~/utils/auth.server";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
-import { authenticator } from "~/utils/auth.server";
+import { FaGithub, FaDiscord } from 'react-icons/fa'; // react-iconsをインストールしてください
+import { Form } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
 	return [
@@ -39,7 +41,7 @@ export default function Index() {
 
 	return (
 		<div className="min-h-screen bg-gradient-to-b ">
-			<Header safeUser={safeUser} />
+			<Header safeUser={safeUser}/>
 			<main className="container mx-auto px-4 py-20">
 				<div className="max-w-4xl mx-auto text-center">
 					<h1 className="text-5xl font-bold mb-6">
@@ -61,20 +63,10 @@ export default function Index() {
 						</Form>
 					</div>
 					<div className="flex justify-center gap-6">
-						<a
-							href="https://github.com/ttizze/eveeve"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="  transition-colors"
-						>
+						<a href="https://github.com/ttizze/eveeve" target="_blank" rel="noopener noreferrer" className="  transition-colors">
 							<FaGithub size={24} />
 						</a>
-						<a
-							href="https://discord.gg/2JfhZdu9zW"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="  transition-colors"
-						>
+						<a href="https://discord.gg/2JfhZdu9zW" target="_blank" rel="noopener noreferrer" className="  transition-colors">
 							<FaDiscord size={24} />
 						</a>
 					</div>
