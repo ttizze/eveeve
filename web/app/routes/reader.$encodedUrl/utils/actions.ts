@@ -46,6 +46,7 @@ export async function handleVoteAction(formData: FormData, userId: number) {
 export async function handleAddTranslationAction(
 	formData: FormData,
 	userId: number,
+	targetLanguage: string,
 ) {
 	const sourceTextId = Number(formData.get("sourceTextId"));
 	const text = String(formData.get("text"));
@@ -58,7 +59,7 @@ export async function handleAddTranslationAction(
 	if (sourceText) {
 		await prisma.translateText.create({
 			data: {
-				language: "ja",
+				targetLanguage,
 				text,
 				sourceTextId,
 				pageId: sourceText.page.id,

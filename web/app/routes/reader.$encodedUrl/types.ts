@@ -11,6 +11,7 @@ export type TranslationData = Pick<TranslateText, "id" | "text" | "point"> & {
 
 export interface SourceTextTranslations {
 	number: number;
+	sourceTextId: number;
 	translations: TranslationData[];
 }
 

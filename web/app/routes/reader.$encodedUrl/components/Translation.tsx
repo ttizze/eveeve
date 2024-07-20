@@ -13,7 +13,7 @@ interface TranslationProps {
 	translations: TranslationData[];
 	targetLanguage: string;
 	onVote: (translationId: number, isUpvote: boolean) => void;
-	onAdd: (text: string) => void;
+	onAdd: (sourceTextId: number, text: string) => void;
 	userId: number | null;
 	sourceTextId: number;
 }
@@ -24,11 +24,11 @@ export function Translation({
 	onVote,
 	onAdd,
 	userId,
+	sourceTextId,
 }: TranslationProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
 	const [editText, setEditText] = useState("");
-
 	const ref = useClickOutside(() => setIsExpanded(false));
 
 	const bestTranslation = useMemo(() => {
@@ -53,25 +53,25 @@ export function Translation({
 	);
 
 	const handleVote = useCallback(
-		(isUpvote: boolean) => {
-			onVote(bestTranslation.id, isUpvote);
+		(translationId: number, isUpvote: boolean) => {
+			onVote(translationId, isUpvote);
 		},
-		[onVote, bestTranslation.id],
+		[onVote],
 	);
 
 	const handleAdd = useCallback(() => {
-		onAdd(editText);
+		onAdd(sourceTextId, editText);
 		setIsEditing(false);
 		setEditText("");
-	}, [onAdd, editText]);
+	}, [onAdd, editText, sourceTextId]);
 
 	return (
 		<div
 			ref={ref}
 			lang={targetLanguage}
-			className="notranslate mt-2 p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200 group relative"
+			className="notranslate mt-2 p-4  rounded-lg shadow-sm border border-gray-200 group relative"
 		>
-			<div className="text-lg font-medium text-gray-800">
+			<div className="text-lg font-medium ">
 				{parse(
 					DOMPurify.sanitize(
 						bestTranslation.text.replace(/(\r\n|\n|\\n)/g, "<br />"),
@@ -93,7 +93,7 @@ export function Translation({
 				<div className="">
 					<VoteButtons
 						translation={bestTranslation}
-						onVote={handleVote}
+						onVote={(isUpvote) => handleVote(bestTranslation.id, isUpvote)}
 						userId={userId}
 					/>
 					{alternativeTranslations.length > 0 && (
@@ -139,7 +139,7 @@ export function Translation({
 									<Textarea
 										value={editText}
 										onChange={(e) => setEditText(e.target.value)}
-										className="w-full mb-2 bg-white border-gray-300 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+										className="w-full mb-2  focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
 										placeholder="Enter your translation..."
 									/>
 									<div className="space-x-2 flex justify-end">

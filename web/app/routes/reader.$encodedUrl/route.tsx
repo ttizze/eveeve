@@ -40,6 +40,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
 	const safeUser = await authenticator.isAuthenticated(request);
 	const safeUserId = safeUser?.id;
+	const session = await getSession(request.headers.get("Cookie"));
+	const targetLanguage = session.get("targetLanguage") || "ja";
 
 	if (!safeUserId) {
 		return json({ error: "User not authenticated" }, { status: 401 });
@@ -52,7 +54,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 		case "vote":
 			return handleVoteAction(formData, safeUserId);
 		case "addTranslation":
-			return handleAddTranslationAction(formData, safeUserId);
+			return handleAddTranslationAction(formData, safeUserId, targetLanguage);
 		default:
 			return json({ error: "Invalid action" }, { status: 400 });
 	}
@@ -83,7 +85,7 @@ export default function ReaderView() {
 		fetcher.submit(
 			{
 				action: "addTranslation",
-				sourceTextId: sourceTextId.toString(),
+				sourceTextId: sourceTextId,
 				text,
 			},
 			{ method: "post" },
@@ -111,6 +113,7 @@ export default function ReaderView() {
 						translations={
 							pageData.translations as Array<{
 								number: number;
+								sourceTextId: number;
 								translations: TranslationData[];
 							}>
 						}
