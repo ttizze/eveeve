@@ -51,9 +51,7 @@ export const SelectConform = ({
 			<Select
 				{...props}
 				value={control.value ?? ""}
-				onValueChange={(value) => {
-					control.change(value);
-				}}
+				onValueChange={control.change}
 				onOpenChange={(open) => {
 					if (!open) {
 						control.blur();
