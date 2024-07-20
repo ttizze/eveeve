@@ -11,40 +11,31 @@ import { authenticator } from "~/utils/auth.server";
 import { validateGeminiApiKey } from "~/utils/gemini";
 import { prisma } from "~/utils/prisma";
 import { getSession } from "~/utils/session.server";
-import { extractNumberedElements } from "./../../libs/extractNumberedElements";
+import { translate } from "../../feature/translate/libs/translation";
+import { addNumbersToContent } from "../../feature/translate/utils/addNumbersToContent";
+import { extractArticle } from "../../feature/translate/utils/extractArticle";
+import { extractNumberedElements } from "../../feature/translate/utils/extractNumberedElements";
+import { fetchWithRetry } from "../../feature/translate/utils/fetchWithRetry";
 import { GeminiApiKeyForm } from "./components/GeminiApiKeyForm";
 import {
 	URLTranslationForm,
 	urlTranslationSchema,
 } from "./components/URLTranslationForm";
 import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
-import { translate } from "./libs/translation";
 import {
 	type UserAITranslationInfoItem,
 	UserAITranslationInfoSchema,
 } from "./types";
 import { geminiApiKeySchema } from "./types";
-import { addNumbersToContent } from "./utils/addNumbersToContent";
-import { extractArticle } from "./utils/extractArticle";
-import { fetchWithRetry } from "./utils/fetchWithRetry";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/",
 	});
 	let hasGeminiApiKey = false;
-	let hasOpenAIApiKey = false;
-	let hasClaudeApiKey = false;
-
 	const dbUser = await prisma.user.findUnique({ where: { id: safeUser.id } });
 	if (dbUser?.geminiApiKey) {
 		hasGeminiApiKey = true;
-	}
-	if (dbUser?.openAIApiKey) {
-		hasOpenAIApiKey = true;
-	}
-	if (dbUser?.claudeApiKey) {
-		hasClaudeApiKey = true;
 	}
 
 	const session = await getSession(request.headers.get("Cookie"));
@@ -87,8 +78,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		targetLanguage,
 		userAITranslationInfo,
 		hasGeminiApiKey,
-		hasOpenAIApiKey,
-		hasClaudeApiKey,
 	});
 }
 
@@ -98,6 +87,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	});
 	const clone = request.clone();
 	const formData = await clone.formData();
+	console.log(formData);
 	switch (formData.get("intent")) {
 		case "saveGeminiApiKey": {
 			const submission = parseWithZod(formData, { schema: geminiApiKeySchema });
@@ -133,8 +123,10 @@ export async function action({ request }: ActionFunctionArgs) {
 			const html = await fetchWithRetry(submission.value.url);
 			const { content, title } = extractArticle(html, submission.value.url);
 			const numberedContent = addNumbersToContent(content);
-			const extractedNumberedElements =
-				extractNumberedElements(numberedContent);
+			const extractedNumberedElements = extractNumberedElements(
+				numberedContent,
+				title,
+			);
 			const session = await getSession(request.headers.get("Cookie"));
 			const targetLanguage = session.get("targetLanguage") || "ja";
 
@@ -157,14 +149,8 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function TranslatePage() {
-	const {
-		safeUser,
-		targetLanguage,
-		userAITranslationInfo,
-		hasGeminiApiKey,
-		hasOpenAIApiKey,
-		hasClaudeApiKey,
-	} = useTypedLoaderData<typeof loader>();
+	const { safeUser, targetLanguage, userAITranslationInfo, hasGeminiApiKey } =
+		useTypedLoaderData<typeof loader>();
 	const revalidator = useRevalidator();
 
 	useEffect(() => {
@@ -179,13 +165,7 @@ export default function TranslatePage() {
 			<Header safeUser={safeUser} />
 			<div className="container mx-auto max-w-2xl min-h-50 py-10">
 				<div className="pb-4">
-					{safeUser && hasGeminiApiKey && (
-						<URLTranslationForm
-							hasGeminiApiKey={hasGeminiApiKey}
-							hasOpenAIApiKey={hasOpenAIApiKey}
-							hasClaudeApiKey={hasClaudeApiKey}
-						/>
-					)}
+					{safeUser && hasGeminiApiKey && <URLTranslationForm />}
 					{safeUser && !hasGeminiApiKey && <GeminiApiKeyForm />}
 				</div>
 				<div>
