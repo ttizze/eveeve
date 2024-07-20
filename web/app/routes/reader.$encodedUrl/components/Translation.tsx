@@ -96,6 +96,7 @@ export function Translation({
 						onVote={(isUpvote) => handleVote(bestTranslation.id, isUpvote)}
 						userId={userId}
 					/>
+					<p className="text-sm text-gray-500 text-right">Translated by:{bestTranslation.userName}</p>
 					{alternativeTranslations.length > 0 && (
 						<div className=" rounded-md">
 							<p className="font-semibold text-gray-600 mb-2">
@@ -105,9 +106,9 @@ export function Translation({
 								{alternativeTranslations.map((alt) => (
 									<div
 										key={alt.id}
-										className="p-2 bg-gray-50 rounded border border-gray-200"
+										className="p-2 rounded border border-gray-200"
 									>
-										<div className="text-sm text-gray-700 mb-2">{alt.text}</div>
+										<div className="text-sm  mb-2">{alt.text}</div>
 										<VoteButtons
 											translation={alt}
 											onVote={(isUpvote) => onVote(alt.id, isUpvote)}
