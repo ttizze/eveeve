@@ -8,7 +8,6 @@ import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { z } from "zod";
 import { Header } from "~/components/Header";
 import { authenticator } from "~/utils/auth.server";
-import { validateGeminiApiKey } from "~/utils/gemini";
 import { prisma } from "~/utils/prisma";
 import { getSession } from "~/utils/session.server";
 import { translate } from "../../feature/translate/libs/translation";
@@ -16,6 +15,7 @@ import { addNumbersToContent } from "../../feature/translate/utils/addNumbersToC
 import { extractArticle } from "../../feature/translate/utils/extractArticle";
 import { extractNumberedElements } from "../../feature/translate/utils/extractNumberedElements";
 import { fetchWithRetry } from "../../feature/translate/utils/fetchWithRetry";
+import { validateGeminiApiKey } from "../../feature/translate/utils/gemini";
 import { GeminiApiKeyForm } from "./components/GeminiApiKeyForm";
 import {
 	URLTranslationForm,

@@ -4,7 +4,11 @@ import { Translation } from "./Translation";
 
 interface TranslatedContentProps {
 	content: string;
-	translations: Array<{ number: number; translations: TranslationData[] }>;
+	translations: Array<{
+		number: number;
+		sourceTextId: number;
+		translations: TranslationData[];
+	}>;
 	targetLanguage: string;
 	onVote: (translationId: number, isUpvote: boolean) => void;
 	onAdd: (sourceTextId: number, text: string) => void;
@@ -53,9 +57,9 @@ export function TranslatedContent({
 									translations={translationGroup.translations}
 									targetLanguage={targetLanguage}
 									onVote={onVote}
-									onAdd={(text) => onAdd(number, text)}
+									onAdd={onAdd}
 									userId={userId}
-									sourceTextId={number}
+									sourceTextId={translationGroup.sourceTextId}
 								/>
 							);
 						}

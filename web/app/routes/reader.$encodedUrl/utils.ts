@@ -18,6 +18,7 @@ export async function fetchLatestPageVersionWithTranslations(
 			content: true,
 			sourceTexts: {
 				select: {
+					id: true,
 					number: true,
 					translateTexts: {
 						where: { targetLanguage },
@@ -49,6 +50,7 @@ export async function fetchLatestPageVersionWithTranslations(
 	const translations: SourceTextTranslations[] = pageVersion.sourceTexts.map(
 		(sourceText) => ({
 			number: sourceText.number,
+			sourceTextId: sourceText.id,
 			translations: sourceText.translateTexts.map((translateText) => ({
 				id: translateText.id,
 				text: translateText.text,
