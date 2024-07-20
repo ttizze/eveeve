@@ -55,8 +55,16 @@ export function AIModelSelector({
 	};
 
 	const getModelOptions = () => [
-		{ name: "gemini-1.5-flash", value: "gemini-1.5-flash", hasApiKey: hasGeminiApiKey },
-		{ name: "gemini-1.5-pro", value: "gemini-1.5-pro", hasApiKey: hasGeminiApiKey },
+		{
+			name: "gemini-1.5-flash",
+			value: "gemini-1.5-flash",
+			hasApiKey: hasGeminiApiKey,
+		},
+		{
+			name: "gemini-1.5-pro",
+			value: "gemini-1.5-pro",
+			hasApiKey: hasGeminiApiKey,
+		},
 	];
 
 	const handleModelSelect = (value: string) => {

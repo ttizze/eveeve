@@ -34,7 +34,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		throw new Response("Failed to fetch article", { status: 500 });
 	}
 
-	return typedjson({ pageData, safeUser, targetLanguage });
+	return typedjson({ pageData, safeUser });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -60,8 +60,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function ReaderView() {
 	const { encodedUrl } = useParams();
-	const { pageData, safeUser, targetLanguage } =
-		useTypedLoaderData<typeof loader>();
+	const { pageData, safeUser } = useTypedLoaderData<typeof loader>();
 	const fetcher = useFetcher();
 
 	if (!pageData) {
@@ -92,7 +91,7 @@ export default function ReaderView() {
 	};
 	return (
 		<div>
-			<Header safeUser={safeUser} targetLanguage={targetLanguage} />
+			<Header safeUser={safeUser} />
 			<div className="container mx-auto px-4 py-8">
 				<article className="prose dark:prose-invert lg:prose-xl mx-auto max-w-3xl">
 					<h1>{pageData.title}</h1>

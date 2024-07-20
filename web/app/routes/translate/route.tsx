@@ -1,14 +1,18 @@
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { useRevalidator } from "@remix-run/react";
 import { useEffect } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { z } from "zod";
 import { Header } from "~/components/Header";
 import { authenticator } from "~/utils/auth.server";
+import { validateGeminiApiKey } from "~/utils/gemini";
 import { prisma } from "~/utils/prisma";
 import { getSession } from "~/utils/session.server";
 import { extractNumberedElements } from "./../../libs/extractNumberedElements";
+import { GeminiApiKeyForm } from "./components/GeminiApiKeyForm";
 import {
 	URLTranslationForm,
 	urlTranslationSchema,
@@ -19,14 +23,10 @@ import {
 	type UserAITranslationInfoItem,
 	UserAITranslationInfoSchema,
 } from "./types";
+import { geminiApiKeySchema } from "./types";
 import { addNumbersToContent } from "./utils/addNumbersToContent";
 import { extractArticle } from "./utils/extractArticle";
 import { fetchWithRetry } from "./utils/fetchWithRetry";
-import { validateGeminiApiKey } from "~/utils/gemini";
-import { geminiApiKeySchema } from "./types";
-import { redirect } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { GeminiApiKeyForm } from "./components/GeminiApiKeyForm";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
@@ -116,12 +116,16 @@ export async function action({ request }: ActionFunctionArgs) {
 			});
 			return redirect("/translate");
 		}
-		case "translateUrl":{
-			const submission = parseWithZod(formData, { schema: urlTranslationSchema });
+		case "translateUrl": {
+			const submission = parseWithZod(formData, {
+				schema: urlTranslationSchema,
+			});
 			if (submission.status !== "success") {
 				return submission.reply();
 			}
-			const dbUser = await prisma.user.findUnique({ where: { id: safeUser.id } });
+			const dbUser = await prisma.user.findUnique({
+				where: { id: safeUser.id },
+			});
 			if (!dbUser?.geminiApiKey) {
 				return submission.reply({ formErrors: ["Gemini API key is not set"] });
 			}
@@ -129,7 +133,8 @@ export async function action({ request }: ActionFunctionArgs) {
 			const html = await fetchWithRetry(submission.value.url);
 			const { content, title } = extractArticle(html, submission.value.url);
 			const numberedContent = addNumbersToContent(content);
-			const extractedNumberedElements = extractNumberedElements(numberedContent);
+			const extractedNumberedElements =
+				extractNumberedElements(numberedContent);
 			const session = await getSession(request.headers.get("Cookie"));
 			const targetLanguage = session.get("targetLanguage") || "ja";
 
@@ -181,9 +186,7 @@ export default function TranslatePage() {
 							hasClaudeApiKey={hasClaudeApiKey}
 						/>
 					)}
-					{safeUser && !hasGeminiApiKey && (
-						<GeminiApiKeyForm />
-					)}
+					{safeUser && !hasGeminiApiKey && <GeminiApiKeyForm />}
 				</div>
 				<div>
 					<h2 className="text-2xl font-bold">Translation history</h2>

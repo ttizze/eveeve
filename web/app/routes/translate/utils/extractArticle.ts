@@ -18,7 +18,7 @@ export const extractArticle = (
 	const contentDom = new JSDOM(article.content);
 	const contentDocument = contentDom.window.document;
 
-	contentDocument.querySelectorAll("img").forEach((img) => {
+	for (const img of contentDocument.querySelectorAll("img")) {
 		const src = img.getAttribute("src");
 		if (src) {
 			try {
@@ -29,7 +29,7 @@ export const extractArticle = (
 				console.error(`Failed to resolve image path: ${src}`, error);
 			}
 		}
-	});
+	}
 
 	const resolvedContent = contentDom.serialize();
 

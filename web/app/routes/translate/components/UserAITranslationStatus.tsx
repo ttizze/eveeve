@@ -59,7 +59,7 @@ export function UserAITranslationStatus({
 							const isCompleted = item.aiTranslationStatus === "completed";
 
 							const CardContents = (
-								<Card className="flex flex-col h-full">
+								<Card key={item.id} className="flex flex-col h-full">
 									<CardHeader>
 										<CardTitle className="text-sm truncate flex flex-col h-10">
 											{item.pageVersion.title}
