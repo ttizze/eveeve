@@ -26,22 +26,20 @@ export function generateSystemMessage(
       "properties": {
         "number": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 1
         },
         "text": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "type": "string",
+          "minLength": 1 
         }
       },
       "required": ["number", "text"]
     }
   }
   
-  - Include the translated title as the first item with "number": 0.
   - For the content, the "number" should correspond to the original text's position.
-  - The "text" should be an array containing the translation. If a paragraph consists of multiple sentences, include each sentence as a separate string in the array.
+  - The "text" should be a string containing the translation. If a paragraph consists of multiple sentences, include all sentences in a single string.
+  - Ensure that each "text" field contains at least one character.
   - Maintain the original array structure and order, with the title translation added as the first item.
   - Output ONLY the translated JSON array. No additional text or explanations.
   
@@ -51,16 +49,12 @@ export function generateSystemMessage(
   Translate to ${target_language} and output in the following format:
   [
     {
-      "number": 0,
-      "text": ["Translated title"]
-    },
-    {
       "number": 1,
-      "text": ["Translated text for item 1, sentence 1", "Translated text for item 1, sentence 2"]
+      "text": "Translated text for item 1"
     },
     {
       "number": 2,
-      "text": ["Translated text for item 2"]
+      "text": "Translated text for item 2"
     },
     ...
   ]`;

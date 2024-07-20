@@ -32,6 +32,7 @@ export function UserAITranslationStatus({
 			return parseWithZod(formData, { schema: urlTranslationSchema });
 		},
 	});
+
 	if (!userAITranslationInfo || userAITranslationInfo.length === 0) {
 		return (
 			<Card>
@@ -44,7 +45,6 @@ export function UserAITranslationStatus({
 			</Card>
 		);
 	}
-
 	return (
 		<Card>
 			<CardHeader>
@@ -56,11 +56,10 @@ export function UserAITranslationStatus({
 						{userAITranslationInfo.map((item) => {
 							const translationInfo =
 								item.pageVersion.pageVersionTranslationInfo?.[0];
-							return (
-								<Card
-									key={item.id}
-									className="flex flex-col hover:shadow-md transition-shadow duration-200"
-								>
+							const isCompleted = item.aiTranslationStatus === "completed";
+
+							const CardContents = (
+								<Card key={item.id} className="flex flex-col h-full">
 									<CardHeader>
 										<CardTitle className="text-sm truncate flex flex-col h-10">
 											{item.pageVersion.title}
@@ -71,12 +70,12 @@ export function UserAITranslationStatus({
 											)}
 										</CardTitle>
 									</CardHeader>
-									<CardContent className="flex-grow">
+									<CardContent className="flex-grow flex flex-col">
 										<p className="text-xs text-muted-foreground truncate">
 											{item.pageVersion.page.url}
 										</p>
 										<Badge
-											className="mt-2"
+											className="mt-2 w-full flex justify-center"
 											variant={getVariantForStatus(item.aiTranslationStatus)}
 										>
 											{item.aiTranslationStatus}
@@ -88,35 +87,49 @@ export function UserAITranslationStatus({
 										<p className="text-xs mt-2">
 											{new Date(item.lastTranslatedAt).toLocaleString()}
 										</p>
-										<div className="mt-2  justify-between items-center">
-											<Link
-												to={`/reader/${encodeURIComponent(item.pageVersion.page.url)}`}
-												className="text-xs text-blue-500 hover:underline"
-											>
-												View
-											</Link>
-											<Form method="post">
-												<input
-													type="hidden"
-													name="url"
-													value={item.pageVersion.page.url}
-												/>
-												<Button
-													type="submit"
-													name="intent"
-													value="translateUrl"
-													disabled={navigation.state === "submitting"}
-												>
-													{navigation.state === "submitting" ? (
-														<LoadingSpinner />
-													) : (
-														<RotateCcw className="w-4 h-4" />
-													)}
-												</Button>
-											</Form>
-										</div>
+										{!isCompleted && (
+											<div className="mt-auto pt-2">
+												<Form method="post">
+													<input
+														type="hidden"
+														name="url"
+														value={item.pageVersion.page.url}
+													/>
+													<Button
+														type="submit"
+														name="intent"
+														value="translateUrl"
+														className="w-full"
+														disabled={navigation.state === "submitting"}
+													>
+														{navigation.state === "submitting" ? (
+															<LoadingSpinner />
+														) : (
+															<RotateCcw className="w-4 h-4" />
+														)}
+													</Button>
+												</Form>
+											</div>
+										)}
 									</CardContent>
 								</Card>
+							);
+
+							return isCompleted ? (
+								<Link
+									key={item.id}
+									to={`/reader/${encodeURIComponent(item.pageVersion.page.url)}`}
+									className="block hover:shadow-md transition-shadow duration-200"
+								>
+									{CardContents}
+								</Link>
+							) : (
+								<div
+									key={item.id}
+									className="hover:shadow-md transition-shadow duration-200"
+								>
+									{CardContents}
+								</div>
 							);
 						})}
 					</div>

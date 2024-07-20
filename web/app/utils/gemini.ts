@@ -62,7 +62,6 @@ export async function getGeminiModelResponse(
 			const result = await modelConfig.generateContent(
 				generateSystemMessage(title, source_text, target_language),
 			);
-			console.log("result", result.response.text());
 			return result.response.text();
 		} catch (error: unknown) {
 			const typedError = error as Error;

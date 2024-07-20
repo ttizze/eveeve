@@ -4,7 +4,7 @@ import { authenticator } from "../utils/auth.server";
 export const loader = ({ request }: LoaderFunctionArgs) => {
 	try {
 		return authenticator.authenticate("google", request, {
-			successRedirect: "/",
+			successRedirect: "/translate",
 			failureRedirect: "/",
 		});
 	} catch (error) {

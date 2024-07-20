@@ -1,3 +1,5 @@
+import { useFetcher } from "@remix-run/react";
+import { useCallback, useEffect, useState } from "react";
 import {
 	Select,
 	SelectContent,
@@ -20,18 +22,33 @@ const targetLanguages: TargetLanguage[] = [
 	{ code: "fr", name: "Français" },
 ];
 
-type TargetLanguageSelectProps = {
-	value: string;
-	onChange: (value: string) => void;
-};
+export function TargetLanguageSelect() {
+	const fetcher = useFetcher<{ targetLanguage: string }>();
+	const [currentLanguage, setCurrentLanguage] = useState(
+		fetcher.data?.targetLanguage ?? "ja",
+	);
 
-export function TargetLanguageSelect({
-	value,
-	onChange,
-}: TargetLanguageSelectProps) {
+	const loadLanguage = useCallback(() => {
+		if (fetcher.state === "idle" && !fetcher.data) {
+			fetcher.load("/api/target-language");
+		}
+	}, [fetcher]);
+
+	useEffect(() => {
+		loadLanguage();
+	}, [loadLanguage]);
+
+	const handleLanguageChange = (value: string) => {
+		setCurrentLanguage(value);
+		fetcher.submit(
+			{ targetLanguage: value },
+			{ method: "post", action: "/api/target-language" },
+		);
+	};
+
 	return (
-		<Select value={value} onValueChange={onChange}>
-			<SelectTrigger className="w-[180px]">
+		<Select value={currentLanguage} onValueChange={handleLanguageChange}>
+			<SelectTrigger className="w-[100px]">
 				<SelectValue placeholder="翻訳言語を選択" />
 			</SelectTrigger>
 			<SelectContent>

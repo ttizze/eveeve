@@ -7,11 +7,11 @@ export async function getOrCreatePageVersionId(
 	content: string,
 	pageId: number,
 ): Promise<number> {
+	const normalizedContent = content.trim().replace(/\s+/g, " ");
 	const contentHash = Buffer.from(
-		createHash("sha256").update(content).digest("hex"),
+		createHash("sha256").update(normalizedContent).digest("hex"),
 		"hex",
 	);
-
 	const existingVersion = await prisma.pageVersion.findFirst({
 		where: {
 			url,

@@ -136,7 +136,6 @@ async function translateUntranslatedElements(
 	const source_text = untranslatedElements
 		.map((el) => JSON.stringify(el))
 		.join("\n");
-	console.log("untranslatedText", source_text);
 	const translatedText = await getGeminiModelResponse(
 		geminiApiKey,
 		AI_MODEL,
@@ -146,11 +145,10 @@ async function translateUntranslatedElements(
 	);
 
 	const extractedTranslations = extractTranslations(translatedText);
-	console.log("extractedNowTranslations", extractedTranslations);
 	await getOrCreatePageVersionTranslationInfo(
 		pageVersionId,
 		targetLanguage,
-		extractedTranslations[0].text,
+		extractedTranslations[1].text,
 	);
 
 	const systemUserId = await getOrCreateAIUser(AI_MODEL);

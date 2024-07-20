@@ -1,5 +1,5 @@
 import { Link } from "@remix-run/react";
-import { Form, useSubmit } from "@remix-run/react";
+import { Form } from "@remix-run/react";
 import { LogIn, LogOut } from "lucide-react";
 import { ModeToggle } from "~/components/dark-mode-toggle";
 import type { SafeUser } from "../types";
@@ -8,18 +8,9 @@ import { Button } from "./ui/button";
 
 interface HeaderProps {
 	safeUser: SafeUser | null;
-	targetLanguage: string;
 }
 
-export function Header({ safeUser, targetLanguage }: HeaderProps) {
-	const submit = useSubmit();
-
-	const handleTargetLanguageChange = (newTargetLanguage: string) => {
-		const formData = new FormData();
-		formData.append("targetLanguage", newTargetLanguage);
-		submit(formData, { method: "post" });
-	};
-
+export function Header({ safeUser }: HeaderProps) {
 	return (
 		<header className="shadow-sm mb-10">
 			<div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
@@ -27,10 +18,7 @@ export function Header({ safeUser, targetLanguage }: HeaderProps) {
 					<h1 className="text-3xl font-bold ">EveEve</h1>
 				</Link>
 				<Form method="post" className="flex items-center space-x-4">
-					<TargetLanguageSelect
-						value={targetLanguage}
-						onChange={handleTargetLanguageChange}
-					/>
+					<TargetLanguageSelect />
 					<nav className="flex items-center space-x-4">
 						<ModeToggle />
 						{safeUser ? (
