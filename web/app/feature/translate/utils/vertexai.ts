@@ -1,5 +1,5 @@
 import { VertexAI } from "@google-cloud/vertexai";
-import { generateSystemMessage } from "../utils/generateGeminiMessage";
+import { generateSystemMessage } from "./generateGeminiMessage";
 
 export async function getVertexAIModelResponse(
 	title: string,

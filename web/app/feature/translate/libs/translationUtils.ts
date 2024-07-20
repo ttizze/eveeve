@@ -3,7 +3,7 @@ import { getOrCreateSourceTextId } from "../../../libs/sourceTextService";
 import { getOrCreateAIUser } from "../../../libs/userService";
 import { AI_MODEL, MAX_CHUNK_SIZE } from "../../../routes/translate/constants";
 import type { NumberedElement } from "../../../routes/translate/types";
-import { getGeminiModelResponse } from "../../../utils/gemini";
+import { getGeminiModelResponse } from "../utils/gemini";
 import { prisma } from "../../../utils/prisma";
 
 export function splitNumberedElements(

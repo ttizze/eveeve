@@ -8,7 +8,7 @@ import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { z } from "zod";
 import { Header } from "~/components/Header";
 import { authenticator } from "~/utils/auth.server";
-import { validateGeminiApiKey } from "~/utils/gemini";
+import { validateGeminiApiKey } from "../../feature/translate/utils/gemini";
 import { prisma } from "~/utils/prisma";
 import { getSession } from "~/utils/session.server";
 import { translate } from "../../feature/translate/libs/translation";
