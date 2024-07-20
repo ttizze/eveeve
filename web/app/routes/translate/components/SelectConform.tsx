@@ -20,13 +20,11 @@ export const SelectConform = ({
 	meta,
 	items,
 	placeholder,
-	onValueChange,
 	...props
 }: {
 	meta: FieldMetadata<string>;
 	items: Array<{ name: ReactNode; value: string }>;
 	placeholder: string;
-	onValueChange: (value: string) => void;
 } & ComponentProps<typeof Select>) => {
 	const selectRef = useRef<ElementRef<typeof SelectTrigger>>(null);
 	const control = useControl(meta);
@@ -55,7 +53,6 @@ export const SelectConform = ({
 				value={control.value ?? ""}
 				onValueChange={(value) => {
 					control.change(value);
-					onValueChange(value);
 				}}
 				onOpenChange={(open) => {
 					if (!open) {

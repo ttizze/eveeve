@@ -4,8 +4,7 @@ import {
 	getOrCreateUserAITranslationInfo,
 	updateUserAITranslationInfo,
 } from "../../../libs/userAITranslationInfo";
-import { updateUserReadHistory } from "../../../libs/userReadHistory";
-import type { NumberedElement } from "../types";
+import type { NumberedElement } from "../../../routes/translate/types";
 import {
 	getOrCreateTranslations,
 	splitNumberedElements,
@@ -33,7 +32,6 @@ export async function translate(
 		pageVersionId,
 		targetLanguage,
 	);
-	await updateUserReadHistory(userId, pageVersionId, 0);
 
 	if (userAITranslationHistory.aiTranslationStatus === "completed") {
 		return userAITranslationHistory.aiTranslationStatus;

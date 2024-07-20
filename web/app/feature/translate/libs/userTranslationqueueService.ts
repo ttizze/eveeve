@@ -1,5 +1,5 @@
 import Queue, { type Queue as QueueType } from "bull";
-import { REDIS_URL } from "../constants";
+import { REDIS_URL } from "../../../routes/translate/constants";
 import { processTranslationJob } from "./translation";
 
 const createUserTranslationQueue = (userId: number) =>

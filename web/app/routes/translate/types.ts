@@ -9,6 +9,7 @@ export const urlTranslationSchema = z.object({
 		.string()
 		.min(1, { message: "URLを入力してください" })
 		.url("有効なURLを入力してください"),
+	model: z.string().min(1, "モデルを選択してください"),
 });
 
 export const PageVersionTranslationInfoSchema = z.object({

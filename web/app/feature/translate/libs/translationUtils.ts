@@ -1,10 +1,10 @@
 import { getOrCreatePageVersionTranslationInfo } from "../../../libs/pageVersionTranslationInfo";
 import { getOrCreateSourceTextId } from "../../../libs/sourceTextService";
 import { getOrCreateAIUser } from "../../../libs/userService";
+import { AI_MODEL, MAX_CHUNK_SIZE } from "../../../routes/translate/constants";
+import type { NumberedElement } from "../../../routes/translate/types";
 import { getGeminiModelResponse } from "../../../utils/gemini";
 import { prisma } from "../../../utils/prisma";
-import { AI_MODEL, MAX_CHUNK_SIZE } from "../constants";
-import type { NumberedElement } from "../types";
 
 export function splitNumberedElements(
 	elements: NumberedElement[],
@@ -36,7 +36,6 @@ export function extractTranslations(
 	text: string,
 ): { number: number; text: string }[] {
 	try {
-		// まず、文字列をJSONとしてパースしてみる
 		const parsed = JSON.parse(text);
 		if (Array.isArray(parsed)) {
 			return parsed;
@@ -148,7 +147,7 @@ async function translateUntranslatedElements(
 	await getOrCreatePageVersionTranslationInfo(
 		pageVersionId,
 		targetLanguage,
-		extractedTranslations[1].text,
+		extractedTranslations[0].text,
 	);
 
 	const systemUserId = await getOrCreateAIUser(AI_MODEL);
