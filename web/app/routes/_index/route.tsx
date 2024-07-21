@@ -4,7 +4,7 @@ import type {
 	MetaFunction,
 } from "@remix-run/node";
 import { Form } from "@remix-run/react";
-import { FaDiscord, FaGithub } from "react-icons/fa"; // react-iconsをインストールしてください
+import { FaDiscord, FaGithub } from "react-icons/fa";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
 import { Button } from "~/components/ui/button";
