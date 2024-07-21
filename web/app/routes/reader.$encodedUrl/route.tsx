@@ -13,6 +13,9 @@ import { TranslatedContent } from "./components/TranslatedContent";
 import type { TranslationData } from "./types";
 import { fetchLatestPageVersionWithTranslations } from "./utils";
 import { handleAddTranslationAction, handleVoteAction } from "./utils/actions";
+import { prisma } from "~/utils/prisma";
+import { splitContentByHeadings } from "./utils";
+import { useNavigate } from "@remix-run/react";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const session = await getSession(request.headers.get("Cookie"));
@@ -22,19 +25,40 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	if (!encodedUrl) {
 		throw new Response("Missing URL parameter", { status: 400 });
 	}
+	const url = new URL(request.url);
+  const page = Number.parseInt(url.searchParams.get("page") || "1", 10);
+
 	const safeUser = await authenticator.isAuthenticated(request);
 	const safeUserId = safeUser?.id;
-	const pageData = await fetchLatestPageVersionWithTranslations(
+  const fullPageVersion = await prisma.pageVersion.findFirst({
+    where: { url: decodeURIComponent(encodedUrl) },
+    orderBy: { createdAt: "desc" },
+    select: { content: true },
+  });
+	if (!fullPageVersion) {
+		throw new Response("Failed to fetch article", { status: 500 });
+	}
+	const sections = splitContentByHeadings(fullPageVersion.content);
+
+  const currentSection = sections[1];
+	console.log(currentSection);
+  if (!currentSection) {
+    throw new Response("Page not found", { status: 404 });
+  }
+	const currentNumbers = currentSection.dataNumber;
+
+	const currentPageData = await fetchLatestPageVersionWithTranslations(
 		decodeURIComponent(encodedUrl),
 		safeUserId ?? 0,
 		targetLanguage,
+		currentNumbers,
 	);
 
-	if (!pageData) {
+	if (!currentPageData) {
 		throw new Response("Failed to fetch article", { status: 500 });
 	}
 
-	return typedjson({ pageData, safeUser });
+	return typedjson({ currentPageData, safeUser, currentPage: page, totalPages: sections.length,sectionHtml: currentSection.html, targetLanguage });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -62,10 +86,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function ReaderView() {
 	const { encodedUrl } = useParams();
-	const { pageData, safeUser } = useTypedLoaderData<typeof loader>();
+	const { currentPageData, safeUser, currentPage, totalPages, sectionHtml, targetLanguage } = useTypedLoaderData<typeof loader>();
+
 	const fetcher = useFetcher();
 
-	if (!pageData) {
+	if (!currentPageData) {
 		return <div>Loading...</div>;
 	}
 
@@ -96,7 +121,7 @@ export default function ReaderView() {
 			<Header safeUser={safeUser} />
 			<div className="container mx-auto px-4 py-8">
 				<article className="prose dark:prose-invert lg:prose-xl mx-auto max-w-3xl">
-					<h1>{pageData.title}</h1>
+					<h1>{currentPageData.title}</h1>
 					<p>
 						<a
 							href={originalUrl}
@@ -109,15 +134,15 @@ export default function ReaderView() {
 					</p>
 					<hr />
 					<TranslatedContent
-						content={pageData.content}
+						content={sectionHtml}
 						translations={
-							pageData.translations as Array<{
+							currentPageData.translations as Array<{
 								number: number;
 								sourceTextId: number;
 								translations: TranslationData[];
 							}>
 						}
-						targetLanguage="ja"
+						targetLanguage={targetLanguage}
 						onVote={handleVote}
 						onAdd={handleAddTranslation}
 						userId={safeUser?.id ?? null}
