@@ -42,12 +42,27 @@ EveEve（Everyone Translate Everything）は、インターネットに公開さ
    cd web
    bun i
    ```
+3. googleログインの設定をする必要があります｡
+   https://console.cloud.google.com/apis
+   設定方法は以下のページを参考にしてください
+   https://developers.google.com/identity/sign-in/web/sign-in?hl=ja
+   https://zenn.dev/yoiyoicho/articles/c44a80e4bb4515#google%E3%83%AD%E3%82%B0%E3%82%A4%E3%83%B3%E3%81%AE%E5%85%AC%E5%BC%8F%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88%E3%82%92%E8%AA%AD%E3%82%80
+
+   承認済みのリダイレクトURIには
+   http://localhost:5173/api/auth/callback/google
+   を設定してください
+
+   クライアントIDとクライアントシークレットを取得してください
+
 3. 環境変数ファイルを作成し、必要な値を設定します：
    ```
    cp .env.example .env
    ```
    `.env` ファイルを開き、以下の変数を適切な値に設定してください：
    - SESSION_SECRET
+   - GOOGLE_CLIENT_ID
+   - GOOGLE_CLIENT_SECRET
+
 4. dockerを起動します：
    ```
    docker compose up -d
@@ -65,13 +80,12 @@ EveEve（Everyone Translate Everything）は、インターネットに公開さ
 
 ## 貢献方法
 翻訳、プログラミング、デザイン、ドキュメンテーションなど、あらゆる形の貢献を歓迎します。現在特に以下の分野での貢献を求めています：
-- 複数フォーマット対応の実装
+
+- PDF等､複数フォーマット入力対応の実装
 - 文字サイズや色の変更機能
 
-貢献する前に、CONTRIBUTING.md ファイルをお読みください。
 
 ## 既知の制限事項
-- 現在はLLMによる機械翻訳のみをサポートしており、人間によるレビュー機能はありません。
 - 出力フォーマットは現在限られています。
 - 長文テキストの処理に制限があります。
 
