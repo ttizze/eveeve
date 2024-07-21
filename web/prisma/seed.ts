@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs'
 const prisma = new PrismaClient()
 
 async function seed() {
-  if (process.env.NODE_ENV !== 'development' && !process.env.ALLOW_SEEDING) {
+  if (process.env.NODE_ENV !== 'development') {
     console.log('Seeding is only allowed in development environment')
     return
   }
