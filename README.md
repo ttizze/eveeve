@@ -42,26 +42,17 @@ EveEve（Everyone Translate Everything）は、インターネットに公開さ
    cd web
    bun i
    ```
-3. googleログインの設定をする必要があります｡
-   https://console.cloud.google.com/apis
-   設定方法は以下のページを参考にしてください
-   https://developers.google.com/identity/sign-in/web/sign-in?hl=ja
-   https://zenn.dev/yoiyoicho/articles/c44a80e4bb4515#google%E3%83%AD%E3%82%B0%E3%82%A4%E3%83%B3%E3%81%AE%E5%85%AC%E5%BC%8F%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88%E3%82%92%E8%AA%AD%E3%82%80
-
-   承認済みのリダイレクトURIには
-   http://localhost:5173/api/auth/callback/google
-   を設定してください
-
-   クライアントIDとクライアントシークレットを取得してください
 
 3. 環境変数ファイルを作成し、必要な値を設定します：
    ```
    cp .env.example .env
    ```
-   `.env` ファイルを開き、以下の変数を適切な値に設定してください：
+   以下のコマンドを実行してください
+   ```
+   openssl rand -base64 32
+   ```
+   このコマンドで生成された文字列を`.env`ファイルの`SESSION_SECRET`に設定してください:
    - SESSION_SECRET
-   - GOOGLE_CLIENT_ID
-   - GOOGLE_CLIENT_SECRET
 
 4. dockerを起動します：
    ```
@@ -71,12 +62,19 @@ EveEve（Everyone Translate Everything）は、インターネットに公開さ
    ```
    bunx prisma migrate dev
    ```
-6. 起動します：
+6. seedを実行します：
+   ```
+   bun run seed
+   ```
+7. 起動します：
    ```
    bun run dev
    ```
-6. ブラウザで `http://localhost:5173` にアクセスして、eveeve を使用開始します。
+6. ブラウザで `http://localhost:5173` にアクセスして、eveeve を使用開始します:
+7. ローカル開発環境では、認証プロセスが簡略化されています：
+   - `http://localhost:5173/auth/login` にアクセスして、dev@example.comとdevpasswordでログインしてください。
 
+   注意: この簡易認証は開発環境でのみ機能し、本番環境では無効になります。本番環境では通常のGoogle認証フローが使用されます。
 
 ## 貢献方法
 翻訳、プログラミング、デザイン、ドキュメンテーションなど、あらゆる形の貢献を歓迎します。現在特に以下の分野での貢献を求めています：
