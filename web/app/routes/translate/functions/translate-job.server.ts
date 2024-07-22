@@ -1,8 +1,8 @@
-import { fetchWithRetry } from "../../feature/translate/utils/fetchWithRetry";
-import { extractArticle } from "../../feature/translate/utils/extractArticle";
-import { addNumbersToContent } from "../../feature/translate/utils/addNumbersToContent";
-import { extractNumberedElements } from "../../feature/translate/utils/extractNumberedElements";
-import { translate } from "../../feature/translate/libs/translation";
+import { translate } from "~/feature/translate/libs/translation";
+import { addNumbersToContent } from "~/feature/translate/utils/addNumbersToContent";
+import { extractArticle } from "~/feature/translate/utils/extractArticle";
+import { extractNumberedElements } from "~/feature/translate/utils/extractNumberedElements";
+import { fetchWithRetry } from "~/feature/translate/utils/fetchWithRetry";
 
 interface TranslateJobParams {
 	url: string;
