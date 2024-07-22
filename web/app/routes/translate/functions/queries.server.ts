@@ -1,5 +1,5 @@
-import { prisma } from "~/utils/prisma";
 import { z } from "zod";
+import { prisma } from "~/utils/prisma";
 import { UserAITranslationInfoSchema } from "../types";
 
 export const getDbUser = async (userId: number) => {

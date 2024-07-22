@@ -4,19 +4,19 @@ import { useRevalidator } from "@remix-run/react";
 import { useEffect } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
-import { authenticator } from "~/utils/auth.server";
-import { translateJob } from "./functions/translate-job.server";
 import { validateGeminiApiKey } from "~/feature/translate/utils/gemini";
+import { authenticator } from "~/utils/auth.server";
+import { getTargetLanguage } from "~/utils/target-language.server";
 import { GeminiApiKeyForm } from "./components/GeminiApiKeyForm";
 import { URLTranslationForm } from "./components/URLTranslationForm";
 import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
-import { schema } from "./types";
+import { updateGeminiApiKey } from "./functions/mutations.server";
 import {
 	getDbUser,
 	listUserAiTransationInfo,
 } from "./functions/queries.server";
-import { updateGeminiApiKey } from "./functions/mutations.server";
-import { getTargetLanguage } from "~/utils/target-language.server";
+import { translateJob } from "./functions/translate-job.server";
+import { schema } from "./types";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
@@ -113,8 +113,8 @@ export default function TranslatePage() {
 			<Header safeUser={safeUser} />
 			<div className="container mx-auto max-w-2xl min-h-50 py-10">
 				<div className="pb-4">
-					{safeUser && hasGeminiApiKey && <URLTranslationForm />}
-					{safeUser && !hasGeminiApiKey && <GeminiApiKeyForm />}
+					{hasGeminiApiKey && <URLTranslationForm />}
+					{!hasGeminiApiKey && <GeminiApiKeyForm />}
 				</div>
 				<div>
 					<h2 className="text-2xl font-bold">Translation history</h2>
