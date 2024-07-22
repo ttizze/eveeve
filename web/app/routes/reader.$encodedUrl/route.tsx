@@ -7,13 +7,12 @@ import { useParams } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
-import { getSession } from "~/utils/session.server";
+import { getTargetLanguage } from "~/utils/target-language.server";
 import { authenticator } from "../../utils/auth.server";
 import { TranslatedContent } from "./components/TranslatedContent";
 import type { TranslationData } from "./types";
 import { fetchLatestPageVersionWithTranslations } from "./utils";
 import { handleAddTranslationAction, handleVoteAction } from "./utils/actions";
-import { getTargetLanguage } from "~/utils/target-language.server";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const targetLanguage = await getTargetLanguage(request);

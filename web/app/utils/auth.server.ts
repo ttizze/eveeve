@@ -39,7 +39,13 @@ const formStrategy = new FormStrategy(async ({ form }) => {
 		throw new AuthorizationError("Invalid password");
 	}
 
-	const { password: _, geminiApiKey: __, openAIApiKey: ___, claudeApiKey: ____, ...safeUser } = user;
+	const {
+		password: _,
+		geminiApiKey: __,
+		openAIApiKey: ___,
+		claudeApiKey: ____,
+		...safeUser
+	} = user;
 	return safeUser;
 });
 
@@ -56,7 +62,13 @@ const googleStrategy = new GoogleStrategy<SafeUser>(
 			where: { email: profile.emails[0].value },
 		});
 		if (user) {
-			const { password, geminiApiKey, openAIApiKey, claudeApiKey, ...safeUser } = user;
+			const {
+				password,
+				geminiApiKey,
+				openAIApiKey,
+				claudeApiKey,
+				...safeUser
+			} = user;
 			return safeUser as SafeUser;
 		}
 		try {
