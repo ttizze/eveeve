@@ -10,11 +10,7 @@ import { Header } from "~/components/Header";
 import { authenticator } from "~/utils/auth.server";
 import { prisma } from "~/utils/prisma";
 import { getSession } from "~/utils/session.server";
-import { translate } from "../../feature/translate/libs/translation";
-import { addNumbersToContent } from "../../feature/translate/utils/addNumbersToContent";
-import { extractArticle } from "../../feature/translate/utils/extractArticle";
-import { extractNumberedElements } from "../../feature/translate/utils/extractNumberedElements";
-import { fetchWithRetry } from "../../feature/translate/utils/fetchWithRetry";
+import { translateJob } from "./translate-job.server";
 import { validateGeminiApiKey } from "../../feature/translate/utils/gemini";
 import { GeminiApiKeyForm } from "./components/GeminiApiKeyForm";
 import {
@@ -87,63 +83,69 @@ export async function action({ request }: ActionFunctionArgs) {
 	});
 	const clone = request.clone();
 	const formData = await clone.formData();
-	console.log(formData);
-	switch (formData.get("intent")) {
+
+	const intent = String(formData.get("intent"));
+	switch (intent) {
 		case "saveGeminiApiKey": {
 			const submission = parseWithZod(formData, { schema: geminiApiKeySchema });
 			if (submission.status !== "success") {
-				return submission.reply();
+				return { intent, lastResult: submission.reply() };
 			}
 			const isValid = await validateGeminiApiKey(submission.value.geminiApiKey);
 			if (!isValid) {
-				return submission.reply({
-					formErrors: ["Gemini API key validation failed"],
-				});
+				return {
+					intent,
+					lastResult: submission.reply({
+						formErrors: ["Gemini API key validation failed"],
+					}),
+				};
 			}
 			await prisma.user.update({
 				where: { id: safeUser.id },
 				data: { geminiApiKey: submission.value.geminiApiKey },
 			});
-			return redirect("/translate");
+			return { intent, lastResult: submission.reply({ resetForm: true }) };
 		}
 		case "translateUrl": {
 			const submission = parseWithZod(formData, {
 				schema: urlTranslationSchema,
 			});
 			if (submission.status !== "success") {
-				return submission.reply();
+				return {
+					intent,
+					lastResult: submission.reply(),
+					url: null,
+				};
 			}
 			const dbUser = await prisma.user.findUnique({
 				where: { id: safeUser.id },
 			});
 			if (!dbUser?.geminiApiKey) {
-				return submission.reply({ formErrors: ["Gemini API key is not set"] });
+				return {
+					intent,
+					lastResult: submission.reply({
+						formErrors: ["Gemini API key is not set"],
+					}),
+					url: null,
+				};
 			}
-
-			const html = await fetchWithRetry(submission.value.url);
-			const { content, title } = extractArticle(html, submission.value.url);
-			const numberedContent = addNumbersToContent(content);
-			const extractedNumberedElements = extractNumberedElements(
-				numberedContent,
-				title,
-			);
 			const session = await getSession(request.headers.get("Cookie"));
-			const targetLanguage = session.get("targetLanguage") || "ja";
+			// Start the translation job in background
+			translateJob({
+				url: submission.value.url,
+				targetLanguage: session.get("targetLanguage") || "ja",
+				apiKey: dbUser.geminiApiKey,
+				userId: safeUser.id,
+			});
 
-			await translate(
-				dbUser.geminiApiKey,
-				safeUser.id,
-				targetLanguage,
-				title,
-				numberedContent,
-				extractedNumberedElements,
-				submission.value.url,
-			);
-
-			return submission.reply();
+			return {
+				intent,
+				lastResult: submission.reply({ resetForm: true }),
+				url: submission.value.url,
+			};
 		}
 		default: {
-			return json({ error: "Invalid intent" });
+			throw new Error("Invalid Intent");
 		}
 	}
 }

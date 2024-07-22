@@ -8,12 +8,15 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { urlTranslationSchema } from "../types";
 import { AIModelSelector } from "./AIModelSelector";
+import type { action } from "../route";
+import { useTypedActionData } from "remix-typedjson";
 
 export function URLTranslationForm() {
 	const navigation = useNavigation();
 	const [selectedModel, setSelectedModel] = useState("gemini-1.5-flash");
-
+	const actionData = useTypedActionData<typeof action>();
 	const [form, fields] = useForm({
+		lastResult: actionData?.lastResult,
 		id: "url-translation-form",
 		constraint: getZodConstraint(urlTranslationSchema),
 		shouldValidate: "onBlur",
@@ -51,6 +54,14 @@ export function URLTranslationForm() {
 					</Button>
 				</div>
 			</Form>
+
+			{actionData?.intent === "translateUrl" && actionData?.url && (
+				<div className="bg-gray-800 p-4 rounded-lg">
+					<p className="text-white">
+						Translation job started for <strong>{actionData.url}</strong>
+					</p>
+				</div>
+			)}
 		</div>
 	);
 }
