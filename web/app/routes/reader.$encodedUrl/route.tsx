@@ -13,10 +13,10 @@ import { TranslatedContent } from "./components/TranslatedContent";
 import type { TranslationData } from "./types";
 import { fetchLatestPageVersionWithTranslations } from "./utils";
 import { handleAddTranslationAction, handleVoteAction } from "./utils/actions";
+import { getTargetLanguage } from "~/utils/target-language.server";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
-	const session = await getSession(request.headers.get("Cookie"));
-	const targetLanguage = session.get("targetLanguage") || "ja";
+	const targetLanguage = await getTargetLanguage(request);
 
 	const { encodedUrl } = params;
 	if (!encodedUrl) {
@@ -40,8 +40,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
 	const safeUser = await authenticator.isAuthenticated(request);
 	const safeUserId = safeUser?.id;
-	const session = await getSession(request.headers.get("Cookie"));
-	const targetLanguage = session.get("targetLanguage") || "ja";
+	const targetLanguage = await getTargetLanguage(request);
 
 	if (!safeUserId) {
 		return json({ error: "User not authenticated" }, { status: 401 });

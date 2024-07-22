@@ -2,7 +2,7 @@ import { commitSession, getSession } from "~/utils/session.server";
 
 export const getTargetLanguage = async (request: Request) => {
 	const session = await getSession(request.headers.get("Cookie"));
-	const targetLanguage = String(session.get("targetLanguage")) || "ja";
+	const targetLanguage = session.get("targetLanguage") ?? "ja";
 	return targetLanguage;
 };
 
