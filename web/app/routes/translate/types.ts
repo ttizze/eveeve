@@ -5,6 +5,7 @@ export const geminiApiKeySchema = z.object({
 });
 
 export const urlTranslationSchema = z.object({
+	intent: z.literal("translateUrl"),
 	url: z
 		.string()
 		.min(1, { message: "URLを入力してください" })
