@@ -1,8 +1,8 @@
 import { json } from "@remix-run/node";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import {
-	getTargetLanguage,
 	buildTargetLanguageCookie,
+	getTargetLanguage,
 } from "~/utils/target-language.server";
 
 export const loader: LoaderFunction = async ({ request }) => {

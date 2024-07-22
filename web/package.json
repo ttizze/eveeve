@@ -11,7 +11,7 @@
 		"typecheck": "tsc",
 		"check": "bunx @biomejs/biome check --write .",
 		"seed": "NODE_ENV=development  prisma db seed"
-  },
+	},
 	"prisma": {
 		"seed": "tsx prisma/seed.ts"
 	},

@@ -96,7 +96,9 @@ export function Translation({
 						onVote={(isUpvote) => handleVote(bestTranslation.id, isUpvote)}
 						userId={userId}
 					/>
-					<p className="text-sm text-gray-500 text-right">Translated by:{bestTranslation.userName}</p>
+					<p className="text-sm text-gray-500 text-right">
+						Translated by:{bestTranslation.userName}
+					</p>
 					{alternativeTranslations.length > 0 && (
 						<div className=" rounded-md">
 							<p className="font-semibold text-gray-600 mb-2">

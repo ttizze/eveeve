@@ -10,8 +10,8 @@ import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
-import { geminiApiKeySchema } from "../types";
 import type { action } from "../route";
+import { geminiApiKeySchema } from "../types";
 export function GeminiApiKeyForm() {
 	const actionData = useActionData<typeof action>();
 	const navigation = useNavigation();
