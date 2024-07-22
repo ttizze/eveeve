@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const geminiApiKeySchema = z.object({
+	intent: z.literal("saveGeminiApiKey"),
 	geminiApiKey: z.string().min(1, "API key is required"),
 });
 
@@ -12,6 +13,11 @@ export const urlTranslationSchema = z.object({
 		.url("有効なURLを入力してください"),
 	model: z.string().min(1, "モデルを選択してください"),
 });
+
+export const schema = z.discriminatedUnion("intent", [
+	geminiApiKeySchema,
+	urlTranslationSchema,
+]);
 
 export const PageVersionTranslationInfoSchema = z.object({
 	id: z.number(),

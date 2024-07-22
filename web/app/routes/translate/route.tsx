@@ -1,73 +1,35 @@
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { json } from "@remix-run/node";
 import { useRevalidator } from "@remix-run/react";
 import { useEffect } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
-import { z } from "zod";
 import { Header } from "~/components/Header";
 import { authenticator } from "~/utils/auth.server";
-import { prisma } from "~/utils/prisma";
-import { getSession } from "~/utils/session.server";
-import { translateJob } from "./translate-job.server";
-import { validateGeminiApiKey } from "../../feature/translate/utils/gemini";
+import { translateJob } from "./functions/translate-job.server";
+import { validateGeminiApiKey } from "~/feature/translate/utils/gemini";
 import { GeminiApiKeyForm } from "./components/GeminiApiKeyForm";
-import {
-	URLTranslationForm,
-	urlTranslationSchema,
-} from "./components/URLTranslationForm";
+import { URLTranslationForm } from "./components/URLTranslationForm";
 import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
+import { schema } from "./types";
 import {
-	type UserAITranslationInfoItem,
-	UserAITranslationInfoSchema,
-} from "./types";
-import { geminiApiKeySchema } from "./types";
+	getDbUser,
+	listUserAiTransationInfo,
+} from "./functions/queries.server";
+import { updateGeminiApiKey } from "./functions/mutations.server";
+import { getTargetLanguage } from "~/utils/target-language.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/",
 	});
-	let hasGeminiApiKey = false;
-	const dbUser = await prisma.user.findUnique({ where: { id: safeUser.id } });
-	if (dbUser?.geminiApiKey) {
-		hasGeminiApiKey = true;
-	}
 
-	const session = await getSession(request.headers.get("Cookie"));
-	const targetLanguage = session.get("targetLanguage") || "ja";
-	let userAITranslationInfo: UserAITranslationInfoItem[] = [];
-	const rawTranslationInfo = await prisma.userAITranslationInfo.findMany({
-		where: {
-			userId: safeUser.id,
-			targetLanguage,
-		},
-		include: {
-			pageVersion: {
-				select: {
-					title: true,
-					page: {
-						select: {
-							url: true,
-						},
-					},
-					pageVersionTranslationInfo: {
-						where: {
-							targetLanguage,
-						},
-					},
-				},
-			},
-		},
-		orderBy: {
-			lastTranslatedAt: "desc",
-		},
-		take: 10,
-	});
-
-	userAITranslationInfo = z
-		.array(UserAITranslationInfoSchema)
-		.parse(rawTranslationInfo);
+	const dbUser = await getDbUser(safeUser.id);
+	const hasGeminiApiKey = !!dbUser?.geminiApiKey;
+	const targetLanguage = await getTargetLanguage(request);
+	const userAITranslationInfo = await listUserAiTransationInfo(
+		safeUser.id,
+		targetLanguage,
+	);
 
 	return typedjson({
 		safeUser,
@@ -81,16 +43,14 @@ export async function action({ request }: ActionFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/",
 	});
-	const clone = request.clone();
-	const formData = await clone.formData();
+	const submission = parseWithZod(await request.formData(), { schema });
+	if (submission.status !== "success") {
+		return { intent: null, lastResult: submission.reply() };
+	}
+	const intent = submission.value.intent;
 
-	const intent = String(formData.get("intent"));
-	switch (intent) {
+	switch (submission.value.intent) {
 		case "saveGeminiApiKey": {
-			const submission = parseWithZod(formData, { schema: geminiApiKeySchema });
-			if (submission.status !== "success") {
-				return { intent, lastResult: submission.reply() };
-			}
 			const isValid = await validateGeminiApiKey(submission.value.geminiApiKey);
 			if (!isValid) {
 				return {
@@ -100,26 +60,11 @@ export async function action({ request }: ActionFunctionArgs) {
 					}),
 				};
 			}
-			await prisma.user.update({
-				where: { id: safeUser.id },
-				data: { geminiApiKey: submission.value.geminiApiKey },
-			});
+			await updateGeminiApiKey(safeUser.id, submission.value.geminiApiKey);
 			return { intent, lastResult: submission.reply({ resetForm: true }) };
 		}
 		case "translateUrl": {
-			const submission = parseWithZod(formData, {
-				schema: urlTranslationSchema,
-			});
-			if (submission.status !== "success") {
-				return {
-					intent,
-					lastResult: submission.reply(),
-					url: null,
-				};
-			}
-			const dbUser = await prisma.user.findUnique({
-				where: { id: safeUser.id },
-			});
+			const dbUser = await getDbUser(safeUser.id);
 			if (!dbUser?.geminiApiKey) {
 				return {
 					intent,
@@ -129,11 +74,11 @@ export async function action({ request }: ActionFunctionArgs) {
 					url: null,
 				};
 			}
-			const session = await getSession(request.headers.get("Cookie"));
+			const targetLanguage = await getTargetLanguage(request);
 			// Start the translation job in background
 			translateJob({
 				url: submission.value.url,
-				targetLanguage: session.get("targetLanguage") || "ja",
+				targetLanguage,
 				apiKey: dbUser.geminiApiKey,
 				userId: safeUser.id,
 			});
@@ -162,6 +107,7 @@ export default function TranslatePage() {
 
 		return () => clearInterval(intervalId);
 	}, [revalidator]);
+
 	return (
 		<div>
 			<Header safeUser={safeUser} />
