@@ -1,6 +1,5 @@
 import { useForm } from "@conform-to/react";
 import { getFormProps, getInputProps } from "@conform-to/react";
-import type { SubmissionResult } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form, useActionData } from "@remix-run/react";
 import { Link } from "@remix-run/react";
@@ -12,13 +11,13 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { geminiApiKeySchema } from "../types";
-
+import type { action } from "../route";
 export function GeminiApiKeyForm() {
-	const lastResult = useActionData<SubmissionResult>();
+	const actionData = useActionData<typeof action>();
 	const navigation = useNavigation();
 	const [form, { geminiApiKey }] = useForm({
 		id: "gemini-api-key-form",
-		lastResult,
+		lastResult: actionData?.lastResult,
 		constraint: getZodConstraint(geminiApiKeySchema),
 		shouldValidate: "onBlur",
 		shouldRevalidate: "onInput",
