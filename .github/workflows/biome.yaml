@@ -18,9 +18,9 @@ jobs:
       - name: Run Biome check and fix
         run: |
           cd web
-          bunx @biomejs/biome check --apply .
+          bunx @biomejs/biome check --write .
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "style: apply Biome fixes"
+          commit_message: "style: write Biome fixes"
           file_pattern: 'web/**/*'
