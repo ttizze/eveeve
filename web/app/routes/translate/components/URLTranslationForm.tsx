@@ -3,17 +3,21 @@ import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form, useNavigation } from "@remix-run/react";
 import { Languages } from "lucide-react";
 import { useState } from "react";
+import { useTypedActionData } from "remix-typedjson";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import type { action } from "../route";
 import { urlTranslationSchema } from "../types";
 import { AIModelSelector } from "./AIModelSelector";
 
 export function URLTranslationForm() {
 	const navigation = useNavigation();
 	const [selectedModel, setSelectedModel] = useState("gemini-1.5-flash");
-
+	const actionData = useTypedActionData<typeof action>();
 	const [form, fields] = useForm({
+		lastResult: actionData?.lastResult,
 		id: "url-translation-form",
 		constraint: getZodConstraint(urlTranslationSchema),
 		shouldValidate: "onBlur",
@@ -51,6 +55,16 @@ export function URLTranslationForm() {
 					</Button>
 				</div>
 			</Form>
+			{actionData?.intent === "translateUrl" && actionData?.url && (
+				<Alert className="bg-blue-50 border-blue-200 text-blue-800 animate-in fade-in duration-300">
+					<AlertTitle className="text-center">
+						Translation Job Started
+					</AlertTitle>
+					<AlertDescription className="text-center">
+						<strong className="font-semibold ">{actionData.url}</strong>
+					</AlertDescription>
+				</Alert>
+			)}
 		</div>
 	);
 }

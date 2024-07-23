@@ -1,24 +1,26 @@
 import { useForm } from "@conform-to/react";
 import { getFormProps, getInputProps } from "@conform-to/react";
-import type { SubmissionResult } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form, useActionData } from "@remix-run/react";
 import { Link } from "@remix-run/react";
 import { useNavigation } from "@remix-run/react";
 import { Save } from "lucide-react";
 import { ExternalLink, Key } from "lucide-react";
+import { TriangleAlert } from "lucide-react";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
+import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
+import type { action } from "../route";
 import { geminiApiKeySchema } from "../types";
 
 export function GeminiApiKeyForm() {
-	const lastResult = useActionData<SubmissionResult>();
+	const actionData = useActionData<typeof action>();
 	const navigation = useNavigation();
 	const [form, { geminiApiKey }] = useForm({
 		id: "gemini-api-key-form",
-		lastResult,
+		lastResult: actionData?.lastResult,
 		constraint: getZodConstraint(geminiApiKeySchema),
 		shouldValidate: "onBlur",
 		shouldRevalidate: "onInput",
@@ -28,7 +30,7 @@ export function GeminiApiKeyForm() {
 	});
 
 	return (
-		<Card className="w-full max-w-md mx-auto ">
+		<Card className="w-full mx-auto ">
 			<CardHeader>
 				<CardTitle className="text-center">Set Gemini API Key</CardTitle>
 			</CardHeader>
@@ -51,6 +53,24 @@ export function GeminiApiKeyForm() {
 						</Button>
 					</Link>
 				</div>
+				<Alert variant="default" className="flex items-center justify-center">
+					<div className="flex items-center gap-2">
+						<TriangleAlert className="h-10 w-4 text-yellow-400" />
+						<AlertDescription>
+							法律に違反する使用や、許可のない商用利用はお控えください。
+							<br />
+							API Keyを保存することで、
+							<Link
+								to="/terms"
+								className="text-blue-600 hover:underline"
+								target="_blank"
+							>
+								利用規約
+							</Link>
+							に同意したものとみなされます。
+						</AlertDescription>
+					</div>
+				</Alert>
 				<Form method="post" {...getFormProps(form)}>
 					<div className="flex items-center">
 						<div className="w-full">
@@ -77,6 +97,7 @@ export function GeminiApiKeyForm() {
 							)}
 						</Button>
 					</div>
+
 					<div
 						id={geminiApiKey.errorId}
 						className="text-red-500 text-center mt-2"

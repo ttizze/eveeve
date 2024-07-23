@@ -1,77 +1,35 @@
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { json } from "@remix-run/node";
 import { useRevalidator } from "@remix-run/react";
 import { useEffect } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
-import { z } from "zod";
 import { Header } from "~/components/Header";
+import { validateGeminiApiKey } from "~/feature/translate/utils/gemini";
 import { authenticator } from "~/utils/auth.server";
-import { prisma } from "~/utils/prisma";
-import { getSession } from "~/utils/session.server";
-import { translate } from "../../feature/translate/libs/translation";
-import { addNumbersToContent } from "../../feature/translate/utils/addNumbersToContent";
-import { extractArticle } from "../../feature/translate/utils/extractArticle";
-import { extractNumberedElements } from "../../feature/translate/utils/extractNumberedElements";
-import { fetchWithRetry } from "../../feature/translate/utils/fetchWithRetry";
-import { validateGeminiApiKey } from "../../feature/translate/utils/gemini";
+import { getTargetLanguage } from "~/utils/target-language.server";
 import { GeminiApiKeyForm } from "./components/GeminiApiKeyForm";
-import {
-	URLTranslationForm,
-	urlTranslationSchema,
-} from "./components/URLTranslationForm";
+import { URLTranslationForm } from "./components/URLTranslationForm";
 import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
+import { updateGeminiApiKey } from "./functions/mutations.server";
 import {
-	type UserAITranslationInfoItem,
-	UserAITranslationInfoSchema,
-} from "./types";
-import { geminiApiKeySchema } from "./types";
+	getDbUser,
+	listUserAiTransationInfo,
+} from "./functions/queries.server";
+import { translateJob } from "./functions/translate-job.server";
+import { schema } from "./types";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/",
 	});
-	let hasGeminiApiKey = false;
-	const dbUser = await prisma.user.findUnique({ where: { id: safeUser.id } });
-	if (dbUser?.geminiApiKey) {
-		hasGeminiApiKey = true;
-	}
 
-	const session = await getSession(request.headers.get("Cookie"));
-	const targetLanguage = session.get("targetLanguage") || "ja";
-	let userAITranslationInfo: UserAITranslationInfoItem[] = [];
-	const rawTranslationInfo = await prisma.userAITranslationInfo.findMany({
-		where: {
-			userId: safeUser.id,
-			targetLanguage,
-		},
-		include: {
-			pageVersion: {
-				select: {
-					title: true,
-					page: {
-						select: {
-							url: true,
-						},
-					},
-					pageVersionTranslationInfo: {
-						where: {
-							targetLanguage,
-						},
-					},
-				},
-			},
-		},
-		orderBy: {
-			lastTranslatedAt: "desc",
-		},
-		take: 10,
-	});
-
-	userAITranslationInfo = z
-		.array(UserAITranslationInfoSchema)
-		.parse(rawTranslationInfo);
+	const dbUser = await getDbUser(safeUser.id);
+	const hasGeminiApiKey = !!dbUser?.geminiApiKey;
+	const targetLanguage = await getTargetLanguage(request);
+	const userAITranslationInfo = await listUserAiTransationInfo(
+		safeUser.id,
+		targetLanguage,
+	);
 
 	return typedjson({
 		safeUser,
@@ -85,65 +43,54 @@ export async function action({ request }: ActionFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/",
 	});
-	const clone = request.clone();
-	const formData = await clone.formData();
-	console.log(formData);
-	switch (formData.get("intent")) {
+	const submission = parseWithZod(await request.formData(), { schema });
+	if (submission.status !== "success") {
+		return { intent: null, lastResult: submission.reply() };
+	}
+	const intent = submission.value.intent;
+
+	switch (submission.value.intent) {
 		case "saveGeminiApiKey": {
-			const submission = parseWithZod(formData, { schema: geminiApiKeySchema });
-			if (submission.status !== "success") {
-				return submission.reply();
-			}
 			const isValid = await validateGeminiApiKey(submission.value.geminiApiKey);
 			if (!isValid) {
-				return submission.reply({
-					formErrors: ["Gemini API key validation failed"],
-				});
+				return {
+					intent,
+					lastResult: submission.reply({
+						formErrors: ["Gemini API key validation failed"],
+					}),
+				};
 			}
-			await prisma.user.update({
-				where: { id: safeUser.id },
-				data: { geminiApiKey: submission.value.geminiApiKey },
-			});
-			return redirect("/translate");
+			await updateGeminiApiKey(safeUser.id, submission.value.geminiApiKey);
+			return { intent, lastResult: submission.reply({ resetForm: true }) };
 		}
 		case "translateUrl": {
-			const submission = parseWithZod(formData, {
-				schema: urlTranslationSchema,
-			});
-			if (submission.status !== "success") {
-				return submission.reply();
-			}
-			const dbUser = await prisma.user.findUnique({
-				where: { id: safeUser.id },
-			});
+			const dbUser = await getDbUser(safeUser.id);
 			if (!dbUser?.geminiApiKey) {
-				return submission.reply({ formErrors: ["Gemini API key is not set"] });
+				return {
+					intent,
+					lastResult: submission.reply({
+						formErrors: ["Gemini API key is not set"],
+					}),
+					url: null,
+				};
 			}
-
-			const html = await fetchWithRetry(submission.value.url);
-			const { content, title } = extractArticle(html, submission.value.url);
-			const numberedContent = addNumbersToContent(content);
-			const extractedNumberedElements = extractNumberedElements(
-				numberedContent,
-				title,
-			);
-			const session = await getSession(request.headers.get("Cookie"));
-			const targetLanguage = session.get("targetLanguage") || "ja";
-
-			await translate(
-				dbUser.geminiApiKey,
-				safeUser.id,
+			const targetLanguage = await getTargetLanguage(request);
+			// Start the translation job in background
+			translateJob({
+				url: submission.value.url,
 				targetLanguage,
-				title,
-				numberedContent,
-				extractedNumberedElements,
-				submission.value.url,
-			);
+				apiKey: dbUser.geminiApiKey,
+				userId: safeUser.id,
+			});
 
-			return submission.reply();
+			return {
+				intent,
+				lastResult: submission.reply({ resetForm: true }),
+				url: submission.value.url,
+			};
 		}
 		default: {
-			return json({ error: "Invalid intent" });
+			throw new Error("Invalid Intent");
 		}
 	}
 }
@@ -160,13 +107,14 @@ export default function TranslatePage() {
 
 		return () => clearInterval(intervalId);
 	}, [revalidator]);
+
 	return (
 		<div>
 			<Header safeUser={safeUser} />
 			<div className="container mx-auto max-w-2xl min-h-50 py-10">
 				<div className="pb-4">
-					{safeUser && hasGeminiApiKey && <URLTranslationForm />}
-					{safeUser && !hasGeminiApiKey && <GeminiApiKeyForm />}
+					{hasGeminiApiKey && <URLTranslationForm />}
+					{!hasGeminiApiKey && <GeminiApiKeyForm />}
 				</div>
 				<div>
 					<h2 className="text-2xl font-bold">Translation history</h2>

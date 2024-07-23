@@ -10,9 +10,9 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Progress } from "~/components/ui/progress";
 import { ScrollArea } from "~/components/ui/scroll-area";
+import { cn } from "~/utils/cn";
 import type { UserAITranslationInfoItem } from "../types";
 import { urlTranslationSchema } from "../types";
-
 type UserAITranslationStatusProps = {
 	userAITranslationInfo: UserAITranslationInfoItem[];
 	targetLanguage: string;
@@ -82,12 +82,16 @@ export function UserAITranslationStatus({
 										</Badge>
 										<Progress
 											value={item.aiTranslationProgress}
-											className="mt-2"
+											className={cn(
+												"mt-2",
+												item.aiTranslationStatus === "in_progress" &&
+													"bg-blue-400 animate-pulse",
+											)}
 										/>
 										<p className="text-xs mt-2">
 											{new Date(item.lastTranslatedAt).toLocaleString()}
 										</p>
-										{!isCompleted && (
+										{item.aiTranslationStatus === "failed" && (
 											<div className="mt-auto pt-2">
 												<Form method="post">
 													<input
@@ -145,7 +149,7 @@ function getVariantForStatus(
 	switch (status) {
 		case "completed":
 			return "default";
-		case "processing":
+		case "in_progress":
 			return "secondary";
 		case "failed":
 			return "destructive";

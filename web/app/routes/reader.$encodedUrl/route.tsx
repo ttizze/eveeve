@@ -7,7 +7,7 @@ import { useParams } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
-import { getSession } from "~/utils/session.server";
+import { getTargetLanguage } from "~/utils/target-language.server";
 import { authenticator } from "../../utils/auth.server";
 import { TranslatedContent } from "./components/TranslatedContent";
 import type { TranslationData } from "./types";
@@ -18,8 +18,7 @@ import { splitContentByHeadings } from "./utils";
 import { useNavigate } from "@remix-run/react";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
-	const session = await getSession(request.headers.get("Cookie"));
-	const targetLanguage = session.get("targetLanguage") || "ja";
+	const targetLanguage = await getTargetLanguage(request);
 
 	const { encodedUrl } = params;
 	if (!encodedUrl) {
@@ -64,8 +63,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
 	const safeUser = await authenticator.isAuthenticated(request);
 	const safeUserId = safeUser?.id;
-	const session = await getSession(request.headers.get("Cookie"));
-	const targetLanguage = session.get("targetLanguage") || "ja";
+	const targetLanguage = await getTargetLanguage(request);
 
 	if (!safeUserId) {
 		return json({ error: "User not authenticated" }, { status: 401 });
