@@ -1,0 +1,26 @@
+name: Biome Check and Fix for Web
+
+on:
+  pull_request:
+
+jobs:
+  biome-check-and-fix-for-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - name: Install Bun
+        run: npm install -g bun
+      - name: Install dependencies
+        run: cd web && bun i
+      - name: Run Biome check and fix
+        run: |
+          cd web
+          bunx @biomejs/biome check --write .
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "style: write Biome fixes"
+          file_pattern: 'web/**/*'
