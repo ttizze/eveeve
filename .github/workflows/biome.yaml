@@ -2,8 +2,6 @@ name: Biome Check and Fix
 
 on:
   pull_request:
-    paths:
-      - 'web/**'
 
 jobs:
   biome:
