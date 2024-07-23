@@ -1,4 +1,4 @@
-name: Biome Check and Fix
+name: Biome Check and Fix for Web
 
 on:
   pull_request:
