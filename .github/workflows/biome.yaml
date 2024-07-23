@@ -11,6 +11,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '20'
+      - name: Install Bun
+        run: npm install -g bun
       - name: Install dependencies
         run: cd web && bun i
       - name: Run Biome check and fix
