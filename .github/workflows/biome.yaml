@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  biome:
+  biome-check-and-fix-for-web:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
