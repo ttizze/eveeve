@@ -3,20 +3,28 @@ import {
 	type LoaderFunctionArgs,
 	json,
 } from "@remix-run/node";
-import { useParams } from "@remix-run/react";
+import { useParams, useSearchParams } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
+import { useNavigate } from "@remix-run/react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
+import {
+	Pagination,
+	PaginationContent,
+	PaginationEllipsis,
+	PaginationItem,
+	PaginationLink,
+	PaginationNext,
+	PaginationPrevious,
+} from "~/components/ui/pagination";
+import { prisma } from "~/utils/prisma";
 import { getTargetLanguage } from "~/utils/target-language.server";
 import { authenticator } from "../../utils/auth.server";
 import { TranslatedContent } from "./components/TranslatedContent";
 import type { TranslationData } from "./types";
 import { fetchLatestPageVersionWithTranslations } from "./utils";
-import { handleAddTranslationAction, handleVoteAction } from "./utils/actions";
-import { prisma } from "~/utils/prisma";
 import { splitContentByHeadings } from "./utils";
-import { useNavigate } from "@remix-run/react";
-
+import { handleAddTranslationAction, handleVoteAction } from "./utils/actions";
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const targetLanguage = await getTargetLanguage(request);
 
@@ -25,25 +33,24 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		throw new Response("Missing URL parameter", { status: 400 });
 	}
 	const url = new URL(request.url);
-  const page = Number.parseInt(url.searchParams.get("page") || "1", 10);
+	const page = Number.parseInt(url.searchParams.get("page") || "1", 10);
 
 	const safeUser = await authenticator.isAuthenticated(request);
 	const safeUserId = safeUser?.id;
-  const fullPageVersion = await prisma.pageVersion.findFirst({
-    where: { url: decodeURIComponent(encodedUrl) },
-    orderBy: { createdAt: "desc" },
-    select: { content: true },
-  });
+	const fullPageVersion = await prisma.pageVersion.findFirst({
+		where: { url: decodeURIComponent(encodedUrl) },
+		orderBy: { createdAt: "desc" },
+		select: { content: true },
+	});
 	if (!fullPageVersion) {
 		throw new Response("Failed to fetch article", { status: 500 });
 	}
 	const sections = splitContentByHeadings(fullPageVersion.content);
 
-  const currentSection = sections[1];
-	console.log(currentSection);
-  if (!currentSection) {
-    throw new Response("Page not found", { status: 404 });
-  }
+	const currentSection = sections[page - 1];
+	if (!currentSection) {
+		throw new Response("Page not found", { status: 404 });
+	}
 	const currentNumbers = currentSection.dataNumber;
 
 	const currentPageData = await fetchLatestPageVersionWithTranslations(
@@ -57,7 +64,14 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		throw new Response("Failed to fetch article", { status: 500 });
 	}
 
-	return typedjson({ currentPageData, safeUser, currentPage: page, totalPages: sections.length,sectionHtml: currentSection.html, targetLanguage });
+	return typedjson({
+		currentPageData,
+		safeUser,
+		currentPage: page,
+		totalPages: sections.length,
+		sectionHtml: currentSection.html,
+		targetLanguage,
+	});
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -83,8 +97,75 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function ReaderView() {
+	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
 	const { encodedUrl } = useParams();
-	const { currentPageData, safeUser, currentPage, totalPages, sectionHtml, targetLanguage } = useTypedLoaderData<typeof loader>();
+	const {
+		currentPageData,
+		safeUser,
+		currentPage,
+		totalPages,
+		sectionHtml,
+		targetLanguage,
+	} = useTypedLoaderData<typeof loader>();
+
+	const handlePageChange = (page: number) => {
+		const newSearchParams = new URLSearchParams(searchParams);
+		newSearchParams.set("page", page.toString());
+		navigate(`/reader/${encodedUrl}?${newSearchParams.toString()}`);
+	};
+	const renderPaginationItems = () => {
+		const items = [];
+
+		// 最初のページへのリンク
+		if (currentPage > 3) {
+			items.push(
+				<PaginationItem key="first">
+					<PaginationLink onClick={() => handlePageChange(1)}>1</PaginationLink>
+				</PaginationItem>,
+			);
+			if (currentPage > 4) {
+				items.push(<PaginationEllipsis />);
+			}
+		}
+
+		for (
+			let i = Math.max(1, currentPage - 2);
+			i <= Math.min(totalPages, currentPage + 2);
+			i++
+		) {
+			items.push(
+				<PaginationItem key={i}>
+					<PaginationLink
+						isActive={i === currentPage}
+						onClick={() => handlePageChange(i)}
+					>
+						{i}
+					</PaginationLink>
+				</PaginationItem>,
+			);
+		}
+
+		// 最後のページへのリンク
+		if (currentPage < totalPages - 2) {
+			if (currentPage < totalPages - 3) {
+				items.push(
+					<PaginationItem key="end-ellipsis">
+						<PaginationEllipsis />
+					</PaginationItem>,
+				);
+			}
+			items.push(
+				<PaginationItem key="last">
+					<PaginationLink onClick={() => handlePageChange(totalPages)}>
+						{totalPages}
+					</PaginationLink>
+				</PaginationItem>,
+			);
+		}
+
+		return items;
+	};
 
 	const fetcher = useFetcher();
 
@@ -145,6 +226,32 @@ export default function ReaderView() {
 						onAdd={handleAddTranslation}
 						userId={safeUser?.id ?? null}
 					/>
+					<div className="mt-8">
+						<Pagination>
+							<PaginationContent style={{ listStyleType: "none" }}>
+								<PaginationItem>
+									<PaginationPrevious href="#" />
+								</PaginationItem>
+								<PaginationItem>
+									<PaginationLink href="#">1</PaginationLink>
+								</PaginationItem>
+								<PaginationItem>
+									<PaginationLink href="#" isActive>
+										2
+									</PaginationLink>
+								</PaginationItem>
+								<PaginationItem>
+									<PaginationLink href="#">3</PaginationLink>
+								</PaginationItem>
+								<PaginationItem>
+									<PaginationEllipsis />
+								</PaginationItem>
+								<PaginationItem>
+									<PaginationNext href="#" />
+								</PaginationItem>
+							</PaginationContent>
+						</Pagination>
+					</div>
 				</article>
 			</div>
 		</div>
