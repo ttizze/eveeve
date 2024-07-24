@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import parse from "html-react-parser";
 import { Plus, X } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -7,7 +8,6 @@ import type { TranslationWithVote } from "../types";
 import { AddTranslationForm } from "./AddTranslationForm";
 import { AlternativeTranslations } from "./AlternativeTranslations";
 import { VoteButtons } from "./VoteButtons";
-import DOMPurify from "dompurify";
 
 interface TranslationProps {
 	translationsWithVotes: TranslationWithVote[];
@@ -56,8 +56,8 @@ export function Translation({
 			<div className="text-lg font-medium ">
 				{parse(
 					DOMPurify.sanitize(
-						bestTranslationWithVote.text.replace(/(\r\n|\n|\\n)/g, "<br />")
-					)
+						bestTranslationWithVote.text.replace(/(\r\n|\n|\\n)/g, "<br />"),
+					),
 				)}
 			</div>
 			<Button
