@@ -6,7 +6,7 @@ on:
 jobs:
   biome-check-and-fix-for-web:
     runs-on: ubuntu-latest
-    if: '!contains(github.event.head_commit.message, "[skip biome]")'
+    if: ${{ github.actor != 'github-actions[bot]' && github.event_name != 'push' || github.event.pusher.name != 'github-actions[bot]' }}
     permissions:
       contents: write
     steps:
