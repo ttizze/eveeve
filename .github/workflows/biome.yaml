@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+            ref: ${{ github.head_ref }}
       - uses: actions/setup-node@v3
         with:
           node-version: '20'
@@ -24,3 +26,4 @@ jobs:
         with:
           commit_message: "style: write Biome fixes"
           file_pattern: 'web/**/*'
+          branch: ${{ github.head_ref }}
