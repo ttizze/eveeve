@@ -16,7 +16,11 @@ export function VoteButtons({ translationWithVote, userId }: VoteButtonsProps) {
 		<div className="flex justify-end items-center mt-2">
 			<fetcher.Form method="post" className="space-x-2 flex">
 				<input type="hidden" name="intent" value="vote" />
-				<input type="hidden" name="translateTextId" value={translationWithVote.id.toString()} />
+				<input
+					type="hidden"
+					name="translateTextId"
+					value={translationWithVote.id.toString()}
+				/>
 				<Button
 					variant="outline"
 					size="sm"
