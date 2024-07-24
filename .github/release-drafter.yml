@@ -39,7 +39,7 @@ version-resolver:
 template: |
   ## Changes
   $CHANGES
-  
+
 autolabeler:
   - label: feature
     branch:
@@ -59,3 +59,7 @@ autolabeler:
   - label: enhancement
     branch:
       - '/(enhancement|improve)[/-].+/'
+  - label: dependencies
+    branch:
+      - '/^dep(s)?[/-].+/'
+      - '/^dependency[/-].+/'
