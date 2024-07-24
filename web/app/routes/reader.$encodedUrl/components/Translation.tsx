@@ -4,9 +4,9 @@ import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { useClickOutside } from "../functions/useClickOutside";
 import type { TranslationWithVote } from "../types";
-import { VoteButtons } from "./VoteButtons";
-import { AlternativeTranslations } from "./AlternativeTranslations";
 import { AddTranslationForm } from "./AddTranslationForm";
+import { AlternativeTranslations } from "./AlternativeTranslations";
+import { VoteButtons } from "./VoteButtons";
 
 interface TranslationProps {
 	translationsWithVotes: TranslationWithVote[];
@@ -54,7 +54,7 @@ export function Translation({
 		>
 			<div className="text-lg font-medium ">
 				{parse(
-					bestTranslationWithVote.text.replace(/(\r\n|\n|\\n)/g, "<br />")
+					bestTranslationWithVote.text.replace(/(\r\n|\n|\\n)/g, "<br />"),
 				)}
 			</div>
 			<Button
@@ -77,10 +77,11 @@ export function Translation({
 					<p className="text-sm text-gray-500 text-right">
 						Translated by:{bestTranslationWithVote.userName}
 					</p>
-					<AlternativeTranslations translationsWithVotes={alternativeTranslationsWithVotes} userId={userId} />
-					{userId && (
-						<AddTranslationForm sourceTextId={sourceTextId} />
-					)}
+					<AlternativeTranslations
+						translationsWithVotes={alternativeTranslationsWithVotes}
+						userId={userId}
+					/>
+					{userId && <AddTranslationForm sourceTextId={sourceTextId} />}
 				</div>
 			)}
 		</div>

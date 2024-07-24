@@ -1,9 +1,9 @@
+import { getFormProps, getInputProps, useForm } from "@conform-to/react";
+import { parseWithZod } from "@conform-to/zod";
 import { useFetcher } from "@remix-run/react";
 import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import type { TranslationWithVote } from "../types";
-import { getFormProps, getInputProps, useForm } from "@conform-to/react";
-import { parseWithZod } from "@conform-to/zod";
 import { voteSchema } from "../types";
 
 interface VoteButtonsProps {
@@ -22,8 +22,15 @@ export function VoteButtons({ translationWithVote, userId }: VoteButtonsProps) {
 
 	return (
 		<div className="flex justify-end items-center mt-2">
-			<fetcher.Form method="post" {...getFormProps(form)} className="space-x-2 flex">
-				<input value="vote" {...getInputProps(fields.intent, { type: "hidden" })} />
+			<fetcher.Form
+				method="post"
+				{...getFormProps(form)}
+				className="space-x-2 flex"
+			>
+				<input
+					value="vote"
+					{...getInputProps(fields.intent, { type: "hidden" })}
+				/>
 				<input
 					value={translationWithVote.id.toString()}
 					{...getInputProps(fields.translateTextId, { type: "hidden" })}
