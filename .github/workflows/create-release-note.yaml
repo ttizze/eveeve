@@ -3,7 +3,10 @@ name: Create Release Note
 on:
   pull_request:
     types:
-      - closed
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
     branches:
       - main
 
