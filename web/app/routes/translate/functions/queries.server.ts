@@ -6,7 +6,7 @@ export const getDbUser = async (userId: number) => {
 	return await prisma.user.findUnique({ where: { id: userId } });
 };
 
-export const listUserAiTransationInfo = async (
+export const listUserAiTranslationInfo = async (
 	userId: number,
 	targetLanguage: string,
 ) => {

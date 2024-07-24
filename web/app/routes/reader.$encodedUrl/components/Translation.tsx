@@ -1,28 +1,25 @@
+import { useFetcher } from "@remix-run/react";
 import DOMPurify from "dompurify";
 import parse from "html-react-parser";
 import { Edit, Plus, X } from "lucide-react";
 import { Save, Trash } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
-import { useClickOutside } from "../hooks/useClickOutside";
-import type { TranslationData } from "../types";
+import { useClickOutside } from "../functions/useClickOutside";
+import type { TranslationWithVote } from "../types";
 import { VoteButtons } from "./VoteButtons";
 
 interface TranslationProps {
-	translations: TranslationData[];
+	translationsWithVotes: TranslationWithVote[];
 	targetLanguage: string;
-	onVote: (translationId: number, isUpvote: boolean) => void;
-	onAdd: (sourceTextId: number, text: string) => void;
 	userId: number | null;
 	sourceTextId: number;
 }
 
 export function Translation({
-	translations,
+	translationsWithVotes,
 	targetLanguage,
-	onVote,
-	onAdd,
 	userId,
 	sourceTextId,
 }: TranslationProps) {
@@ -30,9 +27,10 @@ export function Translation({
 	const [isEditing, setIsEditing] = useState(false);
 	const [editText, setEditText] = useState("");
 	const ref = useClickOutside(() => setIsExpanded(false));
+	const fetcher = useFetcher();
 
-	const bestTranslation = useMemo(() => {
-		const upvotedTranslations = translations.filter(
+	const bestTranslationWithVote = useMemo(() => {
+		const upvotedTranslations = translationsWithVotes.filter(
 			(t) => t.userVote?.isUpvote,
 		);
 		if (upvotedTranslations.length > 0) {
@@ -42,28 +40,27 @@ export function Translation({
 				return currentUpdatedAt > prevUpdatedAt ? current : prev;
 			});
 		}
-		return translations.reduce((prev, current) =>
+		return translationsWithVotes.reduce((prev, current) =>
 			prev.point > current.point ? prev : current,
 		);
-	}, [translations]);
+	}, [translationsWithVotes]);
 
-	const alternativeTranslations = useMemo(
-		() => translations.filter((t) => t.id !== bestTranslation.id),
-		[translations, bestTranslation],
+	const alternativeTranslationsWithVotes = useMemo(
+		() =>
+			translationsWithVotes.filter((t) => t.id !== bestTranslationWithVote.id),
+		[translationsWithVotes, bestTranslationWithVote],
 	);
 
-	const handleVote = useCallback(
-		(translationId: number, isUpvote: boolean) => {
-			onVote(translationId, isUpvote);
-		},
-		[onVote],
-	);
-
-	const handleAdd = useCallback(() => {
-		onAdd(sourceTextId, editText);
-		setIsEditing(false);
-		setEditText("");
-	}, [onAdd, editText, sourceTextId]);
+	const handleAddTranslation = (sourceTextId: number, text: string) => {
+		fetcher.submit(
+			{
+				intent: "add",
+				sourceTextId: sourceTextId,
+				text,
+			},
+			{ method: "post" },
+		);
+	};
 
 	return (
 		<div
@@ -74,7 +71,7 @@ export function Translation({
 			<div className="text-lg font-medium ">
 				{parse(
 					DOMPurify.sanitize(
-						bestTranslation.text.replace(/(\r\n|\n|\\n)/g, "<br />"),
+						bestTranslationWithVote.text.replace(/(\r\n|\n|\\n)/g, "<br />"),
 					),
 				)}
 			</div>
@@ -92,30 +89,25 @@ export function Translation({
 			{isExpanded && (
 				<div className="">
 					<VoteButtons
-						translation={bestTranslation}
-						onVote={(isUpvote) => handleVote(bestTranslation.id, isUpvote)}
+						translationWithVote={bestTranslationWithVote}
 						userId={userId}
 					/>
 					<p className="text-sm text-gray-500 text-right">
-						Translated by:{bestTranslation.userName}
+						Translated by:{bestTranslationWithVote.userName}
 					</p>
-					{alternativeTranslations.length > 0 && (
+					{alternativeTranslationsWithVotes.length > 0 && (
 						<div className=" rounded-md">
 							<p className="font-semibold text-gray-600 mb-2">
 								Other translations:
 							</p>
 							<div className="space-y-3">
-								{alternativeTranslations.map((alt) => (
+								{alternativeTranslationsWithVotes.map((alt) => (
 									<div
 										key={alt.id}
 										className="p-2 rounded border border-gray-200"
 									>
 										<div className="text-sm  mb-2">{alt.text}</div>
-										<VoteButtons
-											translation={alt}
-											onVote={(isUpvote) => onVote(alt.id, isUpvote)}
-											userId={userId}
-										/>
+										<VoteButtons translationWithVote={alt} userId={userId} />
 									</div>
 								))}
 							</div>
@@ -147,8 +139,11 @@ export function Translation({
 									/>
 									<div className="space-x-2 flex justify-end">
 										<Button
-											onClick={handleAdd}
+											onClick={() =>
+												handleAddTranslation(sourceTextId, editText)
+											}
 											className="bg-green-500 hover:bg-green-600 text-white"
+											disabled={!editText}
 										>
 											<Save className="h-4 w-4" />
 										</Button>

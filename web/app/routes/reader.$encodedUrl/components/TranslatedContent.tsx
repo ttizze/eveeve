@@ -1,26 +1,18 @@
 import parse from "html-react-parser";
-import type { TranslationData } from "../types";
+import type { SourceTextInfoWithTranslations } from "../types";
 import { Translation } from "./Translation";
 
 interface TranslatedContentProps {
 	content: string;
-	translations: Array<{
-		number: number;
-		sourceTextId: number;
-		translations: TranslationData[];
-	}>;
+	sourceTextInfoWithTranslations: SourceTextInfoWithTranslations[];
 	targetLanguage: string;
-	onVote: (translationId: number, isUpvote: boolean) => void;
-	onAdd: (sourceTextId: number, text: string) => void;
 	userId: number | null;
 }
 
 export function TranslatedContent({
 	content,
-	translations,
+	sourceTextInfoWithTranslations,
 	targetLanguage,
-	onVote,
-	onAdd,
 	userId,
 }: TranslatedContentProps) {
 	if (typeof window === "undefined") {
@@ -29,7 +21,7 @@ export function TranslatedContent({
 
 	const doc = new DOMParser().parseFromString(content, "text/html");
 
-	for (const { number } of translations) {
+	for (const { number } of sourceTextInfoWithTranslations) {
 		const element = doc.querySelector(`[data-number="${number}"]`);
 		if (element) {
 			const translationElement = doc.createElement("div");
@@ -47,17 +39,18 @@ export function TranslatedContent({
 							domNode.attribs["data-translation"],
 							10,
 						);
-						const translationGroup = translations.find(
+						const translationGroup = sourceTextInfoWithTranslations.find(
 							(t) => t.number === number,
 						);
-						if (translationGroup && translationGroup.translations.length > 0) {
+						if (
+							translationGroup &&
+							translationGroup.translationsWithVotes.length > 0
+						) {
 							return (
 								<Translation
 									key={`translation-group-${number}`}
-									translations={translationGroup.translations}
+									translationsWithVotes={translationGroup.translationsWithVotes}
 									targetLanguage={targetLanguage}
-									onVote={onVote}
-									onAdd={onAdd}
 									userId={userId}
 									sourceTextId={translationGroup.sourceTextId}
 								/>

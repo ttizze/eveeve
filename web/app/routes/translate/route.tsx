@@ -13,7 +13,7 @@ import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
 import { updateGeminiApiKey } from "./functions/mutations.server";
 import {
 	getDbUser,
-	listUserAiTransationInfo,
+	listUserAiTranslationInfo,
 } from "./functions/queries.server";
 import { translateJob } from "./functions/translate-job.server";
 import { schema } from "./types";
@@ -26,7 +26,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const dbUser = await getDbUser(safeUser.id);
 	const hasGeminiApiKey = !!dbUser?.geminiApiKey;
 	const targetLanguage = await getTargetLanguage(request);
-	const userAITranslationInfo = await listUserAiTransationInfo(
+	const userAITranslationInfo = await listUserAiTranslationInfo(
 		safeUser.id,
 		targetLanguage,
 	);
