@@ -6,10 +6,11 @@ on:
 jobs:
   biome-check-and-fix-for-web:
     runs-on: ubuntu-latest
+    if: '!contains(github.event.head_commit.message, "[skip biome]")'
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
-        with:
-            ref: ${{ github.head_ref }}
       - uses: actions/setup-node@v3
         with:
           node-version: '20'
@@ -24,6 +25,5 @@ jobs:
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "style: write Biome fixes"
+          commit_message: "style: write Biome fixes [skip biome]"
           file_pattern: 'web/**/*'
-          branch: ${{ github.head_ref }}

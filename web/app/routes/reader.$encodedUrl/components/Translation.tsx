@@ -7,6 +7,7 @@ import type { TranslationWithVote } from "../types";
 import { AddTranslationForm } from "./AddTranslationForm";
 import { AlternativeTranslations } from "./AlternativeTranslations";
 import { VoteButtons } from "./VoteButtons";
+import DOMPurify from "dompurify";
 
 interface TranslationProps {
 	translationsWithVotes: TranslationWithVote[];
@@ -54,7 +55,9 @@ export function Translation({
 		>
 			<div className="text-lg font-medium ">
 				{parse(
-					bestTranslationWithVote.text.replace(/(\r\n|\n|\\n)/g, "<br />"),
+					DOMPurify.sanitize(
+						bestTranslationWithVote.text.replace(/(\r\n|\n|\\n)/g, "<br />")
+					)
 				)}
 			</div>
 			<Button
