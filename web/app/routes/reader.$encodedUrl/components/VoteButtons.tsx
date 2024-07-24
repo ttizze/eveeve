@@ -2,24 +2,31 @@ import { useFetcher } from "@remix-run/react";
 import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import type { TranslationWithVote } from "../types";
+import { getFormProps, getInputProps, useForm } from "@conform-to/react";
+import { parseWithZod } from "@conform-to/zod";
+import { voteSchema } from "../types";
 
 interface VoteButtonsProps {
 	translationWithVote: TranslationWithVote;
 	userId: number | null;
 }
-
 export function VoteButtons({ translationWithVote, userId }: VoteButtonsProps) {
 	const fetcher = useFetcher();
+	const [form, fields] = useForm({
+		id: `vote-form-${translationWithVote.id}`,
+		onValidate({ formData }) {
+			return parseWithZod(formData, { schema: voteSchema });
+		},
+	});
 	const isVoting = fetcher.state !== "idle";
 
 	return (
 		<div className="flex justify-end items-center mt-2">
-			<fetcher.Form method="post" className="space-x-2 flex">
-				<input type="hidden" name="intent" value="vote" />
+			<fetcher.Form method="post" {...getFormProps(form)} className="space-x-2 flex">
+				<input value="vote" {...getInputProps(fields.intent, { type: "hidden" })} />
 				<input
-					type="hidden"
-					name="translateTextId"
 					value={translationWithVote.id.toString()}
+					{...getInputProps(fields.translateTextId, { type: "hidden" })}
 				/>
 				<Button
 					variant="outline"

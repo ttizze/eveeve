@@ -25,15 +25,19 @@ export interface LatestPageVersionWithTranslations {
 	userId: number | null;
 }
 
+export const voteSchema = z.object({
+	intent: z.literal("vote"),
+	translateTextId: z.number(),
+	isUpvote: z.preprocess((val) => val === "true", z.boolean()),
+});
+
+export const addTranslationSchema = z.object({
+	intent: z.literal("add"),
+	sourceTextId: z.number(),
+	text: z.string(),
+});
+
 export const actionSchema = z.discriminatedUnion("intent", [
-	z.object({
-		intent: z.literal("vote"),
-		translateTextId: z.number(),
-		isUpvote: z.preprocess((val) => val === "true", z.boolean()),
-	}),
-	z.object({
-		intent: z.literal("add"),
-		sourceTextId: z.number(),
-		text: z.string(),
-	}),
+	addTranslationSchema,
+	voteSchema,
 ]);
