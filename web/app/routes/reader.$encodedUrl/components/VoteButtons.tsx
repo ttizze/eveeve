@@ -1,45 +1,52 @@
+import { useFetcher } from "@remix-run/react";
 import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import type { TranslationData } from "../types";
+import type { TranslationWithVote } from "../types";
 
 interface VoteButtonsProps {
-	translation: TranslationData;
-	onVote: (isUpvote: boolean) => void;
+	translationWithVote: TranslationWithVote;
 	userId: number | null;
 }
 
-export function VoteButtons({ translation, onVote, userId }: VoteButtonsProps) {
-	const userVoteStatus = translation.userVote
-		? translation.userVote.isUpvote
-			? "upvoted"
-			: "downvoted"
-		: "not_voted";
+export function VoteButtons({ translationWithVote, userId }: VoteButtonsProps) {
+	const fetcher = useFetcher();
+	const isVoting = fetcher.state !== "idle";
 
 	return (
 		<div className="flex justify-end items-center mt-2">
-			<div className="space-x-2">
+			<fetcher.Form method="post" className="space-x-2 flex">
+				<input type="hidden" name="intent" value="vote" />
+				<input
+					type="hidden"
+					name="translateTextId"
+					value={translationWithVote.id.toString()}
+				/>
 				<Button
 					variant="outline"
 					size="sm"
-					onClick={() => onVote(true)}
-					disabled={!userId}
+					type="submit"
+					name="isUpvote"
+					value="true"
+					disabled={!userId || isVoting}
 				>
 					<ThumbsUp
-						className={`mr-2 h-4 w-4 ${userVoteStatus === "upvoted" ? "text-blue-500" : ""}`}
+						className={`mr-2 h-4 w-4 ${translationWithVote.userVote?.isUpvote === true ? "text-blue-500" : ""}`}
 					/>
-					{translation.point}
+					{translationWithVote.point}
 				</Button>
 				<Button
 					variant="outline"
 					size="sm"
-					onClick={() => onVote(false)}
-					disabled={!userId}
+					type="submit"
+					name="isUpvote"
+					value="false"
+					disabled={!userId || isVoting}
 				>
 					<ThumbsDown
-						className={`mr-2 h-4 w-4 ${userVoteStatus === "downvoted" ? "text-red-500" : ""}`}
+						className={`mr-2 h-4 w-4 ${translationWithVote.userVote?.isUpvote === false ? "text-red-500" : ""}`}
 					/>
 				</Button>
-			</div>
+			</fetcher.Form>
 		</div>
 	);
 }

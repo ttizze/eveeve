@@ -1,10 +1,11 @@
 import { json } from "@remix-run/node";
 import { prisma } from "~/utils/prisma";
 
-export async function handleVoteAction(formData: FormData, userId: number) {
-	const translateTextId = Number(formData.get("translateTextId"));
-	const isUpvote = formData.get("isUpvote") === "true";
-
+export async function handleVoteAction(
+	translateTextId: number,
+	isUpvote: boolean,
+	userId: number,
+) {
 	await prisma.$transaction(async (tx) => {
 		const existingVote = await tx.vote.findUnique({
 			where: {
@@ -44,13 +45,11 @@ export async function handleVoteAction(formData: FormData, userId: number) {
 }
 
 export async function handleAddTranslationAction(
-	formData: FormData,
+	sourceTextId: number,
+	text: string,
 	userId: number,
 	targetLanguage: string,
 ) {
-	const sourceTextId = Number(formData.get("sourceTextId"));
-	const text = String(formData.get("text"));
-
 	const sourceText = await prisma.sourceText.findUnique({
 		where: { id: sourceTextId },
 		include: { page: true },

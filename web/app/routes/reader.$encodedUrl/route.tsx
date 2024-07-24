@@ -1,18 +1,17 @@
-import {
-	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
-	json,
-} from "@remix-run/node";
+import { parseWithZod } from "@conform-to/zod";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useParams } from "@remix-run/react";
-import { useFetcher } from "@remix-run/react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
 import { getTargetLanguage } from "~/utils/target-language.server";
 import { authenticator } from "../../utils/auth.server";
 import { TranslatedContent } from "./components/TranslatedContent";
-import type { TranslationData } from "./types";
-import { fetchLatestPageVersionWithTranslations } from "./utils";
-import { handleAddTranslationAction, handleVoteAction } from "./utils/actions";
+import {
+	handleAddTranslationAction,
+	handleVoteAction,
+} from "./functions/mutations.server";
+import { fetchLatestPageVersionWithTranslations } from "./functions/queries.server";
+import { actionSchema } from "./types";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const targetLanguage = await getTargetLanguage(request);
@@ -33,7 +32,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		throw new Response("Failed to fetch article", { status: 500 });
 	}
 
-	return typedjson({ pageData, safeUser });
+	return typedjson({ targetLanguage, pageData, safeUser });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -41,54 +40,52 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	const safeUserId = safeUser?.id;
 	const targetLanguage = await getTargetLanguage(request);
 
+	const submission = parseWithZod(await request.formData(), {
+		schema: actionSchema,
+	});
 	if (!safeUserId) {
-		return json({ error: "User not authenticated" }, { status: 401 });
+		return {
+			intent: null,
+			lastResult: submission.reply({ formErrors: ["User not authenticated"] }),
+		};
 	}
 
-	const formData = await request.formData();
-	const action = formData.get("action");
-
-	switch (action) {
+	if (submission.status !== "success") {
+		return { intent: null, lastResult: submission.reply() };
+	}
+	const { intent } = submission.value;
+	switch (intent) {
 		case "vote":
-			return handleVoteAction(formData, safeUserId);
-		case "addTranslation":
-			return handleAddTranslationAction(formData, safeUserId, targetLanguage);
+			handleVoteAction(
+				submission.value.translateTextId,
+				submission.value.isUpvote,
+				safeUserId,
+			);
+			return { intent, lastResult: submission.reply({ resetForm: true }) };
+		case "add":
+			handleAddTranslationAction(
+				submission.value.sourceTextId,
+				submission.value.text,
+				safeUserId,
+				targetLanguage,
+			);
+			return { intent, lastResult: submission.reply({ resetForm: true }) };
 		default:
-			return json({ error: "Invalid action" }, { status: 400 });
+			throw new Error("Invalid Intent");
 	}
 };
 
 export default function ReaderView() {
 	const { encodedUrl } = useParams();
-	const { pageData, safeUser } = useTypedLoaderData<typeof loader>();
-	const fetcher = useFetcher();
+	const { targetLanguage, pageData, safeUser } =
+		useTypedLoaderData<typeof loader>();
 
 	if (!pageData) {
 		return <div>Loading...</div>;
 	}
 
 	const originalUrl = encodedUrl ? decodeURIComponent(encodedUrl) : "";
-	const handleVote = (translationId: number, isUpvote: boolean) => {
-		fetcher.submit(
-			{
-				action: "vote",
-				translateTextId: translationId.toString(),
-				isUpvote: isUpvote ? "true" : "false",
-			},
-			{ method: "post" },
-		);
-	};
 
-	const handleAddTranslation = (sourceTextId: number, text: string) => {
-		fetcher.submit(
-			{
-				action: "addTranslation",
-				sourceTextId: sourceTextId,
-				text,
-			},
-			{ method: "post" },
-		);
-	};
 	return (
 		<div>
 			<Header safeUser={safeUser} />
@@ -108,16 +105,10 @@ export default function ReaderView() {
 					<hr />
 					<TranslatedContent
 						content={pageData.content}
-						translations={
-							pageData.translations as Array<{
-								number: number;
-								sourceTextId: number;
-								translations: TranslationData[];
-							}>
+						sourceTextInfoWithTranslations={
+							pageData.sourceTextInfoWithTranslations
 						}
-						targetLanguage="ja"
-						onVote={handleVote}
-						onAdd={handleAddTranslation}
+						targetLanguage={targetLanguage}
 						userId={safeUser?.id ?? null}
 					/>
 				</article>
