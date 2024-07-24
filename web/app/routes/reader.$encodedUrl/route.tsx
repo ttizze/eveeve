@@ -49,7 +49,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			lastResult: submission.reply({ formErrors: ["User not authenticated"] }),
 		};
 	}
-
 	if (submission.status !== "success") {
 		return { intent: null, lastResult: submission.reply() };
 	}
