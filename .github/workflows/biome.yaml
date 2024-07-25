@@ -6,7 +6,6 @@ on:
 jobs:
   biome-check-and-fix-for-web:
     runs-on: ubuntu-latest
-    if: ${{ github.actor != 'github-actions[bot]' && github.event_name != 'push' || github.event.pusher.name != 'github-actions[bot]' }}
     permissions:
       contents: write
     steps:

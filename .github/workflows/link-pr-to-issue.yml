@@ -1,0 +1,28 @@
+name: Link PR to Issue
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  link_pr_to_issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract issue number from branch name
+        id: extract-issue
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          ISSUE_NUMBER=$(echo $BRANCH_NAME | grep -oP 'issue-\K\d+')
+          echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Link PR to issue
+        if: steps.extract-issue.outputs.issue_number
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          ISSUE_NUMBER: ${{ steps.extract-issue.outputs.issue_number }}
+        run: |
+          gh pr edit $PR_NUMBER --add-label "linked-to-issue"
+          gh pr comment $PR_NUMBER --body "This PR is linked to issue #$ISSUE_NUMBER"
+          gh issue edit $ISSUE_NUMBER --add-project "Project Board Name"
+          gh issue comment $ISSUE_NUMBER --body "PR #$PR_NUMBER has been linked to this issue"

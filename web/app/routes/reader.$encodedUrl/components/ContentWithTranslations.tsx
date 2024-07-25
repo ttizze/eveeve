@@ -2,6 +2,7 @@ import parse from "html-react-parser";
 import { memo, useMemo } from "react";
 import type { SourceTextInfoWithTranslations } from "../types";
 import { Translation } from "./Translation";
+import DOMPurify from 'dompurify';
 
 interface ContentWithTranslationsProps {
 	content: string;
@@ -22,6 +23,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 		}
 
 		const doc = new DOMParser().parseFromString(content, "text/html");
+    const sanitizedContent = DOMPurify.sanitize(content);
 		const translationMap = new Map(
 			sourceTextInfoWithTranslations.map((info) => [
 				info.number.toString(),
@@ -38,7 +40,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 			}
 		}
 
-		return parse(doc.body.innerHTML, {
+      return parse(sanitizedContent, {
 			replace: (domNode) => {
 				if (domNode.type === "tag" && domNode.attribs["data-translation"]) {
 					const number = domNode.attribs["data-translation"];
