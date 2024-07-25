@@ -22,8 +22,8 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 			return null;
 		}
 
-		const doc = new DOMParser().parseFromString(content, "text/html");
 		const sanitizedContent = DOMPurify.sanitize(content);
+		const doc = new DOMParser().parseFromString(sanitizedContent, "text/html");
 		const translationMap = new Map(
 			sourceTextInfoWithTranslations.map((info) => [
 				info.number.toString(),
@@ -40,7 +40,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 			}
 		}
 
-		return parse(sanitizedContent, {
+		return parse(doc.body.innerHTML, {
 			replace: (domNode) => {
 				if (domNode.type === "tag" && domNode.attribs["data-translation"]) {
 					const number = domNode.attribs["data-translation"];
