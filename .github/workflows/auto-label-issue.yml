@@ -23,7 +23,6 @@ jobs:
             docs:*|documentation:*) LABEL="documentation" ;;
             refactor:*) LABEL="refactor" ;;
             chore:*) LABEL="chore" ;;
-            *) LABEL="task" ;;
           esac
           
           gh issue edit $ISSUE_NUMBER --add-label "$LABEL"
