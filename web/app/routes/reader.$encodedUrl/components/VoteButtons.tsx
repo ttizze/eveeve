@@ -1,7 +1,7 @@
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { useFetcher } from "@remix-run/react";
-import { memo, useEffect, useMemo, useRef } from "react";
+import { memo, useMemo } from "react";
 import { cn } from "~/utils/cn";
 import type { TranslationWithVote } from "../types";
 import { voteSchema } from "../types";
@@ -28,7 +28,6 @@ export const VoteButtons = memo(function VoteButtons({
 		),
 	});
 	const isVoting = fetcher.state !== "idle";
-
 
 	const buttonClasses = useMemo(
 		() => ({

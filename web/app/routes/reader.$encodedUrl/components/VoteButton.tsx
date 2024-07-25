@@ -1,6 +1,5 @@
 import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { memo } from "react";
-import { useEffect, useRef } from "react";
 import { Button } from "~/components/ui/button";
 
 export const VoteButton = memo(function VoteButton({
