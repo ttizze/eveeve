@@ -5,7 +5,7 @@ import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
 import { getTargetLanguage } from "~/utils/target-language.server";
 import { authenticator } from "../../utils/auth.server";
-import { TranslatedContent } from "./components/TranslatedContent";
+import { ContentWithTranslations } from "./components/ContentWithTranslations";
 import {
 	handleAddTranslationAction,
 	handleVoteAction,
@@ -89,7 +89,7 @@ export default function ReaderView() {
 		<div>
 			<Header safeUser={safeUser} />
 			<div className="container mx-auto px-4 py-8">
-				<article className="prose dark:prose-invert lg:prose-xl mx-auto max-w-3xl">
+				<article className="prose dark:prose-invert lg:prose-xl mx-auto">
 					<h1>{pageData.title}</h1>
 					<p>
 						<a
@@ -102,7 +102,7 @@ export default function ReaderView() {
 						</a>
 					</p>
 					<hr />
-					<TranslatedContent
+					<ContentWithTranslations
 						content={pageData.content}
 						sourceTextInfoWithTranslations={
 							pageData.sourceTextInfoWithTranslations
