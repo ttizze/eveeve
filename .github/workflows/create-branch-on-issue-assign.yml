@@ -18,6 +18,7 @@ jobs:
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ASSIGNEE: ${{ github.event.assignee.login }}
         run: |
+          TYPE="task"
           LABELS=$(gh issue view $ISSUE_NUMBER --json labels -q '.labels[].name')
           
           for LABEL in $LABELS; do
