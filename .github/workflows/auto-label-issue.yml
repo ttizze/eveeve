@@ -17,18 +17,14 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
         run: |
-          if [[ $ISSUE_TITLE =~ ^(feat:|feature:) ]]; then
-            LABEL="feature"
-          elif [[ $ISSUE_TITLE =~ ^(fix:|bug:) ]]; then
-            LABEL="bug"
-          elif [[ $ISSUE_TITLE =~ ^(docs:|documentation:) ]]; then
-            LABEL="documentation"
-          elif [[ $ISSUE_TITLE =~ ^refactor: ]]; then
-            LABEL="refactor"
-          elif [[ $ISSUE_TITLE =~ ^chore: ]]; then
-            LABEL="chore"
-          else
-            LABEL="task"
-          fi
+          case "$ISSUE_TITLE" in
+            feat:*|feature:*) LABEL="feature" ;;
+            fix:*|bug:*) LABEL="bug" ;;
+            docs:*|documentation:*) LABEL="documentation" ;;
+            refactor:*) LABEL="refactor" ;;
+            chore:*) LABEL="chore" ;;
+            *) LABEL="task" ;;
+          esac
           
           gh issue edit $ISSUE_NUMBER --add-label "$LABEL"
+
