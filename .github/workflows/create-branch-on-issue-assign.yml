@@ -18,21 +18,23 @@ jobs:
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ASSIGNEE: ${{ github.event.assignee.login }}
         run: |
-          LABEL=$(gh issue view $ISSUE_NUMBER --json labels -q '.labels[0].name')
+          LABELS=$(gh issue view $ISSUE_NUMBER --json labels -q '.labels[].name')
           
-          case $LABEL in
-            "feature") TYPE="feat" ;;
-            "bug") TYPE="fix" ;;
-            "documentation") TYPE="docs" ;;
-            "refactor") TYPE="refactor" ;;
-            "chore") TYPE="chore" ;;
-          esac
-          
+          for LABEL in $LABELS; do
+            case $LABEL in
+              "feature") TYPE="feat"; break ;;
+              "bug") TYPE="fix"; break ;;
+              "documentation") TYPE="docs"; break ;;
+              "refactor") TYPE="refactor"; break ;;
+              "chore") TYPE="chore"; break ;;
+            esac
+          done
+
           BRANCH_NAME="${ASSIGNEE,,}/issue-${ISSUE_NUMBER}-${TYPE}"
-          
+
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git checkout -b "$BRANCH_NAME"
           git push origin "$BRANCH_NAME"
-          
+
           gh issue comment $ISSUE_NUMBER --body "created branch \`$BRANCH_NAME\`"
