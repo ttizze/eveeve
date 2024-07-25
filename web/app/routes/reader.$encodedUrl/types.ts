@@ -37,7 +37,7 @@ export const addTranslationSchema = z.object({
 		.string()
 		.min(1, "Translation cannot be empty")
 		.max(30000, "Translation is too long")
-		.transform((val) => val.trim())
+		.transform((val) => val.trim()),
 });
 
 export const actionSchema = z.discriminatedUnion("intent", [
