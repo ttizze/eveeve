@@ -16,41 +16,7 @@ export const VoteButtons = memo(function VoteButtons({
 	translationWithVote,
 	userId,
 }: VoteButtonsProps) {
-	const renderCount = useRef(0);
-	const performanceLog = useRef({
-		useForm: { total: 0, count: 0 },
-		classNameGeneration: { total: 0, count: 0 },
-		totalRenderTime: { total: 0, count: 0 },
-	});
-
-	useEffect(() => {
-		renderCount.current += 1;
-		const startTime = performance.now();
-
-		return () => {
-			const endTime = performance.now();
-			const renderTime = endTime - startTime;
-			performanceLog.current.totalRenderTime.total += renderTime;
-			performanceLog.current.totalRenderTime.count += 1;
-
-			console.log(`
-        VoteButtons Performance Log (Render #${renderCount.current}):
-        Total Render Time: ${renderTime.toFixed(2)}ms
-        Average Render Time: ${(performanceLog.current.totalRenderTime.total / performanceLog.current.totalRenderTime.count).toFixed(2)}ms
-        useForm:
-          - Average: ${(performanceLog.current.useForm.total / performanceLog.current.useForm.count).toFixed(2)}ms
-          - Total: ${performanceLog.current.useForm.total.toFixed(2)}ms
-          - Count: ${performanceLog.current.useForm.count}
-        Class Name Generation:
-          - Average: ${(performanceLog.current.classNameGeneration.total / performanceLog.current.classNameGeneration.count).toFixed(2)}ms
-          - Total: ${performanceLog.current.classNameGeneration.total.toFixed(2)}ms
-          - Count: ${performanceLog.current.classNameGeneration.count}
-      `);
-		};
-	});
-
 	const fetcher = useFetcher();
-	const useFormStartTime = performance.now();
 	const [form, fields] = useForm({
 		id: `vote-form-${translationWithVote.id}`,
 		onValidate: useMemo(
@@ -61,13 +27,8 @@ export const VoteButtons = memo(function VoteButtons({
 			[],
 		),
 	});
-	const useFormEndTime = performance.now();
-	performanceLog.current.useForm.total += useFormEndTime - useFormStartTime;
-	performanceLog.current.useForm.count += 1;
-
 	const isVoting = fetcher.state !== "idle";
 
-	const classNameStartTime = performance.now();
 
 	const buttonClasses = useMemo(
 		() => ({
@@ -82,12 +43,6 @@ export const VoteButtons = memo(function VoteButtons({
 		}),
 		[translationWithVote.userVote?.isUpvote],
 	);
-	const classNameEndTime = performance.now();
-	performanceLog.current.classNameGeneration.total +=
-		classNameEndTime - classNameStartTime;
-	performanceLog.current.classNameGeneration.count += 1;
-
-	const isDisabled = !userId || isVoting;
 
 	return (
 		<div className="flex justify-end items-center mt-2">

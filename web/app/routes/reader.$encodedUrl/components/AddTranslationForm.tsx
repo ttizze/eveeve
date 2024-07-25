@@ -12,10 +12,9 @@ interface AddTranslationFormProps {
 }
 
 export function AddTranslationForm({ sourceTextId }: AddTranslationFormProps) {
-	const fetcher = useFetcher();
-	const actionData = useActionData<typeof action>();
+	const fetcher = useFetcher<typeof action>();
 	const [form, fields] = useForm({
-		lastResult: actionData?.lastResult,
+		lastResult: fetcher.data?.lastResult,
 		id: `add-translation-form-${sourceTextId}`,
 		constraint: getZodConstraint(addTranslationSchema),
 		shouldValidate: "onBlur",
