@@ -27,8 +27,15 @@ jobs:
             LABEL="refactor"
           elif [[ $ISSUE_TITLE =~ ^chore: ]]; then
             LABEL="chore"
-          else
-            LABEL="task"
           fi
           
-          gh issue edit $ISSUE_NUMBER --add-label "$LABEL"
+          if [ -n "$LABEL" ]; then
+            if gh issue edit $ISSUE_NUMBER --add-label "$LABEL"; then
+              echo "Successfully added label: $LABEL to issue #$ISSUE_NUMBER"
+            else
+              echo "Failed to add label: $LABEL to issue #$ISSUE_NUMBER"
+              exit 1
+            fi
+          else
+            echo "No specific label determined for issue #$ISSUE_NUMBER. Skipping label addition."
+          fi
