@@ -1,0 +1,30 @@
+name: Auto Label Issue
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  auto_label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Label issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+        run: |
+          case "$ISSUE_TITLE" in
+            feat:*|feature:*) LABEL="feature" ;;
+            fix:*|bug:*) LABEL="bug" ;;
+            docs:*|documentation:*) LABEL="documentation" ;;
+            refactor:*) LABEL="refactor" ;;
+            chore:*) LABEL="chore" ;;
+            *) LABEL="task" ;;
+          esac
+          
+          gh issue edit $ISSUE_NUMBER --add-label "$LABEL"
+
