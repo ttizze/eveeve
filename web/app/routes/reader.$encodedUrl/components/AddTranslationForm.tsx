@@ -1,41 +1,29 @@
 import { getFormProps, getTextareaProps, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
-import { useFetcher } from "@remix-run/react";
-import { Edit, Save, Trash } from "lucide-react";
-import { useState } from "react";
+import { getZodConstraint } from "@conform-to/zod";
+import { useActionData, useFetcher } from "@remix-run/react";
+import { Save, Trash } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
+import type { action } from "../route";
 import { addTranslationSchema } from "../types";
-
 interface AddTranslationFormProps {
 	sourceTextId: number;
 }
 
 export function AddTranslationForm({ sourceTextId }: AddTranslationFormProps) {
 	const fetcher = useFetcher();
-	const [isEditing, setIsEditing] = useState(false);
-
+	const actionData = useActionData<typeof action>();
 	const [form, fields] = useForm({
+		lastResult: actionData?.lastResult,
 		id: `add-translation-form-${sourceTextId}`,
+		constraint: getZodConstraint(addTranslationSchema),
+		shouldValidate: "onBlur",
+		shouldRevalidate: "onInput",
 		onValidate({ formData }) {
 			return parseWithZod(formData, { schema: addTranslationSchema });
 		},
 	});
-
-	if (!isEditing) {
-		return (
-			<div className="mt-4 flex justify-end">
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={() => setIsEditing(true)}
-					className="text-blue-600 hover:bg-blue-50"
-				>
-					<Edit className="h-4 w-4" />
-				</Button>
-			</div>
-		);
-	}
 
 	return (
 		<div className="mt-4">
@@ -47,24 +35,20 @@ export function AddTranslationForm({ sourceTextId }: AddTranslationFormProps) {
 					className="w-full mb-2 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
 					placeholder="Enter your translation..."
 				/>
-				{fields.text.errors && (
-					<p className="text-red-500">{fields.text.errors}</p>
-				)}
 				<div className="space-x-2 flex justify-end">
+					{fields.text.errors && (
+						<p className="text-red-500">{fields.text.errors}</p>
+					)}
 					<Button
 						type="submit"
 						name="intent"
 						value="add"
-						className="bg-green-500 hover:bg-green-600 text-white"
+						className="bg-blue-500 hover:bg-blue-600 text-white"
 						disabled={fetcher.state !== "idle"}
 					>
 						<Save className="h-4 w-4" />
 					</Button>
-					<Button
-						variant="outline"
-						onClick={() => setIsEditing(false)}
-						className="text-red-600 hover:bg-red-50"
-					>
+					<Button variant="outline" className="text-red-600 hover:bg-red-50">
 						<Trash className="h-4 w-4" />
 					</Button>
 				</div>

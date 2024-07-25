@@ -1,13 +1,8 @@
 import DOMPurify from "dompurify";
 import parse from "html-react-parser";
-import { Plus, X } from "lucide-react";
-import { useMemo, useState } from "react";
-import { Button } from "~/components/ui/button";
-import { useClickOutside } from "../functions/useClickOutside";
+import { useMemo, useState,useCallback } from "react";
 import type { TranslationWithVote } from "../types";
-import { AddTranslationForm } from "./AddTranslationForm";
-import { AlternativeTranslations } from "./AlternativeTranslations";
-import { VoteButtons } from "./VoteButtons";
+import { AlternativeTranslationsWithVotes } from "./AlternativeTranslationsWithVotes";
 
 interface TranslationProps {
 	translationsWithVotes: TranslationWithVote[];
@@ -22,9 +17,7 @@ export function Translation({
 	userId,
 	sourceTextId,
 }: TranslationProps) {
-	const [isExpanded, setIsExpanded] = useState(false);
-	const ref = useClickOutside(() => setIsExpanded(false));
-
+	const [isHoverCardVisible, setIsHoverCardVisible] = useState(false);
 	const bestTranslationWithVote = useMemo(() => {
 		const upvotedTranslations = translationsWithVotes.filter(
 			(t) => t.userVote?.isUpvote,
@@ -47,46 +40,48 @@ export function Translation({
 		[translationsWithVotes, bestTranslationWithVote],
 	);
 
+	const showHoverCard = useCallback(() => {
+		const timer = setTimeout(() => setIsHoverCardVisible(true), 300);
+		return () => clearTimeout(timer);
+	}, []);
+
+	const hideHoverCard = useCallback(() => setIsHoverCardVisible(false), []);
+
+	const sanitizedAndParsedText = useMemo(() => {
+		const sanitized = DOMPurify.sanitize(
+			bestTranslationWithVote.text.replace(/(\r\n|\n|\\n)/g, "<br />")
+		);
+		return parse(sanitized);
+	}, [bestTranslationWithVote.text]);
+
 	return (
-		<div
-			ref={ref}
-			lang={targetLanguage}
-			className="notranslate mt-2 pt-2 border-t border-gray-200 group relative"
-		>
-			<div className="text-lg font-medium ">
-				{parse(
-					DOMPurify.sanitize(
-						bestTranslationWithVote.text.replace(/(\r\n|\n|\\n)/g, "<br />"),
-					),
+			<div
+				className={`
+					w-full notranslate mt-2 pt-2 border-t border-gray-200
+					${isHoverCardVisible ? "shadow-xl -translate-y-1 bg-white  rounded-lg " : ""}
+				`}
+				onMouseEnter={showHoverCard}
+				onMouseLeave={hideHoverCard}
+			>
+				<button
+					type="button"
+					lang={targetLanguage}
+					className="w-full text-left"
+					aria-expanded={isHoverCardVisible}
+					aria-haspopup="true"
+				>
+					<div className="text-lg font-medium">
+						{sanitizedAndParsedText}
+					</div>
+				</button>
+				{isHoverCardVisible && (
+					<AlternativeTranslationsWithVotes
+						bestTranslationWithVote={bestTranslationWithVote}
+						alternativeTranslationsWithVotes={alternativeTranslationsWithVotes}
+						userId={userId}
+						sourceTextId={sourceTextId}
+					/>
 				)}
 			</div>
-			<Button
-				variant="outline"
-				size="sm"
-				className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-				onClick={(e) => {
-					e.stopPropagation();
-					setIsExpanded(!isExpanded);
-				}}
-			>
-				{isExpanded ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-			</Button>
-			{isExpanded && (
-				<div className="">
-					<VoteButtons
-						translationWithVote={bestTranslationWithVote}
-						userId={userId}
-					/>
-					<p className="text-sm text-gray-500 text-right">
-						Translated by:{bestTranslationWithVote.userName}
-					</p>
-					<AlternativeTranslations
-						translationsWithVotes={alternativeTranslationsWithVotes}
-						userId={userId}
-					/>
-					{userId && <AddTranslationForm sourceTextId={sourceTextId} />}
-				</div>
-			)}
-		</div>
 	);
 }

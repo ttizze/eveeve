@@ -1,6 +1,5 @@
 import type { TranslateText, Vote } from "@prisma/client";
 import { z } from "zod";
-
 export type UserVote = Pick<Vote, "id" | "isUpvote" | "updatedAt">;
 
 export type TranslationWithVote = Pick<
@@ -34,7 +33,11 @@ export const voteSchema = z.object({
 export const addTranslationSchema = z.object({
 	intent: z.literal("add"),
 	sourceTextId: z.number(),
-	text: z.string(),
+	text: z
+		.string()
+		.min(1, "Translation cannot be empty")
+		.max(30000, "Translation is too long")
+		.transform((val) => val.trim())
 });
 
 export const actionSchema = z.discriminatedUnion("intent", [

@@ -31,7 +31,7 @@ jobs:
             esac
           done
 
-          BRANCH_NAME="${ASSIGNEE,,}/issue-${ISSUE_NUMBER}-${TYPE}"
+          BRANCH_NAME="${ASSIGNEE,,}/${TYPE}-issue-${ISSUE_NUMBER}"
 
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
