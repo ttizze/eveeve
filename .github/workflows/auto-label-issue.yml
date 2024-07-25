@@ -17,11 +17,11 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
         run: |
-          if [[ $ISSUE_TITLE =~ ^feat:|^feature: ]]; then
+          if [[ $ISSUE_TITLE =~ ^(feat:|feature:) ]]; then
             LABEL="feature"
-          elif [[ $ISSUE_TITLE =~ ^fix:|^bug: ]]; then
+          elif [[ $ISSUE_TITLE =~ ^(fix:|bug:) ]]; then
             LABEL="bug"
-          elif [[ $ISSUE_TITLE =~ ^docs:|^documentation: ]]; then
+          elif [[ $ISSUE_TITLE =~ ^(docs:|documentation:) ]]; then
             LABEL="documentation"
           elif [[ $ISSUE_TITLE =~ ^refactor: ]]; then
             LABEL="refactor"
