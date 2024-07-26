@@ -1,0 +1,47 @@
+{
+  "types": [
+    {
+      "prefixes": [
+        "feat:",
+        "feature:"
+      ],
+      "label": "feature"
+    },
+    {
+      "prefixes": [
+        "fix:",
+        "bug:"
+      ],
+      "label": "bug"
+    },
+    {
+      "prefixes": [
+        "docs:",
+        "documentation:"
+      ],
+      "label": "documentation"
+    },
+    {
+      "prefixes": [
+        "refactor:"
+      ],
+      "label": "refactor"
+    },
+    {
+      "prefixes": [
+        "chore:"
+      ],
+      "label": "chore"
+    },
+    {
+      "prefixes": [
+        "enhance:",
+        "enhancement:"
+      ],
+      "label": "enhancement"
+    }
+  ],
+  "defaultType": {
+    "label": "triage"
+  }
+}

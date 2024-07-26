@@ -1,41 +1,89 @@
-name: Auto Label Issue
+name: Auto Label and Comment Issue
 
 on:
   issues:
     types: [opened, edited]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Issue number to process'
+        required: true
+        type: number
 
 jobs:
-  auto_label:
+  process_issue:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Label issue
+      - uses: actions/checkout@v2
+      - name: Determine label
+        id: determine_label
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-          ISSUE_TITLE: ${{ github.event.issue.title }}
         run: |
-          if [[ $ISSUE_TITLE =~ ^(feat:|feature:) ]]; then
-            LABEL="feature"
-          elif [[ $ISSUE_TITLE =~ ^(fix:|bug:) ]]; then
-            LABEL="bug"
-          elif [[ $ISSUE_TITLE =~ ^(docs:|documentation:) ]]; then
-            LABEL="documentation"
-          elif [[ $ISSUE_TITLE =~ ^refactor: ]]; then
-            LABEL="refactor"
-          elif [[ $ISSUE_TITLE =~ ^chore: ]]; then
-            LABEL="chore"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ISSUE_NUMBER=${{ github.event.inputs.issue_number }}
+            ISSUE_TITLE=$(gh issue view $ISSUE_NUMBER --json title -q .title)
+          else
+            ISSUE_NUMBER="${{ github.event.issue.number }}"
+            ISSUE_TITLE="${{ github.event.issue.title }}"
           fi
-          
-          if [ -n "$LABEL" ]; then
-            if gh issue edit $ISSUE_NUMBER --add-label "$LABEL"; then
-              echo "Successfully added label: $LABEL to issue #$ISSUE_NUMBER"
+          echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
+
+          case "$ISSUE_TITLE" in
+            feat:* | feature:*)
+              echo "label=feature" >> $GITHUB_OUTPUT
+              ;;
+            fix:* | bug:*)
+              echo "label=bug" >> $GITHUB_OUTPUT
+              ;;
+            docs:* | documentation:*)
+              echo "label=documentation" >> $GITHUB_OUTPUT
+              ;;
+            refactor:*)
+              echo "label=refactor" >> $GITHUB_OUTPUT
+              ;;
+            chore:*)
+              echo "label=chore" >> $GITHUB_OUTPUT
+              ;;
+            enhance:* | enhancement:*)
+              echo "label=enhancement" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "label=triage" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
+      - name: Apply label and add comment if necessary
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ steps.determine_label.outputs.issue_number }}
+          LABEL: ${{ steps.determine_label.outputs.label }}
+        run: |
+          if [ "$LABEL" = "triage" ]; then
+            COMMENT="Thank you for opening this issue. To help us categorize and prioritize it better, please consider updating the title to start with one of the following prefixes:
+
+            - feat: or feature: for new feature requests
+            - fix: or bug: for bug reports
+            - docs: or documentation: for documentation improvements
+            - refactor: for code refactoring suggestions
+            - chore: for general maintenance tasks
+            - enhance: or enhancement: for enhancement proposals
+
+            For example: 'feat: Add user authentication feature' or 'bug: Fix login page crash'
+
+            This will help our team to quickly understand the nature of the issue and address it more efficiently. Thank you for your cooperation!"
+
+            if gh issue comment $ISSUE_NUMBER --body "$COMMENT"; then
+              echo "Successfully added comment to issue #$ISSUE_NUMBER"
             else
-              echo "Failed to add label: $LABEL to issue #$ISSUE_NUMBER"
+              echo "Failed to add comment to issue #$ISSUE_NUMBER"
               exit 1
             fi
+          fi
+
+          if gh issue edit $ISSUE_NUMBER --add-label "$LABEL"; then
+            echo "Successfully added label: $LABEL to issue #$ISSUE_NUMBER"
           else
-            echo "No specific label determined for issue #$ISSUE_NUMBER. Skipping label addition."
+            echo "Failed to add label: $LABEL to issue #$ISSUE_NUMBER"
+            exit 1
           fi
