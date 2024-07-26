@@ -19,6 +19,16 @@ services:
       fromDatabase:
         name: eveeve-db
         property: connectionString
+    - key: REDIS_HOST
+      fromService:
+        type: redis
+        name: eveeve-redis
+        property: host
+    - key: REDIS_PORT
+      fromService:
+        type: redis
+        name: eveeve-redis
+        property: port
 
 - type: redis
   name: eveeve-redis
