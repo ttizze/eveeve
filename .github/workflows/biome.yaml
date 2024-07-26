@@ -1,7 +1,7 @@
 name: Biome Check and Fix for Web
 
 on:
-  pull_request_target :
+  pull_request_target:
 
 jobs:
   biome-check-and-fix-for-web:
