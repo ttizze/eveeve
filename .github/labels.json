@@ -1,0 +1,52 @@
+[
+  {
+    "name": "bug",
+    "color": "d73a4a",
+    "description": "Something isn't working"
+  },
+  {
+    "name": "feature",
+    "color": "0075ca",
+    "description": "New feature or request"
+  },
+  {
+    "name": "documentation",
+    "color": "0A0A0A",
+    "description": "Improvements or additions to documentation"
+  },
+  {
+    "name": "chore",
+    "color": "cfd3d7",
+    "description": "Maintenance tasks"
+  },
+  {
+    "name": "refactor",
+    "color": "a2eeef",
+    "description": "Refactoring"
+  },
+  {
+    "name": "dependencies",
+    "color": "0366d6",
+    "description": "Pull requests that update a dependency file"
+  },
+  {
+    "name": "enhancement",
+    "color": "a2eeef",
+    "description": "Enhancement proposal"
+  },
+  {
+    "name": "triage",
+    "color": "d4c5f9",
+    "description": "This issue needs to be triaged"
+  },
+  {
+    "name": "wontfix",
+    "color": "ffffff",
+    "description": "This will not be worked on"
+  },
+  {
+    "name": "nice to have",
+    "color": "fef2c0",
+    "description": "Low priority enhancement that would be nice to have"
+  }
+]

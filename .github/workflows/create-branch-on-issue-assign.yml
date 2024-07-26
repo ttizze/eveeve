@@ -3,39 +3,69 @@ name: Create Branch on Issue Assign
 on:
   issues:
     types: [assigned]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "Issue number to process"
+        required: true
+        type: number
 
 jobs:
   create_branch:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Create branch
+      - name: Set issue details and create branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-          ISSUE_TITLE: ${{ github.event.issue.title }}
-          ASSIGNEE: ${{ github.event.assignee.login }}
         run: |
-          TYPE="task"
-          LABELS=$(gh issue view $ISSUE_NUMBER --json labels -q '.labels[].name')
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ISSUE_NUMBER="${{ github.event.inputs.issue_number }}"
+          else
+            ISSUE_NUMBER="${{ github.event.issue.number }}"
+          fi
+
+          ISSUE_DATA=$(gh issue view $ISSUE_NUMBER --json number,title,assignees,labels)
+          ASSIGNEE=$(echo "$ISSUE_DATA" | jq -r '.assignees[0].login // empty')
+          LABELS=$(echo "$ISSUE_DATA" | jq -r '.labels[].name // empty')
+
           
-          for LABEL in $LABELS; do
-            case $LABEL in
-              "feature") TYPE="feat"; break ;;
-              "bug") TYPE="fix"; break ;;
-              "documentation") TYPE="docs"; break ;;
-              "refactor") TYPE="refactor"; break ;;
-              "chore") TYPE="chore"; break ;;
-            esac
+          echo "Debug: ISSUE_DATA=$ISSUE_DATA"
+          echo "Debug: ASSIGNEE=$ASSIGNEE"
+          echo "Debug: LABELS=$LABELS"
+
+          if [ -z "$ASSIGNEE" ]; then
+            echo "Error: Issue is not assigned"
+            exit 1
+          fi
+
+          CONFIG_FILE=".github/issue-type-config.json"
+          BRANCH_LABEL=""
+          for label in $LABELS; do
+            if jq -e ".types[] | select(.label == \"$label\")" "$CONFIG_FILE" > /dev/null; then
+              BRANCH_LABEL="$label"
+              echo "Debug: Matching label found: $BRANCH_LABEL"
+              break
+            fi
           done
 
-          BRANCH_NAME="${ASSIGNEE,,}/${TYPE}-issue-${ISSUE_NUMBER}"
+          if [ -z "$BRANCH_LABEL" ]; then
+            echo "No matching label found in config. Skipping branch creation."
+            exit 0
+          fi
+
+          BRANCH_NAME="${ASSIGNEE,,}/${BRANCH_LABEL}-issue-${ISSUE_NUMBER}"
+
+          echo "Debug: BRANCH_NAME=$BRANCH_NAME"
 
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git checkout -b "$BRANCH_NAME"
           git push origin "$BRANCH_NAME"
 
-          gh issue comment $ISSUE_NUMBER --body "created branch \`$BRANCH_NAME\`"
+          gh issue comment $ISSUE_NUMBER --body "Created branch \`$BRANCH_NAME\`"
