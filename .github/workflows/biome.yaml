@@ -1,7 +1,7 @@
 name: Biome Check and Fix for Web
 
 on:
-  pull_request_target:
+  pull_request:
   push:
     paths:
       - .github/workflows/biome.yaml
@@ -13,8 +13,6 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.head_ref }}
       - uses: actions/setup-node@v3
         with:
           node-version: '20'
@@ -29,6 +27,5 @@ jobs:
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "style: write Biome fixes [skip biome]"
           file_pattern: 'web/**/*'
           branch: ${{ github.head_ref }}
