@@ -4,6 +4,7 @@ import { useRevalidator } from "@remix-run/react";
 import { useEffect } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
+import { getTranslateUserQueue } from "~/feature/translate/translate-user-queue";
 import { validateGeminiApiKey } from "~/feature/translate/utils/gemini";
 import { authenticator } from "~/utils/auth.server";
 import { getTargetLanguage } from "~/utils/target-language.server";
@@ -15,7 +16,6 @@ import {
 	getDbUser,
 	listUserAiTranslationInfo,
 } from "./functions/queries.server";
-import { translateJob } from "./functions/translate-job.server";
 import { schema } from "./types";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -76,12 +76,14 @@ export async function action({ request }: ActionFunctionArgs) {
 			}
 			const targetLanguage = await getTargetLanguage(request);
 			// Start the translation job in background
-			translateJob({
+			const queue = getTranslateUserQueue(safeUser.id);
+			const job = await queue.add(`translate-${safeUser.id}`, {
 				url: submission.value.url,
 				targetLanguage,
 				apiKey: dbUser.geminiApiKey,
 				userId: safeUser.id,
 			});
+			console.log(job.toJSON());
 
 			return {
 				intent,
