@@ -1,64 +1,62 @@
-{
-	"labels": [
-		{
-			"name": "bug",
-			"description": "Something isn't working as expected",
-			"color": "d73a4a"
-		},
-		{
-			"name": "feature",
-			"description": "New feature implementation",
-			"color": "0e8a16"
-		},
-		{
-			"name": "question",
-			"description": "Further information is requested",
-			"color": "d876e3"
-		},
-		{
-			"name": "enhancement",
-			"description": "Improvement to existing features",
-			"color": "a2eeef"
-		},
-		{
-			"name": "good first issue",
-			"description": "Good for newcomers",
-			"color": "7057ff"
-		},
-		{
-			"name": "help wanted",
-			"description": "Extra attention is needed",
-			"color": "008672"
-		},
-		{
-			"name": "duplicate",
-			"description": "This issue already exists",
-			"color": "cfd3d7"
-		},
-		{
-			"name": "wontfix",
-			"description": "This will not be worked on",
-			"color": "ffffff"
-		},
-		{
-			"name": "invalid",
-			"description": "This doesn't seem right",
-			"color": "e4e669"
-		},
-		{
-			"name": "documentation",
-			"description": "Improvements or additions to documentation",
-			"color": "0075ca"
-		},
-		{
-			"name": "refactor",
-			"description": "Code refactoring",
-			"color": "f6a2ff"
-		},
-		{
-			"name": "chore",
-			"description": "General maintenance tasks",
-			"color": "f6a2ff"
-		}
-	]
-}
+[
+	{
+		"name": "bug",
+		"color": "d73a4a",
+		"description": "Something isn't working as expected"
+	},
+	{
+		"name": "feature",
+		"color": "0e8a16",
+		"description": "New feature implementation"
+	},
+	{
+		"name": "question",
+		"color": "d876e3",
+		"description": "Further information is requested"
+	},
+	{
+		"name": "enhancement",
+		"color": "a2eeef",
+		"description": "Improvement to existing features"
+	},
+	{
+		"name": "good first issue",
+		"color": "7057ff",
+		"description": "Good for newcomers"
+	},
+	{
+		"name": "help wanted",
+		"color": "008672",
+		"description": "Extra attention is needed"
+	},
+	{
+		"name": "duplicate",
+		"color": "cfd3d7",
+		"description": "This issue already exists"
+	},
+	{
+		"name": "wontfix",
+		"color": "ffffff",
+		"description": "This will not be worked on"
+	},
+	{
+		"name": "invalid",
+		"color": "e4e669",
+		"description": "This doesn't seem right"
+	},
+	{
+		"name": "documentation",
+		"color": "0075ca",
+		"description": "Improvements or additions to documentation"
+	},
+	{
+		"name": "refactor",
+		"color": "f6a2ff",
+		"description": "Code refactoring"
+	},
+	{
+		"name": "chore",
+		"color": "f6a2ff",
+		"description": "General maintenance tasks"
+	}
+]
