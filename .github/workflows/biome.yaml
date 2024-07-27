@@ -1,4 +1,4 @@
-name: Biome Check and Fix for Web
+name: Biome Check for Web
 
 on:
   pull_request:
@@ -7,12 +7,12 @@ on:
       - .github/workflows/biome.yaml
 
 jobs:
-  biome-check-and-fix-for-web:
+  biome-check-for-web:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: "20"
@@ -20,12 +20,7 @@ jobs:
         run: npm install -g bun
       - name: Install dependencies
         run: cd web && bun i
-      - name: Run Biome check and fix
+      - name: Run Biome check
         run: |
           cd web
-          bunx @biomejs/biome check --write .
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          file_pattern: "web/**/*"
-          branch: ${{ github.head_ref }}
+          bunx @biomejs/biome check .
