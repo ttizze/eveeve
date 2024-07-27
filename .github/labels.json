@@ -1,62 +1,62 @@
 [
 	{
-		"name": "issue or PR: bug",
+		"name": "bug",
 		"color": "d73a4a",
 		"description": "Something isn't working as expected"
 	},
 	{
-		"name": "issue or PR: feature",
+		"name": "feature",
 		"color": "0052cc",
 		"description": "New feature implementation"
 	},
 	{
-		"name": "issue or PR: enhancement",
+		"name": "enhancement",
 		"color": "a2eeef",
 		"description": "Improvement to existing features"
 	},
 	{
-		"name": "issue: question",
+		"name": "question",
 		"color": "d876e3",
 		"description": "Further information is requested"
 	},
 	{
-		"name": "status: good first issue",
-		"color": "7057ff",
-		"description": "Good for newcomers"
-	},
-	{
-		"name": "status: help wanted",
-		"color": "008672",
-		"description": "Extra attention is needed"
-	},
-	{
-		"name": "close: duplicate",
-		"color": "cfd3d7",
-		"description": "This issue already exists"
-	},
-	{
-		"name": "close: wontfix",
-		"color": "ffffff",
-		"description": "This will not be worked on"
-	},
-	{
-		"name": "close: invalid",
-		"color": "e4e669",
-		"description": "This doesn't seem right"
-	},
-	{
-		"name": "PR: documentation",
+		"name": "documentation",
 		"color": "0075ca",
 		"description": "Improvements or additions to documentation"
 	},
 	{
-		"name": "PR: refactor",
+		"name": "refactor",
 		"color": "fbca04",
 		"description": "Code refactoring"
 	},
 	{
-		"name": "PR: chore",
+		"name": "chore",
 		"color": "bfdadc",
 		"description": "General maintenance tasks"
+	},
+	{
+		"name": "good first issue",
+		"color": "7057ff",
+		"description": "Good for newcomers"
+	},
+	{
+		"name": "help wanted",
+		"color": "008672",
+		"description": "Extra attention is needed"
+	},
+	{
+		"name": "duplicate",
+		"color": "cfd3d7",
+		"description": "This issue or pull request already exists"
+	},
+	{
+		"name": "wontfix",
+		"color": "ffffff",
+		"description": "This will not be worked on"
+	},
+	{
+		"name": "invalid",
+		"color": "e4e669",
+		"description": "This doesn't seem right"
 	}
 ]
