@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Extract issue number from branch name
         id: extract-issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             PR_NUMBER="${{ github.event.inputs.pr_number }}"
