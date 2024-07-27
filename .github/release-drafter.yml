@@ -58,7 +58,7 @@ autolabeler:
       - "/doc[/-].+/"
   - label: enhancement
     branch:
-      - "/enhancement[/-].+/"
+      - "/enhance[/-].+/"
   - label: dependencies
     branch:
       - "/dep(s)?[/-].+/"

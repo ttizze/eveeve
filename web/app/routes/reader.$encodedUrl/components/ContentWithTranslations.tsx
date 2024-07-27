@@ -14,7 +14,6 @@ interface ContentWithTranslationsProps {
 export const ContentWithTranslations = memo(function ContentWithTranslations({
 	content,
 	sourceTextInfoWithTranslations,
-	targetLanguage,
 	userId,
 }: ContentWithTranslationsProps) {
 	const parsedContent = useMemo(() => {
@@ -53,7 +52,6 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 							<Translation
 								key={`translation-group-${number}`}
 								translationsWithVotes={translationGroup.translationsWithVotes}
-								targetLanguage={targetLanguage}
 								userId={userId}
 								sourceTextId={translationGroup.sourceTextId}
 							/>
@@ -63,7 +61,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 				return domNode;
 			},
 		});
-	}, [content, sourceTextInfoWithTranslations, targetLanguage, userId]);
+	}, [content, sourceTextInfoWithTranslations, userId]);
 
 	if (typeof window === "undefined") {
 		return <div>Loading...</div>;

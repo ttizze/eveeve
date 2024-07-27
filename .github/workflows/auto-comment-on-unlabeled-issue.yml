@@ -28,18 +28,13 @@ jobs:
           echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
 
           ISSUE_DATA=$(gh issue view $ISSUE_NUMBER --json number,title,labels)
-          ISSUE_TITLE=$(echo "$ISSUE_DATA" | jq -r '.title')
           EXISTING_LABELS=$(echo "$ISSUE_DATA" | jq -r '.labels[].name')
 
           echo "Debug: Current labels: EXISTING_LABELS=$EXISTING_LABELS"
 
-          # Define the labels we want users to add
-          USER_LABELS="bug|feature|enhancement|question"
-
-          # Check if any of the user labels already exist
-          if echo "$EXISTING_LABELS" | grep -qE "(${USER_LABELS})" ; then
+          if [ "$EXISTING_LABELS" != "[]" ]; then
             echo "skip=true" >> $GITHUB_OUTPUT
-            echo "Skipping comment as relevant labels already exist."
+            echo "Skipping comment as labels already exist."
           else
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
