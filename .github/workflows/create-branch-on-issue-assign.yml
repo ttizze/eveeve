@@ -44,8 +44,8 @@ jobs:
             exit 1
           fi
 
-          VALID_LABELS="bug feature enhancement question documentation refactor chore"
-          BRANCH_LABEL=$(echo "$LABELS" | tr ' ' '\n' | grep -m1 -w "$VALID_LABELS")
+          VALID_LABELS="bug|feature|enhancement|documentation|refactor|chore"
+          BRANCH_LABEL=$(echo "$LABELS" | tr ' ' '\n' | grep -m1 -E "$VALID_LABELS")
 
           if [ -z "$BRANCH_LABEL" ]; then
             echo "no_valid_label=true" >> $GITHUB_OUTPUT
@@ -77,7 +77,6 @@ jobs:
           - bug: Something isn't working as expected
           - feature: New feature implementation
           - enhancement: Improvement to existing features
-          - question: Further information is requested
           - documentation: Improvements or additions to documentation
           - refactor: Code refactoring
           - chore: General maintenance tasks
