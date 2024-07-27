@@ -1,31 +1,31 @@
 [
 	{
-		"name": "bug",
-		"color": "d73a4a",
-		"description": "Something isn't working as expected"
-	},
+    "name": "type: bug",
+    "color": "d73a4a",
+    "description": "Something isn't working as expected"
+  },
+  {
+    "name": "type: feature",
+    "color": "0052cc",
+    "description": "New feature implementation"
+  },
+  {
+    "name": "type: enhancement",
+    "color": "a2eeef",
+    "description": "Improvement to existing features"
+  },
 	{
-		"name": "feature",
-		"color": "0052cc",
-		"description": "New feature implementation"
-	},
-	{
-		"name": "question",
+		"name": "issue: question",
 		"color": "d876e3",
 		"description": "Further information is requested"
 	},
 	{
-		"name": "enhancement",
-		"color": "a2eeef",
-		"description": "Improvement to existing features"
-	},
-	{
-		"name": "good first issue",
+		"name": "status: good first issue",
 		"color": "7057ff",
 		"description": "Good for newcomers"
 	},
 	{
-		"name": "help wanted",
+		"name": "status: help wanted",
 		"color": "008672",
 		"description": "Extra attention is needed"
 	},
@@ -45,17 +45,17 @@
 		"description": "This doesn't seem right"
 	},
 	{
-		"name": "documentation",
+		"name": "PR: documentation",
 		"color": "0075ca",
 		"description": "Improvements or additions to documentation"
 	},
 	{
-		"name": "refactor",
+		"name": "PR: refactor",
 		"color": "fbca04",
 		"description": "Code refactoring"
 	},
 	{
-		"name": "chore",
+		"name": "PR: chore",
 		"color": "bfdadc",
 		"description": "General maintenance tasks"
 	}
