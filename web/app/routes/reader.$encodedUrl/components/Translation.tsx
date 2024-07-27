@@ -6,7 +6,6 @@ import { AddAndVoteTranslations } from "./AddAndVoteTranslations";
 
 interface TranslationProps {
 	translationsWithVotes: TranslationWithVote[];
-	targetLanguage: string;
 	userId: number | null;
 	sourceTextId: number;
 }
@@ -31,11 +30,10 @@ function getBestTranslation(
 
 export function Translation({
 	translationsWithVotes,
-	targetLanguage,
 	userId,
 	sourceTextId,
 }: TranslationProps) {
-	const [isLoaded, setIsLoaded] = useState(false);
+	const [isHovered, setIsHovered] = useState(false);
 
 	const bestTranslationWithVote = useMemo(
 		() => getBestTranslation(translationsWithVotes),
@@ -58,19 +56,19 @@ export function Translation({
 	return (
 		<div
 			className="relative group"
-			onMouseEnter={() => !isLoaded && setIsLoaded(true)}
+			onMouseEnter={() => setTimeout(() => setIsHovered(true), 100)}
+			onMouseLeave={() => setIsHovered(false)}
 		>
-			<div className="w-full notranslate mt-2 pt-2 text-lg font-medium ">
+			<div className="w-full notranslate mt-2 pt-2 border-t border-gray-200">
 				{sanitizedAndParsedText}
 			</div>
-			<div className="absolute top-0 left-0 right-0 z-10 opacity-0 invisible border bg-white dark:bg-gray-900 rounded-xl shadow-xl dark:shadow-white/10 group-hover:opacity-100 group-hover:visible transition-all duration-500 ease-in-out">
-				{isLoaded && (
+			<div className="absolute top-0 left-0 right-0 z-10 opacity-0 invisible border bg-slate-50  dark:bg-gray-900 rounded-xl shadow-xl dark:shadow-white/10 group-hover:opacity-100 group-hover:visible transition-all duration-500 ease-in-out">
+				{isHovered && (
 					<AddAndVoteTranslations
 						bestTranslationWithVote={bestTranslationWithVote}
 						alternativeTranslationsWithVotes={alternativeTranslationsWithVotes}
 						userId={userId}
-						sourceTextId={sourceTextId}
-					/>
+						sourceTextId={sourceTextId} />
 				)}
 			</div>
 		</div>
