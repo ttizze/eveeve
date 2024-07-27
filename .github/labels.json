@@ -6,7 +6,7 @@
 	},
 	{
 		"name": "feature",
-		"color": "0e8a16",
+		"color": "0052cc",
 		"description": "New feature implementation"
 	},
 	{
@@ -30,17 +30,17 @@
 		"description": "Extra attention is needed"
 	},
 	{
-		"name": "duplicate",
+		"name": "close: duplicate",
 		"color": "cfd3d7",
 		"description": "This issue already exists"
 	},
 	{
-		"name": "wontfix",
+		"name": "close: wontfix",
 		"color": "ffffff",
 		"description": "This will not be worked on"
 	},
 	{
-		"name": "invalid",
+		"name": "close: invalid",
 		"color": "e4e669",
 		"description": "This doesn't seem right"
 	},
@@ -51,12 +51,12 @@
 	},
 	{
 		"name": "refactor",
-		"color": "f6a2ff",
+		"color": "fbca04",
 		"description": "Code refactoring"
 	},
 	{
 		"name": "chore",
-		"color": "f6a2ff",
+		"color": "bfdadc",
 		"description": "General maintenance tasks"
 	}
 ]
