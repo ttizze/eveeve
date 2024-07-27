@@ -38,10 +38,10 @@ export function AddAndVoteTranslations({
 				showAuthor
 			/>
 			<div className="mt-4">
-				<h4 className="text-sm flex items-center justify-end gap-2">
+				<p className="text-sm flex items-center justify-end gap-2">
 					<ListTree size={16} />
 					Alternative Translations
-				</h4>
+				</p>
 				<AlternativeTranslations
 					translationsWithVotes={displayedTranslations}
 					userId={userId}
@@ -59,10 +59,10 @@ export function AddAndVoteTranslations({
 			</div>
 			{userId && (
 				<div className="mt-4">
-					<h4 className="text-sm flex items-center justify-end gap-2">
+					<p className="text-sm flex items-center justify-end gap-2">
 						<PlusCircle size={16} />
 						Add Your Translation
-					</h4>
+					</p>
 					<AddTranslationForm sourceTextId={sourceTextId} />
 				</div>
 			)}

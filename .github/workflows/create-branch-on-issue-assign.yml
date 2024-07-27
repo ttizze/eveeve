@@ -44,7 +44,18 @@ jobs:
             exit 1
           fi
 
-          VALID_LABELS="bug|feature|enhancement|documentation|refactor|chore"
+          # Define label to branch prefix mapping
+          declare -A LABEL_PREFIX_MAP
+          LABEL_PREFIX_MAP=(
+            ["bug"]="fix"
+            ["feature"]="feat"
+            ["enhancement"]="enhance"
+            ["documentation"]="doc"
+            ["refactor"]="refactor"
+            ["chore"]="chore"
+          )
+
+          VALID_LABELS=$(echo "${!LABEL_PREFIX_MAP[@]}" | tr ' ' '|')
           BRANCH_LABEL=$(echo "$LABELS" | tr ' ' '\n' | grep -m1 -E "$VALID_LABELS")
 
           if [ -z "$BRANCH_LABEL" ]; then
@@ -55,7 +66,8 @@ jobs:
 
           echo "Debug: Matching label found: $BRANCH_LABEL"
 
-          BRANCH_NAME="${ASSIGNEE,,}/${BRANCH_LABEL}-issue-${ISSUE_NUMBER}"
+          BRANCH_PREFIX=${LABEL_PREFIX_MAP[$BRANCH_LABEL]}
+          BRANCH_NAME="${ASSIGNEE,,}/${BRANCH_PREFIX}-issue-${ISSUE_NUMBER}"
 
           echo "Debug: BRANCH_NAME=$BRANCH_NAME"
 

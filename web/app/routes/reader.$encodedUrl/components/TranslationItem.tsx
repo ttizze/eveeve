@@ -15,9 +15,7 @@ export function TranslationItem({
 }: TranslationItemProps) {
 	return (
 		<div className="p-2 rounded-xl border">
-			<div className="font-medium mb-2">
-				{sanitizeAndParseText(translation.text)}
-			</div>
+			<div className="mb-2">{sanitizeAndParseText(translation.text)}</div>
 			{showAuthor && (
 				<p className="text-sm text-gray-500 text-right">
 					Translated by: {translation.userName}
