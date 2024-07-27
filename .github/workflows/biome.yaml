@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: "20"
       - name: Install Bun
         run: npm install -g bun
       - name: Install dependencies
@@ -27,5 +27,5 @@ jobs:
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          file_pattern: 'web/**/*'
+          file_pattern: "web/**/*"
           branch: ${{ github.head_ref }}
