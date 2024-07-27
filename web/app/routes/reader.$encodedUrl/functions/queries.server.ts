@@ -10,11 +10,7 @@ export async function fetchLatestPageVersionWithTranslations(
 	targetLanguage: string,
 ): Promise<LatestPageVersionWithTranslations | null> {
 	const pageVersion = await prisma.pageVersion.findFirst({
-		where: {
-			url: {
-				contains: url,
-			},
-		},
+		where: { url },
 		orderBy: { createdAt: "desc" },
 		select: {
 			title: true,

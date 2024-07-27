@@ -13,17 +13,3 @@ export function normalizeAndSanitizeUrl(inputUrl: string): string {
 		removeQueryParameters: true,
 	});
 }
-
-export function prepareUrlForSearch(inputUrl: string): string {
-	let url = inputUrl;
-	url = url.replace(/^https?:\/\//, "");
-	url = url.replace(/^www\./, "");
-	url = url.split(/[?#]/)[0];
-	url = url.replace(/\/$/, "");
-	return url.toLowerCase();
-}
-
-export function prepareUrlForSearchFromRawInput(inputUrl: string): string {
-	const normalizedUrl = normalizeAndSanitizeUrl(inputUrl);
-	return prepareUrlForSearch(normalizedUrl);
-}

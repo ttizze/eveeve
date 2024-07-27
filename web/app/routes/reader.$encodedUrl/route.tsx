@@ -3,7 +3,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useParams } from "@remix-run/react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
-import { prepareUrlForSearchFromRawInput } from "~/utils/normalize-and-sanitize-url.server";
+import { normalizeAndSanitizeUrl } from "~/utils/normalize-and-sanitize-url.server";
 import { getTargetLanguage } from "~/utils/target-language.server";
 import { authenticator } from "../../utils/auth.server";
 import { ContentWithTranslations } from "./components/ContentWithTranslations";
@@ -24,9 +24,9 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
 	const safeUser = await authenticator.isAuthenticated(request);
 	const safeUserId = safeUser?.id;
-	const searchUrl = prepareUrlForSearchFromRawInput(encodedUrl);
+	const normalizedUrl = normalizeAndSanitizeUrl(encodedUrl);
 	const pageData = await fetchLatestPageVersionWithTranslations(
-		searchUrl,
+		normalizedUrl,
 		safeUserId ?? 0,
 		targetLanguage,
 	);
