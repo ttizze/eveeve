@@ -7,7 +7,6 @@ import { Translation } from "./Translation";
 interface ContentWithTranslationsProps {
 	content: string;
 	sourceTextInfoWithTranslations: SourceTextInfoWithTranslations[];
-	targetLanguage: string;
 	userId: number | null;
 }
 

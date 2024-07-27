@@ -7,6 +7,7 @@ import { Header } from "~/components/Header";
 import { getTranslateUserQueue } from "~/feature/translate/translate-user-queue";
 import { validateGeminiApiKey } from "~/feature/translate/utils/gemini";
 import { authenticator } from "~/utils/auth.server";
+import { normalizeAndSanitizeUrl } from "~/utils/normalize-and-sanitize-url.server";
 import { getTargetLanguage } from "~/utils/target-language.server";
 import { GeminiApiKeyForm } from "./components/GeminiApiKeyForm";
 import { URLTranslationForm } from "./components/URLTranslationForm";
@@ -75,10 +76,11 @@ export async function action({ request }: ActionFunctionArgs) {
 				};
 			}
 			const targetLanguage = await getTargetLanguage(request);
+			const normalizedUrl = normalizeAndSanitizeUrl(submission.value.url);
 			// Start the translation job in background
 			const queue = getTranslateUserQueue(safeUser.id);
 			const job = await queue.add(`translate-${safeUser.id}`, {
-				url: submission.value.url,
+				url: normalizedUrl,
 				targetLanguage,
 				apiKey: dbUser.geminiApiKey,
 				userId: safeUser.id,
@@ -88,7 +90,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			return {
 				intent,
 				lastResult: submission.reply({ resetForm: true }),
-				url: submission.value.url,
+				url: normalizedUrl,
 			};
 		}
 		default: {
