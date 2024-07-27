@@ -34,10 +34,10 @@ jobs:
           echo "Debug: Current labels: EXISTING_LABELS=$EXISTING_LABELS"
 
           # Define the labels we want users to add
-          USER_LABELS="bug feature enhancement question"
+          USER_LABELS="issue or PR: bug|issue or PR: feature|issue or PR: enhancement|issue: question"
 
           # Check if any of the user labels already exist
-          if echo "$EXISTING_LABELS" | grep -qE "(${USER_LABELS// /|})" ; then
+          if echo "$EXISTING_LABELS" | grep -qE "(${USER_LABELS})" ; then
             echo "skip=true" >> $GITHUB_OUTPUT
             echo "Skipping comment as relevant labels already exist."
           else
@@ -52,10 +52,10 @@ jobs:
         run: |
           COMMENT="Thank you for opening this issue. To help us categorize and prioritize it better, please consider adding one of the following labels:
 
-          - bug: Something isn't working as expected
-          - feature: New feature implementation
-          - enhancement: Improvement to existing features
-          - question: Further information is requested
+          - issue or PR: bug: Something isn't working as expected
+          - issue or PR: feature: New feature implementation
+          - issue or PR: enhancement: Improvement to existing features
+          - issue: question: Further information is requested
 
           Adding a label will help our team quickly understand the nature of the issue and address it more efficiently. Thank you for your cooperation!"
 
