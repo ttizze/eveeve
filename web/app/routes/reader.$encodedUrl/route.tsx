@@ -3,6 +3,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useParams } from "@remix-run/react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
+import { prepareUrlForSearchFromRawInput } from "~/utils/normalize-and-sanitize-url.server";
 import { getTargetLanguage } from "~/utils/target-language.server";
 import { authenticator } from "../../utils/auth.server";
 import { ContentWithTranslations } from "./components/ContentWithTranslations";
@@ -15,15 +16,17 @@ import { actionSchema } from "./types";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const targetLanguage = await getTargetLanguage(request);
-
 	const { encodedUrl } = params;
+
 	if (!encodedUrl) {
 		throw new Response("Missing URL parameter", { status: 400 });
 	}
+
 	const safeUser = await authenticator.isAuthenticated(request);
 	const safeUserId = safeUser?.id;
+	const searchUrl = prepareUrlForSearchFromRawInput(encodedUrl);
 	const pageData = await fetchLatestPageVersionWithTranslations(
-		decodeURIComponent(encodedUrl),
+		searchUrl,
 		safeUserId ?? 0,
 		targetLanguage,
 	);
@@ -107,7 +110,6 @@ export default function ReaderView() {
 						sourceTextInfoWithTranslations={
 							pageData.sourceTextInfoWithTranslations
 						}
-						targetLanguage={targetLanguage}
 						userId={safeUser?.id ?? null}
 					/>
 				</article>
