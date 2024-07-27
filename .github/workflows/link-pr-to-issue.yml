@@ -46,7 +46,6 @@ jobs:
           PR_NUMBER: ${{ steps.extract-issue.outputs.pr_number }}
           ISSUE_NUMBER: ${{ steps.extract-issue.outputs.issue_number }}
         run: |
-          gh pr edit $PR_NUMBER --add-label "linked-to-issue"
           gh pr comment $PR_NUMBER --body "This PR is linked to issue #$ISSUE_NUMBER"
-          gh issue edit $ISSUE_NUMBER --add-project "Project Board Name"
           gh issue comment $ISSUE_NUMBER --body "PR #$PR_NUMBER has been linked to this issue"
+          gh pr edit $PR_NUMBER --body "Closes #$ISSUE_NUMBER"
