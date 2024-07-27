@@ -1,19 +1,19 @@
 [
 	{
-    "name": "type: bug",
-    "color": "d73a4a",
-    "description": "Something isn't working as expected"
-  },
-  {
-    "name": "type: feature",
-    "color": "0052cc",
-    "description": "New feature implementation"
-  },
-  {
-    "name": "type: enhancement",
-    "color": "a2eeef",
-    "description": "Improvement to existing features"
-  },
+		"name": "issue or PR: bug",
+		"color": "d73a4a",
+		"description": "Something isn't working as expected"
+	},
+	{
+		"name": "issue or PR: feature",
+		"color": "0052cc",
+		"description": "New feature implementation"
+	},
+	{
+		"name": "issue or PR: enhancement",
+		"color": "a2eeef",
+		"description": "Improvement to existing features"
+	},
 	{
 		"name": "issue: question",
 		"color": "d876e3",
