@@ -1,0 +1,67 @@
+name: Auto Comment on Unlabeled Issue
+
+on:
+  issues:
+    types: [opened, edited]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "Issue number to process"
+        required: true
+        type: number
+
+jobs:
+  process_issue:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check issue labels
+        id: check_labels
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ISSUE_NUMBER=${{ github.event.inputs.issue_number }}
+          else
+            ISSUE_NUMBER="${{ github.event.issue.number }}"
+          fi
+          echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
+
+          ISSUE_DATA=$(gh issue view $ISSUE_NUMBER --json number,title,labels)
+          ISSUE_TITLE=$(echo "$ISSUE_DATA" | jq -r '.title')
+          EXISTING_LABELS=$(echo "$ISSUE_DATA" | jq -r '.labels[].name')
+
+          echo "Debug: Current labels: EXISTING_LABELS=$EXISTING_LABELS"
+
+          # Define the labels we want users to add
+          USER_LABELS="bug feature enhancement question"
+
+          # Check if any of the user labels already exist
+          if echo "$EXISTING_LABELS" | grep -qE "(${USER_LABELS// /|})" ; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Skipping comment as relevant labels already exist."
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Add comment if no labels
+        if: steps.check_labels.outputs.skip == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ steps.check_labels.outputs.issue_number }}
+        run: |
+          COMMENT="Thank you for opening this issue. To help us categorize and prioritize it better, please consider adding one of the following labels:
+
+          - bug: Something isn't working as expected
+          - feature: New feature implementation
+          - enhancement: Improvement to existing features
+          - question: Further information is requested
+
+          Adding a label will help our team quickly understand the nature of the issue and address it more efficiently. Thank you for your cooperation!"
+
+          if gh issue comment $ISSUE_NUMBER --body "$COMMENT"; then
+            echo "Successfully added comment to issue #$ISSUE_NUMBER"
+          else
+            echo "Failed to add comment to issue #$ISSUE_NUMBER"
+            exit 1
+          fi

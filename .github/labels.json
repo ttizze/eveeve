@@ -1,52 +1,64 @@
-[
-  {
-    "name": "bug",
-    "color": "d73a4a",
-    "description": "Something isn't working"
-  },
-  {
-    "name": "feature",
-    "color": "0075ca",
-    "description": "New feature or request"
-  },
-  {
-    "name": "documentation",
-    "color": "0A0A0A",
-    "description": "Improvements or additions to documentation"
-  },
-  {
-    "name": "chore",
-    "color": "cfd3d7",
-    "description": "Maintenance tasks"
-  },
-  {
-    "name": "refactor",
-    "color": "a2eeef",
-    "description": "Refactoring"
-  },
-  {
-    "name": "dependencies",
-    "color": "0366d6",
-    "description": "Pull requests that update a dependency file"
-  },
-  {
-    "name": "enhancement",
-    "color": "a2eeef",
-    "description": "Enhancement proposal"
-  },
-  {
-    "name": "triage",
-    "color": "d4c5f9",
-    "description": "This issue needs to be triaged"
-  },
-  {
-    "name": "wontfix",
-    "color": "ffffff",
-    "description": "This will not be worked on"
-  },
-  {
-    "name": "nice to have",
-    "color": "fef2c0",
-    "description": "Low priority enhancement that would be nice to have"
-  }
-]
+{
+	"labels": [
+		{
+			"name": "bug",
+			"description": "Something isn't working as expected",
+			"color": "d73a4a"
+		},
+		{
+			"name": "feature",
+			"description": "New feature implementation",
+			"color": "0e8a16"
+		},
+		{
+			"name": "question",
+			"description": "Further information is requested",
+			"color": "d876e3"
+		},
+		{
+			"name": "enhancement",
+			"description": "Improvement to existing features",
+			"color": "a2eeef"
+		},
+		{
+			"name": "good first issue",
+			"description": "Good for newcomers",
+			"color": "7057ff"
+		},
+		{
+			"name": "help wanted",
+			"description": "Extra attention is needed",
+			"color": "008672"
+		},
+		{
+			"name": "duplicate",
+			"description": "This issue already exists",
+			"color": "cfd3d7"
+		},
+		{
+			"name": "wontfix",
+			"description": "This will not be worked on",
+			"color": "ffffff"
+		},
+		{
+			"name": "invalid",
+			"description": "This doesn't seem right",
+			"color": "e4e669"
+		},
+		{
+			"name": "documentation",
+			"description": "Improvements or additions to documentation",
+			"color": "0075ca"
+		},
+		{
+			"name": "refactor",
+			"description": "Code refactoring",
+			"color": "f6a2ff"
+		},
+		{
+			"name": "chore",
+			"description": "General maintenance tasks",
+			"color": "f6a2ff"
+		}
+	]
+}
