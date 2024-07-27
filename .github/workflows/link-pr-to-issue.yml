@@ -12,7 +12,7 @@ jobs:
         id: extract-issue
         run: |
           BRANCH_NAME="${{ github.head_ref }}"
-          ISSUE_NUMBER=$(echo $BRANCH_NAME | grep -oP 'issue-\K\d+')
+          ISSUE_NUMBER=$(echo $BRANCH_NAME | grep -oP 'issue-\K\d+' || true)
           if [ -z "$ISSUE_NUMBER" ]; then
             echo "No issue number found in branch name. Workflow will exit."
             exit 0
