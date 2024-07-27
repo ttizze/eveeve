@@ -3,6 +3,11 @@ name: Link PR to Issue
 on:
   pull_request:
     types: [opened]
+  workflow_dispatch:
+      inputs:
+        pr_number:
+          description: 'Pull Request number'
+          required: true  
 
 jobs:
   link_pr_to_issue:
@@ -10,9 +15,16 @@ jobs:
     steps:
       - name: Extract issue number from branch name
         id: extract-issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          BRANCH_NAME="${{ github.head_ref }}"
-          ISSUE_NUMBER=$(echo $BRANCH_NAME | grep -oP 'issue-\K\d+')
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            PR_NUMBER="${{ github.event.inputs.pr_number }}"
+            BRANCH_NAME=$(gh pr view $PR_NUMBER --json headRefName -q .headRefName)
+          else
+            BRANCH_NAME="${{ github.head_ref }}"
+          fi
+          ISSUE_NUMBER=$(echo $BRANCH_NAME | grep -oP 'issue-\K\d+' || true)
           if [ -z "$ISSUE_NUMBER" ]; then
             echo "No issue number found in branch name. Workflow will exit."
             exit 0
