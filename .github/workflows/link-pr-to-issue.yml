@@ -13,6 +13,10 @@ jobs:
         run: |
           BRANCH_NAME="${{ github.head_ref }}"
           ISSUE_NUMBER=$(echo $BRANCH_NAME | grep -oP 'issue-\K\d+')
+          if [ -z "$ISSUE_NUMBER" ]; then
+            echo "No issue number found in branch name. Workflow will exit."
+            exit 0
+          fi
           echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
 
       - name: Link PR to issue
