@@ -68,7 +68,8 @@ export function Translation({
 						bestTranslationWithVote={bestTranslationWithVote}
 						alternativeTranslationsWithVotes={alternativeTranslationsWithVotes}
 						userId={userId}
-						sourceTextId={sourceTextId} />
+						sourceTextId={sourceTextId}
+					/>
 				)}
 			</div>
 		</div>
