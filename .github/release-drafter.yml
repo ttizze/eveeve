@@ -43,23 +43,23 @@ template: |
 autolabeler:
   - label: feature
     branch:
-      - '/^feat(ure)?[/-].+/'
+      - '/feat(ure)?[/-].+/'
   - label: bug
     branch:
-      - '/^fix[/-].+/'
+      - '/fix[/-].+/'
   - label: chore
     branch:
-      - '/^chore[/-].+/'
+      - '/chore[/-].+/'
   - label: refactor
     branch:
-      - '/(refactor|refactoring)[/-].+/'
+      - '/refactor[/-].+/'
   - label: documentation
     branch:
       - '/doc[/-].+/'
   - label: enhancement
     branch:
-      - '/(enhancement|improve)[/-].+/'
+      - '/enhancement[/-].+/'
   - label: dependencies
     branch:
-      - '/^dep(s)?[/-].+/'
-      - '/^dependency[/-].+/'
+      - '/dep(s)?[/-].+/'
+      - '/dependency[/-].+/'
