@@ -1,52 +1,62 @@
 [
-  {
-    "name": "bug",
-    "color": "d73a4a",
-    "description": "Something isn't working"
-  },
-  {
-    "name": "feature",
-    "color": "0075ca",
-    "description": "New feature or request"
-  },
-  {
-    "name": "documentation",
-    "color": "0A0A0A",
-    "description": "Improvements or additions to documentation"
-  },
-  {
-    "name": "chore",
-    "color": "cfd3d7",
-    "description": "Maintenance tasks"
-  },
-  {
-    "name": "refactor",
-    "color": "a2eeef",
-    "description": "Refactoring"
-  },
-  {
-    "name": "dependencies",
-    "color": "0366d6",
-    "description": "Pull requests that update a dependency file"
-  },
-  {
-    "name": "enhancement",
-    "color": "a2eeef",
-    "description": "Enhancement proposal"
-  },
-  {
-    "name": "triage",
-    "color": "d4c5f9",
-    "description": "This issue needs to be triaged"
-  },
-  {
-    "name": "wontfix",
-    "color": "ffffff",
-    "description": "This will not be worked on"
-  },
-  {
-    "name": "nice to have",
-    "color": "fef2c0",
-    "description": "Low priority enhancement that would be nice to have"
-  }
+	{
+		"name": "issue or PR: bug",
+		"color": "d73a4a",
+		"description": "Something isn't working as expected"
+	},
+	{
+		"name": "issue or PR: feature",
+		"color": "0052cc",
+		"description": "New feature implementation"
+	},
+	{
+		"name": "issue or PR: enhancement",
+		"color": "a2eeef",
+		"description": "Improvement to existing features"
+	},
+	{
+		"name": "issue: question",
+		"color": "d876e3",
+		"description": "Further information is requested"
+	},
+	{
+		"name": "status: good first issue",
+		"color": "7057ff",
+		"description": "Good for newcomers"
+	},
+	{
+		"name": "status: help wanted",
+		"color": "008672",
+		"description": "Extra attention is needed"
+	},
+	{
+		"name": "close: duplicate",
+		"color": "cfd3d7",
+		"description": "This issue already exists"
+	},
+	{
+		"name": "close: wontfix",
+		"color": "ffffff",
+		"description": "This will not be worked on"
+	},
+	{
+		"name": "close: invalid",
+		"color": "e4e669",
+		"description": "This doesn't seem right"
+	},
+	{
+		"name": "PR: documentation",
+		"color": "0075ca",
+		"description": "Improvements or additions to documentation"
+	},
+	{
+		"name": "PR: refactor",
+		"color": "fbca04",
+		"description": "Code refactoring"
+	},
+	{
+		"name": "PR: chore",
+		"color": "bfdadc",
+		"description": "General maintenance tasks"
+	}
 ]
