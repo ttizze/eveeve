@@ -1,4 +1,6 @@
-#  EveEve プロジェクト
+![EveEve](./web/public/title-logo-lowercase.png)
+
+#  EveEve 
 
 ## 概要
 EveEve（Everyone Translate Everything）は、インターネットに公開されているテキストに､対訳､脚注､解説を付け、美しいレイアウトで提供し､人々の理解を促進することを目指すオープンソースプロジェクトです。このプロジェクトの目的は、世界中の人々に、物語と知識への扉を開くことです。
