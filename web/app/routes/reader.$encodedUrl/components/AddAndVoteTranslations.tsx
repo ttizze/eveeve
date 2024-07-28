@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, ListTree, PlusCircle } from "lucide-react";
+import { ChevronDown, ChevronUp, ListTree } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import type { TranslationWithVote } from "../types";
@@ -30,7 +30,7 @@ export function AddAndVoteTranslations({
 	const hasMoreTranslations =
 		alternativeTranslationsWithVotes.length > INITIAL_DISPLAY_COUNT;
 
-	const toggleShowAll = () => setShowAll(prev => !prev);
+	const toggleShowAll = () => setShowAll((prev) => !prev);
 
 	return (
 		<div className="p-4 ">
