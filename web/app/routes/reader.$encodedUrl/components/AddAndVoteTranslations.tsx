@@ -1,4 +1,4 @@
-import { ChevronDown, ListTree, PlusCircle } from "lucide-react";
+import { ChevronDown, ChevronUp, ListTree, PlusCircle } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import type { TranslationWithVote } from "../types";
@@ -30,6 +30,8 @@ export function AddAndVoteTranslations({
 	const hasMoreTranslations =
 		alternativeTranslationsWithVotes.length > INITIAL_DISPLAY_COUNT;
 
+	const toggleShowAll = () => setShowAll(prev => !prev);
+
 	return (
 		<div className="p-4 ">
 			<TranslationItem
@@ -40,29 +42,32 @@ export function AddAndVoteTranslations({
 			<div className="mt-4">
 				<p className="text-sm flex items-center justify-end gap-2">
 					<ListTree size={16} />
-					Alternative Translations
+					Alternative
 				</p>
 				<AlternativeTranslations
 					translationsWithVotes={displayedTranslations}
 					userId={userId}
 				/>
-				{hasMoreTranslations && !showAll && (
+				{hasMoreTranslations && (
 					<Button
 						variant="link"
 						className="mt-2 w-full text-sm"
-						onClick={() => setShowAll(true)}
+						onClick={toggleShowAll}
 					>
-						<ChevronDown size={16} className="mr-1" />
-						Show more
+						{showAll ? (
+							<>
+								<ChevronUp size={16} className="mr-1" />
+							</>
+						) : (
+							<>
+								<ChevronDown size={16} className="mr-1" />
+							</>
+						)}
 					</Button>
 				)}
 			</div>
 			{userId && (
 				<div className="mt-4">
-					<p className="text-sm flex items-center justify-end gap-2">
-						<PlusCircle size={16} />
-						Add Your Translation
-					</p>
 					<AddTranslationForm sourceTextId={sourceTextId} />
 				</div>
 			)}

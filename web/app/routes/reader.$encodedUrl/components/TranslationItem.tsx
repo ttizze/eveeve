@@ -1,4 +1,4 @@
-import { sanitizeAndParseText } from "../functions/sanitize-and-parse-text";
+import { sanitizeAndParseText } from "../functions/sanitize-and-parse-text.client";
 import type { TranslationWithVote } from "../types";
 import { VoteButtons } from "./VoteButtons";
 

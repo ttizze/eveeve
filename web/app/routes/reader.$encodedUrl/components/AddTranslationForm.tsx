@@ -36,7 +36,7 @@ export function AddTranslationForm({ sourceTextId }: AddTranslationFormProps) {
 				/>
 				<div className="space-x-2 flex justify-end items-center">
 					{fields.text.errors && (
-						<p className="text-red-500">{fields.text.errors}</p>
+						<p className="text-red-500 text-sm">{fields.text.errors}</p>
 					)}
 					<Button
 						type="submit"
