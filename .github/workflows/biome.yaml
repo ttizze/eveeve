@@ -1,26 +1,19 @@
-name: Biome Check for Web
+name: Biome Check
 
 on:
-  pull_request:
   push:
-    paths:
-      - .github/workflows/biome.yaml
+  pull_request:
+  workflow_dispatch:
 
 jobs:
-  biome-check-for-web:
+  biome-check:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
         with:
-          node-version: "20"
-      - name: Install Bun
-        run: npm install -g bun
-      - name: Install dependencies
-        run: cd web && bun i
-      - name: Run Biome check
-        run: |
-          cd web
-          bunx @biomejs/biome check .
+          version: latest
+      - name: Run Biome
+        run: biome ci .
