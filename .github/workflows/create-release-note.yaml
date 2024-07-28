@@ -3,15 +3,8 @@ name: Create Release Note
 on:
   pull_request:
     types:
-      - opened
-      - reopened
-      - synchronize
       - closed
-    branches:
-      - main
-
-permissions:
-  contents: read
+  workflow_dispatch:
 
 jobs:
   release:
