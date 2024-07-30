@@ -57,7 +57,7 @@ export function Translation({
 
 	return (
 		<div className="group relative">
-			<div className="w-full notranslate mt-2 pt-2 border-t border-gray-200">
+			<div className="w-full notranslate mt-2 py-2 border-b border-gray-200">
 				{sanitizedAndParsedText}
 				<ToggleButton
 					isExpanded={isExpanded}
