@@ -66,11 +66,9 @@ export function AddAndVoteTranslations({
 					</Button>
 				)}
 			</div>
-			{userId && (
-				<div className="mt-4">
-					<AddTranslationForm sourceTextId={sourceTextId} />
-				</div>
-			)}
+			<div className="mt-4">
+				<AddTranslationForm sourceTextId={sourceTextId} userId={userId} />
+			</div>
 		</div>
 	);
 }

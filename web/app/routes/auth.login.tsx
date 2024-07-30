@@ -16,8 +16,9 @@ import {
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
-import { GoogleForm } from "../components/GoogleForm";
 import { authenticator } from "../utils/auth.server";
+import { GoogleForm } from "./resources+/google-form";
+import { useLocation } from "@remix-run/react";
 
 const loginSchema = z.object({
 	email: z.string().email("有効なメールアドレスを入力してください"),
@@ -59,6 +60,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 const LoginPage = () => {
 	const lastResult = useActionData<typeof action>();
+	const location = useLocation();
 	const [form, { email, password }] = useForm({
 		id: "login-form",
 		lastResult,
@@ -79,7 +81,7 @@ const LoginPage = () => {
 				<CardContent>
 					<Form method="post" {...getFormProps(form)}>
 						{form.errors && (
-							<p className="text-red-500 text-center mt-2">invaild</p>
+							<p className="text-red-500 text-center mt-2">invalid</p>
 						)}
 						<div className="space-y-4">
 							<div className="space-y-2">
@@ -112,7 +114,7 @@ const LoginPage = () => {
 					<div className="text-center text-sm text-gray-500 my-2">
 						Or continue with
 					</div>
-					<GoogleForm />
+					<GoogleForm redirectTo={location.pathname + location.search} />
 				</CardFooter>
 			</Card>
 		</div>

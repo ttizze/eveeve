@@ -7,11 +7,13 @@ export const VoteButton = memo(function VoteButton({
 	isDisabled,
 	point,
 	iconClass,
+	onClick,
 }: {
 	isUpvote: boolean;
 	isDisabled: boolean;
 	point?: number;
 	iconClass: string;
+	onClick: (e: React.MouseEvent) => void;
 }) {
 	const Icon = isUpvote ? ThumbsUp : ThumbsDown;
 	return (
@@ -22,6 +24,7 @@ export const VoteButton = memo(function VoteButton({
 			name="isUpvote"
 			value={isUpvote.toString()}
 			disabled={isDisabled}
+			onClick={onClick}
 		>
 			<Icon className={iconClass} />
 			{isUpvote && point}
