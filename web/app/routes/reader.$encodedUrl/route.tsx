@@ -112,6 +112,7 @@ export default function ReaderView() {
 						}
 						userId={safeUser?.id ?? null}
 					/>
+					<p>license: {pageData.license}</p>
 				</article>
 			</div>
 		</div>

@@ -16,6 +16,7 @@ export async function fetchLatestPageVersionWithTranslations(
 			title: true,
 			url: true,
 			content: true,
+			license: true,
 			sourceTexts: {
 				select: {
 					id: true,
@@ -63,6 +64,7 @@ export async function fetchLatestPageVersionWithTranslations(
 	return {
 		title: pageVersion.title,
 		url: pageVersion.url,
+		license: pageVersion.license,
 		content: pageVersion.content,
 		sourceTextInfoWithTranslations,
 		userId,
