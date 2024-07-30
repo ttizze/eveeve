@@ -4,6 +4,7 @@ import { getZodConstraint } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
+import { useLocation } from "@remix-run/react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
@@ -18,7 +19,6 @@ import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
 import { authenticator } from "../utils/auth.server";
 import { GoogleForm } from "./resources+/google-form";
-import { useLocation } from "@remix-run/react";
 
 const loginSchema = z.object({
 	email: z.string().email("有効なメールアドレスを入力してください"),
