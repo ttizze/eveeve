@@ -1,6 +1,7 @@
 import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
 import { Languages, LogIn, LogOut, Search, User } from "lucide-react";
+import { useTheme } from "next-themes";
 import { TargetLanguageSelect } from "~/components/TargetLanguageSelect";
 import { ModeToggle } from "~/components/dark-mode-toggle";
 import { Button } from "~/components/ui/button";
@@ -12,7 +13,6 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Separator } from "~/components/ui/separator";
 import type { SafeUser } from "~/types";
-import { useTheme } from "next-themes";
 interface HeaderProps {
 	safeUser: SafeUser | null;
 }
