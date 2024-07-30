@@ -111,8 +111,8 @@ export default function ReaderView() {
 							pageData.sourceTextInfoWithTranslations
 						}
 						userId={safeUser?.id ?? null}
-						/>
-				<p>license: {pageData.license}</p>
+					/>
+					<p>license: {pageData.license}</p>
 				</article>
 			</div>
 		</div>
