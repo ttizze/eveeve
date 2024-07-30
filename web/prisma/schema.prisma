@@ -91,6 +91,7 @@ model PageVersion {
   url                        String
   title                      String
   content                    String
+  license                    String                       @default("unknown")
   contentHash                Bytes                        @map("content_hash")
   pageId                     Int                          @map("page_id")
   createdAt                  DateTime                     @default(now()) @map("created_at")
@@ -161,7 +162,6 @@ model ApiUsage {
 
   @@map("api_usage")
 }
-
 
 model CustomAIModel {
   id        String   @id @default(cuid())

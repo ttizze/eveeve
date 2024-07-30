@@ -20,6 +20,7 @@ export interface LatestPageVersionWithTranslations {
 	title: string;
 	url: string;
 	content: string;
+	license: string;
 	sourceTextInfoWithTranslations: SourceTextInfoWithTranslations[];
 	userId: number | null;
 }
