@@ -2,6 +2,8 @@ import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { useFetcher } from "@remix-run/react";
 import { memo, useMemo } from "react";
+import { useState } from "react";
+import { LoginDialog } from "~/routes/resources+/LoginDialog";
 import { cn } from "~/utils/cn";
 import type { TranslationWithVote } from "../types";
 import { voteSchema } from "../types";
@@ -17,6 +19,7 @@ export const VoteButtons = memo(function VoteButtons({
 	userId,
 }: VoteButtonsProps) {
 	const fetcher = useFetcher();
+	const [showLoginDialog, setShowLoginDialog] = useState(false);
 	const [form, fields] = useForm({
 		id: `vote-form-${translationWithVote.id}`,
 		onValidate: useMemo(
@@ -42,6 +45,12 @@ export const VoteButtons = memo(function VoteButtons({
 		}),
 		[translationWithVote.userVote?.isUpvote],
 	);
+	const handleVoteClick = (e: React.MouseEvent) => {
+		if (!userId) {
+			setShowLoginDialog(true);
+			e.preventDefault();
+		}
+	};
 
 	return (
 		<div className="flex justify-end items-center mt-2">
@@ -60,16 +69,19 @@ export const VoteButtons = memo(function VoteButtons({
 				/>
 				<VoteButton
 					isUpvote={true}
-					isDisabled={!userId || isVoting}
+					isDisabled={isVoting}
 					point={translationWithVote.point}
 					iconClass={buttonClasses.upVote}
+					onClick={handleVoteClick}
 				/>
 				<VoteButton
 					isUpvote={false}
-					isDisabled={!userId || isVoting}
+					isDisabled={isVoting}
 					iconClass={buttonClasses.downVote}
+					onClick={handleVoteClick}
 				/>
 			</fetcher.Form>
+			<LoginDialog isOpen={showLoginDialog} onOpenChange={setShowLoginDialog} />
 		</div>
 	);
 });
