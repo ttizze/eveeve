@@ -56,11 +56,11 @@ export default function Search() {
 			<div className="container mx-auto max-w-4xl min-h-50 py-10">
 				<Form method="post" {...getFormProps(form)}>
 					<div className="flex gap-2">
-							<Input
-								{...getInputProps(fields.query, { type: "text" })}
-								placeholder="Search for page titles or translations..."
-								className="w-full"
-							/>
+						<Input
+							{...getInputProps(fields.query, { type: "text" })}
+							placeholder="Search for page titles or translations..."
+							className="w-full"
+						/>
 						<Button type="submit" disabled={isSearching}>
 							{isSearching ? "Searching..." : "Search"}
 						</Button>

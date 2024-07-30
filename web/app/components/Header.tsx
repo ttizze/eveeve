@@ -34,7 +34,7 @@ export function Header({ safeUser }: HeaderProps) {
 						</Link>
 					</Button>
 					<ModeToggle />
-					<DropdownMenu  modal={false}>
+					<DropdownMenu modal={false}>
 						<DropdownMenuTrigger>
 							<Button variant="ghost" size="icon">
 								<User className="w-6 h-6" />
