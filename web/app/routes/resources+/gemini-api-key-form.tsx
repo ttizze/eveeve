@@ -1,23 +1,54 @@
 import { useForm } from "@conform-to/react";
 import { getFormProps, getInputProps } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { Form, useActionData } from "@remix-run/react";
+import type { ActionFunctionArgs } from "@remix-run/node";
 import { Link } from "@remix-run/react";
-import { useNavigation } from "@remix-run/react";
+import { useFetcher } from "@remix-run/react";
 import { Save } from "lucide-react";
 import { ExternalLink, Key } from "lucide-react";
 import { TriangleAlert } from "lucide-react";
+import { z } from "zod";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
-import type { action } from "../route";
-import { geminiApiKeySchema } from "../types";
+import { validateGeminiApiKey } from "~/feature/translate/utils/gemini";
+import { authenticator } from "~/utils/auth.server";
+import { updateGeminiApiKey } from "./functions/mutations.server";
+
+export const geminiApiKeySchema = z.object({
+	geminiApiKey: z.string().min(1, "API key is required"),
+});
+
+export async function action({ request }: ActionFunctionArgs) {
+	const safeUser = await authenticator.isAuthenticated(request, {
+		failureRedirect: "/",
+	});
+	const submission = parseWithZod(await request.formData(), {
+		schema: geminiApiKeySchema,
+	});
+	if (submission.status !== "success") {
+		return { lastResult: submission.reply() };
+	}
+
+	const { isValid, errorMessage } = await validateGeminiApiKey(
+		submission.value.geminiApiKey,
+	);
+	if (!isValid) {
+		return {
+			lastResult: submission.reply({
+				formErrors: [errorMessage || "Gemini API key validation failed"],
+			}),
+		};
+	}
+	await updateGeminiApiKey(safeUser.id, submission.value.geminiApiKey);
+	return { lastResult: submission.reply({ resetForm: true }) };
+}
 
 export function GeminiApiKeyForm() {
-	const actionData = useActionData<typeof action>();
-	const navigation = useNavigation();
+	const fetcher = useFetcher<typeof action>();
+	const actionData = fetcher.data;
 	const [form, { geminiApiKey }] = useForm({
 		id: "gemini-api-key-form",
 		lastResult: actionData?.lastResult,
@@ -71,7 +102,11 @@ export function GeminiApiKeyForm() {
 						</AlertDescription>
 					</div>
 				</Alert>
-				<Form method="post" {...getFormProps(form)}>
+				<fetcher.Form
+					method="post"
+					action="/resources/gemini-api-key-form"
+					{...getFormProps(form)}
+				>
 					<div className="flex items-center">
 						<div className="w-full">
 							<Input
@@ -85,12 +120,10 @@ export function GeminiApiKeyForm() {
 						</div>
 						<Button
 							type="submit"
-							name="intent"
-							value="saveGeminiApiKey"
 							size="icon"
-							disabled={navigation.state === "submitting"}
+							disabled={fetcher.state === "submitting"}
 						>
-							{navigation.state === "submitting" ? (
+							{fetcher.state === "submitting" ? (
 								<LoadingSpinner />
 							) : (
 								<Save className="w-4 h-4" />
@@ -107,7 +140,7 @@ export function GeminiApiKeyForm() {
 					{form.errors && (
 						<p className="text-red-500 text-center mt-2">{form.errors}</p>
 					)}
-				</Form>
+				</fetcher.Form>
 			</CardContent>
 		</Card>
 	);

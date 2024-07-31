@@ -4,9 +4,9 @@ import { getZodConstraint } from "@conform-to/zod";
 import { useFetcher } from "@remix-run/react";
 import { Save } from "lucide-react";
 import { useState } from "react";
+import { LoginDialog } from "~/components/LoginDialog";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
-import { LoginDialog } from "~/routes/resources+/LoginDialog";
 import type { action } from "../route";
 import { addTranslationSchema } from "../types";
 

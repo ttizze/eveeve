@@ -15,7 +15,6 @@ import { fetchLatestPageVersionWithTranslations } from "./functions/queries.serv
 import { actionSchema } from "./types";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
-	const targetLanguage = await getTargetLanguage(request);
 	const { "*": urlParam } = params;
 
 	if (!urlParam) {
@@ -24,6 +23,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
 	const safeUser = await authenticator.isAuthenticated(request);
 	const safeUserId = safeUser?.id;
+	const targetLanguage = await getTargetLanguage(request);
 	const normalizedUrl = normalizeAndSanitizeUrl(urlParam);
 	const pageData = await fetchLatestPageVersionWithTranslations(
 		normalizedUrl,
@@ -78,15 +78,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function ReaderView() {
-	const { encodedUrl } = useParams();
-	const { targetLanguage, pageData, safeUser } =
-		useTypedLoaderData<typeof loader>();
+	const { "*": urlParam } = useParams();
+	const { pageData, safeUser } = useTypedLoaderData<typeof loader>();
 
 	if (!pageData) {
 		return <div>Loading...</div>;
 	}
 
-	const originalUrl = encodedUrl ? decodeURIComponent(encodedUrl) : "";
+	const originalUrl = urlParam ? decodeURIComponent(urlParam) : "";
 
 	return (
 		<div>

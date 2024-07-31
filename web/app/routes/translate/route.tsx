@@ -5,19 +5,17 @@ import { useEffect } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
 import { getTranslateUserQueue } from "~/feature/translate/translate-user-queue";
-import { validateGeminiApiKey } from "~/feature/translate/utils/gemini";
 import { authenticator } from "~/utils/auth.server";
 import { normalizeAndSanitizeUrl } from "~/utils/normalize-and-sanitize-url.server";
 import { getTargetLanguage } from "~/utils/target-language.server";
-import { GeminiApiKeyForm } from "./components/GeminiApiKeyForm";
+import { GeminiApiKeyForm } from "../resources+/gemini-api-key-form";
 import { URLTranslationForm } from "./components/URLTranslationForm";
 import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
-import { updateGeminiApiKey } from "./functions/mutations.server";
 import {
 	getDbUser,
 	listUserAiTranslationInfo,
 } from "./functions/queries.server";
-import { schema } from "./types";
+import { urlTranslationSchema } from "./types";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
@@ -44,59 +42,39 @@ export async function action({ request }: ActionFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/",
 	});
-	const submission = parseWithZod(await request.formData(), { schema });
+	const submission = parseWithZod(await request.formData(), {
+		schema: urlTranslationSchema,
+	});
 	if (submission.status !== "success") {
-		return { intent: null, lastResult: submission.reply() };
+		return { lastResult: submission.reply() };
 	}
-	const intent = submission.value.intent;
 
-	switch (submission.value.intent) {
-		case "saveGeminiApiKey": {
-			const isValid = await validateGeminiApiKey(submission.value.geminiApiKey);
-			if (!isValid) {
-				return {
-					intent,
-					lastResult: submission.reply({
-						formErrors: ["Gemini API key validation failed"],
-					}),
-				};
-			}
-			await updateGeminiApiKey(safeUser.id, submission.value.geminiApiKey);
-			return { intent, lastResult: submission.reply({ resetForm: true }) };
-		}
-		case "translateUrl": {
-			const dbUser = await getDbUser(safeUser.id);
-			if (!dbUser?.geminiApiKey) {
-				return {
-					intent,
-					lastResult: submission.reply({
-						formErrors: ["Gemini API key is not set"],
-					}),
-					url: null,
-				};
-			}
-			const targetLanguage = await getTargetLanguage(request);
-			const normalizedUrl = normalizeAndSanitizeUrl(submission.value.url);
-			// Start the translation job in background
-			const queue = getTranslateUserQueue(safeUser.id);
-			const job = await queue.add(`translate-${safeUser.id}`, {
-				url: normalizedUrl,
-				targetLanguage,
-				apiKey: dbUser.geminiApiKey,
-				userId: safeUser.id,
-			});
-			console.log(job.toJSON());
-
-			return {
-				intent,
-				lastResult: submission.reply({ resetForm: true }),
-				url: normalizedUrl,
-			};
-		}
-		default: {
-			throw new Error("Invalid Intent");
-		}
+	const dbUser = await getDbUser(safeUser.id);
+	if (!dbUser?.geminiApiKey) {
+		return {
+			lastResult: submission.reply({
+				formErrors: ["Gemini API key is not set"],
+			}),
+			url: null,
+		};
 	}
+
+	const targetLanguage = await getTargetLanguage(request);
+	const normalizedUrl = normalizeAndSanitizeUrl(submission.value.url);
+	// Start the translation job in background
+	const queue = getTranslateUserQueue(safeUser.id);
+	const job = await queue.add(`translate-${safeUser.id}`, {
+		url: normalizedUrl,
+		targetLanguage,
+		apiKey: dbUser.geminiApiKey,
+		userId: safeUser.id,
+	});
+	console.log(job.toJSON());
+
+	return {
+		lastResult: submission.reply({ resetForm: true }),
+		url: normalizedUrl,
+	};
 }
 
 export default function TranslatePage() {

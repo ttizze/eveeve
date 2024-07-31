@@ -28,7 +28,7 @@ export function AIModelSelector({ onModelSelect }: AIModelSelectorProps) {
 
 	return (
 		<Select value={selectedModel} onValueChange={handleModelChange}>
-			<SelectTrigger className="w-[200px]">
+			<SelectTrigger>
 				<SelectValue placeholder="Select a model" />
 			</SelectTrigger>
 			<SelectContent>
