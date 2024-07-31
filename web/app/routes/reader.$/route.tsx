@@ -16,15 +16,15 @@ import { actionSchema } from "./types";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const targetLanguage = await getTargetLanguage(request);
-	const { encodedUrl } = params;
+	const { "*": urlParam } = params;
 
-	if (!encodedUrl) {
+	if (!urlParam) {
 		throw new Response("Missing URL parameter", { status: 400 });
 	}
 
 	const safeUser = await authenticator.isAuthenticated(request);
 	const safeUserId = safeUser?.id;
-	const normalizedUrl = normalizeAndSanitizeUrl(encodedUrl);
+	const normalizedUrl = normalizeAndSanitizeUrl(urlParam);
 	const pageData = await fetchLatestPageVersionWithTranslations(
 		normalizedUrl,
 		safeUserId ?? 0,
