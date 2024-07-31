@@ -4,13 +4,14 @@ import { FcGoogle } from "react-icons/fc";
 import { Button } from "~/components/ui/button";
 import { authenticator } from "~/utils/auth.server";
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export async function action({ request }: ActionFunctionArgs) {
 	return authenticator.authenticate("google", request, {
 		successRedirect: "/api/auth/callback/google",
 		failureRedirect: "/login",
 	});
-};
-export const GoogleForm = ({ redirectTo }: { redirectTo: string }) => {
+}
+
+export function GoogleForm({ redirectTo }: { redirectTo: string }) {
 	const fetcher = useFetcher();
 	return (
 		<fetcher.Form
@@ -31,4 +32,4 @@ export const GoogleForm = ({ redirectTo }: { redirectTo: string }) => {
 			</Button>
 		</fetcher.Form>
 	);
-};
+}

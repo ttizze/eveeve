@@ -7,7 +7,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "~/components/ui/dialog";
-import { GoogleForm } from "./google-form";
+import { GoogleForm } from "../routes/resources+/google-form";
 
 interface LoginDialogProps {
 	isOpen: boolean;

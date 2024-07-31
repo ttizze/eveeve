@@ -3,7 +3,7 @@ import { parseWithZod } from "@conform-to/zod";
 import { useFetcher } from "@remix-run/react";
 import { memo, useMemo } from "react";
 import { useState } from "react";
-import { LoginDialog } from "~/routes/resources+/LoginDialog";
+import { LoginDialog } from "~/components/LoginDialog";
 import { cn } from "~/utils/cn";
 import type { TranslationWithVote } from "../types";
 import { voteSchema } from "../types";

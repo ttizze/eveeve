@@ -5,14 +5,12 @@ import { useEffect } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
 import { getTranslateUserQueue } from "~/feature/translate/translate-user-queue";
-import { validateGeminiApiKey } from "~/feature/translate/utils/gemini";
 import { authenticator } from "~/utils/auth.server";
 import { normalizeAndSanitizeUrl } from "~/utils/normalize-and-sanitize-url.server";
 import { getTargetLanguage } from "~/utils/target-language.server";
-import { GeminiApiKeyForm } from "./components/GeminiApiKeyForm";
+import { GeminiApiKeyForm } from "../resources+/gemini-api-key-form";
 import { URLTranslationForm } from "./components/URLTranslationForm";
 import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
-import { updateGeminiApiKey } from "./functions/mutations.server";
 import {
 	getDbUser,
 	listUserAiTranslationInfo,
@@ -51,19 +49,6 @@ export async function action({ request }: ActionFunctionArgs) {
 	const intent = submission.value.intent;
 
 	switch (submission.value.intent) {
-		case "saveGeminiApiKey": {
-			const isValid = await validateGeminiApiKey(submission.value.geminiApiKey);
-			if (!isValid) {
-				return {
-					intent,
-					lastResult: submission.reply({
-						formErrors: ["Gemini API key validation failed"],
-					}),
-				};
-			}
-			await updateGeminiApiKey(safeUser.id, submission.value.geminiApiKey);
-			return { intent, lastResult: submission.reply({ resetForm: true }) };
-		}
 		case "translateUrl": {
 			const dbUser = await getDbUser(safeUser.id);
 			if (!dbUser?.geminiApiKey) {
