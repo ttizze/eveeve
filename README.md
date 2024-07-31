@@ -1,4 +1,4 @@
-![EveEve](./web/public/title-logo-lowercase.png)
+![EveEve](./web/public/title-logo-dark.png)
 
 #  EveEve 
 
