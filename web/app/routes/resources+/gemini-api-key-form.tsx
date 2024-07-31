@@ -3,7 +3,6 @@ import { getFormProps, getInputProps } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { Link } from "@remix-run/react";
-import { useNavigation } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
 import { Save } from "lucide-react";
 import { ExternalLink, Key } from "lucide-react";
@@ -33,11 +32,13 @@ export async function action({ request }: ActionFunctionArgs) {
 		return { lastResult: submission.reply() };
 	}
 
-	const isValid = await validateGeminiApiKey(submission.value.geminiApiKey);
+	const { isValid, errorMessage } = await validateGeminiApiKey(
+		submission.value.geminiApiKey,
+	);
 	if (!isValid) {
 		return {
 			lastResult: submission.reply({
-				formErrors: ["Gemini API key validation failed"],
+				formErrors: [errorMessage || "Gemini API key validation failed"],
 			}),
 		};
 	}
@@ -48,7 +49,6 @@ export async function action({ request }: ActionFunctionArgs) {
 export function GeminiApiKeyForm() {
 	const fetcher = useFetcher<typeof action>();
 	const actionData = fetcher.data;
-	const navigation = useNavigation();
 	const [form, { geminiApiKey }] = useForm({
 		id: "gemini-api-key-form",
 		lastResult: actionData?.lastResult,
@@ -121,9 +121,9 @@ export function GeminiApiKeyForm() {
 						<Button
 							type="submit"
 							size="icon"
-							disabled={navigation.state === "submitting"}
+							disabled={fetcher.state === "submitting"}
 						>
-							{navigation.state === "submitting" ? (
+							{fetcher.state === "submitting" ? (
 								<LoadingSpinner />
 							) : (
 								<Save className="w-4 h-4" />

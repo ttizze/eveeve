@@ -4,15 +4,18 @@ import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
 import { useNavigation } from "@remix-run/react";
 import { RotateCcw } from "lucide-react";
+import { useState } from "react";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Progress } from "~/components/ui/progress";
 import { ScrollArea } from "~/components/ui/scroll-area";
+import { AIModelSelector } from "~/feature/translate/components/AIModelSelector";
 import { cn } from "~/utils/cn";
 import type { UserAITranslationInfoItem } from "../types";
 import { urlTranslationSchema } from "../types";
+
 type UserAITranslationStatusProps = {
 	userAITranslationInfo: UserAITranslationInfoItem[];
 	targetLanguage: string;
@@ -22,6 +25,7 @@ export function UserAITranslationStatus({
 	userAITranslationInfo = [],
 	targetLanguage,
 }: UserAITranslationStatusProps) {
+	const [selectedModel, setSelectedModel] = useState("gemini-1.5-flash");
 	const navigation = useNavigation();
 	const [form, fields] = useForm({
 		id: "url-re-translation-form",
@@ -99,17 +103,23 @@ export function UserAITranslationStatus({
 														name="url"
 														value={item.pageVersion.page.url}
 													/>
+													<div className="w-full">
+														<AIModelSelector onModelSelect={setSelectedModel} />
+														<input
+															type="hidden"
+															name="model"
+															value={selectedModel}
+														/>
+													</div>
 													<Button
 														type="submit"
-														name="intent"
-														value="translateUrl"
 														className="w-full"
 														disabled={navigation.state === "submitting"}
 													>
 														{navigation.state === "submitting" ? (
 															<LoadingSpinner />
 														) : (
-															<RotateCcw className="w-4 h-4" />
+															<RotateCcw className="w-4 h-4 mr-2" />
 														)}
 													</Button>
 												</Form>

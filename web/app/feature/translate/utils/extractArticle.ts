@@ -33,10 +33,5 @@ export const extractArticle = (
 
 	const resolvedContent = contentDom.serialize();
 
-	console.log("article", {
-		...article,
-		content: resolvedContent,
-	});
-
 	return { content: resolvedContent, title: article.title };
 };

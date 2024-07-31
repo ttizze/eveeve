@@ -15,7 +15,6 @@ import { fetchLatestPageVersionWithTranslations } from "./functions/queries.serv
 import { actionSchema } from "./types";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
-	const targetLanguage = await getTargetLanguage(request);
 	const { "*": urlParam } = params;
 
 	if (!urlParam) {
@@ -24,6 +23,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
 	const safeUser = await authenticator.isAuthenticated(request);
 	const safeUserId = safeUser?.id;
+	const targetLanguage = await getTargetLanguage(request);
 	const normalizedUrl = normalizeAndSanitizeUrl(urlParam);
 	const pageData = await fetchLatestPageVersionWithTranslations(
 		normalizedUrl,

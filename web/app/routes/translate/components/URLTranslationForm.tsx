@@ -8,7 +8,7 @@ import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { AIModelSelector } from "../../../feature/translate/components/AIModelSelector";
+import { AIModelSelector } from "~/feature/translate/components/AIModelSelector";
 import type { action } from "../route";
 import { urlTranslationSchema } from "../types";
 
@@ -39,14 +39,11 @@ export function URLTranslationForm() {
 						/>
 						<div id={fields.url.errorId}>{fields.url.errors}</div>
 					</div>
-					<AIModelSelector onModelSelect={setSelectedModel} />
+					<div className="w-[200px]">
+						<AIModelSelector onModelSelect={setSelectedModel} />
+					</div>
 					<input type="hidden" name="model" value={selectedModel} />
-					<Button
-						type="submit"
-						name="intent"
-						value="translateUrl"
-						disabled={navigation.state === "submitting"}
-					>
+					<Button type="submit" disabled={navigation.state === "submitting"}>
 						{navigation.state === "submitting" ? (
 							<LoadingSpinner />
 						) : (
@@ -55,7 +52,7 @@ export function URLTranslationForm() {
 					</Button>
 				</div>
 			</Form>
-			{actionData?.intent === "translateUrl" && actionData?.url && (
+			{actionData?.url && (
 				<Alert className="bg-blue-50 border-blue-200 text-blue-800 animate-in fade-in duration-300">
 					<AlertTitle className="text-center">
 						Translation Job Started

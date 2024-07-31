@@ -81,7 +81,9 @@ export async function getGeminiModelResponse(
 	console.error("Max retries reached. Translation failed.");
 	throw lastError || new Error("Translation failed after max retries");
 }
-export async function validateGeminiApiKey(apiKey: string): Promise<boolean> {
+export async function validateGeminiApiKey(
+	apiKey: string,
+): Promise<{ isValid: boolean; errorMessage?: string }> {
 	try {
 		const genAI = new GoogleGenerativeAI(apiKey);
 		const model = genAI.getGenerativeModel({ model: "gemini-pro" });
@@ -90,9 +92,23 @@ export async function validateGeminiApiKey(apiKey: string): Promise<boolean> {
 		const response = await result.response;
 		const text = response.text();
 
-		return text.length > 0;
+		return { isValid: text.length > 0 };
 	} catch (error) {
 		console.error("Gemini API key validation failed:", error);
-		return false;
+		if (
+			error instanceof Error &&
+			error.message.includes("The model is overloaded")
+		) {
+			return {
+				isValid: false,
+				errorMessage:
+					"The model is currently overloaded. Please try again later.",
+			};
+		}
+		return {
+			isValid: false,
+			errorMessage:
+				"Failed to validate the API key. Please check your key and try again.",
+		};
 	}
 }
