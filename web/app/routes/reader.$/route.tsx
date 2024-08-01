@@ -55,6 +55,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	const submission = parseWithZod(await request.formData(), {
 		schema: actionSchema,
 	});
+
 	if (!safeUserId) {
 		return {
 			intent: null,
@@ -91,7 +92,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 					url: null,
 				};
 			}
-
 			const normalizedUrl = normalizeAndSanitizeUrl(submission.value.url);
 			// Start the translation job in background
 			const queue = getTranslateUserQueue(safeUser.id);
@@ -131,7 +131,7 @@ export default function ReaderView() {
 					<Form method="post">
 						<div className="w-60 flex items-center">
 							<AIModelSelector onModelSelect={setSelectedModel} />
-							<input type="hidden" name="model" value={selectedModel} />
+							<input type="hidden" name="aiModel" value={selectedModel} />
 							<input type="hidden" name="url" value={originalUrl} />
 							<Button
 								type="submit"
