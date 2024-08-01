@@ -18,14 +18,14 @@ interface HeaderProps {
 }
 
 export function Header({ safeUser }: HeaderProps) {
-	const { theme } = useTheme();
+	const { resolvedTheme } = useTheme();
 
 	return (
 		<header className="shadow-sm mb-10 z-10 ">
 			<div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
 				<Link to="/">
 					<img
-						src={`/title-logo-${theme || "light"}.png `}
+						src={`/title-logo-${resolvedTheme || "light"}.png `}
 						alt=""
 						className="w-40"
 					/>
