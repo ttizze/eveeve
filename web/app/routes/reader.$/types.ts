@@ -41,7 +41,17 @@ export const addTranslationSchema = z.object({
 		.transform((val) => val.trim()),
 });
 
+export const retranslateSchema = z.object({
+	intent: z.literal("retranslate"),
+	url: z
+		.string()
+		.min(1, { message: "URLを入力してください" })
+		.url("有効なURLを入力してください"),
+	aiModel: z.string().min(1, "モデルを選択してください"),
+});
+
 export const actionSchema = z.discriminatedUnion("intent", [
 	addTranslationSchema,
 	voteSchema,
+	retranslateSchema,
 ]);

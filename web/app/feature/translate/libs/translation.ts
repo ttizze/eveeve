@@ -12,6 +12,7 @@ import {
 
 export async function translate(
 	geminiApiKey: string,
+	aiModel: string,
 	userId: number,
 	targetLanguage: string,
 	title: string,
@@ -39,6 +40,7 @@ export async function translate(
 
 	await processTranslation(
 		geminiApiKey,
+		aiModel,
 		userId,
 		pageId,
 		pageVersionId,
@@ -52,6 +54,7 @@ export async function translate(
 
 export async function processTranslation(
 	geminiApiKey: string,
+	aiModel: string,
 	userId: number,
 	pageId: number,
 	pageVersionId: number,
@@ -74,6 +77,7 @@ export async function processTranslation(
 
 			await getOrCreateTranslations(
 				geminiApiKey,
+				aiModel,
 				chunks[i],
 				targetLanguage,
 				pageId,

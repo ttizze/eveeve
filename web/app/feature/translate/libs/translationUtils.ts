@@ -1,7 +1,7 @@
+import { getOrCreateAIUser } from "~/libs/db/user.server";
 import { getOrCreatePageVersionTranslationInfo } from "../../../libs/pageVersionTranslationInfo";
 import { getOrCreateSourceTextId } from "../../../libs/sourceTextService";
-import { getOrCreateAIUser } from "../../../libs/userService";
-import { AI_MODEL, MAX_CHUNK_SIZE } from "../../../routes/translate/constants";
+import { MAX_CHUNK_SIZE } from "../../../routes/translate/constants";
 import type { NumberedElement } from "../../../routes/translate/types";
 import { prisma } from "../../../utils/prisma";
 import { getGeminiModelResponse } from "../utils/gemini";
@@ -64,6 +64,7 @@ export function extractTranslations(
 
 export async function getOrCreateTranslations(
 	geminiApiKey: string,
+	aiModel: string,
 	elements: NumberedElement[],
 	targetLanguage: string,
 	pageId: number,
@@ -112,6 +113,7 @@ export async function getOrCreateTranslations(
 	if (untranslatedElements.length > 0) {
 		const newTranslations = await translateUntranslatedElements(
 			geminiApiKey,
+			aiModel,
 			untranslatedElements,
 			targetLanguage,
 			pageId,
@@ -126,6 +128,7 @@ export async function getOrCreateTranslations(
 
 async function translateUntranslatedElements(
 	geminiApiKey: string,
+	aiModel: string,
 	untranslatedElements: NumberedElement[],
 	targetLanguage: string,
 	pageId: number,
@@ -137,7 +140,7 @@ async function translateUntranslatedElements(
 		.join("\n");
 	const translatedText = await getGeminiModelResponse(
 		geminiApiKey,
-		AI_MODEL,
+		aiModel,
 		title,
 		source_text,
 		targetLanguage,
@@ -150,7 +153,7 @@ async function translateUntranslatedElements(
 		extractedTranslations[0].text,
 	);
 
-	const systemUserId = await getOrCreateAIUser(AI_MODEL);
+	const systemUserId = await getOrCreateAIUser(aiModel);
 
 	await Promise.all(
 		extractedTranslations.map(async (translation) => {

@@ -42,7 +42,7 @@ export function URLTranslationForm() {
 					<div className="w-[200px]">
 						<AIModelSelector onModelSelect={setSelectedModel} />
 					</div>
-					<input type="hidden" name="model" value={selectedModel} />
+					<input type="hidden" name="aiModel" value={selectedModel} />
 					<Button type="submit" disabled={navigation.state === "submitting"}>
 						{navigation.state === "submitting" ? (
 							<LoadingSpinner />

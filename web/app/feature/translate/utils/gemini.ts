@@ -81,6 +81,7 @@ export async function getGeminiModelResponse(
 	console.error("Max retries reached. Translation failed.");
 	throw lastError || new Error("Translation failed after max retries");
 }
+
 export async function validateGeminiApiKey(
 	apiKey: string,
 ): Promise<{ isValid: boolean; errorMessage?: string }> {

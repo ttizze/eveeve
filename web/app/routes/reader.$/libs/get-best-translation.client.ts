@@ -1,4 +1,4 @@
-import type { TranslationWithVote } from "../type";
+import type { TranslationWithVote } from "../types";
 
 export function getBestTranslation(
 	translationsWithVotes: TranslationWithVote[],

@@ -9,6 +9,7 @@ interface TranslateJobParams {
 	targetLanguage: string;
 	apiKey: string;
 	userId: number;
+	aiModel: string;
 }
 export const translateJob = async (params: TranslateJobParams) => {
 	const html = await fetchWithRetry(params.url);
@@ -22,6 +23,7 @@ export const translateJob = async (params: TranslateJobParams) => {
 
 	await translate(
 		params.apiKey,
+		params.aiModel,
 		params.userId,
 		targetLanguage,
 		title,
