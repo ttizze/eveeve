@@ -35,9 +35,9 @@ export function Queue<Payload>(
 }
 
 export async function clearAllQueues() {
-  for (const [name, { queue }] of Object.entries(registeredQueues)) {
-    await queue.obliterate({ force: true });
-    console.log(`Cleared queue: ${name}`);
-  }
-  console.log("All queues have been cleared.");
+	for (const [name, { queue }] of Object.entries(registeredQueues)) {
+		await queue.obliterate({ force: true });
+		console.log(`Cleared queue: ${name}`);
+	}
+	console.log("All queues have been cleared.");
 }
