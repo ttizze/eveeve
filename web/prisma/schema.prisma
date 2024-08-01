@@ -96,7 +96,6 @@ model PageVersion {
   pageId                     Int                          @map("page_id")
   createdAt                  DateTime                     @default(now()) @map("created_at")
   page                       Page                         @relation(fields: [pageId], references: [id])
-  sourceTexts                SourceText[]
   pageVersionTranslationInfo PageVersionTranslationInfo[]
   userReadHistory            UserReadHistory[]
   userAITranslationInfo      UserAITranslationInfo[]
@@ -111,12 +110,10 @@ model SourceText {
   number         Int
   textHash       Bytes           @map("text_hash")
   pageId         Int             @map("page_id")
-  pageVersionId  Int             @map("page_version_id")
   page           Page            @relation(fields: [pageId], references: [id])
-  pageVersion    PageVersion     @relation(fields: [pageVersionId], references: [id])
   translateTexts TranslateText[]
 
-  @@unique([textHash, pageVersionId, number])
+  @@unique([textHash, number])
   @@index([textHash])
   @@map("source_texts")
 }

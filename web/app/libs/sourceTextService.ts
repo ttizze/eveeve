@@ -15,9 +15,8 @@ export async function getOrCreateSourceTextId(
 	try {
 		const sourceText = await prisma.sourceText.upsert({
 			where: {
-				textHash_pageVersionId_number: {
+				textHash_number: {
 					textHash,
-					pageVersionId,
 					number,
 				},
 			},
@@ -27,7 +26,6 @@ export async function getOrCreateSourceTextId(
 				number,
 				textHash,
 				pageId,
-				pageVersionId,
 			},
 		});
 
