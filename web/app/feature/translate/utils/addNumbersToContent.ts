@@ -18,6 +18,7 @@ export function shouldProcessElement(element: Element): boolean {
 		"style",
 		"textarea",
 		"input",
+		"code",
 		"noscript",
 		"iframe",
 		"source",

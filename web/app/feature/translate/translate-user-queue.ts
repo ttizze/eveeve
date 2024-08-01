@@ -6,6 +6,7 @@ type TranslateJobData = {
 	targetLanguage: string;
 	apiKey: string;
 	userId: number;
+	aiModel: string;
 };
 
 export const getTranslateUserQueue = (userId: number) => {

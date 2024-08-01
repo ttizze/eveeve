@@ -9,6 +9,7 @@
 		"start": "remix-serve ./build/server/index.js",
 		"typecheck": "tsc",
 		"check": "bunx @biomejs/biome check --write .",
+		"clear-queues": "tsx scripts/clear-queues.ts",
 		"seed": "NODE_ENV=development  prisma db seed"
 	},
 	"prisma": {

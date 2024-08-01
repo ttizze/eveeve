@@ -107,7 +107,7 @@ export function UserAITranslationStatus({
 														<AIModelSelector onModelSelect={setSelectedModel} />
 														<input
 															type="hidden"
-															name="model"
+															name="aiModel"
 															value={selectedModel}
 														/>
 													</div>
