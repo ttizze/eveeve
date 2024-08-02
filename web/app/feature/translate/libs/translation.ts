@@ -28,14 +28,14 @@ export async function translate(
 		pageId,
 	);
 
-	const userAITranslationHistory = await getOrCreateUserAITranslationInfo(
+	const userAITranslationInfo = await getOrCreateUserAITranslationInfo(
 		userId,
 		pageVersionId,
 		targetLanguage,
 	);
 
-	if (userAITranslationHistory.aiTranslationStatus === "completed") {
-		return userAITranslationHistory.aiTranslationStatus;
+	if (userAITranslationInfo.aiTranslationStatus === "completed") {
+		return userAITranslationInfo.aiTranslationStatus;
 	}
 
 	await processTranslation(
@@ -49,7 +49,7 @@ export async function translate(
 		numberedElements,
 	);
 
-	return userAITranslationHistory.aiTranslationStatus;
+	return userAITranslationInfo.aiTranslationStatus;
 }
 
 export async function processTranslation(
