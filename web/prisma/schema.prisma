@@ -46,7 +46,7 @@ model UserAITranslationInfo {
   @@unique([userId, pageVersionId, targetLanguage])
   @@index([userId])
   @@index([pageVersionId])
-  @@map("user_translation_history")
+  @@map("user_ai_translation_info")
 }
 
 model UserReadHistory {
