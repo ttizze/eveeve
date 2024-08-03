@@ -39,7 +39,6 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		safeUserId ?? 0,
 		targetLanguage,
 	);
-	console.log(pageData);
 
 	if (!pageData) {
 		throw new Response("Failed to fetch article", { status: 500 });

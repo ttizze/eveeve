@@ -11,7 +11,7 @@ export async function getOrCreateSourceTextIdAndPageVersionSourceText(
 		"hex",
 	);
 
-	const result = await prisma.$transaction(async (tx) => {
+	return prisma.$transaction(async (tx) => {
 		const sourceText = await tx.sourceText.upsert({
 			where: {
 				textHash_number: {
@@ -43,6 +43,4 @@ export async function getOrCreateSourceTextIdAndPageVersionSourceText(
 
 		return sourceText.id;
 	});
-	console.log(result);
-	return result;
 }
