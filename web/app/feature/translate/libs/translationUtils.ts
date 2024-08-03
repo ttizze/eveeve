@@ -1,9 +1,9 @@
 import { getOrCreateAIUser } from "~/libs/db/user.server";
 import { getOrCreatePageVersionTranslationInfo } from "../../../libs/pageVersionTranslationInfo";
-import { getOrCreateSourceTextId } from "../../../libs/sourceTextService";
 import { MAX_CHUNK_SIZE } from "../../../routes/translate/constants";
 import type { NumberedElement } from "../../../routes/translate/types";
 import { prisma } from "../../../utils/prisma";
+import { getOrCreateSourceTextIdAndPageVersionSourceText } from "../functions/mutations.server";
 import { getGeminiModelResponse } from "../utils/gemini";
 
 export function splitNumberedElements(
@@ -75,10 +75,9 @@ export async function getOrCreateTranslations(
 	const untranslatedElements: NumberedElement[] = [];
 	const sourceTextsId = await Promise.all(
 		elements.map((element) =>
-			getOrCreateSourceTextId(
+			getOrCreateSourceTextIdAndPageVersionSourceText(
 				element.text,
 				element.number,
-				pageId,
 				pageVersionId,
 			),
 		),
@@ -168,18 +167,17 @@ async function translateUntranslatedElements(
 				return;
 			}
 
-			const sourceTextId = await getOrCreateSourceTextId(
-				sourceText,
-				translation.number,
-				pageId,
-				pageVersionId,
-			);
+			const sourceTextId =
+				await getOrCreateSourceTextIdAndPageVersionSourceText(
+					sourceText,
+					translation.number,
+					pageVersionId,
+				);
 			await prisma.translateText.create({
 				data: {
 					targetLanguage,
 					text: translation.text,
 					sourceTextId,
-					pageId,
 					userId: systemUserId,
 				},
 			});

@@ -10,7 +10,7 @@ export type TranslationWithVote = Pick<
 	userVote: UserVote | null;
 };
 
-export interface SourceTextInfoWithTranslations {
+export interface SourceTextWithTranslations {
 	number: number;
 	sourceTextId: number;
 	translationsWithVotes: TranslationWithVote[];
@@ -21,7 +21,7 @@ export interface LatestPageVersionWithTranslations {
 	url: string;
 	content: string;
 	license: string;
-	sourceTextInfoWithTranslations: SourceTextInfoWithTranslations[];
+	sourceTextWithTranslations: SourceTextWithTranslations[];
 	userId: number | null;
 }
 

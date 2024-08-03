@@ -39,6 +39,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		safeUserId ?? 0,
 		targetLanguage,
 	);
+	console.log(pageData);
 
 	if (!pageData) {
 		throw new Response("Failed to fetch article", { status: 500 });
@@ -167,9 +168,7 @@ export default function ReaderView() {
 					<hr />
 					<ContentWithTranslations
 						content={pageData.content}
-						sourceTextInfoWithTranslations={
-							pageData.sourceTextInfoWithTranslations
-						}
+						sourceTextWithTranslations={pageData.sourceTextWithTranslations}
 						userId={safeUser?.id ?? null}
 					/>
 					<p>license: {pageData.license}</p>
