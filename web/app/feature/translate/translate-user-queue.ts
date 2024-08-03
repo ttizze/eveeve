@@ -9,8 +9,10 @@ type TranslateJobData = {
 	aiModel: string;
 };
 
+const QUEUE_VERSION = 1;
+
 export const getTranslateUserQueue = (userId: number) => {
-	return Queue<TranslateJobData>(`translation-user-${userId}`, {
+	return Queue<TranslateJobData>(`translation-user-${userId}`, QUEUE_VERSION, {
 		processor: async (job) => {
 			console.log(`Starting job ${job.id} for user ${userId}`);
 			try {

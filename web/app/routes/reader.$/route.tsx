@@ -167,9 +167,7 @@ export default function ReaderView() {
 					<hr />
 					<ContentWithTranslations
 						content={pageData.content}
-						sourceTextInfoWithTranslations={
-							pageData.sourceTextInfoWithTranslations
-						}
+						sourceTextWithTranslations={pageData.sourceTextWithTranslations}
 						userId={safeUser?.id ?? null}
 					/>
 					<p>license: {pageData.license}</p>

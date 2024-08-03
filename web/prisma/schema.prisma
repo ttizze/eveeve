@@ -69,8 +69,6 @@ model Page {
   url            String          @unique @db.VarChar(255)
   createdAt      DateTime        @default(now()) @map("created_at")
   pageVersions   PageVersion[]
-  sourceTexts    SourceText[]
-  translateTexts TranslateText[]
 
   @@map("pages")
 }
@@ -96,7 +94,7 @@ model PageVersion {
   pageId                     Int                          @map("page_id")
   createdAt                  DateTime                     @default(now()) @map("created_at")
   page                       Page                         @relation(fields: [pageId], references: [id])
-  sourceTexts                SourceText[]
+  pageVersionSourceTexts     PageVersionSourceText[]
   pageVersionTranslationInfo PageVersionTranslationInfo[]
   userReadHistory            UserReadHistory[]
   userAITranslationInfo      UserAITranslationInfo[]
@@ -106,19 +104,29 @@ model PageVersion {
 }
 
 model SourceText {
-  id             Int             @id @default(autoincrement())
-  text           String
-  number         Int
-  textHash       Bytes           @map("text_hash")
-  pageId         Int             @map("page_id")
-  pageVersionId  Int             @map("page_version_id")
-  page           Page            @relation(fields: [pageId], references: [id])
-  pageVersion    PageVersion     @relation(fields: [pageVersionId], references: [id])
-  translateTexts TranslateText[]
+  id                     Int                     @id @default(autoincrement())
+  text                   String
+  number                 Int
+  textHash               Bytes                   @map("text_hash")
+  translateTexts         TranslateText[]
+  pageVersionSourceTexts PageVersionSourceText[]
 
-  @@unique([textHash, pageVersionId, number])
-  @@index([textHash])
+  @@unique([textHash, number])
+  @@index([textHash, number])
   @@map("source_texts")
+}
+
+model PageVersionSourceText {
+  id            Int @id @default(autoincrement())
+  pageVersionId Int @map("page_version_id")
+  sourceTextId  Int @map("source_text_id")
+
+  pageVersion PageVersion @relation(fields: [pageVersionId], references: [id])
+  sourceText  SourceText  @relation(fields: [sourceTextId], references: [id])
+
+  @@unique([pageVersionId, sourceTextId])
+  @@index([pageVersionId])
+  @@map("page_version_source_texts")
 }
 
 model TranslateText {
@@ -126,12 +134,10 @@ model TranslateText {
   targetLanguage String
   text           String
   sourceTextId   Int        @map("source_text_id")
-  pageId         Int        @map("page_id")
   userId         Int        @map("user_id")
   point          Int        @default(0)
   editCount      Int        @default(0) @map("edit_count")
   createdAt      DateTime   @default(now()) @map("created_at")
-  page           Page       @relation(fields: [pageId], references: [id])
   sourceText     SourceText @relation(fields: [sourceTextId], references: [id])
   user           User       @relation(fields: [userId], references: [id])
   votes          Vote[]

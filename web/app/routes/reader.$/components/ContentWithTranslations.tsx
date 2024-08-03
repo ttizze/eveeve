@@ -1,18 +1,18 @@
 import DOMPurify from "dompurify";
 import parse from "html-react-parser";
 import { memo, useMemo } from "react";
-import type { SourceTextInfoWithTranslations } from "../types";
+import type { SourceTextWithTranslations } from "../types";
 import { Translation } from "./Translation";
 
 interface ContentWithTranslationsProps {
 	content: string;
-	sourceTextInfoWithTranslations: SourceTextInfoWithTranslations[];
+	sourceTextWithTranslations: SourceTextWithTranslations[];
 	userId: number | null;
 }
 
 export const ContentWithTranslations = memo(function ContentWithTranslations({
 	content,
-	sourceTextInfoWithTranslations,
+	sourceTextWithTranslations,
 	userId,
 }: ContentWithTranslationsProps) {
 	const parsedContent = useMemo(() => {
@@ -23,10 +23,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 		const sanitizedContent = DOMPurify.sanitize(content);
 		const doc = new DOMParser().parseFromString(sanitizedContent, "text/html");
 		const translationMap = new Map(
-			sourceTextInfoWithTranslations.map((info) => [
-				info.number.toString(),
-				info,
-			]),
+			sourceTextWithTranslations.map((info) => [info.number.toString(), info]),
 		);
 
 		for (const [number] of translationMap) {
@@ -60,7 +57,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 				return domNode;
 			},
 		});
-	}, [content, sourceTextInfoWithTranslations, userId]);
+	}, [content, sourceTextWithTranslations, userId]);
 
 	if (typeof window === "undefined") {
 		return <div>Loading...</div>;

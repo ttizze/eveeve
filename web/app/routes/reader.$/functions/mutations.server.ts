@@ -52,7 +52,6 @@ export async function handleAddTranslationAction(
 ) {
 	const sourceText = await prisma.sourceText.findUnique({
 		where: { id: sourceTextId },
-		include: { page: true },
 	});
 
 	if (sourceText) {
@@ -61,7 +60,6 @@ export async function handleAddTranslationAction(
 				targetLanguage,
 				text,
 				sourceTextId,
-				pageId: sourceText.page.id,
 				userId,
 			},
 		});

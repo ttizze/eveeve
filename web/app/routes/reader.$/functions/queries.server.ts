@@ -1,8 +1,5 @@
 import { prisma } from "../../../utils/prisma";
-import type {
-	LatestPageVersionWithTranslations,
-	SourceTextInfoWithTranslations,
-} from "../types";
+import type { LatestPageVersionWithTranslations } from "../types";
 
 export async function fetchLatestPageVersionWithTranslations(
 	url: string,
@@ -17,29 +14,38 @@ export async function fetchLatestPageVersionWithTranslations(
 			url: true,
 			content: true,
 			license: true,
-			sourceTexts: {
+			pageVersionSourceTexts: {
 				select: {
-					id: true,
-					number: true,
-					translateTexts: {
-						where: { targetLanguage },
+					sourceText: {
 						select: {
 							id: true,
-							text: true,
-							point: true,
-							user: { select: { name: true } },
-							votes: {
-								where: userId ? { userId } : undefined,
+							number: true,
+							translateTexts: {
+								where: { targetLanguage },
 								select: {
 									id: true,
-									isUpvote: true,
-									updatedAt: true,
+									text: true,
+									point: true,
+									user: { select: { name: true } },
+									votes: {
+										where: userId ? { userId } : undefined,
+										select: {
+											id: true,
+											isUpvote: true,
+											updatedAt: true,
+										},
+										orderBy: { updatedAt: "desc" },
+										take: 1,
+									},
 								},
-								orderBy: { updatedAt: "desc" },
-								take: 1,
+								orderBy: [{ point: "desc" }, { createdAt: "desc" }],
 							},
 						},
-						orderBy: [{ point: "desc" }, { createdAt: "desc" }],
+					},
+				},
+				orderBy: {
+					sourceText: {
+						number: "asc",
 					},
 				},
 			},
@@ -48,25 +54,26 @@ export async function fetchLatestPageVersionWithTranslations(
 
 	if (!pageVersion) return null;
 
-	const sourceTextInfoWithTranslations: SourceTextInfoWithTranslations[] =
-		pageVersion.sourceTexts.map((sourceText) => ({
-			number: sourceText.number,
-			sourceTextId: sourceText.id,
-			translationsWithVotes: sourceText.translateTexts.map((translateText) => ({
-				id: translateText.id,
-				text: translateText.text,
-				point: translateText.point,
-				userName: translateText.user.name,
-				userVote: translateText.votes[0] || null,
-			})),
-		}));
-
 	return {
 		title: pageVersion.title,
 		url: pageVersion.url,
 		license: pageVersion.license,
 		content: pageVersion.content,
-		sourceTextInfoWithTranslations,
+		sourceTextWithTranslations: pageVersion.pageVersionSourceTexts.map(
+			({ sourceText }) => ({
+				number: sourceText.number,
+				sourceTextId: sourceText.id,
+				translationsWithVotes: sourceText.translateTexts.map(
+					(translateText) => ({
+						id: translateText.id,
+						text: translateText.text,
+						point: translateText.point,
+						userName: translateText.user.name,
+						userVote: translateText.votes[0] || null,
+					}),
+				),
+			}),
+		),
 		userId,
 	};
 }
