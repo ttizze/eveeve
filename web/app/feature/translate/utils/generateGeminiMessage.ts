@@ -42,6 +42,7 @@ export function generateSystemMessage(
   - Ensure that each "text" field contains at least one character.
   - Maintain the original array structure and order, with the title translation added as the first item.
   - Output ONLY the translated JSON array. No additional text or explanations.
+  - Preserve and output newline characters (\n) as they are. It is important to maintain line breaks within the text.
   
   Input text:
   ${source_text}
@@ -54,7 +55,7 @@ export function generateSystemMessage(
     },
     {
       "number": 2,
-      "text": "Translated text for item 2"
+      "text": "Translated text \n for item 2"
     },
     ...
   ]`;
