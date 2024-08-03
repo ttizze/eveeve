@@ -1,57 +1,26 @@
-import { Parser } from "htmlparser2";
+import { JSDOM } from "jsdom";
 
 export function extractNumberedElements(
 	content: string,
-	title: string,
 ): Array<{ number: number; text: string }> {
-	const numberedElements: Array<{ number: number; text: string }> = [
-		{ number: 0, text: title },
-	];
+	const doc = new JSDOM(content);
+	const numberedElements: Array<{ number: number; text: string }> = [];
+	// <br>のみを改行とする
+	doc.window.document.body.innerHTML = doc.window.document.body.innerHTML
+		.replace(/\n/g, "")
+		.replace(/<br\s*\/?>/gi, "\n");
 
-	let currentNumber: number | null = null;
-	let currentText: string[] = [];
-	let inNumberedElement = false;
+	const elements = doc.window.document.querySelectorAll("[data-number]");
 
-	const parser = new Parser(
-		{
-			onopentag(name: string, attributes: { [x: string]: string }) {
-				if (attributes["data-number"]) {
-					currentNumber = Number.parseInt(attributes["data-number"], 10);
-					inNumberedElement = true;
-					currentText = [];
-				}
-			},
-			ontext(text) {
-				if (inNumberedElement) {
-					currentText.push(text.trim());
-				}
-			},
-			onclosetag(name) {
-				if (name === "br" && inNumberedElement) {
-					currentText.push("::BR::");
-				} else if (currentNumber !== null && inNumberedElement) {
-					const processedText = currentText
-						.join("")
-						.replace(/\s+/g, " ")
-						.trim()
-						.replace(/::BR::/g, "\n");
-
-					if (processedText) {
-						numberedElements.push({
-							number: currentNumber,
-							text: processedText,
-						});
-					}
-					currentNumber = null;
-					inNumberedElement = false;
-				}
-			},
-		},
-		{ decodeEntities: true },
-	);
-
-	parser.write(content);
-	parser.end();
+	for (const element of elements) {
+		const dataNumber = element.getAttribute("data-number");
+		if (dataNumber !== null) {
+			numberedElements.push({
+				number: Number.parseInt(dataNumber, 10),
+				text: element.textContent?.trim() || "",
+			});
+		}
+	}
 
 	return numberedElements.sort((a, b) => a.number - b.number);
 }
