@@ -1,31 +1,57 @@
-import { JSDOM } from "jsdom";
+import { Parser } from "htmlparser2";
 
 export function extractNumberedElements(
 	content: string,
 	title: string,
 ): Array<{ number: number; text: string }> {
-	const doc = new JSDOM(content);
 	const numberedElements: Array<{ number: number; text: string }> = [
 		{ number: 0, text: title },
 	];
 
-	function traverseNodes(node: Node) {
-		if (node.nodeType === 1) {
-			const element = node as Element;
-			const dataNumber = element.getAttribute("data-number");
+	let currentNumber: number | null = null;
+	let currentText: string[] = [];
+	let inNumberedElement = false;
 
-			if (dataNumber !== null) {
-				numberedElements.push({
-					number: Number.parseInt(dataNumber, 10),
-					text: element.textContent?.trim() || "",
-				});
-			}
+	const parser = new Parser(
+		{
+			onopentag(name: string, attributes: { [x: string]: string }) {
+				if (attributes["data-number"]) {
+					currentNumber = Number.parseInt(attributes["data-number"], 10);
+					inNumberedElement = true;
+					currentText = [];
+				}
+			},
+			ontext(text) {
+				if (inNumberedElement) {
+					currentText.push(text.trim());
+				}
+			},
+			onclosetag(name) {
+				if (name === "br" && inNumberedElement) {
+					currentText.push("::BR::");
+				} else if (currentNumber !== null && inNumberedElement) {
+					const processedText = currentText
+						.join("")
+						.replace(/\s+/g, " ")
+						.trim()
+						.replace(/::BR::/g, "\n");
 
-			element.childNodes.forEach(traverseNodes);
-		}
-	}
+					if (processedText) {
+						numberedElements.push({
+							number: currentNumber,
+							text: processedText,
+						});
+					}
+					currentNumber = null;
+					inNumberedElement = false;
+				}
+			},
+		},
+		{ decodeEntities: true },
+	);
 
-	doc.window.document.body.childNodes.forEach(traverseNodes);
+	parser.write(content);
+	parser.end();
 
 	return numberedElements.sort((a, b) => a.number - b.number);
 }
