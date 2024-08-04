@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { generateSystemMessage } from "../utils/generateAnthropicSystemMessage";
+import { generateSystemMessage } from "./generateAnthropicSystemMessage";
 
 export async function callAnthropic(
 	apiKey: string | undefined,

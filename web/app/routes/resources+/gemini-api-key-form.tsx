@@ -13,7 +13,7 @@ import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
-import { validateGeminiApiKey } from "~/feature/translate/utils/gemini";
+import { validateGeminiApiKey } from "~/features/translate/services/gemini";
 import { authenticator } from "~/utils/auth.server";
 import { updateGeminiApiKey } from "./functions/mutations.server";
 

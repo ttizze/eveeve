@@ -1,7 +1,7 @@
 import { FilePenLine, X } from "lucide-react";
 import { useMemo, useState } from "react";
-import { getBestTranslation } from "../libs/get-best-translation.client";
-import { sanitizeAndParseText } from "../libs/sanitize-and-parse-text.client";
+import { getBestTranslation } from "../lib/get-best-translation.client";
+import { sanitizeAndParseText } from "../lib/sanitize-and-parse-text.client";
 import type { TranslationWithVote } from "../types";
 import { AddAndVoteTranslations } from "./AddAndVoteTranslations";
 interface TranslationProps {

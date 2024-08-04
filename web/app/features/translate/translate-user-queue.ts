@@ -9,7 +9,7 @@ type TranslateJobData = {
 	aiModel: string;
 };
 
-const QUEUE_VERSION = 1;
+const QUEUE_VERSION = 140;
 
 export const getTranslateUserQueue = (userId: number) => {
 	return Queue<TranslateJobData>(`translation-user-${userId}`, QUEUE_VERSION, {

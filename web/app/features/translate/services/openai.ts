@@ -1,6 +1,6 @@
 import { OpenAI } from "openai/index.mjs";
 import type { TranslationRequestBody } from "../schemas/translation-request.js";
-import { generateSystemMessage } from "../utils/generateAnthropicSystemMessage.js";
+import { generateSystemMessage } from "./generateAnthropicSystemMessage.js";
 
 export async function createTranslation(
 	apiKey: string | undefined,

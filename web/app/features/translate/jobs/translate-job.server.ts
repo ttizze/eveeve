@@ -1,8 +1,8 @@
-import { translate } from "../libs/translation";
-import { addNumbersToContent } from "../utils/addNumbersToContent";
-import { extractArticle } from "../utils/extractArticle";
-import { extractNumberedElements } from "../utils/extractNumberedElements";
-import { fetchWithRetry } from "../utils/fetchWithRetry";
+import { translate } from "../lib/translation";
+import { addNumbersToContent } from "../../prepare-html-for-translate/utils/addNumbersToContent";
+import { extractArticle } from "../../prepare-html-for-translate/utils/extractArticle";
+import { extractNumberedElements } from "../../prepare-html-for-translate/utils/extractNumberedElements";
+import { fetchWithRetry } from "../../prepare-html-for-translate/utils/fetchWithRetry";
 
 interface TranslateJobParams {
 	url: string;
@@ -17,7 +17,6 @@ export const translateJob = async (params: TranslateJobParams) => {
 	const numberedContent = addNumbersToContent(content);
 	const extractedNumberedElements = extractNumberedElements(
 		numberedContent,
-		title,
 	);
 	const targetLanguage = params.targetLanguage;
 

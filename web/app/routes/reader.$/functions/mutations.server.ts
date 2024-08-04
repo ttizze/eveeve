@@ -67,3 +67,28 @@ export async function handleAddTranslationAction(
 
 	return json({ success: true });
 }
+
+
+export async function updateUserReadHistory(
+	userId: number,
+	pageVersionId: number,
+	lastReadDataNumber: number,
+) {
+	await prisma.userReadHistory.upsert({
+		where: {
+			userId_pageVersionId: {
+				userId: userId,
+				pageVersionId: pageVersionId,
+			},
+		},
+		update: {
+			lastReadDataNumber: lastReadDataNumber,
+			readAt: new Date(),
+		},
+		create: {
+			userId: userId,
+			pageVersionId: pageVersionId,
+			lastReadDataNumber: lastReadDataNumber,
+		},
+	});
+}

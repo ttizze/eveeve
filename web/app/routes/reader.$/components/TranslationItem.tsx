@@ -1,4 +1,4 @@
-import { sanitizeAndParseText } from "../libs/sanitize-and-parse-text.client";
+import { sanitizeAndParseText } from "../lib/sanitize-and-parse-text.client";
 import type { TranslationWithVote } from "../types";
 import { VoteButtons } from "./VoteButtons";
 
