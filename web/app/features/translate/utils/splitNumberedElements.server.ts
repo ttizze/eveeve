@@ -1,7 +1,6 @@
 import { MAX_CHUNK_SIZE } from "../constants";
 import type { NumberedElement } from "../types";
 
-
 export function splitNumberedElements(
 	elements: NumberedElement[],
 ): NumberedElement[][] {
@@ -27,4 +26,3 @@ export function splitNumberedElements(
 	}
 	return chunks;
 }
-

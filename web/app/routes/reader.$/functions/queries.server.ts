@@ -78,8 +78,6 @@ export async function fetchLatestPageVersionWithTranslations(
 	};
 }
 
-
-
 export async function getLastReadDataNumber(
 	userId: number,
 	pageVersionId: number,

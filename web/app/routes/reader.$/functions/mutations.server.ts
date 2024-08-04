@@ -68,7 +68,6 @@ export async function handleAddTranslationAction(
 	return json({ success: true });
 }
 
-
 export async function updateUserReadHistory(
 	userId: number,
 	pageVersionId: number,

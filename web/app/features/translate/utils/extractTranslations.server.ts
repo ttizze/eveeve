@@ -1,4 +1,3 @@
-
 export function extractTranslations(
 	text: string,
 ): { number: number; text: string }[] {

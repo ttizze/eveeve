@@ -40,4 +40,3 @@ export type UserAITranslationInfoItem = z.infer<
 export type PageVersionTranslationInfoItem = z.infer<
 	typeof PageVersionTranslationInfoSchema
 >;
-

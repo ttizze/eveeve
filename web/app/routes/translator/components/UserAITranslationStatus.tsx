@@ -89,7 +89,7 @@ export function UserAITranslationStatus({
 											className={cn(
 												"mt-2",
 												item.aiTranslationStatus === "in_progress" &&
-												"bg-blue-400 animate-pulse",
+													"bg-blue-400 animate-pulse",
 											)}
 										/>
 										<p className="text-xs mt-2">

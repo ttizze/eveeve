@@ -5,13 +5,13 @@ import { useEffect } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
-import { getDbUser } from "./functions/queries.server";
 import { authenticator } from "~/utils/auth.server";
 import { normalizeAndSanitizeUrl } from "~/utils/normalize-and-sanitize-url.server";
 import { getTargetLanguage } from "~/utils/target-language.server";
 import { GeminiApiKeyForm } from "../resources+/gemini-api-key-form";
 import { URLTranslationForm } from "./components/URLTranslationForm";
 import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
+import { getDbUser } from "./functions/queries.server";
 import { listUserAiTranslationInfo } from "./functions/queries.server";
 import { urlTranslationSchema } from "./types";
 

@@ -85,7 +85,6 @@ export async function getOrCreatePageId(url: string): Promise<number> {
 	return page.id;
 }
 
-
 export async function getOrCreatePageVersionId(
 	url: string,
 	title: string,
@@ -148,7 +147,6 @@ export async function updateUserAITranslationInfo(
 		},
 	});
 }
-
 
 export async function getOrCreateUserAITranslationInfo(
 	userId: number,
