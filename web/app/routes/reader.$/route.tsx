@@ -9,9 +9,7 @@ import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Button } from "~/components/ui/button";
-import { AIModelSelector } from "~/feature/translate/components/AIModelSelector";
-import { getTranslateUserQueue } from "~/feature/translate/translate-user-queue";
-import { getDbUser } from "~/libs/db/user.server";
+import { AIModelSelector } from "~/features/translate/components/AIModelSelector";
 import { normalizeAndSanitizeUrl } from "~/utils/normalize-and-sanitize-url.server";
 import { getTargetLanguage } from "~/utils/target-language.server";
 import { authenticator } from "../../utils/auth.server";
@@ -82,30 +80,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 				targetLanguage,
 			);
 			return { intent, lastResult: submission.reply({ resetForm: true }) };
-		case "retranslate": {
-			const dbUser = await getDbUser(safeUser.id);
-			if (!dbUser?.geminiApiKey) {
-				return {
-					lastResult: submission.reply({
-						formErrors: ["Gemini API key is not set"],
-					}),
-					url: null,
-				};
-			}
-			const normalizedUrl = normalizeAndSanitizeUrl(submission.value.url);
-			// Start the translation job in background
-			const queue = getTranslateUserQueue(safeUser.id);
-			const job = await queue.add(`translate-${safeUser.id}`, {
-				url: normalizedUrl,
-				targetLanguage,
-				apiKey: dbUser.geminiApiKey,
-				userId: safeUser.id,
-				aiModel: submission.value.aiModel,
-			});
-			console.log(job.toJSON());
-
-			return { intent, lastResult: submission.reply({ resetForm: true }) };
-		}
 		default:
 			throw new Error("Invalid Intent");
 	}
@@ -128,7 +102,7 @@ export default function ReaderView() {
 			<Header safeUser={safeUser} />
 			<div className="container mx-auto px-4 py-8">
 				<div className="flex justify-center items-center mb-8">
-					<Form method="post">
+					<Form method="post" action="/translator">
 						<div className="w-60 flex items-center">
 							<AIModelSelector onModelSelect={setSelectedModel} />
 							<input type="hidden" name="aiModel" value={selectedModel} />

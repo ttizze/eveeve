@@ -77,3 +77,22 @@ export async function fetchLatestPageVersionWithTranslations(
 		userId,
 	};
 }
+
+export async function getLastReadDataNumber(
+	userId: number,
+	pageVersionId: number,
+) {
+	const readHistory = await prisma.userReadHistory.findUnique({
+		where: {
+			userId_pageVersionId: {
+				userId: userId,
+				pageVersionId: pageVersionId,
+			},
+		},
+		select: {
+			lastReadDataNumber: true,
+		},
+	});
+
+	return readHistory?.lastReadDataNumber ?? 0;
+}

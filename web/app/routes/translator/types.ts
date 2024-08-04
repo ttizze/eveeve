@@ -40,8 +40,3 @@ export type UserAITranslationInfoItem = z.infer<
 export type PageVersionTranslationInfoItem = z.infer<
 	typeof PageVersionTranslationInfoSchema
 >;
-
-export type NumberedElement = {
-	number: number;
-	text: string;
-};

@@ -8,7 +8,7 @@ import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { AIModelSelector } from "~/feature/translate/components/AIModelSelector";
+import { AIModelSelector } from "~/features/translate/components/AIModelSelector";
 import type { action } from "../route";
 import { urlTranslationSchema } from "../types";
 

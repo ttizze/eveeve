@@ -11,7 +11,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Progress } from "~/components/ui/progress";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import { AIModelSelector } from "~/feature/translate/components/AIModelSelector";
+import { AIModelSelector } from "~/features/translate/components/AIModelSelector";
 import { cn } from "~/utils/cn";
 import type { UserAITranslationInfoItem } from "../types";
 import { urlTranslationSchema } from "../types";

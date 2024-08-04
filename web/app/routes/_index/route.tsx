@@ -29,7 +29,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function action({ request }: ActionFunctionArgs) {
 	return authenticator.authenticate("google", request, {
-		successRedirect: "/translate",
+		successRedirect: "/translator",
 		failureRedirect: "/",
 	});
 }
