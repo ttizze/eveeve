@@ -18,7 +18,7 @@ import {
 	handleAddTranslationAction,
 	handleVoteAction,
 } from "./functions/mutations.server";
-import { fetchLatestPageVersionWithTranslations } from "./functions/queries.server";
+import { fetchLatestPageWithTranslations } from "./functions/queries.server";
 import { actionSchema } from "./types";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
@@ -32,7 +32,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const safeUserId = safeUser?.id;
 	const targetLanguage = await getTargetLanguage(request);
 	const normalizedUrl = normalizeAndSanitizeUrl(urlParam);
-	const pageData = await fetchLatestPageVersionWithTranslations(
+	const pageData = await fetchLatestPageWithTranslations(
 		normalizedUrl,
 		safeUserId ?? 0,
 		targetLanguage,

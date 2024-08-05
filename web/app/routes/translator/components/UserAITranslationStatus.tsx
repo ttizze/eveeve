@@ -1,5 +1,6 @@
 import { useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
+import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
 import { useNavigation } from "@remix-run/react";
@@ -13,11 +14,10 @@ import { Progress } from "~/components/ui/progress";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { AIModelSelector } from "~/features/translate/components/AIModelSelector";
 import { cn } from "~/utils/cn";
-import type { UserAITranslationInfoItem } from "../types";
 import { urlTranslationSchema } from "../types";
 
 type UserAITranslationStatusProps = {
-	userAITranslationInfo: UserAITranslationInfoItem[];
+	userAITranslationInfo: UserAITranslationInfo[];
 	targetLanguage: string;
 };
 
@@ -58,26 +58,15 @@ export function UserAITranslationStatus({
 				<ScrollArea className="h-[300px]">
 					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
 						{userAITranslationInfo.map((item) => {
-							const translationInfo =
-								item.pageVersion.pageVersionTranslationInfo?.[0];
 							const isCompleted = item.aiTranslationStatus === "completed";
-
 							const CardContents = (
 								<Card key={item.id} className="flex flex-col h-full">
 									<CardHeader>
 										<CardTitle className="text-sm truncate flex flex-col h-10">
-											{item.pageVersion.title}
-											{translationInfo?.translationTitle && (
-												<span className="text-xs text-muted-foreground">
-													{translationInfo.translationTitle}
-												</span>
-											)}
+											{item.url}
 										</CardTitle>
 									</CardHeader>
 									<CardContent className="flex-grow flex flex-col">
-										<p className="text-xs text-muted-foreground truncate">
-											{item.pageVersion.page.url}
-										</p>
 										<Badge
 											className="mt-2 w-full flex justify-center"
 											variant={getVariantForStatus(item.aiTranslationStatus)}
@@ -98,11 +87,7 @@ export function UserAITranslationStatus({
 										{item.aiTranslationStatus === "failed" && (
 											<div className="mt-auto pt-2">
 												<Form method="post">
-													<input
-														type="hidden"
-														name="url"
-														value={item.pageVersion.page.url}
-													/>
+													<input type="hidden" name="url" value={item.url} />
 													<div className="w-full">
 														<AIModelSelector onModelSelect={setSelectedModel} />
 														<input
@@ -132,7 +117,7 @@ export function UserAITranslationStatus({
 							return isCompleted ? (
 								<Link
 									key={item.id}
-									to={`/reader/${encodeURIComponent(item.pageVersion.page.url)}`}
+									to={`/reader/${encodeURIComponent(item.url)}`}
 									className="block hover:shadow-md transition-shadow duration-200"
 								>
 									{CardContents}

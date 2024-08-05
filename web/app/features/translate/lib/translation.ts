@@ -1,11 +1,9 @@
 import { prisma } from "../../../utils/prisma";
 import { getOrCreatePageId } from "../functions/mutations.server";
-import { getOrCreatePageVersionId } from "../functions/mutations.server";
-import { getOrCreateUserAITranslationInfo } from "../functions/mutations.server";
 import { updateUserAITranslationInfo } from "../functions/mutations.server";
 import { getOrCreateAIUser } from "../functions/mutations.server";
-import { getOrCreatePageVersionTranslationInfo } from "../functions/mutations.server";
-import { getOrCreateSourceTextIdAndPageVersionSourceText } from "../functions/mutations.server";
+import { getOrCreatePageTranslationInfo } from "../functions/mutations.server";
+import { getOrCreateSourceTextIdAndPageSourceText } from "../functions/mutations.server";
 import { getGeminiModelResponse } from "../services/gemini";
 import type { NumberedElement } from "../types";
 import { extractTranslations } from "../utils/extractTranslations.server";
@@ -20,46 +18,12 @@ export async function translate(
 	numberedContent: string,
 	numberedElements: NumberedElement[],
 	url: string,
-): Promise<string> {
-	const pageId = await getOrCreatePageId(url || "");
-	const pageVersionId = await getOrCreatePageVersionId(
-		url,
-		title,
-		numberedContent,
-		pageId,
-	);
-
-	const userAITranslationInfo = await getOrCreateUserAITranslationInfo(
-		userId,
-		pageVersionId,
-		targetLanguage,
-	);
-
-	await processTranslation(
-		geminiApiKey,
-		aiModel,
-		userId,
-		pageVersionId,
-		targetLanguage,
-		title,
-		numberedElements,
-	);
-
-	return userAITranslationInfo.aiTranslationStatus;
-}
-
-export async function processTranslation(
-	geminiApiKey: string,
-	aiModel: string,
-	userId: number,
-	pageVersionId: number,
-	targetLanguage: string,
-	title: string,
-	numberedElements: NumberedElement[],
 ) {
+	const pageId = await getOrCreatePageId(url, title, numberedContent);
+
 	await updateUserAITranslationInfo(
 		userId,
-		pageVersionId,
+		url,
 		targetLanguage,
 		"in_progress",
 		0,
@@ -75,13 +39,13 @@ export async function processTranslation(
 				aiModel,
 				chunks[i],
 				targetLanguage,
-				pageVersionId,
+				pageId,
 				title,
 			);
 			const progress = ((i + 1) / totalChunks) * 100;
 			await updateUserAITranslationInfo(
 				userId,
-				pageVersionId,
+				url,
 				targetLanguage,
 				"in_progress",
 				progress,
@@ -89,20 +53,14 @@ export async function processTranslation(
 		}
 		await updateUserAITranslationInfo(
 			userId,
-			pageVersionId,
+			url,
 			targetLanguage,
 			"completed",
 			100,
 		);
 	} catch (error) {
 		console.error("Background translation job failed:", error);
-		await updateUserAITranslationInfo(
-			userId,
-			pageVersionId,
-			targetLanguage,
-			"failed",
-			0,
-		);
+		await updateUserAITranslationInfo(userId, url, targetLanguage, "failed", 0);
 	}
 }
 
@@ -111,10 +69,10 @@ export async function translateChunk(
 	aiModel: string,
 	numberedElements: NumberedElement[],
 	targetLanguage: string,
-	pageVersionId: number,
+	pageId: number,
 	title: string,
 ) {
-	const sourceTexts = await getSourceTexts(numberedElements, pageVersionId);
+	const sourceTexts = await getSourceTexts(numberedElements, pageId);
 	const translatedText = await getTranslatedText(
 		geminiApiKey,
 		aiModel,
@@ -124,8 +82,8 @@ export async function translateChunk(
 	);
 
 	const extractedTranslations = extractTranslations(translatedText);
-	await getOrCreatePageVersionTranslationInfo(
-		pageVersionId,
+	await getOrCreatePageTranslationInfo(
+		pageId,
 		targetLanguage,
 		extractedTranslations[0].text,
 	);
@@ -139,18 +97,19 @@ export async function translateChunk(
 }
 async function getSourceTexts(
 	numberedElements: NumberedElement[],
-	pageVersionId: number,
+	pageId: number,
 ) {
 	return Promise.all(
 		numberedElements.map((element) =>
-			getOrCreateSourceTextIdAndPageVersionSourceText(
+			getOrCreateSourceTextIdAndPageSourceText(
 				element.text,
 				element.number,
-				pageVersionId,
+				pageId,
 			),
 		),
 	);
 }
+
 async function getTranslatedText(
 	geminiApiKey: string,
 	aiModel: string,

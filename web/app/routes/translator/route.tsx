@@ -11,10 +11,10 @@ import { getTargetLanguage } from "~/utils/target-language.server";
 import { GeminiApiKeyForm } from "../resources+/gemini-api-key-form";
 import { URLTranslationForm } from "./components/URLTranslationForm";
 import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
+import { getOrCreateUserAITranslationInfo } from "./functions/mutations.server";
 import { getDbUser } from "./functions/queries.server";
 import { listUserAiTranslationInfo } from "./functions/queries.server";
 import { urlTranslationSchema } from "./types";
-
 export async function loader({ request }: LoaderFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/",
@@ -59,6 +59,12 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	const targetLanguage = await getTargetLanguage(request);
 	const normalizedUrl = normalizeAndSanitizeUrl(submission.value.url);
+	await getOrCreateUserAITranslationInfo(
+		dbUser.id,
+		normalizedUrl,
+		targetLanguage,
+	);
+
 	// Start the translation job in background
 	const queue = getTranslateUserQueue(safeUser.id);
 	const job = await queue.add(`translate-${safeUser.id}`, {
