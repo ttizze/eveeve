@@ -1,10 +1,10 @@
 import { createHash } from "node:crypto";
 import { prisma } from "~/utils/prisma";
 
-export async function getOrCreateSourceTextIdAndPageVersionSourceText(
+export async function getOrCreateSourceTextIdAndPageSourceText(
 	text: string,
 	number: number,
-	pageVersionId: number,
+	pageId: number,
 ): Promise<{ id: number; number: number }> {
 	const textHash = Buffer.from(
 		createHash("sha256").update(text).digest("hex"),
@@ -27,16 +27,16 @@ export async function getOrCreateSourceTextIdAndPageVersionSourceText(
 			},
 		});
 
-		await tx.pageVersionSourceText.upsert({
+		await tx.pageSourceText.upsert({
 			where: {
-				pageVersionId_sourceTextId: {
-					pageVersionId,
+				pageId_sourceTextId: {
+					pageId,
 					sourceTextId: sourceText.id,
 				},
 			},
 			update: {},
 			create: {
-				pageVersionId,
+				pageId,
 				sourceTextId: sourceText.id,
 			},
 		});
@@ -55,88 +55,73 @@ export async function getOrCreateAIUser(name: string): Promise<number> {
 	return user.id;
 }
 
-export async function getOrCreatePageVersionTranslationInfo(
-	pageVersionId: number,
+export async function getOrCreatePageTranslationInfo(
+	pageId: number,
 	targetLanguage: string,
 	translationTitle: string,
 ) {
-	return await prisma.pageVersionTranslationInfo.upsert({
+	return await prisma.pageTranslationInfo.upsert({
 		where: {
-			pageVersionId_targetLanguage: {
-				pageVersionId,
+			pageId_targetLanguage: {
+				pageId,
 				targetLanguage,
 			},
 		},
 		update: {},
 		create: {
-			pageVersionId,
+			pageId,
 			targetLanguage,
 			translationTitle,
 		},
 	});
 }
 
-export async function getOrCreatePageId(url: string): Promise<number> {
-	const page = await prisma.page.upsert({
-		where: { url },
-		update: {},
-		create: { url },
-	});
-	return page.id;
-}
-
-export async function getOrCreatePageVersionId(
+export async function getOrCreatePageId(
 	url: string,
 	title: string,
 	content: string,
-	pageId: number,
 ): Promise<number> {
 	const normalizedContent = content.trim().replace(/\s+/g, " ");
 	const contentHash = Buffer.from(
 		createHash("sha256").update(normalizedContent).digest("hex"),
 		"hex",
 	);
-	const existingVersion = await prisma.pageVersion.findFirst({
+	const existingPage = await prisma.page.findFirst({
 		where: {
 			url,
 			contentHash,
 		},
 	});
 
-	if (existingVersion) {
-		return existingVersion.id;
+	if (existingPage) {
+		return existingPage.id;
 	}
 
-	const newVersion = await prisma.pageVersion.create({
+	const newPage = await prisma.page.create({
 		data: {
 			title,
 			url,
 			content,
 			contentHash,
-			page: {
-				connect: {
-					id: pageId,
-				},
-			},
 		},
 	});
 
-	console.log(`New PageVersion created: ${newVersion.title}`);
-	return newVersion.id;
+	console.log(`New Page created: ${newPage.title}`);
+	return newPage.id;
 }
 
 export async function updateUserAITranslationInfo(
 	userId: number,
-	pageVersionId: number,
+	url: string,
 	targetLanguage: string,
 	status: string,
 	progress: number,
 ) {
 	return await prisma.userAITranslationInfo.update({
 		where: {
-			userId_pageVersionId_targetLanguage: {
+			userId_url_targetLanguage: {
 				userId,
-				pageVersionId,
+				url,
 				targetLanguage,
 			},
 		},
@@ -146,37 +131,4 @@ export async function updateUserAITranslationInfo(
 			lastTranslatedAt: new Date(),
 		},
 	});
-}
-
-export async function getOrCreateUserAITranslationInfo(
-	userId: number,
-	pageVersionId: number,
-	targetLanguage: string,
-) {
-	try {
-		const userAITranslationInfo = await prisma.userAITranslationInfo.upsert({
-			where: {
-				userId_pageVersionId_targetLanguage: {
-					userId,
-					pageVersionId,
-					targetLanguage,
-				},
-			},
-			update: {
-				aiTranslationStatus: "pending",
-				aiTranslationProgress: 0,
-			},
-			create: {
-				userId,
-				pageVersionId,
-				targetLanguage,
-				aiTranslationStatus: "pending",
-				aiTranslationProgress: 0,
-			},
-		});
-		return userAITranslationInfo;
-	} catch (error) {
-		console.error("Error in getOrCreateUserAITranslationInfo:", error);
-		throw error;
-	}
 }

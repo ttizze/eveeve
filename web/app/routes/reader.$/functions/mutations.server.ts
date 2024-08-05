@@ -70,14 +70,14 @@ export async function handleAddTranslationAction(
 
 export async function updateUserReadHistory(
 	userId: number,
-	pageVersionId: number,
+	pageId: number,
 	lastReadDataNumber: number,
 ) {
 	await prisma.userReadHistory.upsert({
 		where: {
-			userId_pageVersionId: {
+			userId_pageId: {
 				userId: userId,
-				pageVersionId: pageVersionId,
+				pageId: pageId,
 			},
 		},
 		update: {
@@ -86,7 +86,7 @@ export async function updateUserReadHistory(
 		},
 		create: {
 			userId: userId,
-			pageVersionId: pageVersionId,
+			pageId: pageId,
 			lastReadDataNumber: lastReadDataNumber,
 		},
 	});

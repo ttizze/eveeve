@@ -78,11 +78,11 @@ export default function Search() {
 										className="hover:bg-gray-300 dark:hover:bg-gray-700 transition duration-150 rounded-lg"
 									>
 										<Link
-											to={`/reader/${encodeURIComponent(result.page.url)}`}
+											to={`/reader/${encodeURIComponent(result.url)}`}
 											className="block p-2 text-inherit no-underline"
 										>
 											<h3 className="font-bold">{result.title}</h3>
-											{result.pageVersionTranslationInfo.map((info) => (
+											{result.pageTranslationInfo.map((info) => (
 												<p key={info.id} className="text-sm ">
 													{info.translationTitle}
 												</p>

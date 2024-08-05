@@ -1,12 +1,12 @@
 import { prisma } from "../../../utils/prisma";
-import type { LatestPageVersionWithTranslations } from "../types";
+import type { LatestPageWithTranslations } from "../types";
 
-export async function fetchLatestPageVersionWithTranslations(
+export async function fetchLatestPageWithTranslations(
 	url: string,
 	userId: number | null,
 	targetLanguage: string,
-): Promise<LatestPageVersionWithTranslations | null> {
-	const pageVersion = await prisma.pageVersion.findFirst({
+): Promise<LatestPageWithTranslations | null> {
+	const page = await prisma.page.findFirst({
 		where: { url },
 		orderBy: { createdAt: "desc" },
 		select: {
@@ -14,7 +14,7 @@ export async function fetchLatestPageVersionWithTranslations(
 			url: true,
 			content: true,
 			license: true,
-			pageVersionSourceTexts: {
+			pageSourceTexts: {
 				select: {
 					sourceText: {
 						select: {
@@ -52,41 +52,34 @@ export async function fetchLatestPageVersionWithTranslations(
 		},
 	});
 
-	if (!pageVersion) return null;
+	if (!page) return null;
 
 	return {
-		title: pageVersion.title,
-		url: pageVersion.url,
-		license: pageVersion.license,
-		content: pageVersion.content,
-		sourceTextWithTranslations: pageVersion.pageVersionSourceTexts.map(
-			({ sourceText }) => ({
-				number: sourceText.number,
-				sourceTextId: sourceText.id,
-				translationsWithVotes: sourceText.translateTexts.map(
-					(translateText) => ({
-						id: translateText.id,
-						text: translateText.text,
-						point: translateText.point,
-						userName: translateText.user.name,
-						userVote: translateText.votes[0] || null,
-					}),
-				),
-			}),
-		),
+		title: page.title,
+		url: page.url,
+		license: page.license,
+		content: page.content,
+		sourceTextWithTranslations: page.pageSourceTexts.map(({ sourceText }) => ({
+			number: sourceText.number,
+			sourceTextId: sourceText.id,
+			translationsWithVotes: sourceText.translateTexts.map((translateText) => ({
+				id: translateText.id,
+				text: translateText.text,
+				point: translateText.point,
+				userName: translateText.user.name,
+				userVote: translateText.votes[0] || null,
+			})),
+		})),
 		userId,
 	};
 }
 
-export async function getLastReadDataNumber(
-	userId: number,
-	pageVersionId: number,
-) {
+export async function getLastReadDataNumber(userId: number, pageId: number) {
 	const readHistory = await prisma.userReadHistory.findUnique({
 		where: {
-			userId_pageVersionId: {
+			userId_pageId: {
 				userId: userId,
-				pageVersionId: pageVersionId,
+				pageId: pageId,
 			},
 		},
 		select: {

@@ -16,7 +16,7 @@ export interface SourceTextWithTranslations {
 	translationsWithVotes: TranslationWithVote[];
 }
 
-export interface LatestPageVersionWithTranslations {
+export interface LatestPageWithTranslations {
 	title: string;
 	url: string;
 	content: string;

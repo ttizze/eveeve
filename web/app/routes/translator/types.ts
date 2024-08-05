@@ -8,35 +8,11 @@ export const urlTranslationSchema = z.object({
 	aiModel: z.string().min(1, "モデルを選択してください"),
 });
 
-export const PageVersionTranslationInfoSchema = z.object({
+export const PageTranslationInfoSchema = z.object({
 	id: z.number(),
-	pageVersionId: z.number(),
+	pageId: z.number(),
 	targetLanguage: z.string(),
 	translationTitle: z.string(),
 });
 
-export const UserAITranslationInfoSchema = z.object({
-	id: z.number(),
-	userId: z.number(),
-	pageVersionId: z.number(),
-	targetLanguage: z.string(),
-	aiTranslationStatus: z.string(),
-	aiTranslationProgress: z.number(),
-	lastTranslatedAt: z.string().or(z.date()),
-	pageVersion: z.object({
-		title: z.string(),
-		page: z.object({
-			url: z.string(),
-		}),
-		pageVersionTranslationInfo: z
-			.array(PageVersionTranslationInfoSchema)
-			.optional(),
-	}),
-});
-
-export type UserAITranslationInfoItem = z.infer<
-	typeof UserAITranslationInfoSchema
->;
-export type PageVersionTranslationInfoItem = z.infer<
-	typeof PageVersionTranslationInfoSchema
->;
+export type PageTranslationInfoItem = z.infer<typeof PageTranslationInfoSchema>;
