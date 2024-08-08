@@ -19,6 +19,7 @@ export interface SourceTextWithTranslations {
 export interface LatestPageWithTranslations {
 	id: number;
 	title: string;
+	translationTitle: string | null;
 	slug: string;
 	sourceUrl: string | null;
 	content: string;
