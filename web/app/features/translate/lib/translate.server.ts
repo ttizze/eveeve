@@ -6,61 +6,64 @@ import { getOrCreatePageTranslationInfo } from "../functions/mutations.server";
 import { getOrCreateSourceTextIdAndPageSourceText } from "../functions/mutations.server";
 import { getGeminiModelResponse } from "../services/gemini";
 import type { NumberedElement } from "../types";
+import type { TranslateJobParams } from "../types";
 import { extractTranslations } from "../utils/extractTranslations.server";
 import { splitNumberedElements } from "../utils/splitNumberedElements.server";
 
-export async function translate(
-	geminiApiKey: string,
-	aiModel: string,
-	userId: number,
-	targetLanguage: string,
-	title: string,
-	numberedContent: string,
-	numberedElements: NumberedElement[],
-	url: string,
-) {
-	const pageId = await getOrCreatePageId(url, title, numberedContent);
+export async function translate(params: TranslateJobParams) {
+	const pageId = await getOrCreatePageId(
+		params.sourceUrl,
+		params.slug,
+		params.title,
+		params.numberedContent,
+	);
 
 	await updateUserAITranslationInfo(
-		userId,
-		url,
-		targetLanguage,
+		params.userId,
+		params.slug,
+		params.targetLanguage,
 		"in_progress",
 		0,
 	);
 	try {
-		const chunks = splitNumberedElements(numberedElements);
+		const chunks = splitNumberedElements(params.numberedElements);
 		const totalChunks = chunks.length;
 		for (let i = 0; i < chunks.length; i++) {
 			console.log(`Processing chunk ${i + 1} of ${totalChunks}`);
 
 			await translateChunk(
-				geminiApiKey,
-				aiModel,
+				params.geminiApiKey,
+				params.aiModel,
 				chunks[i],
-				targetLanguage,
+				params.targetLanguage,
 				pageId,
-				title,
+				params.title,
 			);
 			const progress = ((i + 1) / totalChunks) * 100;
 			await updateUserAITranslationInfo(
-				userId,
-				url,
-				targetLanguage,
+				params.userId,
+				params.slug,
+				params.targetLanguage,
 				"in_progress",
 				progress,
 			);
 		}
 		await updateUserAITranslationInfo(
-			userId,
-			url,
-			targetLanguage,
+			params.userId,
+			params.slug,
+			params.targetLanguage,
 			"completed",
 			100,
 		);
 	} catch (error) {
 		console.error("Background translation job failed:", error);
-		await updateUserAITranslationInfo(userId, url, targetLanguage, "failed", 0);
+		await updateUserAITranslationInfo(
+			params.userId,
+			params.slug,
+			params.targetLanguage,
+			"failed",
+			0,
+		);
 	}
 }
 

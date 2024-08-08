@@ -2,16 +2,18 @@ import { prisma } from "../../../utils/prisma";
 import type { LatestPageWithTranslations } from "../types";
 
 export async function fetchLatestPageWithTranslations(
-	url: string,
+	slug: string,
 	userId: number | null,
 	targetLanguage: string,
 ): Promise<LatestPageWithTranslations | null> {
 	const page = await prisma.page.findFirst({
-		where: { url },
+		where: { slug },
 		orderBy: { createdAt: "desc" },
 		select: {
+			id: true,
 			title: true,
-			url: true,
+			slug: true,
+			sourceUrl: true,
 			content: true,
 			license: true,
 			pageSourceTexts: {
@@ -26,6 +28,7 @@ export async function fetchLatestPageWithTranslations(
 									id: true,
 									text: true,
 									point: true,
+									createdAt: true,
 									user: { select: { name: true } },
 									votes: {
 										where: userId ? { userId } : undefined,
@@ -55,8 +58,10 @@ export async function fetchLatestPageWithTranslations(
 	if (!page) return null;
 
 	return {
+		id: page.id,
 		title: page.title,
-		url: page.url,
+		slug: page.slug,
+		sourceUrl: page.sourceUrl,
 		license: page.license,
 		content: page.content,
 		sourceTextWithTranslations: page.pageSourceTexts.map(({ sourceText }) => ({
@@ -73,6 +78,17 @@ export async function fetchLatestPageWithTranslations(
 		userId,
 	};
 }
+
+export async function fetchPage(pageId: number) {
+	const page = await prisma.page.findFirst({
+		where: { id: pageId },
+	});
+	return page;
+}
+
+export const getDbUser = async (userId: number) => {
+	return await prisma.user.findUnique({ where: { id: userId } });
+};
 
 export async function getLastReadDataNumber(userId: number, pageId: number) {
 	const readHistory = await prisma.userReadHistory.findUnique({

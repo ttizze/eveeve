@@ -77,18 +77,18 @@ export async function getOrCreatePageTranslationInfo(
 }
 
 export async function getOrCreatePageId(
-	url: string,
+	sourceUrl: string | null,
+	slug: string,
 	title: string,
-	content: string,
+	numberedContent: string,
 ): Promise<number> {
-	const normalizedContent = content.trim().replace(/\s+/g, " ");
+	const normalizedContent = numberedContent.trim().replace(/\s+/g, " ");
 	const contentHash = Buffer.from(
 		createHash("sha256").update(normalizedContent).digest("hex"),
 		"hex",
 	);
 	const existingPage = await prisma.page.findFirst({
 		where: {
-			url,
 			contentHash,
 		},
 	});
@@ -100,8 +100,9 @@ export async function getOrCreatePageId(
 	const newPage = await prisma.page.create({
 		data: {
 			title,
-			url,
-			content,
+			sourceUrl: sourceUrl || "",
+			slug,
+			content: numberedContent,
 			contentHash,
 		},
 	});
@@ -112,16 +113,16 @@ export async function getOrCreatePageId(
 
 export async function updateUserAITranslationInfo(
 	userId: number,
-	url: string,
+	slug: string,
 	targetLanguage: string,
 	status: string,
 	progress: number,
 ) {
 	return await prisma.userAITranslationInfo.update({
 		where: {
-			userId_url_targetLanguage: {
+			userId_slug_targetLanguage: {
 				userId,
-				url,
+				slug,
 				targetLanguage,
 			},
 		},

@@ -4,7 +4,7 @@ export type UserVote = Pick<Vote, "id" | "isUpvote" | "updatedAt">;
 
 export type TranslationWithVote = Pick<
 	TranslateText,
-	"id" | "text" | "point"
+	"id" | "text" | "point" | "createdAt"
 > & {
 	userName: string;
 	userVote: UserVote | null;
@@ -17,8 +17,10 @@ export interface SourceTextWithTranslations {
 }
 
 export interface LatestPageWithTranslations {
+	id: number;
 	title: string;
-	url: string;
+	slug: string;
+	sourceUrl: string | null;
 	content: string;
 	license: string;
 	sourceTextWithTranslations: SourceTextWithTranslations[];
@@ -43,10 +45,7 @@ export const addTranslationSchema = z.object({
 
 export const retranslateSchema = z.object({
 	intent: z.literal("retranslate"),
-	url: z
-		.string()
-		.min(1, { message: "URLを入力してください" })
-		.url("有効なURLを入力してください"),
+	pageId: z.number(),
 	aiModel: z.string().min(1, "モデルを選択してください"),
 });
 

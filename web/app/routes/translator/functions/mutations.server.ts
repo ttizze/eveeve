@@ -2,15 +2,15 @@ import { prisma } from "~/utils/prisma";
 
 export async function getOrCreateUserAITranslationInfo(
 	userId: number,
-	url: string,
+	slug: string,
 	targetLanguage: string,
 ) {
 	try {
 		const userAITranslationInfo = await prisma.userAITranslationInfo.upsert({
 			where: {
-				userId_url_targetLanguage: {
+				userId_slug_targetLanguage: {
 					userId,
-					url,
+					slug,
 					targetLanguage,
 				},
 			},
@@ -20,7 +20,7 @@ export async function getOrCreateUserAITranslationInfo(
 			},
 			create: {
 				userId,
-				url,
+				slug,
 				targetLanguage,
 				aiTranslationStatus: "pending",
 				aiTranslationProgress: 0,

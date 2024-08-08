@@ -7,7 +7,7 @@ import { useState } from "react";
 import { LoginDialog } from "~/components/LoginDialog";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
-import type { action } from "../route";
+import type { action } from "../$slug";
 import { addTranslationSchema } from "../types";
 
 interface AddTranslationFormProps {
