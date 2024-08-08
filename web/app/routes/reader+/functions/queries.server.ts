@@ -16,6 +16,10 @@ export async function fetchLatestPageWithTranslations(
 			sourceUrl: true,
 			content: true,
 			license: true,
+			pageTranslationInfo: {
+				where: { targetLanguage },
+				select: { translationTitle: true },
+			},
 			pageSourceTexts: {
 				select: {
 					sourceText: {
@@ -60,6 +64,7 @@ export async function fetchLatestPageWithTranslations(
 	return {
 		id: page.id,
 		title: page.title,
+		translationTitle: page.pageTranslationInfo[0]?.translationTitle,
 		slug: page.slug,
 		sourceUrl: page.sourceUrl,
 		license: page.license,
@@ -73,6 +78,7 @@ export async function fetchLatestPageWithTranslations(
 				point: translateText.point,
 				userName: translateText.user.name,
 				userVote: translateText.votes[0] || null,
+				createdAt: translateText.createdAt,
 			})),
 		})),
 		userId,

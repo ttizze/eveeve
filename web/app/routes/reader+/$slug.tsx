@@ -163,7 +163,10 @@ export default function ReaderView() {
 					</Form>
 				</div>
 				<article className="prose dark:prose-invert lg:prose-xl mx-auto">
-					<h1>{pageData.title}</h1>
+					<h1>
+						{pageData.title}
+						<div>{pageData.translationTitle}</div>
+					</h1>
 					{sourceUrl && (
 						<p>
 							<a
