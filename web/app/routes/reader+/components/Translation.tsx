@@ -22,7 +22,7 @@ function ToggleButton({
 	return (
 		<button
 			type="button"
-			className="absolute top-2 right-2 p-1  z-20"
+			className="absolute -top-4 right-2 p-1  z-20"
 			onClick={onClick}
 			aria-label={label}
 			title={label}
@@ -65,7 +65,7 @@ export function Translation({
 				/>
 			</div>
 			{isExpanded && (
-				<div className="absolute top-0 left-0 right-0 z-10  border bg-white dark:bg-gray-900 rounded-xl shadow-xl dark:shadow-white/10  transition-all duration-500 ease-in-out">
+				<div className="absolute -top-4 left-0 right-0 z-10  border bg-white dark:bg-gray-900 rounded-xl shadow-xl dark:shadow-white/10  transition-all duration-500 ease-in-out">
 					<AddAndVoteTranslations
 						bestTranslationWithVote={bestTranslationWithVote}
 						alternativeTranslationsWithVotes={alternativeTranslationsWithVotes}
