@@ -35,14 +35,14 @@ model User {
 model UserAITranslationInfo {
   id                    Int      @id @default(autoincrement())
   userId                Int      @map("user_id")
-  url                   String   @default("unknown")
+  slug                   String   @default("unknown")
   targetLanguage        String   @map("target_language")
   aiTranslationStatus   String   @default("pending") @map("ai_translation_status")
   aiTranslationProgress Int      @default(0) @map("ai_translation_progress")
   lastTranslatedAt      DateTime @default(now()) @map("last_translated_at")
   user                  User     @relation(fields: [userId], references: [id])
 
-  @@unique([userId, url, targetLanguage])
+  @@unique([userId, slug, targetLanguage])
   @@index([userId])
   @@map("user_ai_translation_info")
 }
@@ -75,18 +75,76 @@ model PageTranslationInfo {
 
 model Page {
   id                  Int                   @id @default(autoincrement())
-  url                 String
+  slug                String                @unique
+  sourceUrl           String?               @map("source_url")
   title               String
   content             String
+  contentHash         Bytes                 @unique @map("content_hash")
   license             String                @default("unknown")
-  contentHash         Bytes                 @map("content_hash")
+  originalLanguage    String                @default("unknown") @map("original_language")
   createdAt           DateTime              @default(now()) @map("created_at")
-  pageSourceTexts PageSourceText[]
+  pageSourceTexts     PageSourceText[]
   pageTranslationInfo PageTranslationInfo[]
   userReadHistory     UserReadHistory[]
+  authors             AuthorPage[]
+  genres              GenrePage[]
+  tags                TagPage[]
 
-  @@unique([url, contentHash])
   @@map("pages")
+}
+
+model Author {
+  id    Int          @id @default(autoincrement())
+  name  String
+  pages AuthorPage[]
+
+  @@map("authors")
+}
+
+model AuthorPage {
+  authorId Int
+  pageId   Int
+  author   Author @relation(fields: [authorId], references: [id])
+  page     Page   @relation(fields: [pageId], references: [id])
+
+  @@id([authorId, pageId])
+  @@map("author_pages")
+}
+
+model Genre {
+  id    Int         @id @default(autoincrement())
+  name  String      @unique
+  pages GenrePage[]
+
+  @@map("genres")
+}
+
+model GenrePage {
+  genreId Int
+  pageId  Int
+  genre   Genre @relation(fields: [genreId], references: [id])
+  page    Page  @relation(fields: [pageId], references: [id])
+
+  @@id([genreId, pageId])
+  @@map("genre_pages")
+}
+
+model Tag {
+  id    Int       @id @default(autoincrement())
+  name  String    @unique
+  pages TagPage[]
+
+  @@map("tags")
+}
+
+model TagPage {
+  tagId  Int
+  pageId Int
+  tag    Tag  @relation(fields: [tagId], references: [id])
+  page   Page @relation(fields: [pageId], references: [id])
+
+  @@id([tagId, pageId])
+  @@map("tag_pages")
 }
 
 model SourceText {

@@ -14,7 +14,7 @@ import { Progress } from "~/components/ui/progress";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { AIModelSelector } from "~/features/translate/components/AIModelSelector";
 import { cn } from "~/utils/cn";
-import { urlTranslationSchema } from "../types";
+import { translationInputSchema } from "../types";
 
 type UserAITranslationStatusProps = {
 	userAITranslationInfo: UserAITranslationInfo[];
@@ -29,11 +29,11 @@ export function UserAITranslationStatus({
 	const navigation = useNavigation();
 	const [form, fields] = useForm({
 		id: "url-re-translation-form",
-		constraint: getZodConstraint(urlTranslationSchema),
+		constraint: getZodConstraint(translationInputSchema),
 		shouldValidate: "onBlur",
 		shouldRevalidate: "onInput",
 		onValidate({ formData }) {
-			return parseWithZod(formData, { schema: urlTranslationSchema });
+			return parseWithZod(formData, { schema: translationInputSchema });
 		},
 	});
 
@@ -63,7 +63,7 @@ export function UserAITranslationStatus({
 								<Card key={item.id} className="flex flex-col h-full">
 									<CardHeader>
 										<CardTitle className="text-sm truncate flex flex-col h-10">
-											{item.url}
+											{item.slug}
 										</CardTitle>
 									</CardHeader>
 									<CardContent className="flex-grow flex flex-col">
@@ -87,7 +87,7 @@ export function UserAITranslationStatus({
 										{item.aiTranslationStatus === "failed" && (
 											<div className="mt-auto pt-2">
 												<Form method="post">
-													<input type="hidden" name="url" value={item.url} />
+													<input type="hidden" name="slug" value={item.slug} />
 													<div className="w-full">
 														<AIModelSelector onModelSelect={setSelectedModel} />
 														<input
@@ -117,7 +117,7 @@ export function UserAITranslationStatus({
 							return isCompleted ? (
 								<Link
 									key={item.id}
-									to={`/reader/${encodeURIComponent(item.url)}`}
+									to={`/reader/${encodeURIComponent(item.slug)}`}
 									className="block hover:shadow-md transition-shadow duration-200"
 								>
 									{CardContents}

@@ -13,7 +13,12 @@ export function getBestTranslation(
 			return currentUpdatedAt > prevUpdatedAt ? current : prev;
 		});
 	}
-	return translationsWithVotes.reduce((prev, current) =>
-		prev.point > current.point ? prev : current,
-	);
+	return translationsWithVotes.reduce((prev, current) => {
+		if (prev.point !== current.point) {
+			return prev.point > current.point ? prev : current;
+		}
+		return new Date(current.createdAt) > new Date(prev.createdAt)
+			? current
+			: prev;
+	});
 }

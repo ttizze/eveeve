@@ -25,7 +25,6 @@ const formStrategy = new FormStrategy(async ({ form }) => {
 	const user = await prisma.user.findUnique({
 		where: { email: String(email) },
 	});
-	console.log(user);
 	if (!user) {
 		throw new AuthorizationError("User not found");
 	}
