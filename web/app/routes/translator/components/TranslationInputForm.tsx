@@ -50,7 +50,7 @@ export function TranslationInputForm() {
 						onClick={() => setInputType("file")}
 						variant={inputType === "file" ? "default" : "outline"}
 					>
-						ファイル
+						File
 					</Button>
 				</div>
 				<div className="flex space-x-1">
