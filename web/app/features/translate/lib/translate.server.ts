@@ -1,9 +1,8 @@
 import { prisma } from "../../../utils/prisma";
-import { getOrCreatePageId } from "../functions/mutations.server";
 import { updateUserAITranslationInfo } from "../functions/mutations.server";
 import { getOrCreateAIUser } from "../functions/mutations.server";
 import { getOrCreatePageTranslationInfo } from "../functions/mutations.server";
-import { getOrCreateSourceTextIdAndPageSourceText } from "../functions/mutations.server";
+import { getSourceTexts } from "../functions/mutations.server";
 import { getGeminiModelResponse } from "../services/gemini";
 import type { NumberedElement } from "../types";
 import type { TranslateJobParams } from "../types";
@@ -11,13 +10,6 @@ import { extractTranslations } from "../utils/extractTranslations.server";
 import { splitNumberedElements } from "../utils/splitNumberedElements.server";
 
 export async function translate(params: TranslateJobParams) {
-	const pageId = await getOrCreatePageId(
-		params.sourceUrl,
-		params.slug,
-		params.title,
-		params.numberedContent,
-	);
-
 	await updateUserAITranslationInfo(
 		params.userId,
 		params.slug,
@@ -36,7 +28,7 @@ export async function translate(params: TranslateJobParams) {
 				params.aiModel,
 				chunks[i],
 				params.targetLanguage,
-				pageId,
+				params.pageId,
 				params.title,
 			);
 			const progress = ((i + 1) / totalChunks) * 100;
@@ -75,7 +67,7 @@ export async function translateChunk(
 	pageId: number,
 	title: string,
 ) {
-	const sourceTexts = await getSourceTexts(numberedElements, pageId);
+	const sourceTexts = await getSourceTexts(pageId);
 	const translatedText = await getTranslatedText(
 		geminiApiKey,
 		aiModel,
@@ -96,20 +88,6 @@ export async function translateChunk(
 		sourceTexts,
 		targetLanguage,
 		aiModel,
-	);
-}
-async function getSourceTexts(
-	numberedElements: NumberedElement[],
-	pageId: number,
-) {
-	return Promise.all(
-		numberedElements.map((element) =>
-			getOrCreateSourceTextIdAndPageSourceText(
-				element.text,
-				element.number,
-				pageId,
-			),
-		),
 	);
 }
 

@@ -7,20 +7,19 @@ import { Header } from "~/components/Header";
 import { addNumbersToContent } from "~/features/prepare-html-for-translate/utils/addNumbersToContent";
 import { extractArticle } from "~/features/prepare-html-for-translate/utils/extractArticle";
 import { extractNumberedElements } from "~/features/prepare-html-for-translate/utils/extractNumberedElements";
-import { fetchWithRetry } from "~/features/prepare-html-for-translate/utils/fetchWithRetry";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import { authenticator } from "~/utils/auth.server";
-import { normalizeAndSanitizeUrl } from "~/utils/normalize-and-sanitize-url.server";
 import { getTargetLanguage } from "~/utils/target-language.server";
 import { GeminiApiKeyForm } from "../resources+/gemini-api-key-form";
 import { TranslationInputForm } from "./components/TranslationInputForm";
 import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
 import { getOrCreateUserAITranslationInfo } from "./functions/mutations.server";
+import { getOrCreatePageId } from "./functions/mutations.server";
 import { getDbUser } from "./functions/queries.server";
 import { listUserAiTranslationInfo } from "./functions/queries.server";
 import { translationInputSchema } from "./types";
 import { generateSlug } from "./utils/generate-slug.server";
-
+import { processUploadedFolder } from "./utils/process-uploaded-folder";
 export async function loader({ request }: LoaderFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/",
@@ -47,67 +46,128 @@ export async function action({ request }: ActionFunctionArgs) {
 		failureRedirect: "/",
 	});
 
-	const contentType = request.headers.get("Content-Type") || "";
-	let formData: FormData;
-	let html: string;
-	let sourceUrl: string | null = null;
-	let slug: string;
-
-	formData = await request.formData();
+	const formData = await request.formData();
 	const submission = parseWithZod(formData, {
 		schema: translationInputSchema,
 	});
-
 	if (submission.status !== "success") {
 		return { lastResult: submission.reply() };
 	}
 
-	let fileInfo: { name: string; size: number } | null = null;
-
-	if (contentType.includes("multipart/form-data")) {
-		const file = formData.get("file") as File;
-		html = await file.text();
-		slug = await generateSlug(file.name);
-		fileInfo = { name: file.name, size: file.size };
-	} else {
-		sourceUrl = normalizeAndSanitizeUrl(submission.value.url || "");
-		html = await fetchWithRetry(sourceUrl);
-		slug = await generateSlug(sourceUrl);
-	}
 	const dbUser = await getDbUser(safeUser.id);
 	if (!dbUser?.geminiApiKey) {
 		return {
 			lastResult: submission.reply({
 				formErrors: ["Gemini API key is not set"],
 			}),
-			slug: null,
+			slugs: [],
 		};
 	}
+
+	const geminiApiKey = dbUser.geminiApiKey;
+
 	const targetLanguage = await getTargetLanguage(request);
-
-	await getOrCreateUserAITranslationInfo(dbUser.id, slug, targetLanguage);
-
-	const { content, title } = extractArticle(html, sourceUrl);
-	const numberedContent = addNumbersToContent(content);
-	const numberedElements = extractNumberedElements(numberedContent);
-	// Start the translation job in background
 	const queue = getTranslateUserQueue(safeUser.id);
-	const job = await queue.add(`translate-${safeUser.id}`, {
-		geminiApiKey: dbUser.geminiApiKey,
-		aiModel: submission.value.aiModel,
-		userId: safeUser.id,
-		targetLanguage,
-		title,
-		numberedContent,
-		numberedElements,
-		sourceUrl,
-		slug,
-	});
+	const slugs: string[] = [];
+
+	function generateLinkArticle(
+		userId: number,
+		folderPath: string,
+		files: { name: string; slug: string }[],
+	): string {
+		let article = `
+			<h1>${folderPath}</h1>
+			<ul>
+		`;
+
+		for (const file of files) {
+			article += `
+				<li>
+					<a href="/${userId}/page/${file.slug}">${file.name}</a>
+					<a href="/${userId}/page/${file.slug}/edit" class="edit-link">[edit]</a>
+				</li>
+			`;
+		}
+
+		article += `
+			</ul>
+		`;
+
+		return article;
+	}
+
+	const processFolder = async (folder: File[]) => {
+		const folderStructure = processUploadedFolder(folder);
+
+		for (const [folderPath, fileList] of Object.entries(folderStructure)) {
+			const folderSlug = await generateSlug(folderPath);
+			await getOrCreateUserAITranslationInfo(
+				dbUser.id,
+				folderSlug,
+				targetLanguage,
+			);
+
+			// ファイルのslugを非同期で生成
+			const fileInfoPromises = fileList.map(async (file) => ({
+				name: file.name,
+				slug: await generateSlug(file.name),
+			}));
+			const fileInfos = await Promise.all(fileInfoPromises);
+
+			// フォルダ内の各ファイルを処理
+			for (const [index, file] of fileList.entries()) {
+				const fileSlug = fileInfos[index].slug;
+				await getOrCreateUserAITranslationInfo(
+					dbUser.id,
+					fileSlug,
+					targetLanguage,
+				);
+
+				const html = await file.text();
+
+				const { content, title } = extractArticle(html);
+				const numberedContent = addNumbersToContent(content);
+				const numberedElements = extractNumberedElements(numberedContent);
+
+				const pageId = await getOrCreatePageId(
+					dbUser.id,
+					fileSlug,
+					title,
+					numberedContent,
+				);
+				// ファイルの翻訳ジョブをキューに追加
+				await queue.add(`translate-${safeUser.id}`, {
+					geminiApiKey: geminiApiKey,
+					aiModel: submission.value.aiModel,
+					userId: safeUser.id,
+					targetLanguage,
+					pageId,
+					title,
+					numberedContent,
+					numberedElements,
+					slug: fileSlug,
+				});
+			}
+
+			// フォルダページ用のリンク記事を作成
+			const linkArticle = generateLinkArticle(
+				safeUser.id,
+				folderSlug,
+				fileInfos,
+			);
+			await getOrCreatePageId(dbUser.id, folderSlug, folderPath, linkArticle);
+
+			slugs.push(folderSlug);
+		}
+	};
+
+	if (submission.value.folder) {
+		await processFolder(submission.value.folder);
+	}
 
 	return {
 		lastResult: submission.reply({ resetForm: true }),
-		slug,
-		fileInfo,
+		slugs,
 	};
 }
 

@@ -18,6 +18,22 @@ export function TranslationInputForm() {
 	const actionData = useTypedActionData<typeof action>();
 	const [inputType, setInputType] = useState<"url" | "file">("url");
 
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const selectedFiles = e.target.files;
+		if (selectedFiles) {
+			const filesArray = Array.from(selectedFiles).map((file) => {
+				Object.defineProperty(file, "path", {
+					value: file.webkitRelativePath || file.name,
+					writable: false,
+					configurable: true,
+					enumerable: true,
+				});
+				return file;
+			});
+			console.log(filesArray);
+		}
+	};
+
 	const [form, fields] = useForm({
 		lastResult: actionData?.lastResult,
 		id: "translation-input-form",
@@ -64,9 +80,12 @@ export function TranslationInputForm() {
 						) : (
 							<input
 								type="file"
-								id="file"
-								name="file"
-								accept=".html,.htm"
+								id="folder"
+								name="folder"
+								/* @ts-expect-error */
+								directory=""
+								webkitdirectory=""
+								multiple
 								className="mt-1 block w-full text-sm text-gray-500
                           file:mr-4 file:py-2 file:px-4
                           file:rounded-full file:border-0
@@ -90,13 +109,13 @@ export function TranslationInputForm() {
 					</Button>
 				</div>
 			</Form>
-			{actionData?.slug && (
+			{actionData?.slugs && actionData.slugs.length > 0 && (
 				<Alert className="bg-blue-50 border-blue-200 text-blue-800 animate-in fade-in duration-300">
 					<AlertTitle className="text-center">
 						Translation Job Started
 					</AlertTitle>
 					<AlertDescription className="text-center">
-						<strong className="font-semibold ">{actionData.slug}</strong>
+						<strong className="font-semibold ">{actionData.slugs[0]}</strong>
 					</AlertDescription>
 				</Alert>
 			)}
