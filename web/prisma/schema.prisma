@@ -10,6 +10,7 @@ datasource db {
 model User {
   id                    Int                     @id @default(autoincrement())
   email                 String                  @unique
+  slug                  String                  @unique
   password              String?
   name                  String
   image                 String
@@ -22,6 +23,7 @@ model User {
   claudeApiKey          String?                 @map("claude_api_key")
   createdAt             DateTime                @default(now()) @map("created_at")
   updatedAt             DateTime                @updatedAt @map("updated_at")
+  pages                 Page[]
   userReadHistory       UserReadHistory[]
   apiUsages             ApiUsage[]
   translations          TranslateText[]
@@ -76,40 +78,20 @@ model PageTranslationInfo {
 model Page {
   id                  Int                   @id @default(autoincrement())
   slug                String                @unique
-  sourceUrl           String?               @map("source_url")
   title               String
   content             String
-  contentHash         Bytes                 @unique @map("content_hash")
-  license             String                @default("unknown")
-  originalLanguage    String                @default("unknown") @map("original_language")
   createdAt           DateTime              @default(now()) @map("created_at")
-  pageSourceTexts     PageSourceText[]
+  user                User                  @relation(fields: [userId], references: [id])
+  userId              Int                   @map("user_id")
+  sourceTexts     SourceText[]
   pageTranslationInfo PageTranslationInfo[]
   userReadHistory     UserReadHistory[]
-  authors             AuthorPage[]
   genres              GenrePage[]
   tags                TagPage[]
 
   @@map("pages")
 }
 
-model Author {
-  id    Int          @id @default(autoincrement())
-  name  String
-  pages AuthorPage[]
-
-  @@map("authors")
-}
-
-model AuthorPage {
-  authorId Int
-  pageId   Int
-  author   Author @relation(fields: [authorId], references: [id])
-  page     Page   @relation(fields: [pageId], references: [id])
-
-  @@id([authorId, pageId])
-  @@map("author_pages")
-}
 
 model Genre {
   id    Int         @id @default(autoincrement())
@@ -151,26 +133,13 @@ model SourceText {
   id              Int              @id @default(autoincrement())
   text            String
   number          Int
-  textHash        Bytes            @map("text_hash")
   translateTexts  TranslateText[]
-  pageSourceTexts PageSourceText[]
+  page            Page             @relation(fields: [pageId], references: [id])
+  pageId          Int              @map("page_id")
 
-  @@unique([textHash, number])
-  @@index([textHash, number])
+  @@unique([pageId, number])
+  @@index([pageId, number])
   @@map("source_texts")
-}
-
-model PageSourceText {
-  id           Int @id @default(autoincrement())
-  pageId       Int @map("page_id")
-  sourceTextId Int @map("source_text_id")
-
-  page       Page       @relation(fields: [pageId], references: [id])
-  sourceText SourceText @relation(fields: [sourceTextId], references: [id])
-
-  @@unique([pageId, sourceTextId])
-  @@index([pageId])
-  @@map("page_source_texts")
 }
 
 model TranslateText {
@@ -180,7 +149,6 @@ model TranslateText {
   sourceTextId   Int        @map("source_text_id")
   userId         Int        @map("user_id")
   point          Int        @default(0)
-  editCount      Int        @default(0) @map("edit_count")
   createdAt      DateTime   @default(now()) @map("created_at")
   sourceText     SourceText @relation(fields: [sourceTextId], references: [id])
   user           User       @relation(fields: [userId], references: [id])

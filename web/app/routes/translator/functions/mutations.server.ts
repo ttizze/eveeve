@@ -32,3 +32,22 @@ export async function getOrCreateUserAITranslationInfo(
 		throw error;
 	}
 }
+
+export async function getOrCreatePageId(
+	userId: number,
+	slug: string,
+	title: string,
+	numberedContent: string,
+): Promise<number> {
+	const newPage = await prisma.page.create({
+		data: {
+			userId,
+			title,
+			slug,
+			content: numberedContent,
+		},
+	});
+
+	console.log(`New Page created: ${newPage.title}`);
+	return newPage.id;
+}
