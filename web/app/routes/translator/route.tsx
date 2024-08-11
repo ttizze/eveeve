@@ -20,9 +20,10 @@ import { listUserAiTranslationInfo } from "./functions/queries.server";
 import { translationInputSchema } from "./types";
 import { generateSlug } from "./utils/generate-slug.server";
 import { processUploadedFolder } from "./utils/process-uploaded-folder";
+
 export async function loader({ request }: LoaderFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
-		failureRedirect: "/",
+		failureRedirect: "/fail",
 	});
 
 	const dbUser = await getDbUser(safeUser.id);

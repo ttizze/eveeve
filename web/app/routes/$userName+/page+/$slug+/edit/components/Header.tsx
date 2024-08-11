@@ -1,6 +1,5 @@
 import { Link } from "@remix-run/react";
 import { LogIn, Search } from "lucide-react";
-import { useTheme } from "next-themes";
 import { ModeToggle } from "~/components/dark-mode-toggle";
 import { Button } from "~/components/ui/button";
 import type { SafeUser } from "~/types";
@@ -10,7 +9,6 @@ interface HeaderProps {
 }
 
 export function Header({ safeUser }: HeaderProps) {
-	const { resolvedTheme } = useTheme();
 
 	return (
 		<header className="mb-10 z-10 ">

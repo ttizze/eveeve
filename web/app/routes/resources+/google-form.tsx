@@ -7,7 +7,7 @@ import { authenticator } from "~/utils/auth.server";
 export async function action({ request }: ActionFunctionArgs) {
 	return authenticator.authenticate("google", request, {
 		successRedirect: "/api/auth/callback/google",
-		failureRedirect: "/login",
+		failureRedirect: "/",
 	});
 }
 

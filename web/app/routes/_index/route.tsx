@@ -10,14 +10,14 @@ import { Header } from "~/components/Header";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { authenticator } from "~/utils/auth.server";
-
+import { Footer } from "~/routes/resources+/footer";
 export const meta: MetaFunction = () => {
 	return [
 		{ title: "EveEve" },
 		{
 			name: "description",
 			content:
-				"EveEveは、インターネット上のテキストを翻訳できるオープンソースプロジェクトです。",
+				"EveEve is an open source project that translates text on the internet.",
 		},
 	];
 };
@@ -30,7 +30,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
 	return authenticator.authenticate("google", request, {
 		successRedirect: "/translator",
-		failureRedirect: "/",
+		failureRedirect: "/faile",
 	});
 }
 
@@ -52,8 +52,6 @@ export default function Index() {
 						<Form method="POST" className="w-full ">
 							<Button
 								type="submit"
-								name="intent"
-								value="SignInWithGoogle"
 								variant="default"
 							>
 								Start
@@ -107,6 +105,7 @@ export default function Index() {
 					</Card>
 				</div>
 			</main>
+			<Footer safeUser={safeUser} />
 		</div>
 	);
 }

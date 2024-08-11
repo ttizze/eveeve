@@ -5,7 +5,7 @@ import { GoogleStrategy } from "remix-auth-google";
 import type { SafeUser } from "../types";
 import { prisma } from "./prisma";
 import { sessionStorage } from "./session.server";
-
+import type { User } from "@prisma/client";
 const SESSION_SECRET = process.env.SESSION_SECRET;
 
 if (!SESSION_SECRET) {
@@ -18,34 +18,22 @@ const formStrategy = new FormStrategy(async ({ form }) => {
 	const email = form.get("email");
 	const password = form.get("password");
 
-	if (!(email && password)) {
-		throw new Error("Invalid Request");
+	if (!email || !password) {
+		throw new AuthorizationError("Email and password are required");
 	}
 
 	const user = await prisma.user.findUnique({
 		where: { email: String(email) },
 	});
-	if (!user) {
-		throw new AuthorizationError("User not found");
+	if (!user || !user.password) {
+		throw new AuthorizationError("Invalid login credentials");
+	}
+	const isValidPassword = await bcrypt.compare(String(password), user.password);
+	if (!isValidPassword) {
+		throw new AuthorizationError("Invalid login credentials");
 	}
 
-	if (!user.password) {
-		throw new AuthorizationError("User has no password set.");
-	}
-	const passwordsMatch = await bcrypt.compare(String(password), user.password);
-
-	if (!passwordsMatch) {
-		throw new AuthorizationError("Invalid password");
-	}
-
-	const {
-		password: _,
-		geminiApiKey: __,
-		openAIApiKey: ___,
-		claudeApiKey: ____,
-		...safeUser
-	} = user;
-	return safeUser;
+	return  sanitizeUser(user);
 });
 
 authenticator.use(formStrategy, "user-pass");
@@ -61,31 +49,31 @@ const googleStrategy = new GoogleStrategy<SafeUser>(
 			where: { email: profile.emails[0].value },
 		});
 		if (user) {
-			const {
-				password,
-				geminiApiKey,
-				openAIApiKey,
-				claudeApiKey,
-				...safeUser
-			} = user;
-			return safeUser as SafeUser;
+			console.log("User found", user);
+			return sanitizeUser(user);
 		}
-		try {
-			const newUser = await prisma.user.create({
-				data: {
-					email: profile.emails[0].value || "",
-					name: profile.displayName,
-					image: profile.photos[0].value,
-					provider: "google",
-				},
-			});
-			return newUser;
-		} catch (error) {
-			console.error("Error creating new user:", error);
-			throw new Error("Error creating new user");
-		}
+
+
+    const temporaryUserName = `new-user-${crypto.randomUUID().slice(0, 10)}-${new Date().toISOString().slice(0, 10)}`;
+    const newUser = await prisma.user.create({
+      data: {
+        email: profile.emails[0].value || "",
+        userName: temporaryUserName,
+        displayName: profile.displayName || "New User",
+        image: profile.photos[0].value || "",
+        provider: "Google",
+			},
+		});
+		console.log("New user created", newUser);
+
+		return sanitizeUser(newUser);
 	},
 );
+function sanitizeUser(user: User): SafeUser {
+	const { password, geminiApiKey, openAIApiKey, claudeApiKey, ...safeUser } =
+		user;
+	return safeUser;
+}
 
 authenticator.use(googleStrategy);
 export { authenticator };

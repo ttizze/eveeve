@@ -25,7 +25,7 @@ import { getOrCreatePage } from "./functions/mutations.server";
 import { getPageBySlug } from "./functions/queries.server";
 import { addNumbersToContent } from "./utils/addNumbersToContent";
 import { extractNumberedElements } from "./utils/extractNumberedElements";
-
+import { Footer } from "~/routes/resources+/footer";
 const schema = z.object({
 	title: z.string().min(1, "タイトルは必須です"),
 	pageContent: z.string().min(1, "内容は必須です"),
@@ -154,6 +154,7 @@ export default function EditPage() {
 					</div>
 				</Form>
 			</div>
+			<Footer safeUser={safeUser} />
 		</div>
 	);
 }
