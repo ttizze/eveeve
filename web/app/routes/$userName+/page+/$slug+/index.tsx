@@ -8,12 +8,12 @@ import { Link } from "@remix-run/react";
 import { Languages } from "lucide-react";
 import { useState } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
-import { Header } from "~/components/Header";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Button } from "~/components/ui/button";
 import { extractNumberedElements } from "~/features/prepare-html-for-translate/utils/extractNumberedElements";
 import { AIModelSelector } from "~/features/translate/components/AIModelSelector";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
+import { GeminiApiKeyDialog } from "~/routes/resources+/gemini-api-key-dialog";
 import { authenticator } from "~/utils/auth.server";
 import { getTargetLanguage } from "~/utils/target-language.server";
 import { ContentWithTranslations } from "./components/ContentWithTranslations";
@@ -39,6 +39,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
 	const safeUser = await authenticator.isAuthenticated(request);
 	const safeUserId = safeUser?.id;
+	const dbUser = await getDbUser(safeUserId ?? 0);
+	const hasGeminiApiKey = !!dbUser?.geminiApiKey;
 	const targetLanguage = await getTargetLanguage(request);
 	const pageData = await fetchPageWithTranslations(
 		slug,
@@ -50,9 +52,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		throw new Response("Failed to fetch article", { status: 500 });
 	}
 
-	return typedjson({ targetLanguage, pageData, safeUser });
+	return typedjson({ targetLanguage, pageData, safeUser, hasGeminiApiKey });
 };
-
 export const action = async ({ request }: ActionFunctionArgs) => {
 	const safeUser = await authenticator.isAuthenticated(request);
 	const safeUserId = safeUser?.id;
@@ -61,7 +62,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	const submission = parseWithZod(await request.formData(), {
 		schema: actionSchema,
 	});
-	console.log(submission);
 	if (!safeUserId) {
 		return {
 			intent: null,
@@ -134,7 +134,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function ReaderView() {
-	const { pageData, safeUser } = useTypedLoaderData<typeof loader>();
+	const { pageData, safeUser, hasGeminiApiKey } =
+		useTypedLoaderData<typeof loader>();
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const actionData = useActionData<typeof action>();
 	const [selectedModel, setSelectedModel] = useState("gemini-1.5-flash");
 	const navigation = useNavigation();
@@ -147,57 +149,69 @@ export default function ReaderView() {
 	}
 
 	return (
-		<div>
-			<Header safeUser={safeUser} />
-			<div className="container px-4 py-8  sm:max-w-prose lg:max-w-2xl xl:max-w-3xl mx-auto">
-				<div className="flex justify-between items-center mb-8 ">
-					<div className="flex items-center justify-center">
-						<TargetLanguageSelector />
-						<Form method="post">
-							<div className="w-60 flex items-center">
-								<AIModelSelector onModelSelect={setSelectedModel} />
-								<input type="hidden" name="pageId" value={pageData.id} />
-								<input type="hidden" name="aiModel" value={selectedModel} />
-								<Button
-									type="submit"
-									name="intent"
-									value="translate"
-									className="w-23"
-									disabled={navigation.state === "submitting"}
-								>
-									{navigation.state === "submitting" ? (
-										<LoadingSpinner />
-									) : (
-										<div className="flex items-center">
-											<Languages className="w-4 h-4 mr-1" />
-											<p>Translate</p>
-										</div>
-									)}
-								</Button>
-							</div>
-						</Form>
-					</div>
-					{pageData.userId === safeUser?.id && (
-						<Button asChild variant="outline">
-							<Link to={`/${safeUser.id}/page/${pageData.slug}/edit`}>
-								Edit
-							</Link>
-						</Button>
-					)}
-				</div>
-				<article className="prose dark:prose-invert lg:prose-xl">
-					<h1>
-						{pageData.title}
-						<div>{pageData.translationTitle}</div>
-					</h1>
-					<hr />
-					<ContentWithTranslations
-						content={pageData.content}
-						sourceTextWithTranslations={pageData.sourceTextWithTranslations}
-						userId={safeUser?.id ?? null}
-					/>
-				</article>
+		<div className="container px-4 py-8  sm:max-w-prose lg:max-w-2xl xl:max-w-3xl mx-auto">
+			<div className="flex justify-end items-center mb-8">
+				{pageData.userId === safeUser?.id && (
+					<Button asChild variant="outline">
+						<Link to={`/${safeUser.userName}/page/${pageData.slug}/edit`}>
+							Edit
+						</Link>
+					</Button>
+				)}
 			</div>
+			<div className="mb-8">
+				<Form method="post">
+					<div className="flex items-center space-x-2">
+						<TargetLanguageSelector />
+						<AIModelSelector onModelSelect={setSelectedModel} />
+						<input type="hidden" name="pageId" value={pageData.id} />
+						<input type="hidden" name="aiModel" value={selectedModel} />
+						{hasGeminiApiKey ? (
+							<Button
+								type="submit"
+								name="intent"
+								value="translate"
+								className="w-full"
+								disabled={navigation.state === "submitting"}
+							>
+								{navigation.state === "submitting" ? (
+									<LoadingSpinner />
+								) : (
+									<div className="flex items-center justify-center w-full">
+										<Languages className="w-4 h-4 mr-1" />
+										<p>Add Translation</p>
+									</div>
+								)}
+							</Button>
+						) : (
+							<>
+								<Button onClick={() => setIsDialogOpen(true)}>
+									<div className="flex items-center justify-center w-full">
+										<Languages className="w-4 h-4 mr-1" />
+										<p>Add Translation</p>
+									</div>
+								</Button>
+								<GeminiApiKeyDialog
+									isOpen={isDialogOpen}
+									onOpenChange={setIsDialogOpen}
+								/>
+							</>
+						)}
+					</div>
+				</Form>
+			</div>
+			<article className="prose dark:prose-invert lg:prose-xl">
+				<h1>
+					{pageData.title}
+					<div>{pageData.translationTitle}</div>
+				</h1>
+				<hr />
+				<ContentWithTranslations
+					content={pageData.content}
+					sourceTextWithTranslations={pageData.sourceTextWithTranslations}
+					userId={safeUser?.id ?? null}
+				/>
+			</article>
 		</div>
 	);
 }

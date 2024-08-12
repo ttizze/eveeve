@@ -2,8 +2,8 @@ import { createCookieSessionStorage } from "@remix-run/node";
 import type { SafeUser } from "~/types";
 
 type Session = {
-  user?: SafeUser;
-  targetLanguage?: string;
+	user?: SafeUser;
+	targetLanguage?: string;
 };
 
 export const sessionStorage = createCookieSessionStorage<Session>({

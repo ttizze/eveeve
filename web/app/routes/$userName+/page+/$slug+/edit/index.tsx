@@ -16,8 +16,10 @@ import {
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { Save } from "lucide-react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
+import { Footer } from "~/routes/resources+/footer";
 import { authenticator } from "~/utils/auth.server";
 import { Header } from "./components/Header";
 import { createOrUpdateSourceTexts } from "./functions/mutations.server";
@@ -25,21 +27,21 @@ import { getOrCreatePage } from "./functions/mutations.server";
 import { getPageBySlug } from "./functions/queries.server";
 import { addNumbersToContent } from "./utils/addNumbersToContent";
 import { extractNumberedElements } from "./utils/extractNumberedElements";
-import { Footer } from "~/routes/resources+/footer";
+
 const schema = z.object({
-	title: z.string().min(1, "タイトルは必須です"),
-	pageContent: z.string().min(1, "内容は必須です"),
+	title: z.string().min(1, "Required"),
+	pageContent: z.string().min(1, "Required"),
 });
 
 export const loader: LoaderFunction = async ({ params, request }) => {
-	const { userId, slug } = params;
-	if (!userId || !slug) throw new Error("Invalid params");
+	const { userName, slug } = params;
+	if (!userName || !slug) throw new Error("Invalid params");
 
 	const safeUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/login",
 	});
 
-	if (safeUser.id !== Number.parseInt(userId)) {
+	if (safeUser.userName !== userName) {
 		throw new Response("Unauthorized", { status: 403 });
 	}
 
@@ -49,8 +51,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
-	const { userId, slug } = params;
-	if (!userId || !slug) throw new Error("Invalid params");
+	const { userName, slug } = params;
+	if (!userName || !slug) throw new Error("Invalid params");
 
 	const safeUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/login",
@@ -71,7 +73,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 	const numberedElements = extractNumberedElements(numberedContent);
 	await createOrUpdateSourceTexts(numberedElements, page.id);
 
-	return redirect(`/${safeUser.id}/page/${slug}`);
+	return redirect(`/${userName}/page/${slug}`);
 };
 
 export default function EditPage() {
@@ -119,6 +121,12 @@ export default function EditPage() {
 			<Header safeUser={safeUser} />
 			<div className="w-full max-w-3xl mx-auto">
 				<Form method="post" {...getFormProps(form)}>
+					<div className="flex justify-end">
+						<Button type="submit" variant="ghost">
+							<Save className="w-6 h-6 mr-2" />
+							Save
+						</Button>
+					</div>
 					<div className="mt-10">
 						<h1 className="text-4xl font-bold">
 							<textarea
@@ -141,16 +149,6 @@ export default function EditPage() {
 								{error}
 							</p>
 						))}
-					</div>
-					<div className="flex justify-between">
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => navigate(-1)}
-						>
-							キャンセル
-						</Button>
-						<Button type="submit">保存</Button>
 					</div>
 				</Form>
 			</div>

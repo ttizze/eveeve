@@ -3,23 +3,22 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useRevalidator } from "@remix-run/react";
 import { useEffect } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
-import { Header } from "~/components/Header";
 import { addNumbersToContent } from "~/features/prepare-html-for-translate/utils/addNumbersToContent";
 import { extractArticle } from "~/features/prepare-html-for-translate/utils/extractArticle";
 import { extractNumberedElements } from "~/features/prepare-html-for-translate/utils/extractNumberedElements";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import { authenticator } from "~/utils/auth.server";
 import { getTargetLanguage } from "~/utils/target-language.server";
-import { GeminiApiKeyForm } from "../resources+/gemini-api-key-form";
 import { TranslationInputForm } from "./components/TranslationInputForm";
 import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
 import { getOrCreateUserAITranslationInfo } from "./functions/mutations.server";
-import { getOrCreatePageId } from "./functions/mutations.server";
+import { getOrCreatePage,  } from "./functions/mutations.server";
 import { getDbUser } from "./functions/queries.server";
 import { listUserAiTranslationInfo } from "./functions/queries.server";
 import { translationInputSchema } from "./types";
 import { generateSlug } from "./utils/generate-slug.server";
 import { processUploadedFolder } from "./utils/process-uploaded-folder";
+import { createOrUpdateSourceTexts } from "./functions/mutations.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
@@ -128,21 +127,16 @@ export async function action({ request }: ActionFunctionArgs) {
 
 				const { content, title } = extractArticle(html);
 				const numberedContent = addNumbersToContent(content);
+				const page = await getOrCreatePage(safeUser.id, fileSlug, title, numberedContent);
 				const numberedElements = extractNumberedElements(numberedContent);
-
-				const pageId = await getOrCreatePageId(
-					dbUser.id,
-					fileSlug,
-					title,
-					numberedContent,
-				);
+				await createOrUpdateSourceTexts(numberedElements, page.id);
 				// ファイルの翻訳ジョブをキューに追加
 				await queue.add(`translate-${safeUser.id}`, {
 					geminiApiKey: geminiApiKey,
 					aiModel: submission.value.aiModel,
 					userId: safeUser.id,
 					targetLanguage,
-					pageId,
+					pageId: page.id,
 					title,
 					numberedContent,
 					numberedElements,
@@ -156,7 +150,7 @@ export async function action({ request }: ActionFunctionArgs) {
 				folderSlug,
 				fileInfos,
 			);
-			await getOrCreatePageId(dbUser.id, folderSlug, folderPath, linkArticle);
+			await getOrCreatePage(dbUser.id, folderSlug, folderPath, linkArticle);
 
 			slugs.push(folderSlug);
 		}
@@ -173,7 +167,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function TranslatePage() {
-	const { safeUser, targetLanguage, userAITranslationInfo, hasGeminiApiKey } =
+	const {  targetLanguage, userAITranslationInfo, hasGeminiApiKey } =
 		useTypedLoaderData<typeof loader>();
 	const revalidator = useRevalidator();
 
@@ -187,10 +181,9 @@ export default function TranslatePage() {
 
 	return (
 		<div>
-			<Header safeUser={safeUser} />
 			<div className="container mx-auto max-w-2xl min-h-50 py-10">
 				<div className="pb-4">
-					{hasGeminiApiKey ? <TranslationInputForm /> : <GeminiApiKeyForm />}
+					{hasGeminiApiKey ? <TranslationInputForm /> : "Gemini API key is not set"}
 				</div>
 				<div>
 					<h2 className="text-2xl font-bold">Translation history</h2>

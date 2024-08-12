@@ -4,7 +4,13 @@ export async function getOrCreateAIUser(name: string): Promise<number> {
 	const user = await prisma.user.upsert({
 		where: { email: `${name}@ai.com` },
 		update: {},
-		create: { name, email: `${name}@ai.com`, isAI: true, image: "" },
+		create: {
+			email: `${name}@ai.com`,
+			isAI: true,
+			image: "",
+			userName: name,
+			displayName: name,
+		},
 	});
 
 	return user.id;

@@ -9,8 +9,8 @@ import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
-import { authenticator } from "~/utils/auth.server";
 import { Footer } from "~/routes/resources+/footer";
+import { authenticator } from "~/utils/auth.server";
 export const meta: MetaFunction = () => {
 	return [
 		{ title: "EveEve" },
@@ -28,10 +28,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-	return authenticator.authenticate("google", request, {
-		successRedirect: "/translator",
-		failureRedirect: "/faile",
-	});
+	const user = await authenticator.authenticate("google", request);
+
+	if (user) {
+		if (user.userName) {
+			return redirect(`/${user.userName}`);
+		}
+		return redirect("/welcome");
+	}
+
+	return redirect("/auth/login");
 }
 
 export default function Index() {
@@ -50,10 +56,7 @@ export default function Index() {
 					</p>
 					<div className="flex justify-center gap-4 mb-8">
 						<Form method="POST" className="w-full ">
-							<Button
-								type="submit"
-								variant="default"
-							>
+							<Button type="submit" variant="default">
 								Start
 							</Button>
 						</Form>

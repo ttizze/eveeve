@@ -1,109 +1,106 @@
 import { Link } from "@remix-run/react";
 
 export default function TermsPage() {
-	return (
-		<div className="min-h-screen bg-background">
-			<main className="container mx-auto px-4 py-8">
-				<h1 className="text-3xl font-bold mb-6">利用規約</h1>
+  return (
+    <div className="min-h-screen bg-background">
+      <main className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Terms of Service</h1>
 
-				<section className="mb-8">
-					<p className="mb-4">
-						EveEve（以下「本サービス」）をご利用いただく前に、以下の利用規約をよくお読みください。
-						本サービスを利用することで、これらの規約に同意したものとみなされます。
-					</p>
-				</section>
+        <section className="mb-8">
+          <p className="mb-4">
+            Please read the following Terms of Service carefully before using EveEve (hereinafter referred to as "the Service").
+            By using the Service, you are deemed to have agreed to these terms.
+          </p>
+        </section>
 
-				<section className="mb-8">
-					<h2 className="text-2xl font-semibold mb-4">1. サービスの説明</h2>
-					<p>
-						本サービスは、ウェブページの内容を表示し、翻訳機能を提供するオープンソースプロジェクトです。
-						ユーザーは指定したURLのコンテンツを閲覧し、翻訳することができます。
-					</p>
-				</section>
+        <section className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4">1. Service Description</h2>
+          <p>
+            The Service is a platform where users can post articles and other users can provide translations for those articles.
+            Users can post their own articles and provide translations for articles posted by other users.
+          </p>
+        </section>
 
-				<section className="mb-8">
-					<h2 className="text-2xl font-semibold mb-4">2. ユーザーの責任</h2>
-					<ul className="list-disc pl-6">
-						<li>
-							ユーザーは、本サービスを利用する際に、すべての適用法令を遵守する責任があります。
-						</li>
-						<li>
-							ユーザーは、翻訳対象のコンテンツの著作権および利用規約を遵守する責任があります。
-						</li>
-						<li>
-							著作権法に違反する使用や、許可のない商用利用は禁止されています。
-						</li>
-						<li>
-							ユーザーは、本サービスを通じて表示されるコンテンツの使用に関して全責任を負います。
-						</li>
-					</ul>
-				</section>
+        <section className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4">2. User Responsibilities</h2>
+          <ul className="list-disc pl-6">
+            <li>
+              Users are responsible for complying with all applicable laws and regulations when using the Service.
+            </li>
+            <li>
+              Users are responsible for complying with the copyright and terms of use of the content they translate.
+            </li>
+            <li>
+              Use that violates copyright law or unauthorized commercial use is prohibited.
+            </li>
+            <li>
+              Users are fully responsible for the use of content displayed through the Service.
+            </li>
+          </ul>
+        </section>
 
-				<section className="mb-8">
-					<h2 className="text-2xl font-semibold mb-4">3. 著作権と知的財産権</h2>
-					<p>
-						本サービスは、第三者のコンテンツを表示することがありますが、それらのコンテンツの著作権は
-						各コンテンツの所有者に帰属します。本サービスは、これらのコンテンツに対する権利を主張しません。
-					</p>
-				</section>
+        <section className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4">3. Copyright and Intellectual Property Rights</h2>
+          <p>
+            Users grant the operating company permission to post and distribute (including public transmission and making transmittable) user content on this website.
+          </p>
+        </section>
 
-				<section className="mb-8">
-					<h2 className="text-2xl font-semibold mb-4">4. 免責事項</h2>
-					<ul className="list-disc pl-6">
-						<li>
-							本サービスは「現状有姿」で提供され、明示または黙示を問わず、いかなる種類の保証も行いません。
-						</li>
-						<li>
-							本サービスは、表示されるコンテンツの正確性、完全性、適時性、または品質について保証しません。
-						</li>
-						<li>本サービスは、翻訳の正確性や品質について保証しません。</li>
-						<li>
-							本サービスの使用によって生じたいかなる損害についても、責任を負いません。
-						</li>
-					</ul>
-				</section>
+        <section className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4">4. Disclaimer</h2>
+          <ul className="list-disc pl-6">
+            <li>
+              The Service is provided "as is" and makes no warranties of any kind, either express or implied.
+            </li>
+            <li>
+              The Service does not guarantee the accuracy, completeness, timeliness, or quality of posted articles or translations.
+            </li>
+            <li>
+              The Service is not responsible for any damages arising from interactions between users or content posted on the Service.
+            </li>
+          </ul>
+        </section>
 
-				<section className="mb-8">
-					<h2 className="text-2xl font-semibold mb-4">
-						5. サービスの制限と終了
-					</h2>
-					<p>
-						本サービスは、予告なくサービスの全部または一部を変更、停止、または終了する権利を有します。
-						また、特定のユーザーのサービス利用を制限または終了する権利を有します。
-					</p>
-				</section>
+        <section className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4">
+            5. Content Removal and Usage Restrictions
+          </h2>
+          <p>
+            The Service reserves the right to remove without notice any posts or content deemed to violate the terms of service or be inappropriate.
+            The Service also reserves the right to restrict or terminate the use of the Service by specific users.
+          </p>
+        </section>
 
-				<section className="mb-8">
-					<h2 className="text-2xl font-semibold mb-4">6. 準拠法と管轄裁判所</h2>
-					<p>
-						本規約の解釈および適用は日本法に準拠するものとし、本サービスに関連する紛争については、
-						東京地方裁判所を第一審の専属的合意管轄裁判所とします。
-					</p>
-				</section>
+        <section className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4">6. Governing Law and Jurisdiction</h2>
+          <p>
+            The interpretation and application of these terms shall be governed by Japanese law, and the Tokyo District Court shall have exclusive jurisdiction as the court of first instance for any disputes related to the Service.
+          </p>
+        </section>
 
-				<section className="mb-8">
-					<h2 className="text-2xl font-semibold mb-4">7. 規約の変更</h2>
-					<p>
-						本サービスは、必要に応じて本規約を変更する権利を有します。重要な変更がある場合は、
-						本サービス上で通知します。変更後も本サービスを継続して利用する場合、
-						変更後の規約に同意したものとみなされます。
-					</p>
-				</section>
+        <section className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4">7. Changes to the Terms</h2>
+          <p>
+            The Service reserves the right to change these terms as necessary. In case of significant changes,
+            we will notify you on the Service. If you continue to use the Service after changes are made,
+            you are deemed to have agreed to the updated terms.
+          </p>
+        </section>
 
-				<section className="mb-8">
-					<h2 className="text-2xl font-semibold mb-4">同意の確認</h2>
-					<p>
-						本サービスを利用することで、上記の利用規約に同意したものとみなされます。
-						これらの規約に同意しない場合は、本サービスの利用を中止してください。
-					</p>
-				</section>
+        <section className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4">Confirmation of Agreement</h2>
+          <p>
+            By using the Service, you are deemed to have agreed to the above terms of service.
+            If you do not agree to these terms, please discontinue use of the Service.
+          </p>
+        </section>
 
-				<div className="mt-8">
-					<Link to="/" className="text-blue-600 hover:underline">
-						ホームに戻る
-					</Link>
-				</div>
-			</main>
-		</div>
-	);
+        <div className="mt-8">
+          <Link to="/" className="text-blue-600 hover:underline">
+            Return to Home
+          </Link>
+        </div>
+      </main>
+    </div>
+  );
 }

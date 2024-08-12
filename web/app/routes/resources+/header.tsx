@@ -1,12 +1,40 @@
+import { json } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
 import { LogIn, Search } from "lucide-react";
 import { NewPageButton } from "~/components/NewPageButton";
 import { Button } from "~/components/ui/button";
 import type { SafeUser } from "~/types";
+import { authenticator } from "~/utils/auth.server";
 
 interface HeaderProps {
 	safeUser: SafeUser | null;
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+	const formData = await request.clone().formData();
+	const intent = formData.get("intent");
+
+	if (intent === "logout") {
+		return await authenticator.logout(request, { redirectTo: "/" });
+	}
+
+	if (intent === "SignInWithGoogle") {
+		const user = await authenticator.authenticate("google", request);
+
+		if (user) {
+			if (user.userName) {
+				return redirect(`/${user.userName}`);
+			}
+			return redirect("/welcome");
+		}
+
+		return redirect("/auth/login");
+	}
+
+	return json({ error: "Invalid intent" }, { status: 400 });
 }
 
 export function Header({ safeUser }: HeaderProps) {
@@ -26,11 +54,9 @@ export function Header({ safeUser }: HeaderProps) {
 						</Link>
 					</Button>
 					{safeUser ? (
-						<>
-							<NewPageButton userId={safeUser.id} />
-						</>
+						<NewPageButton userName={safeUser.userName} />
 					) : (
-						<Form method="post" className="w-full">
+						<Form method="post" action="/resources/header">
 							<Button
 								type="submit"
 								name="intent"

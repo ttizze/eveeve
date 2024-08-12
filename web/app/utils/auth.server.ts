@@ -1,3 +1,4 @@
+import type { User } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { Authenticator, AuthorizationError } from "remix-auth";
 import { FormStrategy } from "remix-auth-form";
@@ -5,7 +6,6 @@ import { GoogleStrategy } from "remix-auth-google";
 import type { SafeUser } from "../types";
 import { prisma } from "./prisma";
 import { sessionStorage } from "./session.server";
-import type { User } from "@prisma/client";
 const SESSION_SECRET = process.env.SESSION_SECRET;
 
 if (!SESSION_SECRET) {
@@ -33,7 +33,7 @@ const formStrategy = new FormStrategy(async ({ form }) => {
 		throw new AuthorizationError("Invalid login credentials");
 	}
 
-	return  sanitizeUser(user);
+	return sanitizeUser(user);
 });
 
 authenticator.use(formStrategy, "user-pass");
@@ -53,15 +53,14 @@ const googleStrategy = new GoogleStrategy<SafeUser>(
 			return sanitizeUser(user);
 		}
 
-
-    const temporaryUserName = `new-user-${crypto.randomUUID().slice(0, 10)}-${new Date().toISOString().slice(0, 10)}`;
-    const newUser = await prisma.user.create({
-      data: {
-        email: profile.emails[0].value || "",
-        userName: temporaryUserName,
-        displayName: profile.displayName || "New User",
-        image: profile.photos[0].value || "",
-        provider: "Google",
+		const temporaryUserName = `new-user-${crypto.randomUUID().slice(0, 10)}-${new Date().toISOString().slice(0, 10)}`;
+		const newUser = await prisma.user.create({
+			data: {
+				email: profile.emails[0].value || "",
+				userName: temporaryUserName,
+				displayName: profile.displayName || "New User",
+				image: profile.photos[0].value || "",
+				provider: "Google",
 			},
 		});
 		console.log("New user created", newUser);
