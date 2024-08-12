@@ -2,7 +2,10 @@ import type { TranslationWithVote } from "../types";
 
 export function getBestTranslation(
 	translationsWithVotes: TranslationWithVote[],
-): TranslationWithVote {
+): TranslationWithVote | null {
+	if (translationsWithVotes.length === 0) {
+		return null;
+	}
 	const upvotedTranslations = translationsWithVotes.filter(
 		(t) => t.userVote?.isUpvote,
 	);

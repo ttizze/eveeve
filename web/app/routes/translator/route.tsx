@@ -127,7 +127,10 @@ export async function action({ request }: ActionFunctionArgs) {
 					targetLanguage,
 				);
 
-				const numberedElements = extractNumberedElements(numberedContent);
+				const numberedElements = extractNumberedElements(
+					numberedContent,
+					title,
+				);
 				await createOrUpdateSourceTexts(numberedElements, page.id);
 				// ファイルの翻訳ジョブをキューに追加
 				await queue.add(`translate-${safeUser.id}`, {

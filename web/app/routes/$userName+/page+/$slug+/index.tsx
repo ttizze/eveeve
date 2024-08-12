@@ -9,8 +9,8 @@ import { Languages } from "lucide-react";
 import { useState } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
-import { extractNumberedElements } from "~/features/prepare-html-for-translate/utils/extractNumberedElements";
 import { AIModelSelector } from "~/features/translate/components/AIModelSelector";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import { GeminiApiKeyDialog } from "~/routes/resources+/gemini-api-key-dialog";
@@ -31,7 +31,7 @@ import {
 	getDbUser,
 } from "./functions/queries.server";
 import { actionSchema } from "./types";
-
+import { extractNumberedElements } from "./utils/extractNumberedElements";
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const { slug } = params;
 
@@ -77,10 +77,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 		return {
 			intent: null,
 			lastResult: submission.reply({ formErrors: ["User not authenticated"] }),
+			slug: null,
 		};
 	}
 	if (submission.status !== "success") {
-		return { intent: null, lastResult: submission.reply() };
+		return { intent: null, lastResult: submission.reply(), slug: null };
 	}
 	const { intent } = submission.value;
 	switch (intent) {
@@ -90,7 +91,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 				submission.value.isUpvote,
 				safeUserId,
 			);
-			return { intent, lastResult: submission.reply({ resetForm: true }) };
+			return {
+				intent,
+				lastResult: submission.reply({ resetForm: true }),
+				slug: null,
+			};
 		case "add":
 			handleAddTranslationAction(
 				submission.value.sourceTextId,
@@ -98,7 +103,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 				safeUserId,
 				targetLanguage,
 			);
-			return { intent, lastResult: submission.reply({ resetForm: true }) };
+			return {
+				intent,
+				lastResult: submission.reply({ resetForm: true }),
+				slug: null,
+			};
 		case "translate": {
 			const dbUser = await getDbUser(safeUser.id);
 			if (!dbUser?.geminiApiKey) {
@@ -106,6 +115,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 					lastResult: submission.reply({
 						formErrors: ["Gemini API key is not set"],
 					}),
+					intent: null,
 					slug: null,
 				};
 			}
@@ -115,6 +125,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 					lastResult: submission.reply({
 						formErrors: ["Page not found"],
 					}),
+					intent: null,
 					slug: null,
 				};
 			}
@@ -125,7 +136,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 				targetLanguage,
 			);
 
-			const numberedElements = extractNumberedElements(page.content);
+			const numberedElements = extractNumberedElements(
+				page.content,
+				page.title,
+			);
 			const queue = getTranslateUserQueue(safeUser.id);
 			const job = await queue.add(`translate-${safeUser.id}`, {
 				userAITranslationInfoId: userAITranslationInfo.id,
@@ -138,7 +152,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 				numberedContent: page.content,
 				numberedElements,
 			});
-			return { intent, lastResult: submission.reply({ resetForm: true }) };
+			return {
+				intent,
+				lastResult: submission.reply({ resetForm: true }),
+				slug: page.slug,
+			};
 		}
 		default:
 			throw new Error("Invalid Intent");
@@ -205,17 +223,23 @@ export default function ReaderView() {
 						)}
 					</div>
 				</Form>
+				{actionData?.slug && (
+					<Alert className="bg-blue-50 border-blue-200 text-blue-800 animate-in fade-in duration-300">
+						<AlertTitle className="text-center">
+							Translation Job Started
+						</AlertTitle>
+						<AlertDescription className="text-center">
+							<strong className="font-semibold ">{actionData.slug}</strong>
+						</AlertDescription>
+					</Alert>
+				)}
 				<UserAITranslationStatus
 					userAITranslationInfo={userAITranslationInfo}
 				/>
 			</div>
 			<article className="prose dark:prose-invert lg:prose-xl">
-				<h1>
-					{pageData.title}
-					<div>{pageData.translationTitle}</div>
-				</h1>
-				<hr />
 				<ContentWithTranslations
+					title={pageData.title}
 					content={pageData.content}
 					sourceTextWithTranslations={pageData.sourceTextWithTranslations}
 					userId={safeUser?.id ?? null}
