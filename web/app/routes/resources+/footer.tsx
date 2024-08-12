@@ -42,50 +42,36 @@ export function Footer({ safeUser }: FooterProps) {
 	return (
 		<footer className="bottom-0 left-0 right-0 border-t border-gray-200 dark:border-gray-700">
 			<div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-				<div className="flex justify-between items-center">
-					<div className="flex items-center">
-						<Link to="/">
-							<img
-								src="/title-logo-dark.png"
-								alt="::COMPANY_NAME::"
-								className="w-32"
-							/>
-						</Link>
-					</div>
-					<Link to={`/${safeUser?.userName}`}>
-						<Button variant="outline">{safeUser?.userName}</Button>
-					</Link>
-
-					<div className="flex items-center space-x-4 text-sm text-gray-6000 dark:text-gray-300">
-						<Link
-							to="/privacy"
-							className="hover:text-gray-900 dark:hover:text-white"
-						>
-							Privacy Policy
-						</Link>
-						<Link
-							to="/terms"
-							className="hover:text-gray-900 dark:hover:text-white"
-						>
-							Terms of Service
-						</Link>
-						<p>© {currentYear} EveEve</p>
-					</div>
-
-					<div>
-						{safeUser ? (
-							<Form method="post" action="/resources/footer">
-								<Button
-									type="submit"
-									name="intent"
-									value="logout"
-									variant="outline"
-								>
-									<LogOut className="w-4 h-4 mr-2" />
-									Log out
-								</Button>
-							</Form>
-						) : (
+				<div className="flex flex-col space-y-4">
+					<div className="flex justify-between items-center">
+						<div className="flex items-center space-x-4">
+							<Link to="/">
+								<img
+									src="/title-logo-dark.png"
+									alt="::COMPANY_NAME::"
+									className="w-32"
+								/>
+							</Link>
+							{safeUser && (
+								<>
+									<Link to={`/${safeUser.userName}`}>
+										<Button variant="outline">{safeUser.userName}</Button>
+									</Link>
+									<Form method="post" action="/resources/footer">
+										<Button
+											type="submit"
+											name="intent"
+											value="logout"
+											variant="outline"
+										>
+											<LogOut className="w-4 h-4 mr-2" />
+											Log out
+										</Button>
+									</Form>
+								</>
+							)}
+						</div>
+						{!safeUser && (
 							<Form method="post" action="/resources/footer">
 								<Button
 									type="submit"
@@ -98,6 +84,23 @@ export function Footer({ safeUser }: FooterProps) {
 								</Button>
 							</Form>
 						)}
+					</div>
+					<div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-300 mt-8">
+						<div className="flex space-x-4">
+							<Link
+								to="/privacy"
+								className="hover:text-gray-900 dark:hover:text-white"
+							>
+								Privacy Policy
+							</Link>
+							<Link
+								to="/terms"
+								className="hover:text-gray-900 dark:hover:text-white"
+							>
+								Terms of Service
+							</Link>
+						</div>
+						<p>© {currentYear} EveEve</p>
 					</div>
 				</div>
 			</div>

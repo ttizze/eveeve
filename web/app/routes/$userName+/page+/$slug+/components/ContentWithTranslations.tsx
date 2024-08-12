@@ -5,16 +5,22 @@ import type { SourceTextWithTranslations } from "../types";
 import { Translation } from "./Translation";
 
 interface ContentWithTranslationsProps {
+	title: string;
 	content: string;
 	sourceTextWithTranslations: SourceTextWithTranslations[];
 	userId: number | null;
 }
 
 export const ContentWithTranslations = memo(function ContentWithTranslations({
+	title,
 	content,
 	sourceTextWithTranslations,
 	userId,
 }: ContentWithTranslationsProps) {
+	const titleTranslation = useMemo(() => {
+		return sourceTextWithTranslations.find((info) => info.number === 0);
+	}, [sourceTextWithTranslations]);
+
 	const parsedContent = useMemo(() => {
 		if (typeof window === "undefined") {
 			return null;
@@ -63,5 +69,19 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 		return <div>Loading...</div>;
 	}
 
-	return <>{parsedContent}</>;
+	return (
+		<>
+			<h1>
+				{title}
+				{titleTranslation && (
+					<Translation
+						translationsWithVotes={titleTranslation.translationsWithVotes}
+						userId={userId}
+						sourceTextId={titleTranslation.sourceTextId}
+					/>
+				)}
+			</h1>
+			{parsedContent}
+		</>
+	);
 });

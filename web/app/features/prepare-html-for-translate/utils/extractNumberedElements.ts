@@ -2,9 +2,12 @@ import { JSDOM } from "jsdom";
 
 export function extractNumberedElements(
 	content: string,
+	title: string,
 ): Array<{ number: number; text: string }> {
 	const doc = new JSDOM(content);
-	const numberedElements: Array<{ number: number; text: string }> = [];
+	const numberedElements: Array<{ number: number; text: string }> = [
+		{ number: 0, text: title },
+	];
 	// <br>のみを改行とする
 	doc.window.document.body.innerHTML = doc.window.document.body.innerHTML
 		.replace(/\n/g, "")

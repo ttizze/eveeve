@@ -20,12 +20,12 @@ import { ArrowDownToLine } from "lucide-react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { authenticator } from "~/utils/auth.server";
+import { addNumbersToContent } from "../utils/addNumbersToContent";
+import { extractNumberedElements } from "../utils/extractNumberedElements";
 import { Header } from "./components/Header";
 import { createOrUpdateSourceTexts } from "./functions/mutations.server";
 import { getOrCreatePage } from "./functions/mutations.server";
 import { getPageBySlug } from "./functions/queries.server";
-import { addNumbersToContent } from "./utils/addNumbersToContent";
-import { extractNumberedElements } from "./utils/extractNumberedElements";
 
 const schema = z.object({
 	title: z.string().min(1, "Required"),
@@ -67,9 +67,8 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 	const { title, pageContent } = submission.value;
 	const numberedContent = addNumbersToContent(pageContent);
-	console.log(numberedContent);
 	const page = await getOrCreatePage(safeUser.id, slug, title, numberedContent);
-	const numberedElements = extractNumberedElements(numberedContent);
+	const numberedElements = extractNumberedElements(numberedContent, title);
 	await createOrUpdateSourceTexts(numberedElements, page.id);
 
 	return redirect(`/${userName}/page/${slug}`);

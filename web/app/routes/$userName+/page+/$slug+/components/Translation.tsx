@@ -46,14 +46,22 @@ export function Translation({
 
 	const alternativeTranslationsWithVotes = useMemo(
 		() =>
-			translationsWithVotes.filter((t) => t.id !== bestTranslationWithVote.id),
+			bestTranslationWithVote
+				? translationsWithVotes.filter(
+						(t) => t.id !== bestTranslationWithVote.id,
+					)
+				: [],
 		[translationsWithVotes, bestTranslationWithVote],
 	);
 
 	const sanitizedAndParsedText = useMemo(() => {
-		const sanitized = sanitizeAndParseText(bestTranslationWithVote.text);
-		return sanitized;
-	}, [bestTranslationWithVote.text]);
+		if (!bestTranslationWithVote) return null;
+		return sanitizeAndParseText(bestTranslationWithVote.text);
+	}, [bestTranslationWithVote]);
+
+	if (!bestTranslationWithVote || !sanitizedAndParsedText) {
+		return null;
+	}
 
 	return (
 		<div className="group relative">
