@@ -6,6 +6,6 @@ export async function updateUserName(
 ): Promise<void> {
 	await prisma.user.update({
 		where: { id: userId },
-		data: { userName },
+		data: { userName, displayName: userName },
 	});
 }

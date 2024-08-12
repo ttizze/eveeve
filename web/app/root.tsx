@@ -42,20 +42,29 @@ export function Layout({ children }: { children: React.ReactNode }) {
 	);
 }
 
-function CommonLayout({ children }: { children: React.ReactNode }) {
+function CommonLayout({
+	children,
+	showHeaderFooter = true,
+}: { children: React.ReactNode; showHeaderFooter?: boolean }) {
 	const { safeUser } = useTypedLoaderData<typeof loader>();
 	return (
 		<>
-			<Header safeUser={safeUser} />
-			<div className="container mx-auto">{children}</div>
-			<Footer safeUser={safeUser} />
+			{showHeaderFooter && <Header safeUser={safeUser} />}
+			<div className="flex flex-col min-h-screen">
+				<main className="flex-grow">
+					<div className="container mx-auto">{children}</div>
+				</main>
+				{showHeaderFooter && <Footer safeUser={safeUser} />}
+			</div>
 		</>
 	);
 }
 
 export default function App() {
 	const location = useLocation();
-	const isEditPage = /^\/\w+\/page\/[\w-]+\/edit$/.test(location.pathname);
+	const isSpecialLayout =
+		/^\/\w+\/page\/[\w-]+\/edit$/.test(location.pathname) ||
+		location.pathname === "/welcome";
 
 	return (
 		<ThemeProvider
@@ -64,13 +73,9 @@ export default function App() {
 			enableSystem
 			disableTransitionOnChange
 		>
-			{isEditPage ? (
+			<CommonLayout showHeaderFooter={!isSpecialLayout}>
 				<Outlet />
-			) : (
-				<CommonLayout>
-					<Outlet />
-				</CommonLayout>
-			)}
+			</CommonLayout>
 		</ThemeProvider>
 	);
 }

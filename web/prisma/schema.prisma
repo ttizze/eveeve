@@ -37,15 +37,17 @@ model User {
 model UserAITranslationInfo {
   id                    Int      @id @default(autoincrement())
   userId                Int      @map("user_id")
-  slug                   String   @default("unknown")
+  pageId                Int      @map("page_id")
   targetLanguage        String   @map("target_language")
+  aiModel               String   @map("ai_model")
   aiTranslationStatus   String   @default("pending") @map("ai_translation_status")
   aiTranslationProgress Int      @default(0) @map("ai_translation_progress")
-  lastTranslatedAt      DateTime @default(now()) @map("last_translated_at")
+  createdAt             DateTime @default(now()) @map("created_at")
   user                  User     @relation(fields: [userId], references: [id])
+  page                  Page     @relation(fields: [pageId], references: [id])
 
-  @@unique([userId, slug, targetLanguage])
   @@index([userId])
+  @@index([pageId, targetLanguage])
   @@map("user_ai_translation_info")
 }
 
@@ -83,6 +85,7 @@ model Page {
   createdAt           DateTime              @default(now()) @map("created_at")
   user                User                  @relation(fields: [userId], references: [id])
   userId              Int                   @map("user_id")
+  userAITranslationInfo UserAITranslationInfo[]
   sourceTexts     SourceText[]
   pageTranslationInfo PageTranslationInfo[]
   userReadHistory     UserReadHistory[]

@@ -1,7 +1,6 @@
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useRevalidator } from "@remix-run/react";
-import { useEffect } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { addNumbersToContent } from "~/features/prepare-html-for-translate/utils/addNumbersToContent";
 import { extractArticle } from "~/features/prepare-html-for-translate/utils/extractArticle";
@@ -10,15 +9,14 @@ import { getTranslateUserQueue } from "~/features/translate/translate-user-queue
 import { authenticator } from "~/utils/auth.server";
 import { getTargetLanguage } from "~/utils/target-language.server";
 import { TranslationInputForm } from "./components/TranslationInputForm";
-import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
-import { getOrCreateUserAITranslationInfo } from "./functions/mutations.server";
-import { getOrCreatePage,  } from "./functions/mutations.server";
+import { createUserAITranslationInfo } from "./functions/mutations.server";
+import { getOrCreatePage } from "./functions/mutations.server";
+import { createOrUpdateSourceTexts } from "./functions/mutations.server";
 import { getDbUser } from "./functions/queries.server";
 import { listUserAiTranslationInfo } from "./functions/queries.server";
 import { translationInputSchema } from "./types";
 import { generateSlug } from "./utils/generate-slug.server";
 import { processUploadedFolder } from "./utils/process-uploaded-folder";
-import { createOrUpdateSourceTexts } from "./functions/mutations.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
@@ -101,12 +99,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 		for (const [folderPath, fileList] of Object.entries(folderStructure)) {
 			const folderSlug = await generateSlug(folderPath);
-			await getOrCreateUserAITranslationInfo(
-				dbUser.id,
-				folderSlug,
-				targetLanguage,
-			);
-
 			// ファイルのslugを非同期で生成
 			const fileInfoPromises = fileList.map(async (file) => ({
 				name: file.name,
@@ -117,21 +109,29 @@ export async function action({ request }: ActionFunctionArgs) {
 			// フォルダ内の各ファイルを処理
 			for (const [index, file] of fileList.entries()) {
 				const fileSlug = fileInfos[index].slug;
-				await getOrCreateUserAITranslationInfo(
-					dbUser.id,
-					fileSlug,
-					targetLanguage,
-				);
 
 				const html = await file.text();
 
 				const { content, title } = extractArticle(html);
 				const numberedContent = addNumbersToContent(content);
-				const page = await getOrCreatePage(safeUser.id, fileSlug, title, numberedContent);
+				const page = await getOrCreatePage(
+					safeUser.id,
+					fileSlug,
+					title,
+					numberedContent,
+				);
+				const userAITranslationInfo = await createUserAITranslationInfo(
+					dbUser.id,
+					page.id,
+					submission.value.aiModel,
+					targetLanguage,
+				);
+
 				const numberedElements = extractNumberedElements(numberedContent);
 				await createOrUpdateSourceTexts(numberedElements, page.id);
 				// ファイルの翻訳ジョブをキューに追加
 				await queue.add(`translate-${safeUser.id}`, {
+					userAITranslationInfoId: userAITranslationInfo.id,
 					geminiApiKey: geminiApiKey,
 					aiModel: submission.value.aiModel,
 					userId: safeUser.id,
@@ -140,7 +140,6 @@ export async function action({ request }: ActionFunctionArgs) {
 					title,
 					numberedContent,
 					numberedElements,
-					slug: fileSlug,
 				});
 			}
 
@@ -167,32 +166,19 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function TranslatePage() {
-	const {  targetLanguage, userAITranslationInfo, hasGeminiApiKey } =
+	const { targetLanguage, userAITranslationInfo, hasGeminiApiKey } =
 		useTypedLoaderData<typeof loader>();
 	const revalidator = useRevalidator();
-
-	useEffect(() => {
-		const intervalId = setInterval(() => {
-			revalidator.revalidate();
-		}, 5000);
-
-		return () => clearInterval(intervalId);
-	}, [revalidator]);
 
 	return (
 		<div>
 			<div className="container mx-auto max-w-2xl min-h-50 py-10">
 				<div className="pb-4">
-					{hasGeminiApiKey ? <TranslationInputForm /> : "Gemini API key is not set"}
-				</div>
-				<div>
-					<h2 className="text-2xl font-bold">Translation history</h2>
-					<div>
-						<UserAITranslationStatus
-							userAITranslationInfo={userAITranslationInfo}
-							targetLanguage={targetLanguage}
-						/>
-					</div>
+					{hasGeminiApiKey ? (
+						<TranslationInputForm />
+					) : (
+						"Gemini API key is not set"
+					)}
 				</div>
 			</div>
 		</div>

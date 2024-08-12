@@ -40,7 +40,7 @@ export function Footer({ safeUser }: FooterProps) {
 	const currentYear = new Date().getFullYear();
 
 	return (
-		<footer className="fixed bottom-0 left-0 right-0 border-t border-gray-200 dark:border-gray-700">
+		<footer className="bottom-0 left-0 right-0 border-t border-gray-200 dark:border-gray-700">
 			<div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between items-center">
 					<div className="flex items-center">
@@ -52,11 +52,9 @@ export function Footer({ safeUser }: FooterProps) {
 							/>
 						</Link>
 					</div>
-          <Link to={`/${safeUser?.userName}`}>
-            <Button variant="outline">
-              {safeUser?.userName}
-            </Button>
-          </Link>
+					<Link to={`/${safeUser?.userName}`}>
+						<Button variant="outline">{safeUser?.userName}</Button>
+					</Link>
 
 					<div className="flex items-center space-x-4 text-sm text-gray-6000 dark:text-gray-300">
 						<Link

@@ -4,13 +4,13 @@ export type NumberedElement = {
 };
 
 export interface TranslateJobParams {
+	userId: number;
+	pageId: number;
+	userAITranslationInfoId: number;
 	geminiApiKey: string;
 	aiModel: string;
-	userId: number;
 	targetLanguage: string;
-	pageId: number;
 	title: string;
 	numberedContent: string;
 	numberedElements: NumberedElement[];
-	slug: string;
 }
