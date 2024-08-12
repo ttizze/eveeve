@@ -92,35 +92,26 @@ export async function updateUserReadHistory(
 	});
 }
 
-export async function getOrCreateUserAITranslationInfo(
+export async function createUserAITranslationInfo(
 	userId: number,
-	slug: string,
+	pageId: number,
+	aiModel: string,
 	targetLanguage: string,
 ) {
 	try {
-		const userAITranslationInfo = await prisma.userAITranslationInfo.upsert({
-			where: {
-				userId_slug_targetLanguage: {
-					userId,
-					slug,
-					targetLanguage,
-				},
-			},
-			update: {
-				aiTranslationStatus: "pending",
-				aiTranslationProgress: 0,
-			},
-			create: {
+		const userAITranslationInfo = await prisma.userAITranslationInfo.create({
+			data: {
 				userId,
-				slug,
+				pageId,
 				targetLanguage,
+				aiModel,
 				aiTranslationStatus: "pending",
 				aiTranslationProgress: 0,
 			},
 		});
 		return userAITranslationInfo;
 	} catch (error) {
-		console.error("Error in getOrCreateUserAITranslationInfo:", error);
+		console.error("Error in createUserAITranslationInfo:", error);
 		throw error;
 	}
 }

@@ -2,6 +2,7 @@ import type { Page } from "@prisma/client";
 import type { SafeUser } from "~/types";
 import { prisma } from "~/utils/prisma";
 import type { UserWithPages } from "../types";
+
 export async function getUserWithPages(
 	userName: string,
 ): Promise<UserWithPages | null> {

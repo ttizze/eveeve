@@ -16,10 +16,9 @@ import {
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Save } from "lucide-react";
+import { ArrowDownToLine } from "lucide-react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
-import { Footer } from "~/routes/resources+/footer";
 import { authenticator } from "~/utils/auth.server";
 import { Header } from "./components/Header";
 import { createOrUpdateSourceTexts } from "./functions/mutations.server";
@@ -121,9 +120,9 @@ export default function EditPage() {
 			<Header safeUser={safeUser} />
 			<div className="w-full max-w-3xl mx-auto">
 				<Form method="post" {...getFormProps(form)}>
-					<div className="flex justify-end">
+					<div className="flex justify-center">
 						<Button type="submit" variant="ghost">
-							<Save className="w-6 h-6 mr-2" />
+							<ArrowDownToLine className="w-6 h-6 mr-2" />
 							Save
 						</Button>
 					</div>
@@ -152,7 +151,6 @@ export default function EditPage() {
 					</div>
 				</Form>
 			</div>
-			<Footer safeUser={safeUser} />
 		</div>
 	);
 }

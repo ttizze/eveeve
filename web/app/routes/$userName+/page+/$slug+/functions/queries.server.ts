@@ -98,3 +98,14 @@ export async function getLastReadDataNumber(userId: number, pageId: number) {
 
 	return readHistory?.lastReadDataNumber ?? 0;
 }
+
+export async function fetchUserAITranslationInfo(
+	pageId: number,
+	userId: number,
+) {
+	const userAITranslationInfo = await prisma.userAITranslationInfo.findMany({
+		where: { pageId, userId },
+		orderBy: { createdAt: "desc" },
+	});
+	return userAITranslationInfo;
+}

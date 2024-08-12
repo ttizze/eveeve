@@ -1,4 +1,4 @@
-import { getFormProps, getInputProps, useForm } from "@conform-to/react";
+import { getFormProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { Form, useNavigation } from "@remix-run/react";
 import { Languages } from "lucide-react";
@@ -7,7 +7,6 @@ import { useTypedActionData } from "remix-typedjson";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
 import { AIModelSelector } from "~/features/translate/components/AIModelSelector";
 import type { action } from "../route";
 import { translationInputSchema } from "../types";
@@ -17,22 +16,6 @@ export function TranslationInputForm() {
 	const [selectedModel, setSelectedModel] = useState("gemini-1.5-flash");
 	const actionData = useTypedActionData<typeof action>();
 	const [inputType, setInputType] = useState<"url" | "file">("url");
-
-	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const selectedFiles = e.target.files;
-		if (selectedFiles) {
-			const filesArray = Array.from(selectedFiles).map((file) => {
-				Object.defineProperty(file, "path", {
-					value: file.webkitRelativePath || file.name,
-					writable: false,
-					configurable: true,
-					enumerable: true,
-				});
-				return file;
-			});
-			console.log(filesArray);
-		}
-	};
 
 	const [form, fields] = useForm({
 		lastResult: actionData?.lastResult,
@@ -56,13 +39,6 @@ export function TranslationInputForm() {
 				<div className="flex space-x-2 mb-2">
 					<Button
 						type="button"
-						onClick={() => setInputType("url")}
-						variant={inputType === "url" ? "default" : "outline"}
-					>
-						URL
-					</Button>
-					<Button
-						type="button"
 						onClick={() => setInputType("file")}
 						variant={inputType === "file" ? "default" : "outline"}
 					>
@@ -71,30 +47,21 @@ export function TranslationInputForm() {
 				</div>
 				<div className="flex space-x-1">
 					<div className="flex-col flex-grow w-full">
-						{inputType === "url" ? (
-							<Input
-								className="bg-gray-800 text-white w-full"
-								placeholder="https://example.com"
-								{...getInputProps(fields.url, { type: "url" })}
-							/>
-						) : (
-							<input
-								type="file"
-								id="folder"
-								name="folder"
-								/* @ts-expect-error */
-								directory=""
-								webkitdirectory=""
-								multiple
-								className="mt-1 block w-full text-sm text-gray-500
+						<input
+							type="file"
+							id="folder"
+							name="folder"
+							/* @ts-expect-error */
+							directory=""
+							webkitdirectory=""
+							multiple
+							className="mt-1 block w-full text-sm text-gray-500
                           file:mr-4 file:py-2 file:px-4
                           file:rounded-full file:border-0
                           file:text-sm file:font-semibold
                           file:bg-blue-50 file:text-blue-700
                           hover:file:bg-blue-100"
-							/>
-						)}
-						<div id={fields.url.errorId}>{fields.url.errors}</div>
+						/>
 					</div>
 					<div className="w-[200px]">
 						<AIModelSelector onModelSelect={setSelectedModel} />

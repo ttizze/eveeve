@@ -10,14 +10,12 @@ import { extractTranslations } from "../utils/extractTranslations.server";
 import { splitNumberedElements } from "../utils/splitNumberedElements.server";
 
 export async function translate(params: TranslateJobParams) {
-	await updateUserAITranslationInfo(
-		params.userId,
-		params.slug,
-		params.targetLanguage,
-		"in_progress",
-		0,
-	);
 	try {
+		await updateUserAITranslationInfo(
+			params.userAITranslationInfoId,
+			"in_progress",
+			0,
+		);
 		const chunks = splitNumberedElements(params.numberedElements);
 		const totalChunks = chunks.length;
 		for (let i = 0; i < chunks.length; i++) {
@@ -33,26 +31,20 @@ export async function translate(params: TranslateJobParams) {
 			);
 			const progress = ((i + 1) / totalChunks) * 100;
 			await updateUserAITranslationInfo(
-				params.userId,
-				params.slug,
-				params.targetLanguage,
+				params.userAITranslationInfoId,
 				"in_progress",
 				progress,
 			);
 		}
 		await updateUserAITranslationInfo(
-			params.userId,
-			params.slug,
-			params.targetLanguage,
+			params.userAITranslationInfoId,
 			"completed",
 			100,
 		);
 	} catch (error) {
 		console.error("Background translation job failed:", error);
 		await updateUserAITranslationInfo(
-			params.userId,
-			params.slug,
-			params.targetLanguage,
+			params.userAITranslationInfoId,
 			"failed",
 			0,
 		);

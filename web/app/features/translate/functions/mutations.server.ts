@@ -38,24 +38,18 @@ export async function getOrCreatePageTranslationInfo(
 }
 
 export async function updateUserAITranslationInfo(
-	userId: number,
-	slug: string,
-	targetLanguage: string,
+	userAITranslationInfoId: number,
 	status: string,
 	progress: number,
 ) {
 	return await prisma.userAITranslationInfo.update({
 		where: {
-			userId_slug_targetLanguage: {
-				userId,
-				slug,
-				targetLanguage,
-			},
+			id: userAITranslationInfoId,
 		},
 		data: {
 			aiTranslationStatus: status,
 			aiTranslationProgress: progress,
-			lastTranslatedAt: new Date(),
+			createdAt: new Date(),
 		},
 	});
 }

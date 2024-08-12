@@ -2,9 +2,10 @@ import { useForm } from "@conform-to/react";
 import { getFormProps, getInputProps } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
-import { Save } from "lucide-react";
+import { ArrowDownToLine } from "lucide-react";
 import { ExternalLink, Key } from "lucide-react";
 import { useEffect } from "react";
 import { z } from "zod";
@@ -15,7 +16,6 @@ import {
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { validateGeminiApiKey } from "~/features/translate/services/gemini";
@@ -26,6 +26,10 @@ export const geminiApiKeySchema = z.object({
 	geminiApiKey: z.string().min(1, "API key is required"),
 });
 
+export async function loader() {
+	return redirect("/");
+}
+
 export async function action({ request }: ActionFunctionArgs) {
 	const safeUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/",
@@ -34,7 +38,12 @@ export async function action({ request }: ActionFunctionArgs) {
 		schema: geminiApiKeySchema,
 	});
 	if (submission.status !== "success") {
-		return { lastResult: submission.reply(), success: false };
+		return {
+			lastResult: submission.reply({
+				formErrors: ["Gemini API key is required"],
+			}),
+			success: false,
+		};
 	}
 
 	const { isValid, errorMessage } = await validateGeminiApiKey(
@@ -82,12 +91,9 @@ export function GeminiApiKeyDialog({
 
 	return (
 		<Dialog open={isOpen} onOpenChange={onOpenChange}>
-			<DialogTrigger asChild>
-				<Button>Set Gemini API Key</Button>
-			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Set Gemini API Key</DialogTitle>
+					<DialogTitle className="text-center">Set Gemini API Key</DialogTitle>
 				</DialogHeader>
 				<div className="text-center mb-4">
 					<Link
@@ -109,7 +115,7 @@ export function GeminiApiKeyDialog({
 				</div>
 				<fetcher.Form
 					method="post"
-					action="/resources/gemini-api-key-form"
+					action="/resources/gemini-api-key-dialog"
 					{...getFormProps(form)}
 				>
 					<div className="flex items-center space-x-2">
@@ -125,7 +131,7 @@ export function GeminiApiKeyDialog({
 							{fetcher.state === "submitting" ? (
 								<LoadingSpinner />
 							) : (
-								<Save className="w-4 h-4 mr-2 " />
+								<ArrowDownToLine className="w-4 h-4 mr-2 " />
 							)}
 							Save
 						</Button>

@@ -18,14 +18,16 @@ import { authenticator } from "~/utils/auth.server";
 import { getTargetLanguage } from "~/utils/target-language.server";
 import { ContentWithTranslations } from "./components/ContentWithTranslations";
 import TargetLanguageSelector from "./components/TargetLanguageSelector";
+import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
 import {
 	handleAddTranslationAction,
 	handleVoteAction,
 } from "./functions/mutations.server";
-import { getOrCreateUserAITranslationInfo } from "./functions/mutations.server";
+import { createUserAITranslationInfo } from "./functions/mutations.server";
 import {
 	fetchPage,
 	fetchPageWithTranslations,
+	fetchUserAITranslationInfo,
 	getDbUser,
 } from "./functions/queries.server";
 import { actionSchema } from "./types";
@@ -51,8 +53,17 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	if (!pageData) {
 		throw new Response("Failed to fetch article", { status: 500 });
 	}
-
-	return typedjson({ targetLanguage, pageData, safeUser, hasGeminiApiKey });
+	const userAITranslationInfo = await fetchUserAITranslationInfo(
+		pageData.id,
+		safeUserId ?? 0,
+	);
+	return typedjson({
+		targetLanguage,
+		pageData,
+		safeUser,
+		hasGeminiApiKey,
+		userAITranslationInfo,
+	});
 };
 export const action = async ({ request }: ActionFunctionArgs) => {
 	const safeUser = await authenticator.isAuthenticated(request);
@@ -107,15 +118,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 					slug: null,
 				};
 			}
-			await getOrCreateUserAITranslationInfo(
+			const userAITranslationInfo = await createUserAITranslationInfo(
 				dbUser.id,
-				page.slug,
+				page.id,
+				submission.value.aiModel,
 				targetLanguage,
 			);
 
 			const numberedElements = extractNumberedElements(page.content);
 			const queue = getTranslateUserQueue(safeUser.id);
 			const job = await queue.add(`translate-${safeUser.id}`, {
+				userAITranslationInfoId: userAITranslationInfo.id,
 				geminiApiKey: dbUser.geminiApiKey,
 				aiModel: submission.value.aiModel,
 				userId: safeUser.id,
@@ -124,7 +137,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 				title: page.title,
 				numberedContent: page.content,
 				numberedElements,
-				slug: page.slug,
 			});
 			return { intent, lastResult: submission.reply({ resetForm: true }) };
 		}
@@ -134,7 +146,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function ReaderView() {
-	const { pageData, safeUser, hasGeminiApiKey } =
+	const { pageData, safeUser, hasGeminiApiKey, userAITranslationInfo } =
 		useTypedLoaderData<typeof loader>();
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const actionData = useActionData<typeof action>();
@@ -151,7 +163,7 @@ export default function ReaderView() {
 	return (
 		<div className="container px-4 py-8  sm:max-w-prose lg:max-w-2xl xl:max-w-3xl mx-auto">
 			<div className="flex justify-end items-center mb-8">
-				{pageData.userId === safeUser?.id && (
+				{pageData.userId === safeUser?.id && safeUser && (
 					<Button asChild variant="outline">
 						<Link to={`/${safeUser.userName}/page/${pageData.slug}/edit`}>
 							Edit
@@ -184,21 +196,18 @@ export default function ReaderView() {
 								)}
 							</Button>
 						) : (
-							<>
-								<Button onClick={() => setIsDialogOpen(true)}>
-									<div className="flex items-center justify-center w-full">
-										<Languages className="w-4 h-4 mr-1" />
-										<p>Add Translation</p>
-									</div>
-								</Button>
-								<GeminiApiKeyDialog
-									isOpen={isDialogOpen}
-									onOpenChange={setIsDialogOpen}
-								/>
-							</>
+							<Button onClick={() => setIsDialogOpen(true)}>
+								<div className="flex items-center justify-center w-full">
+									<Languages className="w-4 h-4 mr-1" />
+									<p>Add Translation</p>
+								</div>
+							</Button>
 						)}
 					</div>
 				</Form>
+				<UserAITranslationStatus
+					userAITranslationInfo={userAITranslationInfo}
+				/>
 			</div>
 			<article className="prose dark:prose-invert lg:prose-xl">
 				<h1>
@@ -212,6 +221,10 @@ export default function ReaderView() {
 					userId={safeUser?.id ?? null}
 				/>
 			</article>
+			<GeminiApiKeyDialog
+				isOpen={isDialogOpen}
+				onOpenChange={setIsDialogOpen}
+			/>
 		</div>
 	);
 }

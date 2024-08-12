@@ -1,27 +1,18 @@
 import { prisma } from "~/utils/prisma";
-import { NumberedElement } from "../types";
+import type { NumberedElement } from "../types";
 
-export async function getOrCreateUserAITranslationInfo(
+export async function createUserAITranslationInfo(
 	userId: number,
-	slug: string,
+	pageId: number,
+	aiModel: string,
 	targetLanguage: string,
 ) {
 	try {
-		const userAITranslationInfo = await prisma.userAITranslationInfo.upsert({
-			where: {
-				userId_slug_targetLanguage: {
-					userId,
-					slug,
-					targetLanguage,
-				},
-			},
-			update: {
-				aiTranslationStatus: "pending",
-				aiTranslationProgress: 0,
-			},
-			create: {
+		const userAITranslationInfo = await prisma.userAITranslationInfo.create({
+			data: {
 				userId,
-				slug,
+				pageId,
+				aiModel,
 				targetLanguage,
 				aiTranslationStatus: "pending",
 				aiTranslationProgress: 0,
@@ -33,7 +24,6 @@ export async function getOrCreateUserAITranslationInfo(
 		throw error;
 	}
 }
-
 
 export async function getOrCreatePage(
 	userId: number,

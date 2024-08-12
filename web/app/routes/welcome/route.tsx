@@ -9,9 +9,9 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { authenticator } from "~/utils/auth.server";
+import { commitSession, getSession } from "~/utils/session.server";
 import { updateUserName } from "./functions/mutations.server";
 import { isUserNameTaken } from "./functions/queries.server";
-
 const schema = z.object({
 	userName: z
 		.string()
@@ -47,7 +47,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 	try {
 		await updateUserName(user.id, userName);
-		return redirect(`/${userName}`);
+		// セッションを更新
+		const session = await getSession(request.headers.get("Cookie"));
+		user.userName = userName;
+		user.displayName = userName;
+		session.set("user", user);
+		return redirect(`/${userName}`, {
+			headers: {
+				"Set-Cookie": await commitSession(session),
+			},
+		});
 	} catch (error) {
 		console.error("Error updating username:", error);
 		return submission.reply({
