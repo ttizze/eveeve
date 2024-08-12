@@ -6,7 +6,7 @@ export type TranslationWithVote = Pick<
 	TranslateText,
 	"id" | "text" | "point" | "createdAt"
 > & {
-	userName: string;
+	displayName: string;
 	userVote: UserVote | null;
 };
 

@@ -18,7 +18,7 @@ export function TranslationItem({
 			<div className="mb-2">{sanitizeAndParseText(translation.text)}</div>
 			{showAuthor && (
 				<p className="text-sm text-gray-500 text-right">
-					Translated by: {translation.userName}
+					Translated by: {translation.displayName}
 				</p>
 			)}
 			<VoteButtons translationWithVote={translation} userId={userId} />

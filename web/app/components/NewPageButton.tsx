@@ -3,15 +3,15 @@ import { PlusCircle } from "lucide-react";
 import { Button } from "~/components/ui/button";
 
 interface NewPageButtonProps {
-	userId: number;
+	userName: string;
 }
 
-export function NewPageButton({ userId }: NewPageButtonProps) {
+export function NewPageButton({ userName }: NewPageButtonProps) {
 	const navigate = useNavigate();
 
 	const handleNewPage = () => {
 		const newSlug = crypto.randomUUID();
-		navigate(`/${userId}/page/${newSlug}/edit`);
+		navigate(`/${userName}/page/${newSlug}/edit`);
 	};
 
 	return (

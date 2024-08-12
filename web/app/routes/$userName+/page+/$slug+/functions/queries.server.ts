@@ -29,7 +29,7 @@ export async function fetchPageWithTranslations(
 							text: true,
 							point: true,
 							createdAt: true,
-							user: { select: { name: true } },
+							user: { select: { displayName: true } },
 							votes: {
 								where: userId ? { userId } : undefined,
 								select: {
@@ -64,7 +64,7 @@ export async function fetchPageWithTranslations(
 				id: translateText.id,
 				text: translateText.text,
 				point: translateText.point,
-				userName: translateText.user.name,
+				displayName: translateText.user.displayName,
 				userVote: translateText.votes[0] || null,
 				createdAt: translateText.createdAt,
 			})),

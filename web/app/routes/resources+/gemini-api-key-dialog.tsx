@@ -6,12 +6,17 @@ import { Link } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
 import { Save } from "lucide-react";
 import { ExternalLink, Key } from "lucide-react";
-import { TriangleAlert } from "lucide-react";
+import { useEffect } from "react";
 import { z } from "zod";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
-import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { validateGeminiApiKey } from "~/features/translate/services/gemini";
 import { authenticator } from "~/utils/auth.server";
@@ -29,7 +34,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		schema: geminiApiKeySchema,
 	});
 	if (submission.status !== "success") {
-		return { lastResult: submission.reply() };
+		return { lastResult: submission.reply(), success: false };
 	}
 
 	const { isValid, errorMessage } = await validateGeminiApiKey(
@@ -40,13 +45,22 @@ export async function action({ request }: ActionFunctionArgs) {
 			lastResult: submission.reply({
 				formErrors: [errorMessage || "Gemini API key validation failed"],
 			}),
+			success: false,
 		};
 	}
 	await updateGeminiApiKey(safeUser.id, submission.value.geminiApiKey);
-	return { lastResult: submission.reply({ resetForm: true }) };
+	return { lastResult: submission.reply({ resetForm: true }), success: true };
 }
 
-export function GeminiApiKeyForm() {
+interface GeminiApiKeyDialogProps {
+	isOpen: boolean;
+	onOpenChange: (open: boolean) => void;
+}
+
+export function GeminiApiKeyDialog({
+	isOpen,
+	onOpenChange,
+}: GeminiApiKeyDialogProps) {
 	const fetcher = useFetcher<typeof action>();
 	const actionData = fetcher.data;
 	const [form, { geminiApiKey }] = useForm({
@@ -60,12 +74,21 @@ export function GeminiApiKeyForm() {
 		},
 	});
 
+	useEffect(() => {
+		if (actionData?.success) {
+			onOpenChange(false);
+		}
+	}, [actionData, onOpenChange]);
+
 	return (
-		<Card className="w-full mx-auto ">
-			<CardHeader>
-				<CardTitle className="text-center">Set Gemini API Key</CardTitle>
-			</CardHeader>
-			<CardContent className="space-y-4">
+		<Dialog open={isOpen} onOpenChange={onOpenChange}>
+			<DialogTrigger asChild>
+				<Button>Set Gemini API Key</Button>
+			</DialogTrigger>
+			<DialogContent>
+				<DialogHeader>
+					<DialogTitle>Set Gemini API Key</DialogTitle>
+				</DialogHeader>
 				<div className="text-center mb-4">
 					<Link
 						to="https://aistudio.google.com/app/apikey"
@@ -84,53 +107,29 @@ export function GeminiApiKeyForm() {
 						</Button>
 					</Link>
 				</div>
-				<Alert variant="default" className="flex items-center justify-center">
-					<div className="flex items-center gap-2">
-						<TriangleAlert className="h-10 w-4 text-yellow-400" />
-						<AlertDescription>
-							法律に違反する使用や、許可のない商用利用はお控えください。
-							<br />
-							API Keyを保存することで、
-							<Link
-								to="/terms"
-								className="text-blue-600 hover:underline"
-								target="_blank"
-							>
-								利用規約
-							</Link>
-							に同意したものとみなされます。
-						</AlertDescription>
-					</div>
-				</Alert>
 				<fetcher.Form
 					method="post"
 					action="/resources/gemini-api-key-form"
 					{...getFormProps(form)}
 				>
-					<div className="flex items-center">
-						<div className="w-full">
-							<Input
-								{...getInputProps(geminiApiKey, {
-									type: "password",
-									required: true,
-								})}
-								className="flex-grow"
-								placeholder="Enter your Gemini API Key"
-							/>
-						</div>
-						<Button
-							type="submit"
-							size="icon"
-							disabled={fetcher.state === "submitting"}
-						>
+					<div className="flex items-center space-x-2">
+						<Input
+							{...getInputProps(geminiApiKey, {
+								type: "password",
+								required: true,
+							})}
+							className="flex-grow"
+							placeholder="Enter your Gemini API Key"
+						/>
+						<Button type="submit" disabled={fetcher.state === "submitting"}>
 							{fetcher.state === "submitting" ? (
 								<LoadingSpinner />
 							) : (
-								<Save className="w-4 h-4" />
+								<Save className="w-4 h-4 mr-2 " />
 							)}
+							Save
 						</Button>
 					</div>
-
 					<div
 						id={geminiApiKey.errorId}
 						className="text-red-500 text-center mt-2"
@@ -141,7 +140,7 @@ export function GeminiApiKeyForm() {
 						<p className="text-red-500 text-center mt-2">{form.errors}</p>
 					)}
 				</fetcher.Form>
-			</CardContent>
-		</Card>
+			</DialogContent>
+		</Dialog>
 	);
 }

@@ -18,3 +18,8 @@ export const PageTranslationInfoSchema = z.object({
 });
 
 export type PageTranslationInfoItem = z.infer<typeof PageTranslationInfoSchema>;
+
+export type NumberedElement = {
+	number: number;
+	text: string;
+};

@@ -34,7 +34,6 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Search() {
-	const { safeUser } = useTypedLoaderData<typeof loader>();
 	const actionData = useActionData<typeof action>();
 	const navigation = useNavigation();
 	const isSearching = navigation.state === "submitting";
@@ -52,7 +51,6 @@ export default function Search() {
 
 	return (
 		<div>
-			<Header safeUser={safeUser} />
 			<div className="container mx-auto max-w-4xl min-h-50 py-10">
 				<Form method="post" {...getFormProps(form)}>
 					<div className="flex gap-2">
