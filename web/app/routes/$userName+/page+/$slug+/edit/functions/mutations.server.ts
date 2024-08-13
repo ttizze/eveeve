@@ -23,34 +23,19 @@ export async function getOrCreatePage(
 		},
 	});
 
-	console.log(`Page upserted: ${page.title}`);
 	return page;
 }
 
-export async function createOrUpdateSourceTexts(
+export async function createOrSkipSourceTexts(
 	numberedElements: NumberedElement[],
 	pageId: number,
 ) {
-	const sourceTexts = numberedElements.map((element) => ({
-		pageId,
-		number: element.number,
-		text: element.text,
-	}));
-
 	await prisma.sourceText.createMany({
-		data: sourceTexts,
+		data: numberedElements.map((element) => ({
+			pageId,
+			number: element.number,
+			text: element.text,
+		})),
 		skipDuplicates: true,
-	});
-
-	for (const element of numberedElements) {
-		await prisma.sourceText.update({
-			where: { pageId_number: { pageId, number: element.number } },
-			data: { text: element.text },
-		});
-	}
-
-	return prisma.sourceText.findMany({
-		where: { pageId },
-		select: { id: true, number: true },
 	});
 }

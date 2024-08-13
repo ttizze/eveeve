@@ -54,10 +54,20 @@ export async function updateUserAITranslationInfo(
 	});
 }
 
-export async function getSourceTexts(pageId: number) {
+export async function getLatestSourceTexts(pageId: number) {
 	return await prisma.sourceText.findMany({
 		where: {
 			pageId,
+		},
+		orderBy: {
+			createdAt: "desc",
+		},
+		distinct: ["number"],
+		select: {
+			id: true,
+			number: true,
+			text: true,
+			createdAt: true,
 		},
 	});
 }
