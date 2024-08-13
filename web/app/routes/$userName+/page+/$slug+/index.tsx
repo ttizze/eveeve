@@ -32,6 +32,7 @@ import {
 } from "./functions/queries.server";
 import { actionSchema } from "./types";
 import { extractNumberedElements } from "./utils/extractNumberedElements";
+
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const { slug } = params;
 
@@ -65,6 +66,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		userAITranslationInfo,
 	});
 };
+
 export const action = async ({ request }: ActionFunctionArgs) => {
 	const safeUser = await authenticator.isAuthenticated(request);
 	const safeUserId = safeUser?.id;

@@ -139,9 +139,10 @@ model SourceText {
   translateTexts  TranslateText[]
   page            Page             @relation(fields: [pageId], references: [id])
   pageId          Int              @map("page_id")
+  createdAt       DateTime         @default(now()) @map("created_at")
 
-  @@unique([pageId, number])
-  @@index([pageId, number])
+  @@unique([pageId, number, text])
+  @@index([pageId])
   @@map("source_texts")
 }
 

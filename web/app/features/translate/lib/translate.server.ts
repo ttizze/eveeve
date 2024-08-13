@@ -2,7 +2,7 @@ import { prisma } from "../../../utils/prisma";
 import { updateUserAITranslationInfo } from "../functions/mutations.server";
 import { getOrCreateAIUser } from "../functions/mutations.server";
 import { getOrCreatePageTranslationInfo } from "../functions/mutations.server";
-import { getSourceTexts } from "../functions/mutations.server";
+import { getLatestSourceTexts } from "../functions/mutations.server";
 import { getGeminiModelResponse } from "../services/gemini";
 import type { NumberedElement } from "../types";
 import type { TranslateJobParams } from "../types";
@@ -59,7 +59,7 @@ export async function translateChunk(
 	pageId: number,
 	title: string,
 ) {
-	const sourceTexts = await getSourceTexts(pageId);
+	const sourceTexts = await getLatestSourceTexts(pageId);
 	const translatedText = await getTranslatedText(
 		geminiApiKey,
 		aiModel,
