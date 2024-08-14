@@ -65,6 +65,9 @@ export const action: ActionFunction = async ({ request, params }) => {
 	const nonSanitizedUser = await getNonSanitizedUserbyUserName(
 		currentUser.userName,
 	);
+	if (!nonSanitizedUser) {
+		throw new Response("User not found", { status: 404 });
+	}
 	const page = await getOrCreatePage(
 		nonSanitizedUser.id,
 		slug,

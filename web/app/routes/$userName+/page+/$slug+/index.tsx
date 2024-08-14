@@ -76,8 +76,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 		schema: actionSchema,
 	});
 	const nonSanitizedUser = await getNonSanitizedUserbyUserName(
-		currentUser?.userName ?? "",
+		currentUser.userName,
 	);
+	if (!nonSanitizedUser) {
+		throw new Response("User not found", { status: 404 });
+	}
 	const targetLanguage = await getTargetLanguage(request);
 
 	if (submission.status !== "success") {
@@ -89,7 +92,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			handleVoteAction(
 				submission.value.translateTextId,
 				submission.value.isUpvote,
-				nonSanitizedUser?.id ?? 0,
+				nonSanitizedUser.id,
 			);
 			return {
 				intent,
@@ -100,7 +103,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			handleAddTranslationAction(
 				submission.value.sourceTextId,
 				submission.value.text,
-				nonSanitizedUser?.id ?? 0,
+				nonSanitizedUser.id,
 				targetLanguage,
 			);
 			return {
@@ -129,7 +132,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 				};
 			}
 			const userAITranslationInfo = await createUserAITranslationInfo(
-				nonSanitizedUser?.id ?? 0,
+				nonSanitizedUser.id,
 				page.id,
 				submission.value.aiModel,
 				targetLanguage,
@@ -139,12 +142,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 				page.content,
 				page.title,
 			);
-			const queue = getTranslateUserQueue(nonSanitizedUser?.id ?? 0);
-			const job = await queue.add(`translate-${nonSanitizedUser?.id ?? 0}`, {
+			const queue = getTranslateUserQueue(nonSanitizedUser.id);
+			const job = await queue.add(`translate-${nonSanitizedUser.id}`, {
 				userAITranslationInfoId: userAITranslationInfo.id,
-				geminiApiKey: nonSanitizedUser?.geminiApiKey,
+				geminiApiKey: nonSanitizedUser.geminiApiKey,
 				aiModel: submission.value.aiModel,
-				userId: nonSanitizedUser?.id ?? 0,
+				userId: nonSanitizedUser.id,
 				pageId: page.id,
 				targetLanguage,
 				title: page.title,
@@ -182,7 +185,7 @@ export default function ReaderView() {
 	}
 
 	return (
-		<div className="container px-4 py-8  sm:max-w-prose lg:max-w-2xl xl:max-w-3xl mx-auto">
+		<div className="px-4 py-8 prose dark:prose-invert sm:max-w-prose lg:max-w-2xl xl:max-w-3xl mx-auto">
 			<div className="flex justify-end items-center mb-8">
 				{pagWithTranslations.user.userName === currentUser?.userName &&
 					currentUser && (
@@ -241,7 +244,7 @@ export default function ReaderView() {
 					userAITranslationInfo={userAITranslationInfo}
 				/>
 			</div>
-			<article className="prose dark:prose-invert lg:prose-xl">
+			<article>
 				<ContentWithTranslations
 					pageWithTranslations={pagWithTranslations}
 					currentUserName={currentUser?.userName ?? null}
