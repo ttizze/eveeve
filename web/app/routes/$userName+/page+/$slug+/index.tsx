@@ -185,7 +185,7 @@ export default function ReaderView() {
 	}
 
 	return (
-		<div className="px-4 py-8 prose dark:prose-invert sm:max-w-prose lg:max-w-2xl xl:max-w-3xl mx-auto">
+		<div className=" w-full max-w-3xl  mx-auto">
 			<div className="flex justify-end items-center mb-8">
 				{pagWithTranslations.user.userName === currentUser?.userName &&
 					currentUser && (
@@ -200,9 +200,11 @@ export default function ReaderView() {
 			</div>
 			<div className="mb-8">
 				<Form method="post">
-					<div className="flex items-center space-x-2">
-						<TargetLanguageSelector />
-						<AIModelSelector onModelSelect={setSelectedModel} />
+					<div className="flex flex-col space-y-2">
+						<div className="flex items-center space-x-2">
+							<TargetLanguageSelector />
+							<AIModelSelector onModelSelect={setSelectedModel} />
+						</div>
 						<input type="hidden" name="pageId" value={pagWithTranslations.id} />
 						<input type="hidden" name="aiModel" value={selectedModel} />
 						{hasGeminiApiKey ? (
@@ -244,7 +246,7 @@ export default function ReaderView() {
 					userAITranslationInfo={userAITranslationInfo}
 				/>
 			</div>
-			<article>
+			<article className="w-full prose dark:prose-invert prose-sm sm:prose lg:prose-lg mx-auto mb-20">
 				<ContentWithTranslations
 					pageWithTranslations={pagWithTranslations}
 					currentUserName={currentUser?.userName ?? null}

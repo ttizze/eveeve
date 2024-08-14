@@ -87,6 +87,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 					/>
 				)}
 			</h1>
+			<hr />
 			<div className="flex items-center text-gray-500">
 				<Link
 					to={`/${pageWithTranslations.user.userName}`}

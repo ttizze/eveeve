@@ -1,25 +1,20 @@
-import {
-	getFormProps,
-	getTextareaProps,
-	useForm,
-	useInputControl,
-} from "@conform-to/react";
+import { getFormProps, getTextareaProps, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { redirect } from "@remix-run/node";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
-import Placeholder from "@tiptap/extension-placeholder";
-import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
+import { useFetcher } from "@remix-run/react";
 import { z } from "zod";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
 import { authenticator } from "~/utils/auth.server";
 import { addNumbersToContent } from "../utils/addNumbersToContent";
 import { extractNumberedElements } from "../utils/extractNumberedElements";
 import { EditHeader } from "./components/EditHeader";
+import { Editor } from "./components/Editor";
 import { createOrSkipSourceTexts } from "./functions/mutations.server";
 import { getOrCreatePage } from "./functions/mutations.server";
 import { getPageBySlug } from "./functions/queries.server";
+
 const schema = z.object({
 	title: z.string().min(1, "Required"),
 	pageContent: z.string().min(1, "Required Change something"),
@@ -83,11 +78,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function EditPage() {
 	const { currentUser, page } = useLoaderData<typeof loader>();
 	const actionData = useActionData<typeof action>();
-	const pageContentControl = useInputControl({
-		name: "pageContent",
-		formId: "edit-page",
-	});
-
+	const fetcher = useFetcher();
 	const [form, { title, pageContent }] = useForm({
 		id: "edit-page",
 		lastResult: actionData?.lastResult,
@@ -97,32 +88,11 @@ export default function EditPage() {
 		},
 	});
 
-	const editor = useEditor({
-		immediatelyRender: false,
-		extensions: [
-			StarterKit.configure({ heading: { levels: [2, 3, 4] } }),
-			Placeholder.configure({
-				placeholder: "input content...",
-			}),
-		],
-
-		content: page?.content || "",
-		editorProps: {
-			attributes: {
-				class:
-					"prose dark:prose-invert prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none",
-			},
-		},
-		onUpdate: ({ editor }) => {
-			pageContentControl.change(editor.getHTML());
-		},
-	});
-
 	return (
 		<div>
 			<Form method="post" {...getFormProps(form)}>
-				<EditHeader currentUser={currentUser} />
-				<div className="w-full max-w-3xl mx-auto">
+				<EditHeader currentUser={currentUser} pageSlug={page?.slug} />
+				<div className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg mx-auto">
 					<div className="mt-10">
 						<h1 className="text-4xl font-bold">
 							<textarea
@@ -139,7 +109,7 @@ export default function EditPage() {
 					</div>
 					<hr className="my-10" />
 					<div className="mt-16">
-						<EditorContent editor={editor} />
+						<Editor initialContent={page?.content || ""} />
 						{pageContent.errors?.map((error) => (
 							<p className="text-sm text-red-500" key={error}>
 								{error}
