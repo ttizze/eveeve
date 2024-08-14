@@ -1,6 +1,13 @@
 import type { User } from "@prisma/client";
 
-export type SafeUser = Omit<
+export type SanitizedUser = Omit<
 	User,
-	"password" | "geminiApiKey" | "openAIApiKey" | "claudeApiKey" | "email"
+	| "password"
+	| "geminiApiKey"
+	| "openAIApiKey"
+	| "claudeApiKey"
+	| "email"
+	| "provider"
+	| "id"
+	| "plan"
 >;

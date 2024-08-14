@@ -7,56 +7,51 @@ import {
 import { parseWithZod } from "@conform-to/zod";
 import { redirect } from "@remix-run/node";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import {
-	Form,
-	useActionData,
-	useLoaderData,
-	useNavigate,
-} from "@remix-run/react";
+import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { ArrowDownToLine } from "lucide-react";
 import { z } from "zod";
-import { Button } from "~/components/ui/button";
+import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
 import { authenticator } from "~/utils/auth.server";
 import { addNumbersToContent } from "../utils/addNumbersToContent";
 import { extractNumberedElements } from "../utils/extractNumberedElements";
-import { Header } from "./components/Header";
+import { EditHeader } from "./components/EditHeader";
 import { createOrSkipSourceTexts } from "./functions/mutations.server";
 import { getOrCreatePage } from "./functions/mutations.server";
 import { getPageBySlug } from "./functions/queries.server";
-
 const schema = z.object({
 	title: z.string().min(1, "Required"),
-	pageContent: z.string().min(1, "Required"),
+	pageContent: z.string().min(1, "Required Change something"),
 });
 
 export const loader: LoaderFunction = async ({ params, request }) => {
 	const { userName, slug } = params;
 	if (!userName || !slug) throw new Error("Invalid params");
 
-	const safeUser = await authenticator.isAuthenticated(request, {
+	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/login",
 	});
 
-	if (safeUser.userName !== userName) {
+	if (currentUser.userName !== userName) {
 		throw new Response("Unauthorized", { status: 403 });
 	}
 
 	const page = await getPageBySlug(slug);
 
-	return { safeUser, page };
+	return { currentUser, page };
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
 	const { userName, slug } = params;
 	if (!userName || !slug) throw new Error("Invalid params");
 
-	const safeUser = await authenticator.isAuthenticated(request, {
+	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/login",
 	});
-
+	if (currentUser.userName !== userName) {
+		throw new Response("Unauthorized", { status: 403 });
+	}
 	const formData = await request.formData();
 	const submission = parseWithZod(formData, {
 		schema,
@@ -67,7 +62,15 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 	const { title, pageContent } = submission.value;
 	const numberedContent = addNumbersToContent(pageContent);
-	const page = await getOrCreatePage(safeUser.id, slug, title, numberedContent);
+	const nonSanitizedUser = await getNonSanitizedUserbyUserName(
+		currentUser.userName,
+	);
+	const page = await getOrCreatePage(
+		nonSanitizedUser.id,
+		slug,
+		title,
+		numberedContent,
+	);
 	const numberedElements = extractNumberedElements(numberedContent, title);
 	await createOrSkipSourceTexts(numberedElements, page.id);
 
@@ -75,14 +78,12 @@ export const action: ActionFunction = async ({ request, params }) => {
 };
 
 export default function EditPage() {
-	const { safeUser, page } = useLoaderData<typeof loader>();
+	const { currentUser, page } = useLoaderData<typeof loader>();
 	const actionData = useActionData<typeof action>();
 	const pageContentControl = useInputControl({
 		name: "pageContent",
 		formId: "edit-page",
 	});
-
-	const navigate = useNavigate();
 
 	const [form, { title, pageContent }] = useForm({
 		id: "edit-page",
@@ -116,15 +117,9 @@ export default function EditPage() {
 
 	return (
 		<div>
-			<Header safeUser={safeUser} />
-			<div className="w-full max-w-3xl mx-auto">
-				<Form method="post" {...getFormProps(form)}>
-					<div className="flex justify-center">
-						<Button type="submit" variant="ghost">
-							<ArrowDownToLine className="w-6 h-6 mr-2" />
-							Save
-						</Button>
-					</div>
+			<Form method="post" {...getFormProps(form)}>
+				<EditHeader currentUser={currentUser} />
+				<div className="w-full max-w-3xl mx-auto">
 					<div className="mt-10">
 						<h1 className="text-4xl font-bold">
 							<textarea
@@ -148,8 +143,8 @@ export default function EditPage() {
 							</p>
 						))}
 					</div>
-				</Form>
-			</div>
+				</div>
+			</Form>
 		</div>
 	);
 }

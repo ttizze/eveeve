@@ -11,12 +11,12 @@ import { VoteButton } from "./VoteButton";
 
 interface VoteButtonsProps {
 	translationWithVote: TranslationWithVote;
-	userId: number | null;
+	currentUserName: string | null;
 }
 
 export const VoteButtons = memo(function VoteButtons({
 	translationWithVote,
-	userId,
+	currentUserName,
 }: VoteButtonsProps) {
 	const fetcher = useFetcher();
 	const [showLoginDialog, setShowLoginDialog] = useState(false);
@@ -46,7 +46,7 @@ export const VoteButtons = memo(function VoteButtons({
 		[translationWithVote.userVote?.isUpvote],
 	);
 	const handleVoteClick = (e: React.MouseEvent) => {
-		if (!userId) {
+		if (!currentUserName) {
 			setShowLoginDialog(true);
 			e.preventDefault();
 		}

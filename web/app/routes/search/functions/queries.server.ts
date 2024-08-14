@@ -17,7 +17,10 @@ export async function searchTitle(query: string) {
 		select: {
 			id: true,
 			title: true,
-			url: true,
+			slug: true,
+			user: {
+				select: { userName: true },
+			},
 			pageTranslationInfo: {
 				select: { id: true, targetLanguage: true, translationTitle: true },
 			},

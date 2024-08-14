@@ -6,7 +6,7 @@ import type { TranslationWithVote } from "../types";
 import { AddAndVoteTranslations } from "./AddAndVoteTranslations";
 interface TranslationProps {
 	translationsWithVotes: TranslationWithVote[];
-	userId: number | null;
+	currentUserName: string | null;
 	sourceTextId: number;
 }
 
@@ -34,7 +34,7 @@ function ToggleButton({
 
 export function Translation({
 	translationsWithVotes,
-	userId,
+	currentUserName,
 	sourceTextId,
 }: TranslationProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
@@ -77,7 +77,7 @@ export function Translation({
 					<AddAndVoteTranslations
 						bestTranslationWithVote={bestTranslationWithVote}
 						alternativeTranslationsWithVotes={alternativeTranslationsWithVotes}
-						userId={userId}
+						currentUserName={currentUserName}
 						sourceTextId={sourceTextId}
 					/>
 				</div>

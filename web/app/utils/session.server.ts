@@ -1,8 +1,8 @@
 import { createCookieSessionStorage } from "@remix-run/node";
-import type { SafeUser } from "~/types";
+import type { SanitizedUser } from "~/types";
 
 type Session = {
-	user?: SafeUser;
+	user?: SanitizedUser;
 	targetLanguage?: string;
 };
 

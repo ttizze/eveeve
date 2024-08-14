@@ -13,6 +13,7 @@ import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { AIModelSelector } from "~/features/translate/components/AIModelSelector";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
+import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
 import { GeminiApiKeyDialog } from "~/routes/resources+/gemini-api-key-dialog";
 import { authenticator } from "~/utils/auth.server";
 import { getTargetLanguage } from "~/utils/target-language.server";
@@ -28,7 +29,6 @@ import {
 	fetchPage,
 	fetchPageWithTranslations,
 	fetchUserAITranslationInfo,
-	getDbUser,
 } from "./functions/queries.server";
 import { actionSchema } from "./types";
 import { extractNumberedElements } from "./utils/extractNumberedElements";
@@ -40,48 +40,46 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		throw new Response("Missing URL parameter", { status: 400 });
 	}
 
-	const safeUser = await authenticator.isAuthenticated(request);
-	const safeUserId = safeUser?.id;
-	const dbUser = await getDbUser(safeUserId ?? 0);
-	const hasGeminiApiKey = !!dbUser?.geminiApiKey;
+	const currentUser = await authenticator.isAuthenticated(request);
+	const nonSanitizedUser = await getNonSanitizedUserbyUserName(
+		currentUser?.userName ?? "",
+	);
+	const hasGeminiApiKey = !!nonSanitizedUser?.geminiApiKey;
 	const targetLanguage = await getTargetLanguage(request);
-	const pageData = await fetchPageWithTranslations(
+	const pagWithTranslations = await fetchPageWithTranslations(
 		slug,
-		safeUserId ?? 0,
+		nonSanitizedUser?.id ?? 0,
 		targetLanguage,
 	);
 
-	if (!pageData) {
+	if (!pagWithTranslations) {
 		throw new Response("Failed to fetch article", { status: 500 });
 	}
 	const userAITranslationInfo = await fetchUserAITranslationInfo(
-		pageData.id,
-		safeUserId ?? 0,
+		pagWithTranslations.id,
+		nonSanitizedUser?.id ?? 0,
 	);
 	return typedjson({
 		targetLanguage,
-		pageData,
-		safeUser,
+		pagWithTranslations,
+		currentUser,
 		hasGeminiApiKey,
 		userAITranslationInfo,
 	});
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-	const safeUser = await authenticator.isAuthenticated(request);
-	const safeUserId = safeUser?.id;
-	const targetLanguage = await getTargetLanguage(request);
-
+	const currentUser = await authenticator.isAuthenticated(request, {
+		failureRedirect: "/auth/login",
+	});
 	const submission = parseWithZod(await request.formData(), {
 		schema: actionSchema,
 	});
-	if (!safeUserId) {
-		return {
-			intent: null,
-			lastResult: submission.reply({ formErrors: ["User not authenticated"] }),
-			slug: null,
-		};
-	}
+	const nonSanitizedUser = await getNonSanitizedUserbyUserName(
+		currentUser?.userName ?? "",
+	);
+	const targetLanguage = await getTargetLanguage(request);
+
 	if (submission.status !== "success") {
 		return { intent: null, lastResult: submission.reply(), slug: null };
 	}
@@ -91,7 +89,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			handleVoteAction(
 				submission.value.translateTextId,
 				submission.value.isUpvote,
-				safeUserId,
+				nonSanitizedUser?.id ?? 0,
 			);
 			return {
 				intent,
@@ -102,7 +100,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			handleAddTranslationAction(
 				submission.value.sourceTextId,
 				submission.value.text,
-				safeUserId,
+				nonSanitizedUser?.id ?? 0,
 				targetLanguage,
 			);
 			return {
@@ -111,8 +109,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 				slug: null,
 			};
 		case "translate": {
-			const dbUser = await getDbUser(safeUser.id);
-			if (!dbUser?.geminiApiKey) {
+			if (!nonSanitizedUser?.geminiApiKey) {
 				return {
 					lastResult: submission.reply({
 						formErrors: ["Gemini API key is not set"],
@@ -132,7 +129,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 				};
 			}
 			const userAITranslationInfo = await createUserAITranslationInfo(
-				dbUser.id,
+				nonSanitizedUser?.id ?? 0,
 				page.id,
 				submission.value.aiModel,
 				targetLanguage,
@@ -142,12 +139,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 				page.content,
 				page.title,
 			);
-			const queue = getTranslateUserQueue(safeUser.id);
-			const job = await queue.add(`translate-${safeUser.id}`, {
+			const queue = getTranslateUserQueue(nonSanitizedUser?.id ?? 0);
+			const job = await queue.add(`translate-${nonSanitizedUser?.id ?? 0}`, {
 				userAITranslationInfoId: userAITranslationInfo.id,
-				geminiApiKey: dbUser.geminiApiKey,
+				geminiApiKey: nonSanitizedUser?.geminiApiKey,
 				aiModel: submission.value.aiModel,
-				userId: safeUser.id,
+				userId: nonSanitizedUser?.id ?? 0,
 				pageId: page.id,
 				targetLanguage,
 				title: page.title,
@@ -166,8 +163,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function ReaderView() {
-	const { pageData, safeUser, hasGeminiApiKey, userAITranslationInfo } =
-		useTypedLoaderData<typeof loader>();
+	const {
+		pagWithTranslations,
+		currentUser,
+		hasGeminiApiKey,
+		userAITranslationInfo,
+	} = useTypedLoaderData<typeof loader>();
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const actionData = useActionData<typeof action>();
 	const [selectedModel, setSelectedModel] = useState("gemini-1.5-flash");
@@ -176,27 +177,30 @@ export default function ReaderView() {
 		lastResult: actionData?.lastResult,
 	});
 
-	if (!pageData) {
+	if (!pagWithTranslations) {
 		return <div>Loading...</div>;
 	}
 
 	return (
 		<div className="container px-4 py-8  sm:max-w-prose lg:max-w-2xl xl:max-w-3xl mx-auto">
 			<div className="flex justify-end items-center mb-8">
-				{pageData.userId === safeUser?.id && safeUser && (
-					<Button asChild variant="outline">
-						<Link to={`/${safeUser.userName}/page/${pageData.slug}/edit`}>
-							Edit
-						</Link>
-					</Button>
-				)}
+				{pagWithTranslations.user.userName === currentUser?.userName &&
+					currentUser && (
+						<Button asChild variant="outline">
+							<Link
+								to={`/${currentUser.userName}/page/${pagWithTranslations.slug}/edit`}
+							>
+								Edit
+							</Link>
+						</Button>
+					)}
 			</div>
 			<div className="mb-8">
 				<Form method="post">
 					<div className="flex items-center space-x-2">
 						<TargetLanguageSelector />
 						<AIModelSelector onModelSelect={setSelectedModel} />
-						<input type="hidden" name="pageId" value={pageData.id} />
+						<input type="hidden" name="pageId" value={pagWithTranslations.id} />
 						<input type="hidden" name="aiModel" value={selectedModel} />
 						{hasGeminiApiKey ? (
 							<Button
@@ -227,9 +231,7 @@ export default function ReaderView() {
 				</Form>
 				{actionData?.slug && (
 					<Alert className="bg-blue-50 border-blue-200 text-blue-800 animate-in fade-in duration-300">
-						<AlertTitle className="text-center">
-							Translation Job Started
-						</AlertTitle>
+						<AlertTitle className="text-center">Translation Started</AlertTitle>
 						<AlertDescription className="text-center">
 							<strong className="font-semibold ">{actionData.slug}</strong>
 						</AlertDescription>
@@ -241,10 +243,8 @@ export default function ReaderView() {
 			</div>
 			<article className="prose dark:prose-invert lg:prose-xl">
 				<ContentWithTranslations
-					title={pageData.title}
-					content={pageData.content}
-					sourceTextWithTranslations={pageData.sourceTextWithTranslations}
-					userId={safeUser?.id ?? null}
+					pageWithTranslations={pagWithTranslations}
+					currentUserName={currentUser?.userName ?? null}
 				/>
 			</article>
 			<GeminiApiKeyDialog

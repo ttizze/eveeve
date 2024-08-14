@@ -14,7 +14,7 @@ export const listUserAiTranslationInfo = async (
 			targetLanguage,
 		},
 		orderBy: {
-			lastTranslatedAt: "desc",
+			createdAt: "desc",
 		},
 		take: 10,
 	});
