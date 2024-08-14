@@ -244,7 +244,7 @@ export default function ReaderView() {
 					userAITranslationInfo={userAITranslationInfo}
 				/>
 			</div>
-			<article >
+			<article>
 				<ContentWithTranslations
 					pageWithTranslations={pagWithTranslations}
 					currentUserName={currentUser?.userName ?? null}

@@ -1,8 +1,8 @@
 import {
-	SchemaType,
 	GoogleGenerativeAI,
 	HarmBlockThreshold,
 	HarmCategory,
+	SchemaType,
 } from "@google/generative-ai";
 import { generateSystemMessage } from "./generateGeminiMessage";
 const MAX_RETRIES = 3;
