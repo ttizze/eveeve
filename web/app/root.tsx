@@ -17,8 +17,8 @@ import tailwind from "~/tailwind.css?url";
 import { authenticator } from "~/utils/auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	const safeUser = await authenticator.isAuthenticated(request);
-	return typedjson({ safeUser });
+	const currentUser = await authenticator.isAuthenticated(request);
+	return typedjson({ currentUser });
 }
 export const links: LinksFunction = () => [
 	{ rel: "stylesheet", href: tailwind },
@@ -46,15 +46,15 @@ function CommonLayout({
 	children,
 	showHeaderFooter = true,
 }: { children: React.ReactNode; showHeaderFooter?: boolean }) {
-	const { safeUser } = useTypedLoaderData<typeof loader>();
+	const { currentUser } = useTypedLoaderData<typeof loader>();
 	return (
 		<>
-			{showHeaderFooter && <Header safeUser={safeUser} />}
+			{showHeaderFooter && <Header currentUser={currentUser} />}
 			<div className="flex flex-col min-h-screen">
 				<main className="flex-grow">
 					<div className="container mx-auto">{children}</div>
 				</main>
-				{showHeaderFooter && <Footer safeUser={safeUser} />}
+				{showHeaderFooter && <Footer currentUser={currentUser} />}
 			</div>
 		</>
 	);

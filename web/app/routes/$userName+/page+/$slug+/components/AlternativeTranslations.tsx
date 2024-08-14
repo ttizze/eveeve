@@ -3,12 +3,12 @@ import { TranslationItem } from "./TranslationItem";
 
 interface AlternativeTranslationsProps {
 	translationsWithVotes: TranslationWithVote[];
-	userId: number | null;
+	currentUserName: string | null;
 }
 
 export function AlternativeTranslations({
 	translationsWithVotes,
-	userId,
+	currentUserName,
 }: AlternativeTranslationsProps) {
 	if (translationsWithVotes.length === 0) return null;
 
@@ -18,7 +18,7 @@ export function AlternativeTranslations({
 				<TranslationItem
 					key={translation.id}
 					translation={translation}
-					userId={userId}
+					currentUserName={currentUserName}
 				/>
 			))}
 		</div>

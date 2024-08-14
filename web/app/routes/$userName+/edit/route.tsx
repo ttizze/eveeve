@@ -1,4 +1,9 @@
-import { getFormProps, getInputProps, useForm } from "@conform-to/react";
+import {
+	getFormProps,
+	getInputProps,
+	getTextareaProps,
+	useForm,
+} from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
@@ -8,7 +13,7 @@ import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { authenticator } from "~/utils/auth.server";
+import { authenticator, sanitizeUser } from "~/utils/auth.server";
 import { commitSession, getSession } from "~/utils/session.server";
 import { updateUser } from "./functions/mutations.server";
 
@@ -17,21 +22,22 @@ const schema = z.object({
 		.string()
 		.min(1, "Display name is required")
 		.max(50, "Display name must be 50 characters or less"),
+	profile: z.string().max(200, "Profile must be 200 characters or less"),
 });
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
-	const safeUser = await authenticator.isAuthenticated(request, {
+	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/login",
 	});
-	if (safeUser.userName !== params.userName) {
+	if (currentUser.userName !== params.userName) {
 		throw new Response("Unauthorized", { status: 403 });
 	}
 
-	return typedjson({ safeUser });
+	return typedjson({ currentUser });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-	const safeUser = await authenticator.isAuthenticated(request, {
+	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/login",
 	});
 	const submission = parseWithZod(await request.formData(), { schema });
@@ -40,14 +46,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 		return submission.reply();
 	}
 
-	const { displayName } = submission.value;
+	const { displayName, profile } = submission.value;
 
-	await updateUser(safeUser.id, { displayName });
+	const updatedUser = await updateUser(currentUser.userName, {
+		displayName,
+		profile,
+	});
 	const session = await getSession(request.headers.get("Cookie"));
-	const updatedUser = { ...safeUser, displayName };
-	session.set("user", updatedUser);
+	session.set("user", sanitizeUser(updatedUser));
 
-	return redirect(`/${safeUser.userName}`, {
+	return redirect(`/${currentUser.userName}`, {
 		headers: {
 			"Set-Cookie": await commitSession(session),
 		},
@@ -55,14 +63,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function EditProfile() {
-	const { safeUser } = useTypedLoaderData<typeof loader>();
+	const { currentUser } = useTypedLoaderData<typeof loader>();
 
-	const [form, { displayName }] = useForm({
+	const [form, { displayName, profile }] = useForm({
 		id: "edit-profile-form",
 		constraint: getZodConstraint(schema),
 		shouldValidate: "onBlur",
 		shouldRevalidate: "onInput",
-		defaultValue: { displayName: safeUser.displayName },
+		defaultValue: {
+			displayName: currentUser.displayName,
+			profile: currentUser.profile,
+		},
 		onValidate({ formData }) {
 			return parseWithZod(formData, { schema });
 		},
@@ -76,6 +87,16 @@ export default function EditProfile() {
 					<Input {...getInputProps(displayName, { type: "text" })} />
 					<div id={displayName.errorId} className="text-red-500 text-sm mt-1">
 						{displayName.errors}
+					</div>
+				</div>
+				<div>
+					<Label htmlFor={profile.id}>Profile</Label>
+					<textarea
+						{...getTextareaProps(profile)}
+						className="w-full h-32 px-3 py-2  border rounded-lg focus:outline-none"
+					/>
+					<div id={profile.errorId} className="text-red-500 text-sm mt-1">
+						{profile.errors}
 					</div>
 				</div>
 				<Button type="submit">Save Changes</Button>

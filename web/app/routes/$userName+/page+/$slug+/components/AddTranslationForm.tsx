@@ -12,12 +12,12 @@ import { addTranslationSchema } from "../types";
 
 interface AddTranslationFormProps {
 	sourceTextId: number;
-	userId: number | null;
+	currentUserName: string | null;
 }
 
 export function AddTranslationForm({
 	sourceTextId,
-	userId,
+	currentUserName,
 }: AddTranslationFormProps) {
 	const fetcher = useFetcher<typeof action>();
 	const [showLoginDialog, setShowLoginDialog] = useState(false);
@@ -33,7 +33,7 @@ export function AddTranslationForm({
 	});
 
 	const handleInteraction = (e: React.MouseEvent | React.FocusEvent) => {
-		if (!userId) {
+		if (!currentUserName) {
 			e.preventDefault();
 			setShowLoginDialog(true);
 		}
@@ -60,7 +60,7 @@ export function AddTranslationForm({
 						name="intent"
 						value="add"
 						className="bg-blue-500 hover:bg-blue-600 text-white"
-						disabled={fetcher.state !== "idle" || !userId}
+						disabled={fetcher.state !== "idle" || !currentUserName}
 					>
 						<Save className="h-4 w-4" />
 					</Button>

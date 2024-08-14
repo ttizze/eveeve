@@ -10,47 +10,61 @@ import {
 	CardTitle,
 } from "~/components/ui/card";
 import { authenticator } from "~/utils/auth.server";
-import { getUserWithPages } from "./functions/queries.server";
-import type { UserWithPages } from "./types";
+import { getSanitizedUserWithPages } from "./functions/queries.server";
+import type { sanitizedUserWithPages } from "./types";
+
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const { userName } = params;
 	if (!userName) throw new Error("Username is required");
 
-	const userWithPages = await getUserWithPages(userName);
-	if (!userWithPages) throw new Response("Not Found", { status: 404 });
+	const sanitizedUserWithPages = await getSanitizedUserWithPages(userName);
+	if (!sanitizedUserWithPages) throw new Response("Not Found", { status: 404 });
 
 	const currentUser = await authenticator.isAuthenticated(request);
 
-	const isOwnProfile = currentUser?.id === userWithPages.id;
+	const isOwnProfile =
+		currentUser?.userName === sanitizedUserWithPages.userName;
 
-	return { userWithPages: userWithPages, isOwnProfile };
+	return { sanitizedUserWithPages, isOwnProfile };
 };
 
 export default function UserProfile() {
-	const { userWithPages, isOwnProfile } = useLoaderData<{
-		userWithPages: UserWithPages;
+	const stripHtmlTags = (html: string) => {
+		return html.replace(/<[^>]*>/g, "");
+	};
+
+	const { sanitizedUserWithPages, isOwnProfile } = useLoaderData<{
+		sanitizedUserWithPages: sanitizedUserWithPages;
 		isOwnProfile: boolean;
 	}>();
 
 	return (
 		<div className="container mx-auto mt-10">
-			<div className="flex justify-between items-center mb-6">
-				<h1 className="text-3xl font-bold">{userWithPages.displayName}</h1>
-				{isOwnProfile && (
-					<Link to={`/${userWithPages.userName}/edit`}>
-						<Button variant="outline">Edit Profile</Button>
-					</Link>
-				)}
-			</div>
+			<Card className="h-full mb-6">
+				<CardHeader>
+					<CardTitle className="text-3xl font-bold flex justify-between items-center">
+						{sanitizedUserWithPages.displayName}
+
+						{isOwnProfile && (
+							<Link to={`/${sanitizedUserWithPages.userName}/edit`}>
+								<Button variant="outline">Edit Profile</Button>
+							</Link>
+						)}
+					</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<p className="">{sanitizedUserWithPages.profile}</p>
+				</CardContent>
+			</Card>
 
 			<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-				{userWithPages.pages.map((page) => (
+				{sanitizedUserWithPages.pages.map((page) => (
 					<Link
-						to={`/${userWithPages.userName}/page/${page.slug}`}
+						to={`/${sanitizedUserWithPages.userName}/page/${page.slug}`}
 						key={page.id}
 						className="h-full"
 					>
-						<Card className="flex flex-col h-full">
+						<Card className="C">
 							<CardHeader>
 								<CardTitle className="line-clamp-2">{page.title}</CardTitle>
 								<CardDescription>
@@ -59,7 +73,7 @@ export default function UserProfile() {
 							</CardHeader>
 							<CardContent className="flex-grow">
 								<p className="text-sm text-gray-600 line-clamp-4">
-									{page.content}
+									{stripHtmlTags(page.content)}
 								</p>
 							</CardContent>
 						</Card>
@@ -67,7 +81,7 @@ export default function UserProfile() {
 				))}
 			</div>
 
-			{userWithPages.pages.length === 0 && (
+			{sanitizedUserWithPages.pages.length === 0 && (
 				<p className="text-center text-gray-500 mt-10">
 					{isOwnProfile
 						? "You haven't created any pages yet."

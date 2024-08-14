@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { Authenticator, AuthorizationError } from "remix-auth";
 import { FormStrategy } from "remix-auth-form";
 import { GoogleStrategy } from "remix-auth-google";
-import type { SafeUser } from "../types";
+import type { SanitizedUser } from "../types";
 import { prisma } from "./prisma";
 import { sessionStorage } from "./session.server";
 const SESSION_SECRET = process.env.SESSION_SECRET;
@@ -12,7 +12,7 @@ if (!SESSION_SECRET) {
 	throw new Error("SESSION_SECRET is not defined");
 }
 
-const authenticator = new Authenticator<SafeUser>(sessionStorage);
+const authenticator = new Authenticator<SanitizedUser>(sessionStorage);
 
 const formStrategy = new FormStrategy(async ({ form }) => {
 	const email = form.get("email");
@@ -38,7 +38,7 @@ const formStrategy = new FormStrategy(async ({ form }) => {
 
 authenticator.use(formStrategy, "user-pass");
 
-const googleStrategy = new GoogleStrategy<SafeUser>(
+const googleStrategy = new GoogleStrategy<SanitizedUser>(
 	{
 		clientID: process.env.GOOGLE_CLIENT_ID || "",
 		clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
@@ -68,10 +68,20 @@ const googleStrategy = new GoogleStrategy<SafeUser>(
 		return sanitizeUser(newUser);
 	},
 );
-function sanitizeUser(user: User): SafeUser {
-	const { password, geminiApiKey, openAIApiKey, claudeApiKey, ...safeUser } =
-		user;
-	return safeUser;
+
+export function sanitizeUser(user: User): SanitizedUser {
+	const {
+		id,
+		password,
+		geminiApiKey,
+		openAIApiKey,
+		claudeApiKey,
+		email,
+		provider,
+		plan,
+		...sanitizedUser
+	} = user;
+	return sanitizedUser;
 }
 
 authenticator.use(googleStrategy);

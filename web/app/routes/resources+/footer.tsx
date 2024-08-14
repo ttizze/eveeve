@@ -5,11 +5,11 @@ import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
 import { LogIn, LogOut } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import type { SafeUser } from "~/types";
+import type { SanitizedUser } from "~/types";
 import { authenticator } from "~/utils/auth.server";
 
 interface FooterProps {
-	safeUser: SafeUser | null;
+	currentUser: SanitizedUser | null;
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -36,7 +36,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	return json({ error: "Invalid intent" }, { status: 400 });
 }
 
-export function Footer({ safeUser }: FooterProps) {
+export function Footer({ currentUser }: FooterProps) {
 	const currentYear = new Date().getFullYear();
 
 	return (
@@ -52,10 +52,10 @@ export function Footer({ safeUser }: FooterProps) {
 									className="w-32"
 								/>
 							</Link>
-							{safeUser && (
+							{currentUser && (
 								<>
-									<Link to={`/${safeUser.userName}`}>
-										<Button variant="outline">{safeUser.userName}</Button>
+									<Link to={`/${currentUser.userName}`}>
+										<Button variant="outline">{currentUser.userName}</Button>
 									</Link>
 									<Form method="post" action="/resources/footer">
 										<Button
@@ -71,7 +71,7 @@ export function Footer({ safeUser }: FooterProps) {
 								</>
 							)}
 						</div>
-						{!safeUser && (
+						{!currentUser && (
 							<Form method="post" action="/resources/footer">
 								<Button
 									type="submit"

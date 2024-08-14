@@ -20,10 +20,11 @@ export interface PageWithTranslations {
 	id: number;
 	title: string;
 	translationTitle: string | null;
+	user: { displayName: string; userName: string; image: string };
+	createdAt: Date;
 	slug: string;
 	content: string;
 	sourceTextWithTranslations: SourceTextWithTranslations[];
-	userId: number;
 }
 
 export const voteSchema = z.object({

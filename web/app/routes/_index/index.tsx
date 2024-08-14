@@ -22,8 +22,8 @@ export const meta: MetaFunction = () => {
 	];
 };
 export async function loader({ request }: LoaderFunctionArgs) {
-	const safeUser = await authenticator.isAuthenticated(request);
-	return typedjson({ safeUser });
+	const currentUser = await authenticator.isAuthenticated(request);
+	return typedjson({ currentUser });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -40,7 +40,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Index() {
-	const { safeUser } = useTypedLoaderData<typeof loader>();
+	const { currentUser } = useTypedLoaderData<typeof loader>();
 
 	return (
 		<div className="min-h-screen bg-gradient-to-b ">

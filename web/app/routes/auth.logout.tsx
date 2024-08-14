@@ -11,18 +11,18 @@ import {
 } from "~/components/ui/card";
 import { authenticator } from "../utils/auth.server";
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-	const safeUser = await authenticator.isAuthenticated(request, {
+	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/auth/login",
 	});
 
-	return json({ safeUser });
+	return json({ currentUser });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
 	return await authenticator.logout(request, { redirectTo: "/" });
 };
 export default function Logout() {
-	const { safeUser } = useLoaderData<typeof loader>();
+	const { currentUser } = useLoaderData<typeof loader>();
 	return (
 		<div className="container mx-auto max-w-md py-8">
 			<Card>
@@ -33,7 +33,7 @@ export default function Logout() {
 				</CardHeader>
 				<CardContent>
 					<p className="text-center mb-4">
-						<span className="font-semibold">{safeUser.name}</span>
+						<span className="font-semibold">{currentUser.userName}</span>
 					</p>
 					<p className="text-center text-sm text-gray-60 mb-4">
 						Are you sure you want to logout?

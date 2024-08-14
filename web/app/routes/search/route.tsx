@@ -16,20 +16,20 @@ const schema = z.object({
 	query: z.string().min(1, "Search query is required"),
 });
 export async function loader({ request }: LoaderFunctionArgs) {
-	const safeUser = await authenticator.isAuthenticated(request);
-	return typedjson({ safeUser });
+	const currentUser = await authenticator.isAuthenticated(request);
+	return typedjson({ currentUser });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData();
 	const submission = parseWithZod(formData, { schema });
 	if (submission.status !== "success") {
-		return { lastResult: submission.reply(), results: [] };
+		return { lastResult: submission.reply(), searchResults: [] };
 	}
 	const { query } = submission.value;
 
-	const results = await searchTitle(query);
-	return { lastResult: submission.reply(), results };
+	const searchResults = await searchTitle(query);
+	return { lastResult: submission.reply(), searchResults };
 }
 
 export default function Search() {
@@ -63,19 +63,19 @@ export default function Search() {
 						</Button>
 					</div>
 				</Form>
-				{actionData?.results && (
+				{actionData?.searchResults && (
 					<div className=" shadow-lg rounded-md z-10  ">
-						{actionData.results.length === 0 ? (
+						{actionData.searchResults.length === 0 ? (
 							<p className="p-2 text-gray-500">No results found.</p>
 						) : (
 							<ul className="max-h-60 overflow-y-auto">
-								{actionData.results.map((result) => (
+								{actionData.searchResults.map((result) => (
 									<li
 										key={result.id}
 										className="hover:bg-gray-300 dark:hover:bg-gray-700 transition duration-150 rounded-lg"
 									>
 										<Link
-											to={`/reader/${encodeURIComponent(result.url)}`}
+											to={`/${result.user.userName}/page/${encodeURIComponent(result.slug)}`}
 											className="block p-2 text-inherit no-underline"
 										>
 											<h3 className="font-bold">{result.title}</h3>

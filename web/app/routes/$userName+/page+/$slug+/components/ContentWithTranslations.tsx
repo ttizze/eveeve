@@ -1,35 +1,37 @@
+import { Link } from "@remix-run/react";
 import DOMPurify from "dompurify";
 import parse from "html-react-parser";
 import { memo, useMemo } from "react";
-import type { SourceTextWithTranslations } from "../types";
+import type { PageWithTranslations } from "../types";
 import { Translation } from "./Translation";
 
 interface ContentWithTranslationsProps {
-	title: string;
-	content: string;
-	sourceTextWithTranslations: SourceTextWithTranslations[];
-	userId: number | null;
+	pageWithTranslations: PageWithTranslations;
+	currentUserName: string | null;
 }
 
 export const ContentWithTranslations = memo(function ContentWithTranslations({
-	title,
-	content,
-	sourceTextWithTranslations,
-	userId,
+	pageWithTranslations,
+	currentUserName,
 }: ContentWithTranslationsProps) {
-	const titleTranslation = useMemo(() => {
-		return sourceTextWithTranslations.find((info) => info.number === 0);
-	}, [sourceTextWithTranslations]);
+	const bestTranslationTitle = useMemo(() => {
+		return pageWithTranslations.sourceTextWithTranslations.find(
+			(info) => info.number === 0,
+		);
+	}, [pageWithTranslations.sourceTextWithTranslations]);
 
 	const parsedContent = useMemo(() => {
 		if (typeof window === "undefined") {
 			return null;
 		}
 
-		const sanitizedContent = DOMPurify.sanitize(content);
+		const sanitizedContent = DOMPurify.sanitize(pageWithTranslations.content);
 		const doc = new DOMParser().parseFromString(sanitizedContent, "text/html");
 		const translationMap = new Map(
-			sourceTextWithTranslations.map((info) => [info.number.toString(), info]),
+			pageWithTranslations.sourceTextWithTranslations.map((info) => [
+				info.number.toString(),
+				info,
+			]),
 		);
 
 		for (const [number] of translationMap) {
@@ -54,7 +56,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 							<Translation
 								key={`translation-group-${number}`}
 								translationsWithVotes={translationGroup.translationsWithVotes}
-								userId={userId}
+								currentUserName={currentUserName}
 								sourceTextId={translationGroup.sourceTextId}
 							/>
 						);
@@ -63,7 +65,11 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 				return domNode;
 			},
 		});
-	}, [content, sourceTextWithTranslations, userId]);
+	}, [
+		pageWithTranslations.content,
+		pageWithTranslations.sourceTextWithTranslations,
+		currentUserName,
+	]);
 
 	if (typeof window === "undefined") {
 		return <div>Loading...</div>;
@@ -72,15 +78,24 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 	return (
 		<>
 			<h1>
-				{title}
-				{titleTranslation && (
+				{pageWithTranslations.title}
+				{bestTranslationTitle && (
 					<Translation
-						translationsWithVotes={titleTranslation.translationsWithVotes}
-						userId={userId}
-						sourceTextId={titleTranslation.sourceTextId}
+						translationsWithVotes={bestTranslationTitle.translationsWithVotes}
+						currentUserName={currentUserName}
+						sourceTextId={bestTranslationTitle.sourceTextId}
 					/>
 				)}
 			</h1>
+			<div className="flex items-center text-gray-500">
+				<Link
+					to={`/${pageWithTranslations.user.userName}`}
+					className="text-gray-500 flex items-center mr-2 no-underline hover:text-gray-700"
+				>
+					{pageWithTranslations.user.displayName}
+				</Link>
+				<p>{pageWithTranslations.createdAt.toLocaleDateString()}</p>
+			</div>
 			{parsedContent}
 		</>
 	);

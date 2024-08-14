@@ -1,6 +1,6 @@
 import type { Page } from "@prisma/client";
-import type { SafeUser } from "~/types";
+import type { SanitizedUser } from "~/types";
 
-export type UserWithPages = SafeUser & {
+export type sanitizedUserWithPages = SanitizedUser & {
 	pages: Page[];
 };

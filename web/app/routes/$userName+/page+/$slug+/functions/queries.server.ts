@@ -11,9 +11,10 @@ export async function fetchPageWithTranslations(
 		select: {
 			id: true,
 			title: true,
-			userId: true,
+			user: { select: { displayName: true, userName: true, image: true } },
 			slug: true,
 			content: true,
+			createdAt: true,
 			pageTranslationInfo: {
 				where: { targetLanguage },
 				select: { translationTitle: true },
@@ -55,10 +56,15 @@ export async function fetchPageWithTranslations(
 	return {
 		id: page.id,
 		title: page.title,
-		userId: page.userId,
+		user: {
+			displayName: page.user.displayName,
+			userName: page.user.userName,
+			image: page.user.image,
+		},
 		translationTitle: page.pageTranslationInfo[0]?.translationTitle,
 		slug: page.slug,
 		content: page.content,
+		createdAt: page.createdAt,
 		sourceTextWithTranslations: page.sourceTexts.map((sourceText) => ({
 			sourceTextId: sourceText.id,
 			number: sourceText.number,
@@ -80,10 +86,6 @@ export async function fetchPage(pageId: number) {
 	});
 	return page;
 }
-
-export const getDbUser = async (userId: number) => {
-	return await prisma.user.findUnique({ where: { id: userId } });
-};
 
 export async function getLastReadDataNumber(userId: number, pageId: number) {
 	const readHistory = await prisma.userReadHistory.findUnique({

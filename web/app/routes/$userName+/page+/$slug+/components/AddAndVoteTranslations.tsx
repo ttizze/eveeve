@@ -11,12 +11,12 @@ const INITIAL_DISPLAY_COUNT = 3;
 export function AddAndVoteTranslations({
 	bestTranslationWithVote,
 	alternativeTranslationsWithVotes,
-	userId,
+	currentUserName,
 	sourceTextId,
 }: {
 	bestTranslationWithVote: TranslationWithVote;
 	alternativeTranslationsWithVotes: TranslationWithVote[];
-	userId: number | null;
+	currentUserName: string | null;
 	sourceTextId: number;
 }) {
 	const [showAll, setShowAll] = useState(false);
@@ -36,7 +36,7 @@ export function AddAndVoteTranslations({
 		<div className="p-4 ">
 			<TranslationItem
 				translation={bestTranslationWithVote}
-				userId={userId}
+				currentUserName={currentUserName}
 				showAuthor
 			/>
 			<div className="mt-4">
@@ -46,7 +46,7 @@ export function AddAndVoteTranslations({
 				</p>
 				<AlternativeTranslations
 					translationsWithVotes={displayedTranslations}
-					userId={userId}
+					currentUserName={currentUserName}
 				/>
 				{hasMoreTranslations && (
 					<Button
@@ -67,7 +67,10 @@ export function AddAndVoteTranslations({
 				)}
 			</div>
 			<div className="mt-4">
-				<AddTranslationForm sourceTextId={sourceTextId} userId={userId} />
+				<AddTranslationForm
+					sourceTextId={sourceTextId}
+					currentUserName={currentUserName}
+				/>
 			</div>
 		</div>
 	);

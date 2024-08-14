@@ -4,13 +4,13 @@ import { VoteButtons } from "./VoteButtons";
 
 interface TranslationItemProps {
 	translation: TranslationWithVote;
-	userId: number | null;
+	currentUserName: string | null;
 	showAuthor?: boolean;
 }
 
 export function TranslationItem({
 	translation,
-	userId,
+	currentUserName,
 	showAuthor = false,
 }: TranslationItemProps) {
 	return (
@@ -21,7 +21,10 @@ export function TranslationItem({
 					Translated by: {translation.displayName}
 				</p>
 			)}
-			<VoteButtons translationWithVote={translation} userId={userId} />
+			<VoteButtons
+				translationWithVote={translation}
+				currentUserName={currentUserName}
+			/>
 		</div>
 	);
 }
