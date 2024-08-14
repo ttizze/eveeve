@@ -34,7 +34,7 @@ export function UserAITranslationStatus({
 	return (
 		<Card className="mt-6">
 			<CardHeader className="flex flex-row items-center justify-between">
-				<CardTitle>Your AI Translation Status</CardTitle>
+				<CardTitle className="text-sm">Your AI Translation Status</CardTitle>
 				<Button
 					variant="ghost"
 					size="sm"
