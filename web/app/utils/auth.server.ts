@@ -71,7 +71,6 @@ const googleStrategy = new GoogleStrategy<SanitizedUser>(
 
 export function sanitizeUser(user: User): SanitizedUser {
 	const {
-		id,
 		password,
 		geminiApiKey,
 		openAIApiKey,

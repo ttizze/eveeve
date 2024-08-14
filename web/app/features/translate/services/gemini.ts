@@ -1,5 +1,5 @@
 import {
-	FunctionDeclarationSchemaType,
+	SchemaType,
 	GoogleGenerativeAI,
 	HarmBlockThreshold,
 	HarmCategory,
@@ -39,15 +39,15 @@ export async function getGeminiModelResponse(
 		generationConfig: {
 			responseMimeType: "application/json",
 			responseSchema: {
-				type: FunctionDeclarationSchemaType.ARRAY,
+				type: SchemaType.ARRAY,
 				items: {
-					type: FunctionDeclarationSchemaType.OBJECT,
+					type: SchemaType.OBJECT,
 					properties: {
 						number: {
-							type: FunctionDeclarationSchemaType.INTEGER,
+							type: SchemaType.INTEGER,
 						},
 						text: {
-							type: FunctionDeclarationSchemaType.STRING,
+							type: SchemaType.STRING,
 						},
 					},
 					required: ["number", "text"],

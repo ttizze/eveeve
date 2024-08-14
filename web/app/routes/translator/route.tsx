@@ -13,7 +13,6 @@ import { getTargetLanguage } from "~/utils/target-language.server";
 import { TranslationInputForm } from "./components/TranslationInputForm";
 import { createUserAITranslationInfo } from "./functions/mutations.server";
 import { getOrCreatePage } from "./functions/mutations.server";
-import { listUserAiTranslationInfo } from "./functions/queries.server";
 import { translationInputSchema } from "./types";
 import { generateSlug } from "./utils/generate-slug.server";
 import { processUploadedFolder } from "./utils/process-uploaded-folder";
@@ -28,15 +27,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	);
 	const hasGeminiApiKey = !!nonSanitizedUser?.geminiApiKey;
 	const targetLanguage = await getTargetLanguage(request);
-	const userAITranslationInfo = await listUserAiTranslationInfo(
-		nonSanitizedUser.id,
-		targetLanguage,
-	);
 
 	return typedjson({
 		currentUser,
 		targetLanguage,
-		userAITranslationInfo,
 		hasGeminiApiKey,
 	});
 }

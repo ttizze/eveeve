@@ -3,7 +3,7 @@ import type { PageWithTranslations } from "../types";
 
 export async function fetchPageWithTranslations(
 	slug: string,
-	userId: number | null,
+	currentUserId: number | null,
 	targetLanguage: string,
 ): Promise<PageWithTranslations | null> {
 	const page = await prisma.page.findFirst({
@@ -34,7 +34,7 @@ export async function fetchPageWithTranslations(
 							createdAt: true,
 							user: { select: { displayName: true } },
 							votes: {
-								where: userId ? { userId } : undefined,
+								where: currentUserId ? { userId: currentUserId } : undefined,
 								select: {
 									id: true,
 									isUpvote: true,
