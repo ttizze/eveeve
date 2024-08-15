@@ -6,9 +6,10 @@ import { Button } from "~/components/ui/button";
 import type { SanitizedUser } from "~/types";
 interface EditHeaderProps {
 	currentUser: SanitizedUser | null;
+	pageSlug: string | null;
 }
 
-export function EditHeader({ currentUser }: EditHeaderProps) {
+export function EditHeader({ currentUser, pageSlug }: EditHeaderProps) {
 	const navigation = useNavigation();
 	const isLoading = navigation.state === "loading";
 
@@ -17,7 +18,11 @@ export function EditHeader({ currentUser }: EditHeaderProps) {
 			<div className="max-w-7xl mx-auto py-4 px-4 sm:px-6  flex justify-between items-center">
 				<Button variant="ghost">
 					<Link
-						to={`/${currentUser?.userName}`}
+						to={
+							pageSlug
+								? `/${currentUser?.userName}/page/${pageSlug}`
+								: `/${currentUser?.userName}`
+						}
 						className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
 					>
 						{isLoading ? (
