@@ -1,11 +1,10 @@
 import { getFormProps, getTextareaProps, useForm } from "@conform-to/react";
-import { parseWithZod } from "@conform-to/zod";
+import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { redirect } from "@remix-run/node";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
 import { z } from "zod";
-import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
 import { authenticator } from "~/utils/auth.server";
 import { addNumbersToContent } from "../utils/addNumbersToContent";
 import { extractNumberedElements } from "../utils/extractNumberedElements";
@@ -57,14 +56,8 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 	const { title, pageContent } = submission.value;
 	const numberedContent = addNumbersToContent(pageContent);
-	const nonSanitizedUser = await getNonSanitizedUserbyUserName(
-		currentUser.userName,
-	);
-	if (!nonSanitizedUser) {
-		throw new Response("User not found", { status: 404 });
-	}
 	const page = await getOrCreatePage(
-		nonSanitizedUser.id,
+		currentUser.id,
 		slug,
 		title,
 		numberedContent,
@@ -82,6 +75,9 @@ export default function EditPage() {
 	const [form, { title, pageContent }] = useForm({
 		id: "edit-page",
 		lastResult: actionData?.lastResult,
+		constraint: getZodConstraint(schema),
+		shouldValidate: "onBlur",
+		shouldRevalidate: "onInput",
 		defaultValue: {
 			title: page?.title,
 			pageContent: page?.content,

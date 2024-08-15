@@ -39,7 +39,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export function Header({ currentUser }: HeaderProps) {
 	return (
-		<header className="shadow-sm mb-10 z-10 ">
+		<header className="shadow-sm mb-5 z-10 ">
 			<div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
 				<Link to="/">
 					<img src="/title-logo-dark.png" alt="" className="w-40" />

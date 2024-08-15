@@ -1,6 +1,7 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Link } from "@remix-run/react";
+import Linkify from "linkify-react";
 import { Button } from "~/components/ui/button";
 import {
 	Card,
@@ -44,16 +45,17 @@ export default function UserProfile() {
 				<CardHeader>
 					<CardTitle className="text-3xl font-bold flex justify-between items-center">
 						{sanitizedUserWithPages.displayName}
-
 						{isOwnProfile && (
 							<Link to={`/${sanitizedUserWithPages.userName}/edit`}>
-								<Button variant="outline">Edit Profile</Button>
+								<Button variant="outline">Edit</Button>
 							</Link>
 						)}
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<p className="">{sanitizedUserWithPages.profile}</p>
+					<Linkify options={{ className: "underline" }}>
+						{sanitizedUserWithPages.profile}
+					</Linkify>
 				</CardContent>
 			</Card>
 

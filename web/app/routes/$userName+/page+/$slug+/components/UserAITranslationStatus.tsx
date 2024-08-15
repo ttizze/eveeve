@@ -32,17 +32,17 @@ export function UserAITranslationStatus({
 	}
 
 	return (
-		<Card className="mt-6">
+		<Card className="mt-3">
 			<CardHeader className="flex flex-row items-center justify-between">
-				<CardTitle className="text-sm">Your AI Translation Status</CardTitle>
 				<Button
 					variant="ghost"
-					size="sm"
+					className="w-full justify-between"
 					onClick={() => setIsOpen(!isOpen)}
 					aria-label={
 						isOpen ? "Close translation status" : "Open translation status"
 					}
 				>
+					<CardTitle className="text-sm">Your AI Translation Status</CardTitle>
 					{isOpen ? (
 						<ChevronUp className="h-4 w-4" />
 					) : (

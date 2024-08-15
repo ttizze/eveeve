@@ -1,8 +1,8 @@
 import { useInputControl } from "@conform-to/react";
+import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-
 interface EditorProps {
 	initialContent: string;
 }
@@ -17,6 +17,9 @@ export function Editor({ initialContent }: EditorProps) {
 		immediatelyRender: false,
 		extensions: [
 			StarterKit.configure({ heading: { levels: [2, 3, 4] } }),
+			Link.configure({
+				autolink: true,
+			}),
 			Placeholder.configure({
 				placeholder: "input content...",
 			}),
