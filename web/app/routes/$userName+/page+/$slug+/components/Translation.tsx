@@ -1,4 +1,4 @@
-import { FilePenLine, X } from "lucide-react";
+import { SquarePen, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { getBestTranslation } from "../lib/get-best-translation.client";
 import { sanitizeAndParseText } from "../lib/sanitize-and-parse-text.client";
@@ -14,7 +14,7 @@ function ToggleButton({
 	isExpanded,
 	onClick,
 }: { isExpanded: boolean; onClick: () => void }) {
-	const Icon = isExpanded ? X : FilePenLine;
+	const Icon = isExpanded ? X : SquarePen;
 	const label = isExpanded
 		? "Close translation options"
 		: "Show translation options";
@@ -22,12 +22,12 @@ function ToggleButton({
 	return (
 		<button
 			type="button"
-			className="absolute -top-4 right-2 p-1  z-20"
+			className="absolute top-1 right-2 p-1  z-20"
 			onClick={onClick}
 			aria-label={label}
 			title={label}
 		>
-			<Icon className="w-6 h-6 opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity duration-200" />
+			<Icon className="w-5 h-5 opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity duration-200" />
 		</button>
 	);
 }
@@ -64,8 +64,8 @@ export function Translation({
 	}
 
 	return (
-		<div className="group relative">
-			<div className="w-full notranslate mt-2 py-2 border-b border-gray-200">
+		<div className="group relative rounded-xl bg-gray-100 dark:bg-gray-900">
+			<div className="notranslate mt-2 pt-6 pb-3 px-4">
 				{sanitizedAndParsedText}
 				<ToggleButton
 					isExpanded={isExpanded}
@@ -73,7 +73,7 @@ export function Translation({
 				/>
 			</div>
 			{isExpanded && (
-				<div className="absolute -top-4 left-0 right-0 z-10  border bg-white dark:bg-gray-900 rounded-xl shadow-xl dark:shadow-white/10  transition-all duration-500 ease-in-out">
+				<div className="absolute -top-2 left-0 right-0 z-10  border bg-white dark:bg-gray-900 rounded-xl shadow-xl dark:shadow-white/10  transition-all duration-500 ease-in-out">
 					<AddAndVoteTranslations
 						bestTranslationWithVote={bestTranslationWithVote}
 						alternativeTranslationsWithVotes={alternativeTranslationsWithVotes}

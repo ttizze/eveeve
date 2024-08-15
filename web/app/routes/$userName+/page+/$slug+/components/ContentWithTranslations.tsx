@@ -37,7 +37,12 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 		for (const [number] of translationMap) {
 			const element = doc.querySelector(`[data-number="${number}"]`);
 			if (element instanceof HTMLElement) {
-				const translationElement = doc.createElement("div");
+				const contentWrapper = doc.createElement("div");
+				contentWrapper.classList.add("px-4");
+				contentWrapper.innerHTML = element.innerHTML;
+				element.innerHTML = "";
+				element.appendChild(contentWrapper);
+				const translationElement = doc.createElement("span");
 				translationElement.setAttribute("data-translation", number);
 				element.appendChild(translationElement);
 			}
@@ -78,7 +83,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 	return (
 		<>
 			<h1>
-				{pageWithTranslations.title}
+				<div className="px-4">{pageWithTranslations.title}</div>
 				{bestTranslationTitle && (
 					<Translation
 						translationsWithVotes={bestTranslationTitle.translationsWithVotes}
@@ -87,7 +92,6 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 					/>
 				)}
 			</h1>
-			<hr />
 			<div className="flex items-center text-gray-500">
 				<Link
 					to={`/${pageWithTranslations.user.userName}`}

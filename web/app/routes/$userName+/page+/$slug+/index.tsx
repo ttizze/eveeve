@@ -186,9 +186,9 @@ export default function ReaderView() {
 
 	return (
 		<div className=" w-full max-w-3xl  mx-auto">
-			<div className="flex justify-end items-center mb-8">
-				{pagWithTranslations.user.userName === currentUser?.userName &&
-					currentUser && (
+			{pagWithTranslations.user.userName === currentUser?.userName &&
+				currentUser && (
+					<div className="flex justify-end items-center mb-8">
 						<Button asChild variant="outline">
 							<Link
 								to={`/${currentUser.userName}/page/${pagWithTranslations.slug}/edit`}
@@ -196,8 +196,8 @@ export default function ReaderView() {
 								Edit
 							</Link>
 						</Button>
-					)}
-			</div>
+					</div>
+				)}
 			<div className="mb-8">
 				<Form method="post">
 					<div className="flex flex-col space-y-2">
@@ -246,7 +246,7 @@ export default function ReaderView() {
 					userAITranslationInfo={userAITranslationInfo}
 				/>
 			</div>
-			<article className="w-full prose dark:prose-invert prose-sm sm:prose lg:prose-lg mx-auto mb-20">
+			<article className="w-full prose dark:prose-invert sm:prose lg:prose-lg mx-auto mb-20">
 				<ContentWithTranslations
 					pageWithTranslations={pagWithTranslations}
 					currentUserName={currentUser?.userName ?? null}
