@@ -27,7 +27,7 @@ function ToggleButton({
 			aria-label={label}
 			title={label}
 		>
-			<Icon className="w-5 h-5 opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity duration-200" />
+			<Icon className="w-5 h-5" />
 		</button>
 	);
 }
