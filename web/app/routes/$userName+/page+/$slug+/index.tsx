@@ -188,7 +188,7 @@ export default function ReaderView() {
 		<div className=" w-full max-w-3xl  mx-auto">
 			{pagWithTranslations.user.userName === currentUser?.userName &&
 				currentUser && (
-					<div className="flex justify-end items-center mb-8">
+					<div className="flex justify-end items-center mb-3">
 						<Button asChild variant="outline">
 							<Link
 								to={`/${currentUser.userName}/page/${pagWithTranslations.slug}/edit`}
