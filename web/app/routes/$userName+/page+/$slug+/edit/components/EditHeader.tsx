@@ -1,22 +1,25 @@
 import { Link } from "@remix-run/react";
-import { ArrowDownToLine, ArrowLeft, Loader2, Check } from "lucide-react";
+import type { Fetcher } from "@remix-run/react";
+import { ArrowDownToLine, ArrowLeft, Check, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { ModeToggle } from "~/components/dark-mode-toggle";
 import { Button } from "~/components/ui/button";
 import type { SanitizedUser } from "~/types";
-import type { Fetcher } from "@remix-run/react";
-import { useEffect, useState } from "react";
 
 interface EditHeaderProps {
 	currentUser: SanitizedUser | null;
 	pageSlug: string | null;
-	fetcher: Fetcher
+	fetcher: Fetcher;
 }
 
-export function EditHeader({ currentUser, pageSlug, fetcher }: EditHeaderProps) {
+export function EditHeader({
+	currentUser,
+	pageSlug,
+	fetcher,
+}: EditHeaderProps) {
 	const isSubmitting = fetcher.state === "submitting";
 	const isLoading = fetcher.state === "loading";
 	const [showSuccess, setShowSuccess] = useState(false);
-
 
 	useEffect(() => {
 		if (fetcher.state === "loading") {

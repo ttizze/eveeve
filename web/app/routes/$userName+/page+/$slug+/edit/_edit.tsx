@@ -114,7 +114,11 @@ export default function EditPage() {
 	return (
 		<div>
 			<fetcher.Form method="post" {...getFormProps(form)}>
-				<EditHeader currentUser={currentUser} pageSlug={page?.slug} fetcher={fetcher} />
+				<EditHeader
+					currentUser={currentUser}
+					pageSlug={page?.slug}
+					fetcher={fetcher}
+				/>
 				<div className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg mx-auto">
 					<div className="mt-10">
 						<h1 className="text-4xl font-bold">
