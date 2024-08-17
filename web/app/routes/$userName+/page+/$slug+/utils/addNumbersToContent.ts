@@ -42,6 +42,7 @@ export function addNumbersToContent(content: string): string {
 	const sanitizedContent = DOMPurify.sanitize(content);
 	const doc = new JSDOM(sanitizedContent);
 	let currentNumber = 1;
+
 	function processNode(node: Node) {
 		if (
 			node.nodeType === Node.ELEMENT_NODE &&

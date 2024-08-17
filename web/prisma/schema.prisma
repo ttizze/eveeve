@@ -32,7 +32,6 @@ model User {
   userAITranslationInfo UserAITranslationInfo[]
   customAIModels        CustomAIModel[]
 
-  @@index([userName])
   @@map("users")
 }
 
@@ -63,8 +62,6 @@ model UserReadHistory {
   page               Page     @relation(fields: [pageId], references: [id])
 
   @@unique([userId, pageId])
-  @@index([userId])
-  @@index([pageId])
   @@map("user_read_history")
 }
 
@@ -143,8 +140,7 @@ model SourceText {
   pageId          Int              @map("page_id")
   createdAt       DateTime         @default(now()) @map("created_at")
 
-  @@unique([pageId, number, text])
-  @@index([pageId])
+  @@index([pageId, number])
   @@map("source_texts")
 }
 
