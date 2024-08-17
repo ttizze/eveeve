@@ -1,5 +1,31 @@
-import { prisma } from "../../../../../utils/prisma";
+import { prisma } from "~/utils/prisma";
 import type { PageWithTranslations } from "../types";
+
+export async function fetchPageWithSourceTexts(pageId: number) {
+	const pageWithSourceTexts = await prisma.page.findFirst({
+		where: { id: pageId },
+		select: {
+			id: true,
+			title: true,
+			slug: true,
+			content: true,
+			createdAt: true,
+			sourceTexts: {
+				distinct: ["number"],
+				orderBy: { createdAt: "desc" },
+				select: {
+					id: true,
+					number: true,
+					text: true,
+				},
+			},
+		},
+	});
+
+	if (!pageWithSourceTexts) return null;
+
+	return pageWithSourceTexts;
+}
 
 export async function fetchPageWithTranslations(
 	slug: string,
@@ -78,13 +104,6 @@ export async function fetchPageWithTranslations(
 			})),
 		})),
 	};
-}
-
-export async function fetchPage(pageId: number) {
-	const page = await prisma.page.findFirst({
-		where: { id: pageId },
-	});
-	return page;
 }
 
 export async function getLastReadDataNumber(userId: number, pageId: number) {

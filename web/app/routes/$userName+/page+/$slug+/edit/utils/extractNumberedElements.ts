@@ -1,12 +1,14 @@
 import { JSDOM } from "jsdom";
+import type { NumberedElement } from "../types";
 
-export function extractNumberedElements(
+export async function extractNumberedElements(
 	content: string,
 	title: string,
-): Array<{ number: number; text: string }> {
+	titleSourceTextId: number | null,
+): Promise<Array<NumberedElement>> {
 	const doc = new JSDOM(content);
-	const numberedElements: Array<{ number: number; text: string }> = [
-		{ number: 0, text: title },
+	const numberedElements: Array<NumberedElement> = [
+		{ number: 0, text: title, sourceTextId: titleSourceTextId },
 	];
 	// <br>のみを改行とする
 	doc.window.document.body.innerHTML = doc.window.document.body.innerHTML
@@ -17,10 +19,14 @@ export function extractNumberedElements(
 
 	for (const element of elements) {
 		const dataNumber = element.getAttribute("data-number");
+		const dataSourceTextId = element.getAttribute("data-source-text-id");
 		if (dataNumber !== null) {
 			numberedElements.push({
 				number: Number.parseInt(dataNumber, 10),
 				text: element.textContent?.trim() || "",
+				sourceTextId: dataSourceTextId
+					? Number.parseInt(dataSourceTextId, 10)
+					: null,
 			});
 		}
 	}

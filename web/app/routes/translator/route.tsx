@@ -2,11 +2,11 @@ import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useRevalidator } from "@remix-run/react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
-import { addNumbersToContent } from "~/features/prepare-html-for-translate/utils/addNumbersToContent";
-import { extractArticle } from "~/features/prepare-html-for-translate/utils/extractArticle";
-import { extractNumberedElements } from "~/features/prepare-html-for-translate/utils/extractNumberedElements";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
-import { createOrSkipSourceTexts } from "~/routes/$userName+/page+/$slug+/edit/functions/mutations.server";
+import { createOrUpdateSourceTexts } from "~/routes/$userName+/page+/$slug+/edit/functions/mutations.server";
+import { addNumbersToContent } from "~/routes/$userName+/page+/$slug+/edit/utils/addNumbersToContent";
+import { extractArticle } from "~/routes/$userName+/page+/$slug+/edit/utils/extractArticle";
+import { extractNumberedElements } from "~/routes/$userName+/page+/$slug+/edit/utils/extractNumberedElements";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
 import { authenticator } from "~/utils/auth.server";
 import { getTargetLanguage } from "~/utils/target-language.server";
@@ -124,11 +124,12 @@ export async function action({ request }: ActionFunctionArgs) {
 					targetLanguage,
 				);
 
-				const numberedElements = extractNumberedElements(
+				const numberedElements = await extractNumberedElements(
 					numberedContent,
 					title,
+					null,
 				);
-				await createOrSkipSourceTexts(numberedElements, page.id);
+				await createOrUpdateSourceTexts(numberedElements, page.id);
 				await queue.add(`translate-${nonSanitizedUser.id}`, {
 					userAITranslationInfoId: userAITranslationInfo.id,
 					geminiApiKey: geminiApiKey,
