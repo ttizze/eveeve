@@ -1,7 +1,7 @@
 import { getFormProps, getTextareaProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import { useActionData, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
 import { z } from "zod";
 import { authenticator } from "~/utils/auth.server";
@@ -97,11 +97,10 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 export default function EditPage() {
 	const { currentUser, page } = useLoaderData<typeof loader>();
-	const actionData = useActionData<typeof action>();
-	const fetcher = useFetcher();
+	const fetcher = useFetcher<typeof action>();
 	const [form, { title, pageContent }] = useForm({
 		id: "edit-page",
-		lastResult: actionData?.lastResult,
+		lastResult: fetcher.data?.lastResult,
 		constraint: getZodConstraint(schema),
 		shouldValidate: "onBlur",
 		shouldRevalidate: "onInput",
