@@ -27,42 +27,40 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 
 		const sanitizedContent = DOMPurify.sanitize(pageWithTranslations.content);
 		const doc = new DOMParser().parseFromString(sanitizedContent, "text/html");
-		const translationMap = new Map(
-			pageWithTranslations.sourceTextWithTranslations.map((info) => [
-				info.number.toString(),
-				info,
-			]),
-		);
 
-		for (const [number] of translationMap) {
-			const element = doc.querySelector(`[data-number="${number}"]`);
+		const elements = doc.querySelectorAll("[data-source-text-id]");
+		for (const element of elements) {
 			if (element instanceof HTMLElement) {
-				const contentWrapper = doc.createElement("div");
-				contentWrapper.classList.add("px-4");
+				const sourceTextId = element.getAttribute("data-source-text-id");
+				const contentWrapper = document.createElement("span");
+				contentWrapper.classList.add("inline-block", "px-4");
 				contentWrapper.innerHTML = element.innerHTML;
 				element.innerHTML = "";
 				element.appendChild(contentWrapper);
-				const translationElement = doc.createElement("span");
-				translationElement.setAttribute("data-translation", number);
+				const translationElement = document.createElement("span");
+				translationElement.setAttribute(
+					"data-translation-id",
+					sourceTextId || "",
+				);
 				element.appendChild(translationElement);
 			}
 		}
 
 		return parse(doc.body.innerHTML, {
 			replace: (domNode) => {
-				if (domNode.type === "tag" && domNode.attribs["data-translation"]) {
-					const number = domNode.attribs["data-translation"];
-					const translationGroup = translationMap.get(number);
-					if (
-						translationGroup &&
-						translationGroup.translationsWithVotes.length > 0
-					) {
+				if (domNode.type === "tag" && domNode.attribs["data-translation-id"]) {
+					const sourceTextId = domNode.attribs["data-translation-id"];
+					const translations =
+						pageWithTranslations.sourceTextWithTranslations.find(
+							(info) => info.sourceTextId.toString() === sourceTextId,
+						);
+					if (translations && translations.translationsWithVotes.length > 0) {
 						return (
 							<Translation
-								key={`translation-group-${number}`}
-								translationsWithVotes={translationGroup.translationsWithVotes}
+								key={`translation-${sourceTextId}`}
+								translationsWithVotes={translations.translationsWithVotes}
 								currentUserName={currentUserName}
-								sourceTextId={translationGroup.sourceTextId}
+								sourceTextId={translations.sourceTextId}
 							/>
 						);
 					}

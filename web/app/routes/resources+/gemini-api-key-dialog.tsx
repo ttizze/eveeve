@@ -19,7 +19,6 @@ import {
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { validateGeminiApiKey } from "~/features/translate/services/gemini";
-import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
 import { authenticator } from "~/utils/auth.server";
 import { updateGeminiApiKey } from "./functions/mutations.server";
 
@@ -35,9 +34,6 @@ export async function action({ request }: ActionFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/",
 	});
-	const nonSanitizedUser = await getNonSanitizedUserbyUserName(
-		currentUser.userName,
-	);
 	const submission = parseWithZod(await request.formData(), {
 		schema: geminiApiKeySchema,
 	});
@@ -61,8 +57,8 @@ export async function action({ request }: ActionFunctionArgs) {
 			success: false,
 		};
 	}
-	await updateGeminiApiKey(nonSanitizedUser.id, submission.value.geminiApiKey);
-	return { lastResult: submission.reply({ resetForm: true }), success: true };
+	await updateGeminiApiKey(currentUser.id, submission.value.geminiApiKey);
+	return { lastResult: submission.reply(), success: true };
 }
 
 interface GeminiApiKeyDialogProps {

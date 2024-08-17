@@ -1,7 +1,7 @@
 import { prisma } from "~/utils/prisma";
 import type { NumberedElement } from "../types";
 
-export async function getOrCreatePage(
+export async function createOrUpdatePage(
 	userId: number,
 	slug: string,
 	title: string,
@@ -25,17 +25,34 @@ export async function getOrCreatePage(
 
 	return page;
 }
-
-export async function createOrSkipSourceTexts(
+//sourceTextIdがあればupdate、なければcreate
+export async function createOrUpdateSourceTexts(
 	numberedElements: NumberedElement[],
 	pageId: number,
-) {
-	await prisma.sourceText.createMany({
-		data: numberedElements.map((element) => ({
-			pageId,
-			number: element.number,
-			text: element.text,
-		})),
-		skipDuplicates: true,
+): Promise<Array<{ number: number; sourceTextId: number }>> {
+	return await prisma.$transaction(async (tx) => {
+		const results = await Promise.all(
+			numberedElements.map(async (element) => {
+				if (element.sourceTextId) {
+					const sourceText = await tx.sourceText.update({
+						where: { id: element.sourceTextId },
+						data: {
+							number: element.number,
+							text: element.text,
+						},
+					});
+					return { number: element.number, sourceTextId: sourceText.id };
+				}
+				const sourceText = await tx.sourceText.create({
+					data: {
+						pageId,
+						number: element.number,
+						text: element.text,
+					},
+				});
+				return { number: element.number, sourceTextId: sourceText.id };
+			}),
+		);
+		return results;
 	});
 }

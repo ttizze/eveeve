@@ -7,12 +7,17 @@ import { useFetcher } from "@remix-run/react";
 import { z } from "zod";
 import { authenticator } from "~/utils/auth.server";
 import { addNumbersToContent } from "../utils/addNumbersToContent";
+import { addSourceTextIdToContent } from "../utils/addSourceTextIdToContent";
 import { extractNumberedElements } from "../utils/extractNumberedElements";
+import { removeSourceTextIdDuplicates } from "../utils/removeSourceTextIdDuplicates";
 import { EditHeader } from "./components/EditHeader";
 import { Editor } from "./components/Editor";
-import { createOrSkipSourceTexts } from "./functions/mutations.server";
-import { getOrCreatePage } from "./functions/mutations.server";
-import { getPageBySlug } from "./functions/queries.server";
+import { createOrUpdateSourceTexts } from "./functions/mutations.server";
+import { createOrUpdatePage } from "./functions/mutations.server";
+import {
+	getPageBySlug,
+	getPageWithSourceTexts,
+} from "./functions/queries.server";
 
 const schema = z.object({
 	title: z.string().min(1, "Required"),
@@ -56,15 +61,40 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 	const { title, pageContent } = submission.value;
 	const numberedContent = addNumbersToContent(pageContent);
-	const page = await getOrCreatePage(
+	//tiptapが既存の要素を引き継いで重複したsourceTextIdを追加してしまうため、重複を削除
+	const numberedContentWithoutDuplicatesSourceTextId =
+		removeSourceTextIdDuplicates(numberedContent);
+	const page = await createOrUpdatePage(
 		currentUser.id,
 		slug,
 		title,
-		numberedContent,
+		numberedContentWithoutDuplicatesSourceTextId,
 	);
-	const numberedElements = extractNumberedElements(numberedContent, title);
-	await createOrSkipSourceTexts(numberedElements, page.id);
 
+	const existingPage = await getPageWithSourceTexts(slug);
+	const titleSourceTextId =
+		existingPage?.sourceTexts.find((st) => st.number === 0)?.id || null;
+
+	const numberedElements = extractNumberedElements(
+		numberedContentWithoutDuplicatesSourceTextId,
+		title,
+		titleSourceTextId,
+	);
+
+	const numberedSourceTexts = await createOrUpdateSourceTexts(
+		numberedElements,
+		page.id,
+	);
+	const contentWithSourceTextId = addSourceTextIdToContent(
+		numberedContentWithoutDuplicatesSourceTextId,
+		numberedSourceTexts,
+	);
+	await createOrUpdatePage(
+		currentUser.id,
+		slug,
+		title,
+		contentWithSourceTextId,
+	);
 	return redirect(`/${userName}/page/${slug}`);
 };
 

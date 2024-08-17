@@ -1,6 +1,7 @@
 export type NumberedElement = {
 	number: number;
 	text: string;
+	sourceTextId: number | null;
 };
 
 export interface TranslateJobParams {
