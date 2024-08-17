@@ -6,10 +6,6 @@ import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
 import { z } from "zod";
 import { authenticator } from "~/utils/auth.server";
-import { addNumbersToContent } from "../utils/addNumbersToContent";
-import { addSourceTextIdToContent } from "../utils/addSourceTextIdToContent";
-import { extractNumberedElements } from "../utils/extractNumberedElements";
-import { removeSourceTextIdDuplicates } from "../utils/removeSourceTextIdDuplicates";
 import { EditHeader } from "./components/EditHeader";
 import { Editor } from "./components/Editor";
 import { createOrUpdateSourceTexts } from "./functions/mutations.server";
@@ -18,6 +14,10 @@ import {
 	getPageBySlug,
 	getPageWithSourceTexts,
 } from "./functions/queries.server";
+import { addNumbersToContent } from "./utils/addNumbersToContent";
+import { addSourceTextIdToContent } from "./utils/addSourceTextIdToContent";
+import { extractNumberedElements } from "./utils/extractNumberedElements";
+import { removeSourceTextIdDuplicates } from "./utils/removeSourceTextIdDuplicates";
 
 const schema = z.object({
 	title: z.string().min(1, "Required"),
@@ -60,34 +60,32 @@ export const action: ActionFunction = async ({ request, params }) => {
 	}
 
 	const { title, pageContent } = submission.value;
-	const numberedContent = addNumbersToContent(pageContent);
+	const existingPage = await getPageWithSourceTexts(slug);
+	const titleSourceTextId =
+		existingPage?.sourceTexts.find((st) => st.number === 0)?.id || null;
 	//tiptapが既存の要素を引き継いで重複したsourceTextIdを追加してしまうため、重複を削除
-	const numberedContentWithoutDuplicatesSourceTextId =
-		removeSourceTextIdDuplicates(numberedContent);
+	const numberedContent = await removeSourceTextIdDuplicates(
+		addNumbersToContent(pageContent),
+	);
+	const numberedElements = await extractNumberedElements(
+		numberedContent,
+		title,
+		titleSourceTextId,
+	);
 	const page = await createOrUpdatePage(
 		currentUser.id,
 		slug,
 		title,
-		numberedContentWithoutDuplicatesSourceTextId,
+		numberedContent,
 	);
 
-	const existingPage = await getPageWithSourceTexts(slug);
-	const titleSourceTextId =
-		existingPage?.sourceTexts.find((st) => st.number === 0)?.id || null;
-
-	const numberedElements = extractNumberedElements(
-		numberedContentWithoutDuplicatesSourceTextId,
-		title,
-		titleSourceTextId,
-	);
-
-	const numberedSourceTexts = await createOrUpdateSourceTexts(
+	const sourceTextsIdWithNumber = await createOrUpdateSourceTexts(
 		numberedElements,
 		page.id,
 	);
 	const contentWithSourceTextId = addSourceTextIdToContent(
-		numberedContentWithoutDuplicatesSourceTextId,
-		numberedSourceTexts,
+		numberedContent,
+		sourceTextsIdWithNumber,
 	);
 	await createOrUpdatePage(
 		currentUser.id,

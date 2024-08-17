@@ -26,12 +26,11 @@ import {
 } from "./functions/mutations.server";
 import { createUserAITranslationInfo } from "./functions/mutations.server";
 import {
-	fetchPage,
+	fetchPageWithSourceTexts,
 	fetchPageWithTranslations,
 	fetchUserAITranslationInfo,
 } from "./functions/queries.server";
 import { actionSchema } from "./types";
-import { extractNumberedElements } from "./utils/extractNumberedElements";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const { slug } = params;
@@ -121,8 +120,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 					slug: null,
 				};
 			}
-			const page = await fetchPage(submission.value.pageId);
-			if (!page) {
+			const pageWithSourceTexts = await fetchPageWithSourceTexts(
+				submission.value.pageId,
+			);
+			if (!pageWithSourceTexts) {
 				return {
 					lastResult: submission.reply({
 						formErrors: ["Page not found"],
@@ -133,31 +134,27 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			}
 			const userAITranslationInfo = await createUserAITranslationInfo(
 				nonSanitizedUser.id,
-				page.id,
+				pageWithSourceTexts.id,
 				submission.value.aiModel,
 				targetLanguage,
 			);
 
-			const numberedElements = extractNumberedElements(
-				page.content,
-				page.title,
-			);
 			const queue = getTranslateUserQueue(nonSanitizedUser.id);
 			const job = await queue.add(`translate-${nonSanitizedUser.id}`, {
 				userAITranslationInfoId: userAITranslationInfo.id,
 				geminiApiKey: nonSanitizedUser.geminiApiKey,
 				aiModel: submission.value.aiModel,
 				userId: nonSanitizedUser.id,
-				pageId: page.id,
+				pageId: pageWithSourceTexts.id,
 				targetLanguage,
-				title: page.title,
-				numberedContent: page.content,
-				numberedElements,
+				title: pageWithSourceTexts.title,
+				numberedContent: pageWithSourceTexts.content,
+				numberedElements: pageWithSourceTexts.sourceTexts,
 			});
 			return {
 				intent,
 				lastResult: submission.reply({ resetForm: true }),
-				slug: page.slug,
+				slug: pageWithSourceTexts.slug,
 			};
 		}
 		default:

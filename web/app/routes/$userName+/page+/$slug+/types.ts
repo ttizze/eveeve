@@ -1,5 +1,6 @@
 import type { TranslateText, Vote } from "@prisma/client";
 import { z } from "zod";
+
 export type UserVote = Pick<Vote, "id" | "isUpvote" | "updatedAt">;
 
 export type TranslationWithVote = Pick<
