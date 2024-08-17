@@ -46,11 +46,7 @@ export function Footer({ currentUser }: FooterProps) {
 					<div className="flex justify-between items-center">
 						<div className="flex items-center space-x-4">
 							<Link to="/">
-								<img
-									src="/title-logo-dark.png"
-									alt="::COMPANY_NAME::"
-									className="w-32"
-								/>
+								<h1 className="text-4xl font-bold">EveEve</h1>
 							</Link>
 							{currentUser && (
 								<>

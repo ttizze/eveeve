@@ -1,8 +1,7 @@
 import { getFormProps, getTextareaProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { redirect } from "@remix-run/node";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import { useActionData, useLoaderData } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
 import { z } from "zod";
 import { authenticator } from "~/utils/auth.server";
@@ -93,7 +92,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 		title,
 		contentWithSourceTextId,
 	);
-	return redirect(`/${userName}/page/${slug}`);
+	return null;
 };
 
 export default function EditPage() {
@@ -114,8 +113,12 @@ export default function EditPage() {
 
 	return (
 		<div>
-			<Form method="post" {...getFormProps(form)}>
-				<EditHeader currentUser={currentUser} pageSlug={page?.slug} />
+			<fetcher.Form method="post" {...getFormProps(form)}>
+				<EditHeader
+					currentUser={currentUser}
+					pageSlug={page?.slug}
+					fetcher={fetcher}
+				/>
 				<div className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg mx-auto">
 					<div className="mt-10">
 						<h1 className="text-4xl font-bold">
@@ -141,7 +144,7 @@ export default function EditPage() {
 						))}
 					</div>
 				</div>
-			</Form>
+			</fetcher.Form>
 		</div>
 	);
 }

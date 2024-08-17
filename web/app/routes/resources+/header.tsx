@@ -5,6 +5,7 @@ import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
 import { LogIn, Search } from "lucide-react";
 import { NewPageButton } from "~/components/NewPageButton";
+import { ModeToggle } from "~/components/dark-mode-toggle";
 import { Button } from "~/components/ui/button";
 import type { SanitizedUser } from "~/types";
 import { authenticator } from "~/utils/auth.server";
@@ -42,7 +43,7 @@ export function Header({ currentUser }: HeaderProps) {
 		<header className="shadow-sm mb-5 z-10 ">
 			<div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
 				<Link to="/">
-					<img src="/title-logo-dark.png" alt="" className="w-40" />
+					<h1 className="text-4xl font-bold">EveEve</h1>
 				</Link>
 				<div className="flex items-center">
 					<Button variant="ghost">
@@ -53,6 +54,7 @@ export function Header({ currentUser }: HeaderProps) {
 							<Search className="w-6 h-6" />
 						</Link>
 					</Button>
+					<ModeToggle />
 					{currentUser ? (
 						<NewPageButton userName={currentUser.userName} />
 					) : (

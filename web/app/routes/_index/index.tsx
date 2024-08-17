@@ -1,12 +1,7 @@
-import type {
-	ActionFunctionArgs,
-	LoaderFunctionArgs,
-	MetaFunction,
-} from "@remix-run/node";
+import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form } from "@remix-run/react";
 import { FaDiscord, FaGithub } from "react-icons/fa";
-import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { authenticator } from "~/utils/auth.server";
@@ -21,10 +16,6 @@ export const meta: MetaFunction = () => {
 		},
 	];
 };
-export async function loader({ request }: LoaderFunctionArgs) {
-	const currentUser = await authenticator.isAuthenticated(request);
-	return typedjson({ currentUser });
-}
 
 export async function action({ request }: ActionFunctionArgs) {
 	const user = await authenticator.authenticate("google", request);
@@ -40,8 +31,6 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Index() {
-	const { currentUser } = useTypedLoaderData<typeof loader>();
-
 	return (
 		<div className="min-h-screen bg-gradient-to-b ">
 			<main className="container mx-auto px-4 py-20">

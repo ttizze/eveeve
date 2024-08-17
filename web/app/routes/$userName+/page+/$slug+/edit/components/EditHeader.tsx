@@ -1,17 +1,34 @@
 import { Link } from "@remix-run/react";
-import { useNavigation } from "@remix-run/react";
-import { ArrowDownToLine, ArrowLeft, Loader2 } from "lucide-react";
+import type { Fetcher } from "@remix-run/react";
+import { ArrowDownToLine, ArrowLeft, Check, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { ModeToggle } from "~/components/dark-mode-toggle";
 import { Button } from "~/components/ui/button";
 import type { SanitizedUser } from "~/types";
+
 interface EditHeaderProps {
 	currentUser: SanitizedUser | null;
 	pageSlug: string | null;
+	fetcher: Fetcher;
 }
 
-export function EditHeader({ currentUser, pageSlug }: EditHeaderProps) {
-	const navigation = useNavigation();
-	const isLoading = navigation.state === "loading";
+export function EditHeader({
+	currentUser,
+	pageSlug,
+	fetcher,
+}: EditHeaderProps) {
+	const isSubmitting = fetcher.state === "submitting";
+	const isLoading = fetcher.state === "loading";
+	const [showSuccess, setShowSuccess] = useState(false);
+
+	useEffect(() => {
+		if (fetcher.state === "loading") {
+			setShowSuccess(true);
+		} else if (fetcher.state === "idle" && showSuccess) {
+			const timer = setTimeout(() => setShowSuccess(false), 500);
+			return () => clearTimeout(timer);
+		}
+	}, [fetcher.state, showSuccess]);
 
 	return (
 		<header className="mb-10 z-10 ">
@@ -32,9 +49,21 @@ export function EditHeader({ currentUser, pageSlug }: EditHeaderProps) {
 						)}
 					</Link>
 				</Button>
-				<Button type="submit" variant="ghost">
-					<ArrowDownToLine className="w-6 h-6 mr-2" />
-					Save
+				<Button type="submit" variant="ghost" disabled={isSubmitting}>
+					{isSubmitting ? (
+						<>
+							<Loader2 className="w-6 h-6 animate-spin" />
+						</>
+					) : showSuccess ? (
+						<>
+							<Check className="w-6 h-6 " />
+						</>
+					) : (
+						<>
+							<ArrowDownToLine className="w-6 h-6 mr-2" />
+							Save
+						</>
+					)}
 				</Button>
 				<div className="flex items-center">
 					<ModeToggle />
