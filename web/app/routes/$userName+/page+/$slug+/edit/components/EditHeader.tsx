@@ -33,22 +33,22 @@ export function EditHeader({
 	return (
 		<header className="mb-10 z-10 ">
 			<div className="max-w-7xl mx-auto py-4 px-4 sm:px-6  flex justify-between items-center">
-				<Button variant="ghost">
-					<Link
-						to={
-							pageSlug
-								? `/${currentUser?.userName}/page/${pageSlug}`
-								: `/${currentUser?.userName}`
-						}
-						className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-					>
+				<Link
+					to={
+						pageSlug
+							? `/${currentUser?.userName}/page/${pageSlug}`
+							: `/${currentUser?.userName}`
+					}
+					className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+				>
+					<Button variant="ghost">
 						{isLoading ? (
 							<Loader2 className="w-6 h-6 animate-spin" />
 						) : (
 							<ArrowLeft className="w-6 h-6" />
 						)}
-					</Link>
-				</Button>
+					</Button>
+				</Link>
 				<Button type="submit" variant="ghost" disabled={isSubmitting}>
 					{isSubmitting ? (
 						<>
