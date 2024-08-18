@@ -4,7 +4,9 @@ import { useRevalidator } from "@remix-run/react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import { createOrUpdateSourceTexts } from "~/routes/$userName+/page+/$slug+/edit/functions/mutations.server";
+import { createOrUpdatePage } from "~/routes/$userName+/page+/$slug+/edit/functions/mutations.server";
 import { addNumbersToContent } from "~/routes/$userName+/page+/$slug+/edit/utils/addNumbersToContent";
+import { addSourceTextIdToContent } from "~/routes/$userName+/page+/$slug+/edit/utils/addSourceTextIdToContent";
 import { extractArticle } from "~/routes/$userName+/page+/$slug+/edit/utils/extractArticle";
 import { extractNumberedElements } from "~/routes/$userName+/page+/$slug+/edit/utils/extractNumberedElements";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
@@ -111,11 +113,30 @@ export async function action({ request }: ActionFunctionArgs) {
 
 				const { content, title } = extractArticle(html);
 				const numberedContent = addNumbersToContent(content);
-				const page = await getOrCreatePage(
+				const numberedElements = await extractNumberedElements(
+					numberedContent,
+					title,
+					null,
+				);
+				const page = await createOrUpdatePage(
 					nonSanitizedUser.id,
 					fileSlug,
 					title,
 					numberedContent,
+				);
+				const sourceTextsIdWithNumber = await createOrUpdateSourceTexts(
+					numberedElements,
+					page.id,
+				);
+				const contentWithSourceTextId = addSourceTextIdToContent(
+					numberedContent,
+					sourceTextsIdWithNumber,
+				);
+				await createOrUpdatePage(
+					currentUser.id,
+					fileSlug,
+					title,
+					contentWithSourceTextId,
 				);
 				const userAITranslationInfo = await createUserAITranslationInfo(
 					nonSanitizedUser.id,
@@ -124,12 +145,6 @@ export async function action({ request }: ActionFunctionArgs) {
 					targetLanguage,
 				);
 
-				const numberedElements = await extractNumberedElements(
-					numberedContent,
-					title,
-					null,
-				);
-				await createOrUpdateSourceTexts(numberedElements, page.id);
 				await queue.add(`translate-${nonSanitizedUser.id}`, {
 					userAITranslationInfoId: userAITranslationInfo.id,
 					geminiApiKey: geminiApiKey,
