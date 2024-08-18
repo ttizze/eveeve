@@ -40,7 +40,7 @@ export default function UserProfile() {
 	}>();
 
 	return (
-		<div className="container mx-auto mt-10">
+		<div className="container mx-auto">
 			<Card className="h-full mb-6">
 				<CardHeader>
 					<CardTitle className="text-3xl font-bold flex justify-between items-center">
@@ -66,15 +66,15 @@ export default function UserProfile() {
 						key={page.id}
 						className="h-full"
 					>
-						<Card className="C">
+						<Card className="h-full">
 							<CardHeader>
 								<CardTitle className="line-clamp-2">{page.title}</CardTitle>
 								<CardDescription>
 									{new Date(page.createdAt).toLocaleDateString()}
 								</CardDescription>
 							</CardHeader>
-							<CardContent className="flex-grow">
-								<p className="text-sm text-gray-600 line-clamp-4">
+							<CardContent className="flex-grow overflow-hidden px-4">
+								<p className="text-sm text-gray-600 line-clamp-4 break-words">
 									{stripHtmlTags(page.content)}
 								</p>
 							</CardContent>
