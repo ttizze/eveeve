@@ -80,51 +80,56 @@ export default function EditProfile() {
 		},
 	});
 	return (
-		<div className="container mx-auto mt-10">
+		<div className="container mx-auto">
 			<Link to={`/${currentUser.userName}`}>
-				<ArrowLeft className="w-6 h-6 mb-10" />
+				<ArrowLeft className="w-6 h-6 mb-5" />
 			</Link>
 			<div className="rounded-xl border p-4 shadow-md">
-				<h1 className="text-3xl font-bold mb-6">Edit Profile</h1>
-				<Form method="post" {...getFormProps(form)} className="space-y-4">
-					<div>
-						<Label htmlFor={displayName.id}>Display Name</Label>
-						<Input {...getInputProps(displayName, { type: "text" })} />
-						<div id={displayName.errorId} className="text-red-500 text-sm mt-1">
-							{displayName.errors}
+				<div className="rounded-xl border p-4 ">
+					<h2 className="text-xl font-bold mb-3">Edit Profile</h2>
+					<Form method="post" {...getFormProps(form)} className="space-y-4">
+						<div>
+							<Label htmlFor={displayName.id}>Display Name</Label>
+							<Input {...getInputProps(displayName, { type: "text" })} />
+							<div
+								id={displayName.errorId}
+								className="text-red-500 text-sm mt-1"
+							>
+								{displayName.errors}
+							</div>
 						</div>
-					</div>
-					<div>
-						<Label htmlFor={profile.id}>Profile</Label>
-						<textarea
-							{...getTextareaProps(profile)}
-							className="w-full h-32 px-3 py-2  border rounded-lg focus:outline-none"
-						/>
-						<div id={profile.errorId} className="text-red-500 text-sm mt-1">
-							{profile.errors}
+						<div>
+							<Label htmlFor={profile.id}>Profile</Label>
+							<textarea
+								{...getTextareaProps(profile)}
+								className="w-full h-32 px-3 py-2  border rounded-lg focus:outline-none"
+							/>
+							<div id={profile.errorId} className="text-red-500 text-sm mt-1">
+								{profile.errors}
+							</div>
 						</div>
-					</div>
+						<Button
+							type="submit"
+							className="w-full"
+							disabled={navigation.state === "submitting"}
+						>
+							Save
+						</Button>
+					</Form>
+				</div>
+				<div className="mt-10 rounded-xl border p-4 shadow-md">
+					<h2 className="text-xl font-bold mb-3">Gemini API Key</h2>
 					<Button
-						type="submit"
 						className="w-full"
-						disabled={navigation.state === "submitting"}
+						onClick={() => setIsGeminiApiKeyDialogOpen(true)}
 					>
-						Save
+						Change Gemini API Key
 					</Button>
-				</Form>
-			</div>
-			<div className="mt-16 rounded-xl border p-4 shadow-md">
-				<h1 className="text-3xl font-bold mb-6">Change Gemini API Key</h1>
-				<Button
-					className="w-full"
-					onClick={() => setIsGeminiApiKeyDialogOpen(true)}
-				>
-					Change Gemini API Key
-				</Button>
-				<GeminiApiKeyDialog
-					isOpen={isGeminiApiKeyDialogOpen}
-					onOpenChange={setIsGeminiApiKeyDialogOpen}
-				/>
+					<GeminiApiKeyDialog
+						isOpen={isGeminiApiKeyDialogOpen}
+						onOpenChange={setIsGeminiApiKeyDialogOpen}
+					/>
+				</div>
 			</div>
 		</div>
 	);
