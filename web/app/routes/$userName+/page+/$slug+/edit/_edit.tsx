@@ -86,6 +86,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 		numberedContent,
 		sourceTextsIdWithNumber,
 	);
+	console.log("contentWithSourceTextId", contentWithSourceTextId);
 	await createOrUpdatePage(
 		currentUser.id,
 		slug,
