@@ -11,6 +11,7 @@ import { Link } from "@remix-run/react";
 import { useNavigation } from "@remix-run/react";
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { useEffect } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -21,7 +22,6 @@ import { authenticator, sanitizeUser } from "~/utils/auth.server";
 import { commitSession, getSession } from "~/utils/session.server";
 import { updateUser } from "./functions/mutations.server";
 import { getUserByUserName } from "./functions/queries.server";
-import { useEffect } from "react";
 
 const schema = z.object({
 	displayName: z
@@ -130,11 +130,13 @@ export default function EditProfile() {
 							className="w-full h-10"
 							disabled={navigation.state === "submitting"}
 						>
-							{showSuccess
-								? <Check className="w-6 h-6" />
-								: navigation.state === "submitting"
-									? <Loader2 className="w-6 h-6 animate-spin" />
-									: "Save"}
+							{showSuccess ? (
+								<Check className="w-6 h-6" />
+							) : navigation.state === "submitting" ? (
+								<Loader2 className="w-6 h-6 animate-spin" />
+							) : (
+								"Save"
+							)}
 						</Button>
 					</Form>
 				</div>

@@ -1,7 +1,7 @@
 import { useNavigate } from "@remix-run/react";
 import { PlusCircle } from "lucide-react";
-import { Button } from "~/components/ui/button";
 import { useState } from "react";
+import { Button } from "~/components/ui/button";
 interface NewPageButtonProps {
 	userName: string;
 }
