@@ -109,13 +109,13 @@ export function EditHeader({
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
-							<DropdownMenuItem onSelect={() => handlePublishToggle(true)}>
-								<Globe className="mr-2 h-4 w-4" />
-								<span>Set to Public</span>
-							</DropdownMenuItem>
 							<DropdownMenuItem onSelect={() => handlePublishToggle(false)}>
 								<Lock className="mr-2 h-4 w-4" />
 								<span>Set to Private</span>
+							</DropdownMenuItem>
+							<DropdownMenuItem onSelect={() => handlePublishToggle(true)}>
+								<Globe className="mr-2 h-4 w-4" />
+								<span>Set to Public</span>
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
