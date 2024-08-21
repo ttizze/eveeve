@@ -25,6 +25,8 @@ export interface PageWithTranslations {
 	createdAt: Date;
 	slug: string;
 	content: string;
+	isPublished: boolean;
+	isArchived: boolean;
 	sourceTextWithTranslations: SourceTextWithTranslations[];
 }
 

@@ -45,22 +45,29 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	);
 	const hasGeminiApiKey = !!nonSanitizedUser?.geminiApiKey;
 	const targetLanguage = await getTargetLanguage(request);
-	const pagWithTranslations = await fetchPageWithTranslations(
+	const pageWithTranslations = await fetchPageWithTranslations(
 		slug,
 		nonSanitizedUser?.id ?? 0,
 		targetLanguage,
 	);
 
-	if (!pagWithTranslations) {
+	if (!pageWithTranslations) {
 		throw new Response("Failed to fetch article", { status: 500 });
 	}
+	const isOwner = pageWithTranslations?.user.userName === currentUser?.userName;
+	if (pageWithTranslations.isArchived) {
+		throw new Response("Page not found", { status: 404 });
+	}
+	if (!isOwner && !pageWithTranslations.isPublished) {
+		throw new Response("Page not found", { status: 404 });
+	}
 	const userAITranslationInfo = await fetchUserAITranslationInfo(
-		pagWithTranslations.id,
+		pageWithTranslations.id,
 		nonSanitizedUser?.id ?? 0,
 	);
 	return typedjson({
 		targetLanguage,
-		pagWithTranslations,
+		pageWithTranslations,
 		currentUser,
 		hasGeminiApiKey,
 		userAITranslationInfo,
@@ -164,7 +171,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function ReaderView() {
 	const {
-		pagWithTranslations,
+		pageWithTranslations,
 		currentUser,
 		hasGeminiApiKey,
 		userAITranslationInfo,
@@ -177,18 +184,18 @@ export default function ReaderView() {
 		lastResult: actionData?.lastResult,
 	});
 
-	if (!pagWithTranslations) {
+	if (!pageWithTranslations) {
 		return <div>Loading...</div>;
 	}
 
 	return (
 		<div className=" w-full max-w-3xl  mx-auto">
-			{pagWithTranslations.user.userName === currentUser?.userName &&
+			{pageWithTranslations.user.userName === currentUser?.userName &&
 				currentUser && (
 					<div className="flex justify-end items-center mb-3">
 						<Button asChild variant="outline">
 							<Link
-								to={`/${currentUser.userName}/page/${pagWithTranslations.slug}/edit`}
+								to={`/${currentUser.userName}/page/${pageWithTranslations.slug}/edit`}
 							>
 								Edit
 							</Link>
@@ -202,7 +209,11 @@ export default function ReaderView() {
 							<TargetLanguageSelector />
 							<AIModelSelector onModelSelect={setSelectedModel} />
 						</div>
-						<input type="hidden" name="pageId" value={pagWithTranslations.id} />
+						<input
+							type="hidden"
+							name="pageId"
+							value={pageWithTranslations.id}
+						/>
 						<input type="hidden" name="aiModel" value={selectedModel} />
 						{hasGeminiApiKey ? (
 							<Button
@@ -245,7 +256,7 @@ export default function ReaderView() {
 			</div>
 			<article className="w-full prose dark:prose-invert sm:prose lg:prose-lg mx-auto mb-20">
 				<ContentWithTranslations
-					pageWithTranslations={pagWithTranslations}
+					pageWithTranslations={pageWithTranslations}
 					currentUserName={currentUser?.userName ?? null}
 				/>
 			</article>
