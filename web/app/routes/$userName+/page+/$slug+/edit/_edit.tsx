@@ -55,7 +55,6 @@ export const action: ActionFunction = async ({ request, params }) => {
 	const submission = parseWithZod(formData, {
 		schema,
 	});
-	console.log("submission", submission);
 	if (submission.status !== "success") {
 		return { lastResult: submission.reply() };
 	}

@@ -3,7 +3,7 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
-import { UserPen, LogIn, LogOut } from "lucide-react";
+import { LogIn, LogOut, UserPen } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import type { SanitizedUser } from "~/types";
 import { authenticator } from "~/utils/auth.server";

@@ -20,6 +20,7 @@ import { GeminiApiKeyDialog } from "~/routes/resources+/gemini-api-key-dialog";
 import { authenticator, sanitizeUser } from "~/utils/auth.server";
 import { commitSession, getSession } from "~/utils/session.server";
 import { updateUser } from "./functions/mutations.server";
+import { getUserByUserName } from "./functions/queries.server";
 const schema = z.object({
 	displayName: z
 		.string()
@@ -35,8 +36,11 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	if (currentUser.userName !== params.userName) {
 		throw new Response("Unauthorized", { status: 403 });
 	}
-
-	return typedjson({ currentUser });
+	const updatedUser = await getUserByUserName(currentUser.userName);
+	if (!updatedUser) {
+		throw new Response("Not Found", { status: 404 });
+	}
+	return typedjson({ currentUser: updatedUser });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {

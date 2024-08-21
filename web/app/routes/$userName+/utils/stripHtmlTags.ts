@@ -1,6 +1,8 @@
+import DOMPurify from "dompurify";
+
 export function stripHtmlTags(html: string) {
-	return html
-		.replace(/<[^>]+>/g, "")
-		.replace(/&nbsp;/g, " ")
-		.trim();
+	return DOMPurify.sanitize(html, {
+		ALLOWED_TAGS: [],
+		ALLOWED_ATTR: [],
+	}).trim();
 }

@@ -99,7 +99,7 @@ export default function UserProfile() {
 						)}
 					</CardTitle>
 				</CardHeader>
-				<CardContent>
+				<CardContent className="whitespace-pre-wrap">
 					<Linkify options={{ className: "underline" }}>
 						{sanitizedUserWithPages.profile}
 					</Linkify>
