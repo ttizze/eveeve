@@ -9,8 +9,9 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form } from "@remix-run/react";
 import { Link } from "@remix-run/react";
 import { useNavigation } from "@remix-run/react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Check, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { useEffect } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -21,6 +22,7 @@ import { authenticator, sanitizeUser } from "~/utils/auth.server";
 import { commitSession, getSession } from "~/utils/session.server";
 import { updateUser } from "./functions/mutations.server";
 import { getUserByUserName } from "./functions/queries.server";
+
 const schema = z.object({
 	displayName: z
 		.string()
@@ -70,6 +72,7 @@ export default function EditProfile() {
 	const [isGeminiApiKeyDialogOpen, setIsGeminiApiKeyDialogOpen] =
 		useState(false);
 	const navigation = useNavigation();
+	const [showSuccess, setShowSuccess] = useState(false);
 	const [form, { displayName, profile }] = useForm({
 		id: "edit-profile-form",
 		constraint: getZodConstraint(schema),
@@ -83,6 +86,16 @@ export default function EditProfile() {
 			return parseWithZod(formData, { schema });
 		},
 	});
+
+	useEffect(() => {
+		if (navigation.state === "loading") {
+			setShowSuccess(true);
+		} else if (navigation.state === "idle" && showSuccess) {
+			const timer = setTimeout(() => setShowSuccess(false), 500);
+			return () => clearTimeout(timer);
+		}
+	}, [navigation.state, showSuccess]);
+
 	return (
 		<div className="container mx-auto">
 			<Link to={`/${currentUser.userName}`}>
@@ -114,10 +127,16 @@ export default function EditProfile() {
 						</div>
 						<Button
 							type="submit"
-							className="w-full"
+							className="w-full h-10"
 							disabled={navigation.state === "submitting"}
 						>
-							Save
+							{showSuccess ? (
+								<Check className="w-6 h-6" />
+							) : navigation.state === "submitting" ? (
+								<Loader2 className="w-6 h-6 animate-spin" />
+							) : (
+								"Save"
+							)}
 						</Button>
 					</Form>
 				</div>
