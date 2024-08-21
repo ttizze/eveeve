@@ -3,7 +3,7 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
-import { Home, LogIn, LogOut } from "lucide-react";
+import { LogIn, LogOut, UserPen } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import type { SanitizedUser } from "~/types";
 import { authenticator } from "~/utils/auth.server";
@@ -52,7 +52,7 @@ export function Footer({ currentUser }: FooterProps) {
 								<>
 									<Link to={`/${currentUser.userName}`}>
 										<Button variant="outline">
-											<Home className="w-4 h-4 mr-2" />
+											<UserPen className="w-4 h-4 mr-2" />
 											{currentUser.userName}
 										</Button>
 									</Link>

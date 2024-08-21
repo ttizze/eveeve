@@ -5,6 +5,7 @@ import { useLoaderData } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
 import { z } from "zod";
 import { authenticator } from "~/utils/auth.server";
+import { EditFooter } from "./components/EditFooter";
 import { EditHeader } from "./components/EditHeader";
 import { Editor } from "./components/Editor";
 import { createOrUpdateSourceTexts } from "./functions/mutations.server";
@@ -17,10 +18,10 @@ import { addNumbersToContent } from "./utils/addNumbersToContent";
 import { addSourceTextIdToContent } from "./utils/addSourceTextIdToContent";
 import { extractNumberedElements } from "./utils/extractNumberedElements";
 import { removeSourceTextIdDuplicates } from "./utils/removeSourceTextIdDuplicates";
-
 const schema = z.object({
 	title: z.string().min(1, "Required"),
 	pageContent: z.string().min(1, "Required Change something"),
+	isPublished: z.string(),
 });
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -58,7 +59,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 		return { lastResult: submission.reply() };
 	}
 
-	const { title, pageContent } = submission.value;
+	const { title, pageContent, isPublished } = submission.value;
 	const existingPage = await getPageWithSourceTexts(slug);
 	const titleSourceTextId =
 		existingPage?.sourceTexts.find((st) => st.number === 0)?.id || null;
@@ -76,6 +77,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 		slug,
 		title,
 		numberedContent,
+		Boolean(isPublished),
 	);
 
 	const sourceTextsIdWithNumber = await createOrUpdateSourceTexts(
@@ -92,6 +94,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 		slug,
 		title,
 		contentWithSourceTextId,
+		Boolean(isPublished),
 	);
 	return null;
 };
@@ -99,7 +102,8 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function EditPage() {
 	const { currentUser, page } = useLoaderData<typeof loader>();
 	const fetcher = useFetcher<typeof action>();
-	const [form, { title, pageContent }] = useForm({
+
+	const [form, { title, pageContent, isPublished }] = useForm({
 		id: "edit-page",
 		lastResult: fetcher.data?.lastResult,
 		constraint: getZodConstraint(schema),
@@ -108,6 +112,7 @@ export default function EditPage() {
 		defaultValue: {
 			title: page?.title,
 			pageContent: page?.content,
+			isPublished: page?.isPublished,
 		},
 	});
 
@@ -117,9 +122,10 @@ export default function EditPage() {
 				<EditHeader
 					currentUser={currentUser}
 					pageSlug={page?.slug}
+					initialIsPublished={page?.isPublished}
 					fetcher={fetcher}
 				/>
-				<div className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg mx-auto">
+				<div className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg mt-32 mx-auto">
 					<div className="mt-10">
 						<h1 className="text-4xl font-bold">
 							<textarea
@@ -145,6 +151,7 @@ export default function EditPage() {
 					</div>
 				</div>
 			</fetcher.Form>
+			<EditFooter />
 		</div>
 	);
 }

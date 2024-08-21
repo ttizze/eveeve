@@ -6,6 +6,7 @@ export async function createOrUpdatePage(
 	slug: string,
 	title: string,
 	content: string,
+	isPublished: boolean,
 ) {
 	const page = await prisma.page.upsert({
 		where: {
@@ -14,12 +15,14 @@ export async function createOrUpdatePage(
 		update: {
 			title,
 			content,
+			isPublished,
 		},
 		create: {
 			userId,
 			slug,
 			title,
 			content,
+			isPublished,
 		},
 	});
 
