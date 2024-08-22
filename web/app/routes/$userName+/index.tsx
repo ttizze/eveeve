@@ -128,7 +128,7 @@ export default function UserProfile() {
 								<DropdownMenuTrigger asChild>
 									<Button
 										variant="ghost"
-										className="h-8 w-8 p-0 absolute top- right-2"
+										className="h-8 w-8 p-0 absolute top-2 right-2"
 									>
 										<MoreVertical className="h-4 w-4" />
 									</Button>
