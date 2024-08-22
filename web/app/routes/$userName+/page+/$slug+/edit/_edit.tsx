@@ -7,7 +7,7 @@ import { z } from "zod";
 import { authenticator } from "~/utils/auth.server";
 import { EditFooter } from "./components/EditFooter";
 import { EditHeader } from "./components/EditHeader";
-import { Editor } from "./components/Editor";
+import { Editor } from "./components/editor/Editor";
 import { createOrUpdateSourceTexts } from "./functions/mutations.server";
 import { createOrUpdatePage } from "./functions/mutations.server";
 import {
