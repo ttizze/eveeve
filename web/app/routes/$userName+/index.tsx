@@ -3,6 +3,7 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Link } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
+import { useNavigate } from "@remix-run/react";
 import Linkify from "linkify-react";
 import { Lock, MoreVertical } from "lucide-react";
 import { Button } from "~/components/ui/button";
@@ -62,6 +63,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function UserProfile() {
+	const navigate = useNavigate();
 	const { sanitizedUserWithPages, isOwner } = useLoaderData<{
 		sanitizedUserWithPages: sanitizedUserWithPages;
 		isOwner: boolean;
@@ -88,24 +90,36 @@ export default function UserProfile() {
 
 	return (
 		<div className="container mx-auto">
-			<Card className="h-full mb-6">
-				<CardHeader>
-					<CardTitle className="text-3xl font-bold flex justify-between items-center">
-						{sanitizedUserWithPages.displayName}
-						{isOwner && (
-							<Link to={`/${sanitizedUserWithPages.userName}/edit`}>
-								<Button variant="outline">Edit</Button>
-							</Link>
-						)}
-					</CardTitle>
-				</CardHeader>
-				<CardContent className="whitespace-pre-wrap">
-					<Linkify options={{ className: "underline" }}>
-						{sanitizedUserWithPages.profile}
-					</Linkify>
-				</CardContent>
+			<Card className="mb-6">
+				<div className="grid grid-cols-4 gap-4 p-4">
+					<Link to={`${sanitizedUserWithPages.image}`}>
+						<div className="col-span-1 flex items-start justify-start mt-3 ml-5">
+							<img
+								src={sanitizedUserWithPages.image}
+								alt={sanitizedUserWithPages.displayName}
+								className="w-40 h-40 rounded-full object-cover"
+							/>
+						</div>
+					</Link>
+					<div className="col-span-3">
+						<CardHeader className="p-0">
+							<CardTitle className="text-3xl font-bold flex justify-between items-center">
+								<div>{sanitizedUserWithPages.displayName}</div>
+								{isOwner && (
+									<Link to={`/${sanitizedUserWithPages.userName}/edit`}>
+										<Button variant="outline">Edit</Button>
+									</Link>
+								)}
+							</CardTitle>
+						</CardHeader>
+						<CardContent className="whitespace-pre-wrap mt-2 p-0">
+							<Linkify options={{ className: "underline" }}>
+								{sanitizedUserWithPages.profile}
+							</Linkify>
+						</CardContent>
+					</div>
+				</div>
 			</Card>
-
 			<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
 				{sanitizedUserWithPages.pages.map((page) => (
 					<Card key={page.id} className="h-full relative">
@@ -120,6 +134,15 @@ export default function UserProfile() {
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end">
+									<DropdownMenuItem
+										onSelect={() =>
+											navigate(
+												`/${sanitizedUserWithPages.userName}/page/${page.slug}/edit`,
+											)
+										}
+									>
+										Edit
+									</DropdownMenuItem>
 									<DropdownMenuItem
 										onSelect={() => togglePagePublicStatus(page.id)}
 									>

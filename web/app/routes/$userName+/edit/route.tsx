@@ -3,6 +3,7 @@ import {
 	getInputProps,
 	getTextareaProps,
 	useForm,
+	useInputControl,
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
@@ -17,6 +18,7 @@ import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { uploadImage } from "~/routes/$userName+/utils/uploadImage";
 import { GeminiApiKeyDialog } from "~/routes/resources+/gemini-api-key-dialog";
 import { authenticator, sanitizeUser } from "~/utils/auth.server";
 import { commitSession, getSession } from "~/utils/session.server";
@@ -29,6 +31,7 @@ const schema = z.object({
 		.min(1, "Display name is required")
 		.max(50, "Display name must be 50 characters or less"),
 	profile: z.string().max(200, "Profile must be 200 characters or less"),
+	image: z.string(),
 });
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
@@ -50,16 +53,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 		failureRedirect: "/login",
 	});
 	const submission = parseWithZod(await request.formData(), { schema });
-
 	if (submission.status !== "success") {
 		return submission.reply();
 	}
 
-	const { displayName, profile } = submission.value;
+	const { displayName, profile, image } = submission.value;
 
 	const updatedUser = await updateUser(currentUser.userName, {
 		displayName,
 		profile,
+		image,
 	});
 	const session = await getSession(request.headers.get("Cookie"));
 	session.set("user", sanitizeUser(updatedUser));
@@ -73,20 +76,6 @@ export default function EditProfile() {
 		useState(false);
 	const navigation = useNavigation();
 	const [showSuccess, setShowSuccess] = useState(false);
-	const [form, { displayName, profile }] = useForm({
-		id: "edit-profile-form",
-		constraint: getZodConstraint(schema),
-		shouldValidate: "onBlur",
-		shouldRevalidate: "onInput",
-		defaultValue: {
-			displayName: currentUser.displayName,
-			profile: currentUser.profile,
-		},
-		onValidate({ formData }) {
-			return parseWithZod(formData, { schema });
-		},
-	});
-
 	useEffect(() => {
 		if (navigation.state === "loading") {
 			setShowSuccess(true);
@@ -95,6 +84,38 @@ export default function EditProfile() {
 			return () => clearTimeout(timer);
 		}
 	}, [navigation.state, showSuccess]);
+	const [form, fields] = useForm({
+		id: "edit-profile-form",
+		constraint: getZodConstraint(schema),
+		shouldValidate: "onBlur",
+		shouldRevalidate: "onInput",
+		defaultValue: {
+			displayName: currentUser.displayName,
+			profile: currentUser.profile,
+			image: currentUser.image,
+		},
+		onValidate({ formData }) {
+			return parseWithZod(formData, { schema });
+		},
+	});
+
+	const imageForm = useInputControl(fields.image);
+	const [profileIconUrl, setProfileIconUrl] = useState<string>(
+		currentUser.image,
+	);
+
+	const handleProfileImageUpload = async (
+		event: React.ChangeEvent<HTMLInputElement>,
+	) => {
+		const file = event.target.files?.[0];
+		if (file) {
+			const url = await uploadImage(file);
+			if (url) {
+				imageForm.change(url);
+				setProfileIconUrl(url);
+			}
+		}
+	};
 
 	return (
 		<div className="container mx-auto">
@@ -106,25 +127,50 @@ export default function EditProfile() {
 					<h2 className="text-xl font-bold mb-3">Edit Profile</h2>
 					<Form method="post" {...getFormProps(form)} className="space-y-4">
 						<div>
-							<Label htmlFor={displayName.id}>Display Name</Label>
-							<Input {...getInputProps(displayName, { type: "text" })} />
+							<Label htmlFor="image-upload">Icon</Label>
+							<img
+								src={profileIconUrl}
+								alt="Preview"
+								className="mt-2 w-40 h-40 object-cover rounded-full"
+							/>
+							<Input
+								id={fields.image.id}
+								type="file"
+								accept="image/*"
+								onChange={handleProfileImageUpload}
+								className="mt-1"
+							/>
 							<div
-								id={displayName.errorId}
+								id={fields.image.errorId}
 								className="text-red-500 text-sm mt-1"
 							>
-								{displayName.errors}
+								{fields.image.errors}
 							</div>
 						</div>
 						<div>
-							<Label htmlFor={profile.id}>Profile</Label>
-							<textarea
-								{...getTextareaProps(profile)}
-								className="w-full h-32 px-3 py-2  border rounded-lg focus:outline-none"
-							/>
-							<div id={profile.errorId} className="text-red-500 text-sm mt-1">
-								{profile.errors}
+							<Label htmlFor={fields.displayName.id}>Display Name</Label>
+							<Input {...getInputProps(fields.displayName, { type: "text" })} />
+							<div
+								id={fields.displayName.errorId}
+								className="text-red-500 text-sm mt-1"
+							>
+								{fields.displayName.errors}
 							</div>
 						</div>
+						<div>
+							<Label htmlFor={fields.profile.id}>Profile</Label>
+							<textarea
+								{...getTextareaProps(fields.profile)}
+								className="w-full h-32 px-3 py-2  border rounded-lg focus:outline-none"
+							/>
+							<div
+								id={fields.profile.errorId}
+								className="text-red-500 text-sm mt-1"
+							>
+								{fields.profile.errors}
+							</div>
+						</div>
+
 						<Button
 							type="submit"
 							className="w-full h-10"
