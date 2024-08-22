@@ -5,7 +5,7 @@ import { Link } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
 import { useNavigate } from "@remix-run/react";
 import Linkify from "linkify-react";
-import { Lock, MoreVertical } from "lucide-react";
+import { Lock, MoreVertical, Settings } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
 	Card,
@@ -89,25 +89,29 @@ export default function UserProfile() {
 	};
 
 	return (
-		<div className="container mx-auto">
-			<Card className="mb-6">
+		<div className="">
+			<Card className="mb-6 rounded-3xl">
 				<div className="grid grid-cols-4 gap-4 p-4">
 					<Link to={`${sanitizedUserWithPages.image}`}>
-						<div className="col-span-1 flex items-start justify-start mt-3 ml-5">
-							<img
-								src={sanitizedUserWithPages.image}
-								alt={sanitizedUserWithPages.displayName}
-								className="w-40 h-40 rounded-full object-cover"
-							/>
+						<div className="col-span-1 flex  justify-start">
+							<div className="aspect-square w-40  md:w-32 lg:w-40 overflow-hidden rounded-full">
+								<img
+									src={sanitizedUserWithPages.image}
+									alt={sanitizedUserWithPages.displayName}
+									className="w-full h-full object-cover"
+								/>
+							</div>
 						</div>
 					</Link>
 					<div className="col-span-3">
 						<CardHeader className="p-0">
-							<CardTitle className="text-3xl font-bold flex justify-between items-center">
+							<CardTitle className="text-2xl font-bold flex justify-between items-center">
 								<div>{sanitizedUserWithPages.displayName}</div>
 								{isOwner && (
 									<Link to={`/${sanitizedUserWithPages.userName}/edit`}>
-										<Button variant="outline">Edit</Button>
+										<Button variant="outline">
+											<Settings />
+										</Button>
 									</Link>
 								)}
 							</CardTitle>
