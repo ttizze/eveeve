@@ -5,11 +5,10 @@ import { useActionData } from "@remix-run/react";
 import { useNavigation } from "@remix-run/react";
 import { Form } from "@remix-run/react";
 import { Link } from "@remix-run/react";
-import { Languages } from "lucide-react";
+import { Languages, SquarePen } from "lucide-react";
 import { useState } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { AIModelSelector } from "~/features/translate/components/AIModelSelector";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
@@ -197,7 +196,7 @@ export default function ReaderView() {
 							<Link
 								to={`/${currentUser.userName}/page/${pageWithTranslations.slug}/edit`}
 							>
-								Edit
+								<SquarePen className="w-6 h-6" />
 							</Link>
 						</Button>
 					</div>
@@ -242,14 +241,6 @@ export default function ReaderView() {
 						)}
 					</div>
 				</Form>
-				{actionData?.slug && (
-					<Alert className="bg-blue-50 border-blue-200 text-blue-800 animate-in fade-in duration-300">
-						<AlertTitle className="text-center">Translation Started</AlertTitle>
-						<AlertDescription className="text-center">
-							<strong className="font-semibold ">{actionData.slug}</strong>
-						</AlertDescription>
-					</Alert>
-				)}
 				<UserAITranslationStatus
 					userAITranslationInfo={userAITranslationInfo}
 				/>
