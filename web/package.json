@@ -15,6 +15,7 @@
 		"seed": "tsx prisma/seed.ts"
 	},
 	"dependencies": {
+		"@aws-sdk/client-s3": "^3.635.0",
 		"@conform-to/react": "^1.1.5",
 		"@conform-to/zod": "^1.1.5",
 		"@google-cloud/vertexai": "^1.4.1",
@@ -36,7 +37,9 @@
 		"@remix-run/react": "^2.11.1",
 		"@remix-run/serve": "^2.11.1",
 		"@tailwindcss/typography": "^0.5.14",
+		"@tiptap-pro/extension-file-handler": "^2.10.11",
 		"@tiptap/core": "^2.6.2",
+		"@tiptap/extension-image": "^2.6.4",
 		"@tiptap/extension-link": "^2.6.3",
 		"@tiptap/extension-placeholder": "^2.6.2",
 		"@tiptap/pm": "^2.6.2",
@@ -78,6 +81,7 @@
 		"@types/react-dom": "^18.3.0",
 		"@types/react-window": "^1.8.8",
 		"autoprefixer": "^10.4.20",
+		"minio": "^8.0.1",
 		"postcss": "^8.4.41",
 		"prisma": "^5.18.0",
 		"remix-flat-routes": "^0.6.5",
