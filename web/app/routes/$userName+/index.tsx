@@ -90,7 +90,7 @@ export default function UserProfile() {
 
 	return (
 		<div className="">
-			<Card className="mb-6 rounded-3xl">
+			<Card className="mb-6 rounded-3xl w-full overflow-hidden">
 				<div className="grid grid-cols-4 gap-4 p-4">
 					<Link to={`${sanitizedUserWithPages.image}`}>
 						<div className="col-span-1 flex  justify-start">
@@ -116,7 +116,7 @@ export default function UserProfile() {
 								)}
 							</CardTitle>
 						</CardHeader>
-						<CardContent className="whitespace-pre-wrap mt-2 p-0">
+						<CardContent className="break-all overflow-wrap-anywhere mt-2 p-0">
 							<Linkify options={{ className: "underline" }}>
 								{sanitizedUserWithPages.profile}
 							</Linkify>
@@ -124,9 +124,12 @@ export default function UserProfile() {
 					</div>
 				</div>
 			</Card>
-			<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+			<div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
 				{sanitizedUserWithPages.pages.map((page) => (
-					<Card key={page.id} className="h-full relative">
+					<Card
+						key={page.id}
+						className="h-full relative  w-full overflow-hidden"
+					>
 						{isOwner && (
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
@@ -173,7 +176,7 @@ export default function UserProfile() {
 								</CardDescription>
 							</CardHeader>
 							<CardContent className="flex-grow overflow-hidden px-4">
-								<p className="text-sm text-gray-600 line-clamp-4 break-words">
+								<p className="text-sm text-gray-600 line-clamp-4 break-all overflow-wrap-anywhere hyphens-auto">
 									{page.content}
 								</p>
 							</CardContent>
