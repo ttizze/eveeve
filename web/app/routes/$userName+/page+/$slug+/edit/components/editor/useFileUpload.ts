@@ -5,22 +5,17 @@ async function uploadImage(file: File): Promise<string> {
 	const formData = new FormData();
 	formData.append("file", file);
 
-	try {
-		const response = await fetch("/resources/upload-r2", {
-			method: "POST",
-			body: formData,
-		});
+	const response = await fetch("/resources/upload-r2", {
+		method: "POST",
+		body: formData,
+	});
 
-		if (!response.ok) {
-			throw new Error(EDITOR_MESSAGES.UPLOAD_FAILED);
-		}
-
-		const data = await response.json();
-		return data.url;
-	} catch (error) {
-		console.error("upload error:", error);
-		throw error;
+	if (!response.ok) {
+		throw new Error(EDITOR_MESSAGES.UPLOAD_FAILED);
 	}
+
+	const data = await response.json();
+	return data.url;
 }
 
 export async function handleFileUpload(
@@ -39,7 +34,6 @@ export async function handleFileUpload(
 			type: "image",
 			attrs: {
 				src: "https://via.placeholder.com/300x200?text=Uploading...",
-				class: "transition-all duration-300 ease-in-out",
 			},
 		})
 		.focus()
@@ -48,8 +42,6 @@ export async function handleFileUpload(
 		const url = await uploadImage(file);
 		editor.commands.updateAttributes("image", {
 			src: url,
-			"data-temp-id": null,
-			class: "transition-all duration-300 ease-in-out",
 		});
 	} catch (error) {
 		window.alert(EDITOR_MESSAGES.UPLOAD_ERROR);

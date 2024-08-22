@@ -18,16 +18,8 @@ export const action: ActionFunction = async ({ request }) => {
 		return json({ error: "file not found" }, { status: 400 });
 	}
 
-	try {
-		const url = await uploadToR2(file);
-		return json({ url });
-	} catch (error) {
-		console.error("upload error:", error);
-		return json(
-			{ error: "upload error please try again later" },
-			{ status: 500 },
-		);
-	}
+	const url = await uploadToR2(file);
+	return json({ url });
 };
 
 const isProduction = process.env.NODE_ENV === "production";
