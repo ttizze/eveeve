@@ -22,7 +22,7 @@ function ToggleButton({
 	return (
 		<button
 			type="button"
-			className={`absolute -top-2 right-0 bg-gray-200 dark:bg-gray-800 rounded-xl p-1 ${isExpanded ? " z-20" : "z-0"}`}
+			className={`absolute -top-2 right-0  rounded-md p-1 ${isExpanded ? " z-20 bg-transparent" : "z-0 bg-gray-200 dark:bg-gray-800"}`}
 			onClick={onClick}
 			aria-label={label}
 			title={label}

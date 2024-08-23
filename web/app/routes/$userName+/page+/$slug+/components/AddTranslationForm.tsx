@@ -2,7 +2,7 @@ import { getFormProps, getTextareaProps, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { getZodConstraint } from "@conform-to/zod";
 import { useFetcher } from "@remix-run/react";
-import { Save } from "lucide-react";
+import { ArrowUpFromLine } from "lucide-react";
 import { useState } from "react";
 import { LoginDialog } from "~/components/LoginDialog";
 import { Button } from "~/components/ui/button";
@@ -59,10 +59,10 @@ export function AddTranslationForm({
 						type="submit"
 						name="intent"
 						value="add"
-						className="bg-blue-500 hover:bg-blue-600 text-white"
+						className=""
 						disabled={fetcher.state !== "idle" || !currentUserName}
 					>
-						<Save className="h-4 w-4" />
+						<ArrowUpFromLine className="h-4 w-4" />
 					</Button>
 				</div>
 			</fetcher.Form>

@@ -92,14 +92,24 @@ export default function UserProfile() {
 		<div className="">
 			<Card className="mb-6 rounded-3xl w-full overflow-hidden">
 				<div className="grid grid-cols-4 gap-4 p-4">
-					<Link to={`${sanitizedUserWithPages.image}`}>
+					<Link to={`${sanitizedUserWithPages.icon}`}>
 						<div className="col-span-1 flex  justify-start">
 							<div className="aspect-square w-40  md:w-32 lg:w-40 overflow-hidden rounded-full">
-								<img
-									src={sanitizedUserWithPages.image}
-									alt={sanitizedUserWithPages.displayName}
-									className="w-full h-full object-cover"
-								/>
+								{sanitizedUserWithPages.icon ? (
+									<img
+										src={sanitizedUserWithPages.icon}
+										alt={sanitizedUserWithPages.displayName}
+										className="w-full h-full object-cover"
+									/>
+								) : (
+									<div className="w-full h-full bg-gray-200 flex items-center justify-center">
+										<span className="text-2xl font-bold text-gray-500">
+											{sanitizedUserWithPages.displayName
+												.charAt(0)
+												.toUpperCase()}
+										</span>
+									</div>
+								)}
 							</div>
 						</div>
 					</Link>
@@ -131,7 +141,7 @@ export default function UserProfile() {
 						className="h-full relative  w-full overflow-hidden"
 					>
 						{isOwner && (
-							<DropdownMenu>
+							<DropdownMenu modal={false}>
 								<DropdownMenuTrigger asChild>
 									<Button
 										variant="ghost"

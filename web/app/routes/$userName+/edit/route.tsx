@@ -31,7 +31,7 @@ const schema = z.object({
 		.min(1, "Display name is required")
 		.max(50, "Display name must be 50 characters or less"),
 	profile: z.string().max(200, "Profile must be 200 characters or less"),
-	image: z.string(),
+	icon: z.string(),
 });
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
@@ -57,12 +57,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 		return submission.reply();
 	}
 
-	const { displayName, profile, image } = submission.value;
+	const { displayName, profile, icon } = submission.value;
 
 	const updatedUser = await updateUser(currentUser.userName, {
 		displayName,
 		profile,
-		image,
+		icon,
 	});
 	const session = await getSession(request.headers.get("Cookie"));
 	session.set("user", sanitizeUser(updatedUser));
@@ -92,16 +92,16 @@ export default function EditProfile() {
 		defaultValue: {
 			displayName: currentUser.displayName,
 			profile: currentUser.profile,
-			image: currentUser.image,
+			icon: currentUser.icon,
 		},
 		onValidate({ formData }) {
 			return parseWithZod(formData, { schema });
 		},
 	});
 
-	const imageForm = useInputControl(fields.image);
+	const imageForm = useInputControl(fields.icon);
 	const [profileIconUrl, setProfileIconUrl] = useState<string>(
-		currentUser.image,
+		currentUser.icon,
 	);
 
 	const handleProfileImageUpload = async (
@@ -134,17 +134,17 @@ export default function EditProfile() {
 								className="mt-2 w-40 h-40 object-cover rounded-full"
 							/>
 							<Input
-								id={fields.image.id}
+								id={fields.icon.id}
 								type="file"
 								accept="image/*"
 								onChange={handleProfileImageUpload}
 								className="mt-1"
 							/>
 							<div
-								id={fields.image.errorId}
+								id={fields.icon.errorId}
 								className="text-red-500 text-sm mt-1"
 							>
-								{fields.image.errors}
+								{fields.icon.errors}
 							</div>
 						</div>
 						<div>

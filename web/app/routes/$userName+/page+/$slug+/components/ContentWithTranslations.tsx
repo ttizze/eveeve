@@ -95,9 +95,14 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 					to={`/${pageWithTranslations.user.userName}`}
 					className="text-gray-500 flex items-center mr-2 no-underline hover:text-gray-700"
 				>
+					<img
+						src={pageWithTranslations.user.icon}
+						alt="Icon"
+						className="w-14 h-14 rounded-full object-cover mr-3 !my-0"
+					/>
 					{pageWithTranslations.user.displayName}
 				</Link>
-				<p>{pageWithTranslations.createdAt.toLocaleDateString()}</p>
+				{pageWithTranslations.createdAt.toLocaleDateString()}
 			</div>
 			{parsedContent}
 		</>

@@ -20,6 +20,7 @@ export async function translate(params: TranslateJobParams) {
 		const totalChunks = chunks.length;
 		for (let i = 0; i < chunks.length; i++) {
 			console.log(`Processing chunk ${i + 1} of ${totalChunks}`);
+			console.log(chunks[i]);
 
 			await translateChunk(
 				params.geminiApiKey,
@@ -117,7 +118,7 @@ async function saveTranslations(
 			)?.id;
 			if (!sourceTextId) {
 				console.error(
-					`Source text ID not found for translation number ${translation.number}`,
+					`Source text ID not found for translation number ${translation.number} ${translation.text}`,
 				);
 				return null;
 			}

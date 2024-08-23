@@ -59,7 +59,7 @@ const googleStrategy = new GoogleStrategy<SanitizedUser>(
 				email: profile.emails[0].value || "",
 				userName: temporaryUserName,
 				displayName: profile.displayName || "New User",
-				image: profile.photos[0].value || "",
+				icon: profile.photos[0].value || "",
 				provider: "Google",
 			},
 		});

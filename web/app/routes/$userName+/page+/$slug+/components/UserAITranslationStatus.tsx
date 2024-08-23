@@ -1,12 +1,11 @@
 import type { UserAITranslationInfo } from "@prisma/client";
 import { useRevalidator } from "@remix-run/react";
 import { useEffect } from "react";
-import { Badge } from "~/components/ui/badge";
 import { Progress } from "~/components/ui/progress";
 import { cn } from "~/utils/cn";
 
 type UserAITranslationStatusProps = {
-	userAITranslationInfo: UserAITranslationInfo[] | null;
+	userAITranslationInfo: UserAITranslationInfo | null;
 };
 
 export function UserAITranslationStatus({
@@ -21,43 +20,32 @@ export function UserAITranslationStatus({
 		return () => clearInterval(intervalId);
 	}, [revalidator]);
 
-	if (!userAITranslationInfo || userAITranslationInfo.length === 0) {
+	if (!userAITranslationInfo) {
 		return null;
 	}
 
-	const latestTranslation = userAITranslationInfo[0]; // 最新の翻訳情報を使用
+	const statusText =
+		{
+			in_progress: "in_progress",
+			failed: "failed",
+			completed: "completed",
+		}[userAITranslationInfo.aiTranslationStatus] || "";
 
 	return (
-		<div className="mt-3 space-y-2">
+		<div className="mt-3 space-y-1">
 			<Progress
-				value={latestTranslation.aiTranslationProgress}
+				value={userAITranslationInfo.aiTranslationProgress}
 				className={cn(
-					latestTranslation.aiTranslationStatus === "in_progress" &&
+					userAITranslationInfo.aiTranslationStatus === "in_progress" &&
 						"bg-blue-400 animate-pulse",
+					userAITranslationInfo.aiTranslationStatus === "failed" &&
+						"bg-red-400",
 				)}
 			/>
-			<div className="flex justify-end items-center">
-				<Badge
-					variant={getVariantForStatus(latestTranslation.aiTranslationStatus)}
-				>
-					{latestTranslation.aiTranslationStatus}
-				</Badge>
+			<div className="flex justify-between text-sm">
+				<span>{statusText}</span>
+				<span>{Math.round(userAITranslationInfo.aiTranslationProgress)}%</span>
 			</div>
 		</div>
 	);
-}
-
-function getVariantForStatus(
-	status: string,
-): "default" | "secondary" | "destructive" | "outline" {
-	switch (status) {
-		case "completed":
-			return "default";
-		case "in_progress":
-			return "secondary";
-		case "failed":
-			return "destructive";
-		default:
-			return "outline";
-	}
 }

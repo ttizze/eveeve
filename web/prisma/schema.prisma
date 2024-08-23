@@ -13,7 +13,7 @@ model User {
   userName              String                  @unique @map("user_name")
   displayName           String                  @map("display_name")
   password              String?
-  image                 String
+  icon                 String
   profile               String                  @default("")
   plan                  String                  @default("free")
   totalPoints           Int                     @default(0) @map("total_points")
@@ -153,6 +153,7 @@ model TranslateText {
   sourceTextId   Int        @map("source_text_id")
   userId         Int        @map("user_id")
   point          Int        @default(0)
+  isArchived     Boolean    @default(false) @map("is_archived")
   createdAt      DateTime   @default(now()) @map("created_at")
   sourceText     SourceText @relation(fields: [sourceTextId], references: [id])
   user           User       @relation(fields: [userId], references: [id])
