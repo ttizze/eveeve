@@ -22,7 +22,7 @@ function ToggleButton({
 	return (
 		<button
 			type="button"
-			className={`absolute -top-2 right-0 bg-gray-200 dark:bg-gray-800 rounded-xl p-1 ${isExpanded ? " z-20" : "z-0"}`}
+			className={`absolute -top-2 right-0  rounded-md p-1 ${isExpanded ? " z-20 bg-transparent" : "z-0 bg-gray-200 dark:bg-gray-800"}`}
 			onClick={onClick}
 			aria-label={label}
 			title={label}
@@ -65,7 +65,7 @@ export function Translation({
 
 	return (
 		<div className="group relative rounded-xl bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-800 ">
-			<div className="notranslate mt-2 py-3 px-4">
+			<div className="notranslate mt-2 py-3 px-2">
 				{sanitizedAndParsedText}
 				<ToggleButton
 					isExpanded={isExpanded}

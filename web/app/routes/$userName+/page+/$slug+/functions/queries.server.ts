@@ -38,7 +38,7 @@ export async function fetchPageWithTranslations(
 		select: {
 			id: true,
 			title: true,
-			user: { select: { displayName: true, userName: true, image: true } },
+			user: { select: { displayName: true, userName: true, icon: true } },
 			slug: true,
 			content: true,
 			createdAt: true,
@@ -61,7 +61,7 @@ export async function fetchPageWithTranslations(
 							text: true,
 							point: true,
 							createdAt: true,
-							user: { select: { displayName: true } },
+							user: { select: { displayName: true, userName: true } },
 							votes: {
 								where: currentUserId ? { userId: currentUserId } : undefined,
 								select: {
@@ -88,7 +88,7 @@ export async function fetchPageWithTranslations(
 		user: {
 			displayName: page.user.displayName,
 			userName: page.user.userName,
-			image: page.user.image,
+			icon: page.user.icon,
 		},
 		translationTitle: page.pageTranslationInfo[0]?.translationTitle,
 		slug: page.slug,
@@ -103,6 +103,7 @@ export async function fetchPageWithTranslations(
 				id: translateText.id,
 				text: translateText.text,
 				point: translateText.point,
+				userName: translateText.user.userName,
 				displayName: translateText.user.displayName,
 				userVote: translateText.votes[0] || null,
 				createdAt: translateText.createdAt,
@@ -127,13 +128,13 @@ export async function getLastReadDataNumber(userId: number, pageId: number) {
 	return readHistory?.lastReadDataNumber ?? 0;
 }
 
-export async function fetchUserAITranslationInfo(
+export async function fetchLatestUserAITranslationInfo(
 	pageId: number,
 	userId: number,
+	targetLanguage: string,
 ) {
-	const userAITranslationInfo = await prisma.userAITranslationInfo.findMany({
-		where: { pageId, userId },
+	return await prisma.userAITranslationInfo.findFirst({
+		where: { pageId, userId, targetLanguage },
 		orderBy: { createdAt: "desc" },
 	});
-	return userAITranslationInfo;
 }

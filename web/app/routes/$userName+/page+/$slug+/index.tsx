@@ -1,11 +1,8 @@
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { useActionData } from "@remix-run/react";
-import { useNavigation } from "@remix-run/react";
-import { Form } from "@remix-run/react";
-import { Link } from "@remix-run/react";
-import { Languages, SquarePen } from "lucide-react";
+import { Form, useActionData, useNavigation } from "@remix-run/react";
+import { Languages, Plus } from "lucide-react";
 import { useState } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
@@ -20,14 +17,14 @@ import { ContentWithTranslations } from "./components/ContentWithTranslations";
 import TargetLanguageSelector from "./components/TargetLanguageSelector";
 import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
 import {
+	createUserAITranslationInfo,
 	handleAddTranslationAction,
 	handleVoteAction,
 } from "./functions/mutations.server";
-import { createUserAITranslationInfo } from "./functions/mutations.server";
 import {
+	fetchLatestUserAITranslationInfo,
 	fetchPageWithSourceTexts,
 	fetchPageWithTranslations,
-	fetchUserAITranslationInfo,
 } from "./functions/queries.server";
 import { actionSchema } from "./types";
 
@@ -60,9 +57,10 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	if (!isOwner && !pageWithTranslations.isPublished) {
 		throw new Response("Page not found", { status: 404 });
 	}
-	const userAITranslationInfo = await fetchUserAITranslationInfo(
+	const userAITranslationInfo = await fetchLatestUserAITranslationInfo(
 		pageWithTranslations.id,
 		nonSanitizedUser?.id ?? 0,
+		targetLanguage,
 	);
 	return typedjson({
 		targetLanguage,
@@ -189,19 +187,7 @@ export default function ReaderView() {
 
 	return (
 		<div className=" w-full max-w-3xl  mx-auto">
-			{pageWithTranslations.user.userName === currentUser?.userName &&
-				currentUser && (
-					<div className="flex justify-end items-center mb-3">
-						<Button asChild variant="outline">
-							<Link
-								to={`/${currentUser.userName}/page/${pageWithTranslations.slug}/edit`}
-							>
-								<SquarePen className="w-6 h-6" />
-							</Link>
-						</Button>
-					</div>
-				)}
-			<div className="mb-8">
+			<div className="mb-3 border rounded-xl p-4">
 				<Form method="post">
 					<div className="flex flex-col space-y-2">
 						<div className="flex items-center space-x-2">
@@ -226,7 +212,8 @@ export default function ReaderView() {
 									<LoadingSpinner />
 								) : (
 									<div className="flex items-center justify-center w-full">
-										<Languages className="w-4 h-4 mr-1" />
+										<Plus className="w-5 h-5 mr-1" />
+										<Languages className="w-5 h-5 mr-1" />
 										<p>Add Translation</p>
 									</div>
 								)}
@@ -234,7 +221,8 @@ export default function ReaderView() {
 						) : (
 							<Button onClick={() => setIsDialogOpen(true)}>
 								<div className="flex items-center justify-center w-full">
-									<Languages className="w-4 h-4 mr-1" />
+									<Plus className="w-5 h-5 mr-1" />
+									<Languages className="w-5 h-5 mr-1" />
 									<p>Add Translation</p>
 								</div>
 							</Button>

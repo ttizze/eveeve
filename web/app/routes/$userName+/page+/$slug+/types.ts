@@ -8,6 +8,7 @@ export type TranslationWithVote = Pick<
 	"id" | "text" | "point" | "createdAt"
 > & {
 	displayName: string;
+	userName: string;
 	userVote: UserVote | null;
 };
 
@@ -21,7 +22,7 @@ export interface PageWithTranslations {
 	id: number;
 	title: string;
 	translationTitle: string | null;
-	user: { displayName: string; userName: string; image: string };
+	user: { displayName: string; userName: string; icon: string };
 	createdAt: Date;
 	slug: string;
 	content: string;

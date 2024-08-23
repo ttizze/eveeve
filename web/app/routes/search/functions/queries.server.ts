@@ -3,16 +3,27 @@ import { prisma } from "~/utils/prisma";
 export async function searchTitle(query: string) {
 	return prisma.page.findMany({
 		where: {
-			OR: [
-				{ title: { contains: query, mode: "insensitive" } },
+			AND: [
 				{
-					pageTranslationInfo: {
-						some: {
-							translationTitle: { contains: query, mode: "insensitive" },
+					isPublished: true,
+					isArchived: false,
+				},
+				{
+					OR: [
+						{ title: { contains: query, mode: "insensitive" } },
+						{
+							pageTranslationInfo: {
+								some: {
+									translationTitle: { contains: query, mode: "insensitive" },
+								},
+							},
 						},
-					},
+					],
 				},
 			],
+		},
+		orderBy: {
+			createdAt: "desc",
 		},
 		select: {
 			id: true,
