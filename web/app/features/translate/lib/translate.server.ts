@@ -16,7 +16,11 @@ export async function translate(params: TranslateJobParams) {
 			"in_progress",
 			0,
 		);
-		const chunks = splitNumberedElements(params.numberedElements);
+		const sortedNumberedElements = params.numberedElements.sort(
+			(a, b) => a.number - b.number,
+		);
+
+		const chunks = splitNumberedElements(sortedNumberedElements);
 		const totalChunks = chunks.length;
 		for (let i = 0; i < chunks.length; i++) {
 			console.log(`Processing chunk ${i + 1} of ${totalChunks}`);

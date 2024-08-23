@@ -131,9 +131,10 @@ export async function getLastReadDataNumber(userId: number, pageId: number) {
 export async function fetchLatestUserAITranslationInfo(
 	pageId: number,
 	userId: number,
+	targetLanguage: string,
 ) {
 	return await prisma.userAITranslationInfo.findFirst({
-		where: { pageId, userId },
+		where: { pageId, userId, targetLanguage },
 		orderBy: { createdAt: "desc" },
 	});
 }

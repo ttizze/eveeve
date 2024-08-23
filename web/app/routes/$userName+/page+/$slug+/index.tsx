@@ -1,8 +1,8 @@
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, Link, useActionData, useNavigation } from "@remix-run/react";
-import { Languages, Plus, SquarePen } from "lucide-react";
+import { Form, useActionData, useNavigation } from "@remix-run/react";
+import { Languages, Plus } from "lucide-react";
 import { useState } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
@@ -60,6 +60,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const userAITranslationInfo = await fetchLatestUserAITranslationInfo(
 		pageWithTranslations.id,
 		nonSanitizedUser?.id ?? 0,
+		targetLanguage,
 	);
 	return typedjson({
 		targetLanguage,
@@ -186,19 +187,7 @@ export default function ReaderView() {
 
 	return (
 		<div className=" w-full max-w-3xl  mx-auto">
-			{pageWithTranslations.user.userName === currentUser?.userName &&
-				currentUser && (
-					<div className="flex justify-end items-center mb-3">
-						<Button asChild variant="outline">
-							<Link
-								to={`/${currentUser.userName}/page/${pageWithTranslations.slug}/edit`}
-							>
-								<SquarePen className="w-6 h-6" />
-							</Link>
-						</Button>
-					</div>
-				)}
-			<div className="mb-5 border rounded-xl p-4">
+			<div className="mb-3 border rounded-xl p-4">
 				<Form method="post">
 					<div className="flex flex-col space-y-2">
 						<div className="flex items-center space-x-2">

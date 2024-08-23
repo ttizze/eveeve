@@ -1,7 +1,9 @@
 import { Link } from "@remix-run/react";
 import DOMPurify from "dompurify";
 import parse from "html-react-parser";
+import { SquarePen } from "lucide-react";
 import { memo, useMemo } from "react";
+import { Button } from "~/components/ui/button";
 import type { PageWithTranslations } from "../types";
 import { Translation } from "./Translation";
 
@@ -33,7 +35,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 			if (element instanceof HTMLElement) {
 				const sourceTextId = element.getAttribute("data-source-text-id");
 				const contentWrapper = document.createElement("span");
-				contentWrapper.classList.add("inline-block", "px-4");
+				contentWrapper.classList.add("inline-block", "px-2");
 				contentWrapper.innerHTML = element.innerHTML;
 				element.innerHTML = "";
 				element.appendChild(contentWrapper);
@@ -81,7 +83,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 	return (
 		<>
 			<h1>
-				<div className="px-4">{pageWithTranslations.title}</div>
+				<div className="px-2">{pageWithTranslations.title}</div>
 				{bestTranslationTitle && (
 					<Translation
 						translationsWithVotes={bestTranslationTitle.translationsWithVotes}
@@ -98,11 +100,23 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 					<img
 						src={pageWithTranslations.user.icon}
 						alt="Icon"
-						className="w-14 h-14 rounded-full object-cover mr-3 !my-0"
+						className="w-14 h-14 rounded-full object-cover mx-3 !my-0"
 					/>
 					{pageWithTranslations.user.displayName}
 				</Link>
 				{pageWithTranslations.createdAt.toLocaleDateString()}
+				{pageWithTranslations.user.userName === currentUserName &&
+					currentUserName && (
+						<div className="ml-auto">
+							<Button asChild variant="outline">
+								<Link
+									to={`/${currentUserName}/page/${pageWithTranslations.slug}/edit`}
+								>
+									<SquarePen className="w-6 h-6" />
+								</Link>
+							</Button>
+						</div>
+					)}
 			</div>
 			{parsedContent}
 		</>

@@ -41,7 +41,7 @@ export async function action({ request }: ActionFunctionArgs) {
 export function Header({ currentUser }: HeaderProps) {
 	return (
 		<header className="shadow-sm z-10 ">
-			<div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+			<div className="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
 				<Link to="/">
 					<h1 className="text-4xl font-bold">EveEve</h1>
 				</Link>

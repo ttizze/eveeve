@@ -15,37 +15,33 @@ export function UserAITranslationStatus({
 	useEffect(() => {
 		const intervalId = setInterval(() => {
 			revalidator.revalidate();
-		}, 5000);
+		}, 3000);
 
 		return () => clearInterval(intervalId);
 	}, [revalidator]);
 
-	if (!userAITranslationInfo) {
-		return null;
-	}
-
-	const statusText =
-		{
-			in_progress: "in_progress",
-			failed: "failed",
-			completed: "completed",
-		}[userAITranslationInfo.aiTranslationStatus] || "";
-
 	return (
-		<div className="mt-3 space-y-1">
-			<Progress
-				value={userAITranslationInfo.aiTranslationProgress}
-				className={cn(
-					userAITranslationInfo.aiTranslationStatus === "in_progress" &&
-						"bg-blue-400 animate-pulse",
-					userAITranslationInfo.aiTranslationStatus === "failed" &&
-						"bg-red-400",
-				)}
-			/>
-			<div className="flex justify-between text-sm">
-				<span>{statusText}</span>
-				<span>{Math.round(userAITranslationInfo.aiTranslationProgress)}%</span>
-			</div>
+		<div className="h-[20px] flex mt-1 items-center space-y-1">
+			{userAITranslationInfo ? (
+				<>
+					<Progress
+						value={userAITranslationInfo.aiTranslationProgress}
+						className={cn(
+							"flex-grow",
+							userAITranslationInfo.aiTranslationStatus === "in_progress" &&
+								"bg-blue-400 animate-pulse",
+							userAITranslationInfo.aiTranslationStatus === "failed" &&
+								"bg-red-400",
+						)}
+					/>
+					<span className="mx-2 !my-0">
+						{Math.round(userAITranslationInfo.aiTranslationProgress)}%
+					</span>
+					<span className="!my-0">
+						{userAITranslationInfo.aiTranslationStatus}
+					</span>
+				</>
+			) : null}
 		</div>
 	);
 }
