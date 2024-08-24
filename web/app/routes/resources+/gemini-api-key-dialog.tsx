@@ -6,10 +6,9 @@ import { redirect } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
 import { ArrowDownToLine } from "lucide-react";
-import { ExternalLink, Key } from "lucide-react";
+import { ExternalLink, Key, Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { z } from "zod";
-import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Button } from "~/components/ui/button";
 import {
 	Dialog,
@@ -23,7 +22,7 @@ import { authenticator } from "~/utils/auth.server";
 import { updateGeminiApiKey } from "./functions/mutations.server";
 
 export const geminiApiKeySchema = z.object({
-	geminiApiKey: z.string().min(1, "API key is required"),
+	geminiApiKey: z.string().optional(),
 });
 
 export async function loader() {
@@ -40,27 +39,28 @@ export async function action({ request }: ActionFunctionArgs) {
 	if (submission.status !== "success") {
 		return {
 			lastResult: submission.reply({
-				formErrors: ["Gemini API key is required"],
+				formErrors: ["Invalid input"],
 			}),
 			success: false,
 		};
 	}
 
-	const { isValid, errorMessage } = await validateGeminiApiKey(
-		submission.value.geminiApiKey,
-	);
-	if (!isValid) {
-		return {
-			lastResult: submission.reply({
-				formErrors: [errorMessage || "Gemini API key validation failed"],
-			}),
-			success: false,
-		};
+	const { geminiApiKey } = submission.value;
+
+	if (geminiApiKey && geminiApiKey.trim() !== "") {
+		const { isValid, errorMessage } = await validateGeminiApiKey(geminiApiKey);
+		if (!isValid) {
+			return {
+				lastResult: submission.reply({
+					formErrors: [errorMessage || "Gemini API key validation failed"],
+				}),
+				success: false,
+			};
+		}
 	}
-	await updateGeminiApiKey(currentUser.id, submission.value.geminiApiKey);
+	await updateGeminiApiKey(currentUser.id, geminiApiKey || "");
 	return { lastResult: submission.reply(), success: true };
 }
-
 interface GeminiApiKeyDialogProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -129,11 +129,10 @@ export function GeminiApiKeyDialog({
 						/>
 						<Button type="submit" disabled={fetcher.state === "submitting"}>
 							{fetcher.state === "submitting" ? (
-								<LoadingSpinner />
+								<Loader2 className="w-4 h-4 animate-spin" />
 							) : (
-								<ArrowDownToLine className="w-4 h-4 mr-2 " />
+								<ArrowDownToLine className="w-4 h-4" />
 							)}
-							Save
 						</Button>
 					</div>
 					<div

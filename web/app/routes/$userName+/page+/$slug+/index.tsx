@@ -1,21 +1,13 @@
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useActionData, useNavigation } from "@remix-run/react";
-import { Languages, Plus } from "lucide-react";
-import { useState } from "react";
+import { useActionData } from "@remix-run/react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
-import { LoadingSpinner } from "~/components/LoadingSpinner";
-import { Button } from "~/components/ui/button";
-import { AIModelSelector } from "~/features/translate/components/AIModelSelector";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
-import { GeminiApiKeyDialog } from "~/routes/resources+/gemini-api-key-dialog";
 import { authenticator } from "~/utils/auth.server";
 import { getTargetLanguage } from "~/utils/target-language.server";
 import { ContentWithTranslations } from "./components/ContentWithTranslations";
-import TargetLanguageSelector from "./components/TargetLanguageSelector";
-import { UserAITranslationStatus } from "./components/UserAITranslationStatus";
 import {
 	createUserAITranslationInfo,
 	handleAddTranslationAction,
@@ -173,10 +165,7 @@ export default function ReaderView() {
 		hasGeminiApiKey,
 		userAITranslationInfo,
 	} = useTypedLoaderData<typeof loader>();
-	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const actionData = useActionData<typeof action>();
-	const [selectedModel, setSelectedModel] = useState("gemini-1.5-flash");
-	const navigation = useNavigation();
 	const [form, fields] = useForm({
 		lastResult: actionData?.lastResult,
 	});
@@ -187,62 +176,14 @@ export default function ReaderView() {
 
 	return (
 		<div className=" w-full max-w-3xl  mx-auto">
-			<div className="mb-3 border rounded-xl p-4">
-				<Form method="post">
-					<div className="flex flex-col space-y-2">
-						<div className="flex items-center space-x-2">
-							<TargetLanguageSelector />
-							<AIModelSelector onModelSelect={setSelectedModel} />
-						</div>
-						<input
-							type="hidden"
-							name="pageId"
-							value={pageWithTranslations.id}
-						/>
-						<input type="hidden" name="aiModel" value={selectedModel} />
-						{hasGeminiApiKey ? (
-							<Button
-								type="submit"
-								name="intent"
-								value="translate"
-								className="w-full"
-								disabled={navigation.state === "submitting"}
-							>
-								{navigation.state === "submitting" ? (
-									<LoadingSpinner />
-								) : (
-									<div className="flex items-center justify-center w-full">
-										<Plus className="w-5 h-5 mr-1" />
-										<Languages className="w-5 h-5 mr-1" />
-										<p>Add Translation</p>
-									</div>
-								)}
-							</Button>
-						) : (
-							<Button onClick={() => setIsDialogOpen(true)}>
-								<div className="flex items-center justify-center w-full">
-									<Plus className="w-5 h-5 mr-1" />
-									<Languages className="w-5 h-5 mr-1" />
-									<p>Add Translation</p>
-								</div>
-							</Button>
-						)}
-					</div>
-				</Form>
-				<UserAITranslationStatus
-					userAITranslationInfo={userAITranslationInfo}
-				/>
-			</div>
 			<article className="w-full prose dark:prose-invert sm:prose lg:prose-lg mx-auto mb-20">
 				<ContentWithTranslations
 					pageWithTranslations={pageWithTranslations}
 					currentUserName={currentUser?.userName ?? null}
+					hasGeminiApiKey={hasGeminiApiKey}
+					userAITranslationInfo={userAITranslationInfo}
 				/>
 			</article>
-			<GeminiApiKeyDialog
-				isOpen={isDialogOpen}
-				onOpenChange={setIsDialogOpen}
-			/>
 		</div>
 	);
 }

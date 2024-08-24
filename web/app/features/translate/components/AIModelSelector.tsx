@@ -8,15 +8,23 @@ import {
 } from "~/components/ui/select";
 
 const geminiModels = [
-	{ name: "gemini-1.5-flash", value: "gemini-1.5-flash" },
-	{ name: "gemini-1.5-pro", value: "gemini-1.5-pro" },
+	{ name: "gemini-1.5-flash", description: "fast", value: "gemini-1.5-flash" },
+	{
+		name: "gemini-1.5-pro",
+		description: "high quality",
+		value: "gemini-1.5-pro",
+	},
 ];
 
 interface AIModelSelectorProps {
+	className?: string;
 	onModelSelect: (model: string) => void;
 }
 
-export function AIModelSelector({ onModelSelect }: AIModelSelectorProps) {
+export function AIModelSelector({
+	onModelSelect,
+	className,
+}: AIModelSelectorProps) {
 	const [selectedModel, setSelectedModel] = useState<string>(
 		geminiModels[0].value,
 	);
@@ -26,15 +34,24 @@ export function AIModelSelector({ onModelSelect }: AIModelSelectorProps) {
 		onModelSelect(value);
 	};
 
+	const getSelectedModelName = () => {
+		return (
+			geminiModels.find((model) => model.value === selectedModel)?.name ||
+			"Select a model"
+		);
+	};
 	return (
 		<Select value={selectedModel} onValueChange={handleModelChange}>
-			<SelectTrigger>
-				<SelectValue placeholder="Select a model" />
+			<SelectTrigger className={`${className}`}>
+				<SelectValue>{getSelectedModelName()}</SelectValue>
 			</SelectTrigger>
-			<SelectContent>
+			<SelectContent className="">
 				{geminiModels.map((model) => (
 					<SelectItem key={model.value} value={model.value}>
-						{model.name}
+						<div className="flex flex-col">
+							<span className="font-medium">{model.name}</span>
+							<span className="text-sm text-gray-500">{model.description}</span>
+						</div>
 					</SelectItem>
 				))}
 			</SelectContent>

@@ -18,8 +18,8 @@ export function TranslationItem({
 		<div className="p-2 rounded-xl border">
 			<div className="mb-2">{sanitizeAndParseText(translation.text)}</div>
 			{showAuthor && (
-				<Link to={`/${translation.userName}`}>
-					<p className="text-sm text-gray-500 text-right flex justify-end items-center">
+				<Link to={`/${translation.userName}`} className="!no-underline">
+					<p className="text-sm text-gray-500 text-right flex justify-end items-center  ">
 						<Languages className="w-5 h-5 mr-2" /> by: {translation.displayName}
 					</p>
 				</Link>

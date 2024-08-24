@@ -21,7 +21,7 @@ export function UserAITranslationStatus({
 	}, [revalidator]);
 
 	return (
-		<div className="h-[20px] flex mt-1 items-center space-y-1">
+		<div className="h-[15px] flex mt-1 items-center space-y-1">
 			{userAITranslationInfo ? (
 				<>
 					<Progress
@@ -33,13 +33,16 @@ export function UserAITranslationStatus({
 							userAITranslationInfo.aiTranslationStatus === "failed" &&
 								"bg-red-400",
 						)}
+						indicatorClassName="bg-gray-400"
 					/>
-					<span className="mx-2 !my-0">
-						{Math.round(userAITranslationInfo.aiTranslationProgress)}%
-					</span>
-					<span className="!my-0">
-						{userAITranslationInfo.aiTranslationStatus}
-					</span>
+					<div className="flex items-center whitespace-nowrap ml-2">
+						<span className="text-xs text-gray-500 mr-1">
+							{Math.round(userAITranslationInfo.aiTranslationProgress)}
+						</span>
+						<span className="text-xs text-gray-500">
+							{userAITranslationInfo.aiTranslationStatus}
+						</span>
+					</div>
 				</>
 			) : null}
 		</div>

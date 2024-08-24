@@ -21,7 +21,7 @@ import { removeSourceTextIdDuplicates } from "./utils/removeSourceTextIdDuplicat
 const schema = z.object({
 	title: z.string().min(1, "Required"),
 	pageContent: z.string().min(1, "Required Change something"),
-	isPublished: z.string(),
+	isPublished: z.enum(["true", "false"]).transform((val) => val === "true"),
 });
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -77,7 +77,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 		slug,
 		title,
 		numberedContent,
-		Boolean(isPublished),
+		isPublished,
 	);
 
 	const sourceTextsIdWithNumber = await createOrUpdateSourceTexts(
@@ -88,13 +88,12 @@ export const action: ActionFunction = async ({ request, params }) => {
 		numberedContent,
 		sourceTextsIdWithNumber,
 	);
-	console.log("contentWithSourceTextId", contentWithSourceTextId);
 	await createOrUpdatePage(
 		currentUser.id,
 		slug,
 		title,
 		contentWithSourceTextId,
-		Boolean(isPublished),
+		isPublished,
 	);
 	return null;
 };

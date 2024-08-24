@@ -48,56 +48,56 @@ export function EditHeader({
 	}, [fetcher.state, showSuccess]);
 
 	return (
-		<header className="mb-10 z-10 ">
-			<div className="fixed top-4 left-2 right-2 flex justify-between items-center">
-				<Link
-					to={
-						pageSlug
-							? `/${currentUser?.userName}/page/${pageSlug}`
-							: `/${currentUser?.userName}`
-					}
-					className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-				>
-					<Button variant="ghost">
-						{isLoading ? (
+		<header className="mb-10 z-10">
+			<div className="fixed top-4 left-2 right-2 grid grid-cols-3 items-center">
+				<div className="justify-self-start">
+					<Link
+						to={
+							pageSlug
+								? `/${currentUser?.userName}/page/${pageSlug}`
+								: `/${currentUser?.userName}`
+						}
+						className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+					>
+						<Button variant="ghost">
+							{isLoading ? (
+								<Loader2 className="w-6 h-6 animate-spin" />
+							) : (
+								<ArrowLeft className="w-6 h-6" />
+							)}
+						</Button>
+					</Link>
+				</div>
+				<div className="justify-self-center">
+					<Button type="submit" variant="ghost" disabled={isSubmitting}>
+						{isSubmitting ? (
 							<Loader2 className="w-6 h-6 animate-spin" />
+						) : showSuccess ? (
+							<Check className="w-6 h-6" />
 						) : (
-							<ArrowLeft className="w-6 h-6" />
+							<>
+								{isPublished ? (
+									<div className="flex justify-center items-center space-x-2">
+										<ArrowUpFromLine className="w-5 h-5 mr-2" />
+										Publish
+									</div>
+								) : (
+									<div className="flex justify-center items-center space-x-2">
+										<ArrowDownToLine className="w-5 h-5 mr-2" />
+										Save
+									</div>
+								)}
+							</>
 						)}
 					</Button>
-				</Link>
-				<Button type="submit" variant="ghost" disabled={isSubmitting}>
-					{isSubmitting ? (
-						<>
-							<Loader2 className="w-6 h-6 animate-spin" />
-						</>
-					) : showSuccess ? (
-						<>
-							<Check className="w-6 h-6 " />
-						</>
-					) : (
-						<>
-							{isPublished ? (
-								<div className="flex justify-center items-center space-x-2 w-30">
-									<ArrowUpFromLine className="w-6 h-6 mr-2" />
-									Publish
-								</div>
-							) : (
-								<div className="flex justify-center items-center space-x-2 w-30">
-									<ArrowDownToLine className="w-6 h-6 mr-2" />
-									Save
-								</div>
-							)}
-						</>
-					)}
 					<input
 						type="hidden"
 						name="isPublished"
 						value={isPublished ? "true" : "false"}
 					/>
-				</Button>
-				<div className="flex items-center space-x-2 w-35">
-					<DropdownMenu>
+				</div>
+				<div className="justify-self-end">
+					<DropdownMenu modal={false}>
 						<DropdownMenuTrigger asChild>
 							<Button variant="ghost" className="ml-auto">
 								{isPublished ? (
@@ -105,13 +105,17 @@ export function EditHeader({
 								) : (
 									<Lock className="w-5 h-5 text-gray-500 mr-2" />
 								)}
-								{isPublished ? "Public" : "Private"}
+								{isPublished ? (
+									"Public"
+								) : (
+									<span className="text-gray-500">Private</span>
+								)}
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
 							<DropdownMenuItem onSelect={() => handlePublishToggle(false)}>
 								<Lock className="mr-2 h-4 w-4" />
-								<span>Set to Private</span>
+								<span className="text-gray-500">Set to Private</span>
 							</DropdownMenuItem>
 							<DropdownMenuItem onSelect={() => handlePublishToggle(true)}>
 								<Globe className="mr-2 h-4 w-4" />

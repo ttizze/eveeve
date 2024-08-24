@@ -54,8 +54,8 @@ function CommonLayout({
 		<>
 			{showHeaderFooter && <Header currentUser={currentUser} />}
 			<div className="flex flex-col min-h-screen">
-				<main className="flex-grow mb-10 mt-1 md:mt-5">
-					<div className="container mx-auto !px-6">{children}</div>
+				<main className="flex-grow mb-10 mt-3 md:mt-5">
+					<div className="mx-auto px-6">{children}</div>
 				</main>
 				{showHeaderFooter && <Footer currentUser={currentUser} />}
 			</div>
