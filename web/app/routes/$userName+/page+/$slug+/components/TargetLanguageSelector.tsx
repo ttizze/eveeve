@@ -53,16 +53,18 @@ export default function TargetLanguageSelector() {
 					variant="outline"
 					role="combobox"
 					aria-expanded={open}
-					className="w-[200px] justify-between"
+					className="w-full justify-between"
 				>
-					{currentLanguage
-						? targetLanguages.find((lang) => lang.code === currentLanguage)
-								?.name
-						: "select"}
+					<span className="truncate">
+						{currentLanguage
+							? targetLanguages.find((lang) => lang.code === currentLanguage)
+									?.name
+							: "select"}
+					</span>
 					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-[200px] p-0">
+			<PopoverContent className="w-full p-0 truncate">
 				<Command>
 					<CommandInput placeholder="search..." />
 					<CommandList>
@@ -82,7 +84,7 @@ export default function TargetLanguageSelector() {
 												: "opacity-0",
 										)}
 									/>
-									{lang.name}
+									<span className="truncate">{lang.name}</span>
 								</CommandItem>
 							))}
 						</CommandGroup>

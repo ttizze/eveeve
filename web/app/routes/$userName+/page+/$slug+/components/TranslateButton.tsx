@@ -1,7 +1,7 @@
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Form } from "@remix-run/react";
 import { useNavigation } from "@remix-run/react";
-import { Languages, Plus } from "lucide-react";
+import { Languages } from "lucide-react";
 import { useState } from "react";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Button } from "~/components/ui/button";
@@ -28,46 +28,45 @@ export function TranslateButton({
 	return (
 		<>
 			<div className="mb-5  rounded-xl px-4 py-4 bg-gray-100 dark:bg-gray-900 shadow-inner">
-				<Form method="post">
-					<div className="flex flex-col space-y-2">
-						<div className="flex items-center space-x-2">
-							<TargetLanguageSelector />
-							<AIModelSelector
-								onModelSelect={setSelectedModel}
-								className="bg-background"
-							/>
-						</div>
-						<input type="hidden" name="pageId" value={pageId} />
-						<input type="hidden" name="aiModel" value={selectedModel} />
-						{hasGeminiApiKey ? (
-							<Button
-								type="submit"
-								name="intent"
-								value="translate"
-								className="w-full"
-								disabled={navigation.state === "submitting"}
-							>
-								{navigation.state === "submitting" ? (
-									<LoadingSpinner />
-								) : (
+				<div className="flex flex-col space-y-2">
+					<div className="flex items-center space-x-1 h-10">
+						<TargetLanguageSelector />
+						<AIModelSelector
+							onModelSelect={setSelectedModel}
+							className="bg-background"
+						/>
+					</div>
+					<div className="h-full">
+						<Form method="post" className="h-full">
+							<input type="hidden" name="pageId" value={pageId} />
+							<input type="hidden" name="aiModel" value={selectedModel} />
+							{hasGeminiApiKey ? (
+								<Button
+									type="submit"
+									name="intent"
+									value="translate"
+									className="w-full h-full"
+									disabled={navigation.state === "submitting"}
+								>
+									{navigation.state === "submitting" ? (
+										<LoadingSpinner />
+									) : (
+										<div className="flex items-center justify-center w-full">
+											<Languages className="w-5 h-5" />
+										</div>
+									)}
+								</Button>
+							) : (
+								<Button onClick={() => setIsDialogOpen(true)}>
 									<div className="flex items-center justify-center w-full">
-										<Plus className="w-5 h-5 mr-1" />
-										<Languages className="w-5 h-5 mr-1" />
+										<Languages className="w-5 h-5" />
 										<p>Add Translation</p>
 									</div>
-								)}
-							</Button>
-						) : (
-							<Button onClick={() => setIsDialogOpen(true)}>
-								<div className="flex items-center justify-center w-full">
-									<Plus className="w-5 h-5 mr-1" />
-									<Languages className="w-5 h-5 mr-1" />
-									<p>Add Translation</p>
-								</div>
-							</Button>
-						)}
+								</Button>
+							)}
+						</Form>
 					</div>
-				</Form>
+				</div>
 				<UserAITranslationStatus
 					userAITranslationInfo={userAITranslationInfo}
 				/>
