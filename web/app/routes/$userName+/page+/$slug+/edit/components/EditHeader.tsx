@@ -35,6 +35,7 @@ export function EditHeader({
 	const isLoading = fetcher.state === "loading";
 	const [isPublished, setIsPublished] = useState(initialIsPublished);
 	const [showSuccess, setShowSuccess] = useState(false);
+
 	const handlePublishToggle = (newPublishState: boolean) => {
 		setIsPublished(newPublishState);
 	};
@@ -59,7 +60,7 @@ export function EditHeader({
 						}
 						className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
 					>
-						<Button variant="ghost">
+						<Button variant="ghost" type="button">
 							{isLoading ? (
 								<Loader2 className="w-6 h-6 animate-spin" />
 							) : (
@@ -99,7 +100,7 @@ export function EditHeader({
 				<div className="justify-self-end">
 					<DropdownMenu modal={false}>
 						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" className="ml-auto">
+							<Button variant="ghost" className="ml-auto" type="button">
 								{isPublished ? (
 									<Globe className="w-5 h-5  mr-2" />
 								) : (

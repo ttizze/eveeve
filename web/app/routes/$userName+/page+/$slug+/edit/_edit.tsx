@@ -106,8 +106,6 @@ export default function EditPage() {
 		id: "edit-page",
 		lastResult: fetcher.data?.lastResult,
 		constraint: getZodConstraint(schema),
-		shouldValidate: "onBlur",
-		shouldRevalidate: "onInput",
 		defaultValue: {
 			title: page?.title,
 			pageContent: page?.content,
