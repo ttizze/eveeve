@@ -90,7 +90,7 @@ export default function UserProfile() {
 
 	return (
 		<div className="">
-			<Card className="mb-6 rounded-3xl w-full overflow-hidden shadow-xl shadow-gray-800 dark:shadow-gray-800">
+			<Card className="mb-6 rounded-3xl w-full overflow-hidden shadow-md shadow-gray-500 dark:shadow-gray-600">
 				<div className="grid grid-cols-4 gap-4 p-4">
 					<Link to={`${sanitizedUserWithPages.icon}`}>
 						<div className="col-span-1 flex  justify-start">

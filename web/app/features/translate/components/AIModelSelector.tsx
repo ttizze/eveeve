@@ -13,10 +13,14 @@ const geminiModels = [
 ];
 
 interface AIModelSelectorProps {
+	className?: string;
 	onModelSelect: (model: string) => void;
 }
 
-export function AIModelSelector({ onModelSelect }: AIModelSelectorProps) {
+export function AIModelSelector({
+	onModelSelect,
+	className,
+}: AIModelSelectorProps) {
 	const [selectedModel, setSelectedModel] = useState<string>(
 		geminiModels[0].value,
 	);
@@ -28,7 +32,7 @@ export function AIModelSelector({ onModelSelect }: AIModelSelectorProps) {
 
 	return (
 		<Select value={selectedModel} onValueChange={handleModelChange}>
-			<SelectTrigger>
+			<SelectTrigger className={className}>
 				<SelectValue placeholder="Select a model" />
 			</SelectTrigger>
 			<SelectContent>

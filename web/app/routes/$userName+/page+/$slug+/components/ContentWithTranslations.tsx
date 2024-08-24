@@ -1,3 +1,4 @@
+import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import DOMPurify from "dompurify";
 import parse from "html-react-parser";
@@ -5,16 +6,21 @@ import { Lock, SquarePen } from "lucide-react";
 import { memo, useMemo } from "react";
 import { Button } from "~/components/ui/button";
 import type { PageWithTranslations } from "../types";
+import { TranslateButton } from "./TranslateButton";
 import { Translation } from "./Translation";
 
 interface ContentWithTranslationsProps {
 	pageWithTranslations: PageWithTranslations;
 	currentUserName: string | null;
+	hasGeminiApiKey: boolean;
+	userAITranslationInfo: UserAITranslationInfo | null;
 }
 
 export const ContentWithTranslations = memo(function ContentWithTranslations({
 	pageWithTranslations,
 	currentUserName,
+	hasGeminiApiKey,
+	userAITranslationInfo,
 }: ContentWithTranslationsProps) {
 	const bestTranslationTitle = useMemo(() => {
 		return pageWithTranslations.sourceTextWithTranslations.find(
@@ -82,7 +88,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 
 	return (
 		<>
-			<h1>
+			<h1 className="!mb-5">
 				<div className="px-2">
 					{!pageWithTranslations.isPublished && (
 						<Lock className="h-6 w-6 mr-1 inline" />
@@ -97,6 +103,11 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 					/>
 				)}
 			</h1>
+			<TranslateButton
+				pageId={pageWithTranslations.id}
+				userAITranslationInfo={userAITranslationInfo}
+				hasGeminiApiKey={hasGeminiApiKey}
+			/>
 			<div className="flex items-center text-gray-500">
 				<Link
 					to={`/${pageWithTranslations.user.userName}`}
