@@ -1,10 +1,10 @@
 import { ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
+import { TranslationItem } from "~/routes/resources+/translation-item";
 import type { TranslationWithVote } from "../types";
 import { AddTranslationForm } from "./AddTranslationForm";
 import { AlternativeTranslations } from "./AlternativeTranslations";
-import { TranslationItem } from "./TranslationItem";
 
 const INITIAL_DISPLAY_COUNT = 3;
 
@@ -39,7 +39,7 @@ export function AddAndVoteTranslations({
 				currentUserName={currentUserName}
 				showAuthor
 			/>
-			<div className="mt-4">
+			<div className="mt-2">
 				<p className="text-gray-500 flex items-center justify-end mr-2">
 					<ArrowUpDown size={16} />
 				</p>
@@ -65,7 +65,7 @@ export function AddAndVoteTranslations({
 					</Button>
 				)}
 			</div>
-			<div className="mt-4">
+			<div className="mt-2">
 				<AddTranslationForm
 					sourceTextId={sourceTextId}
 					currentUserName={currentUserName}
