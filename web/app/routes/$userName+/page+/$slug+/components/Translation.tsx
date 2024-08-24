@@ -1,4 +1,4 @@
-import { SquarePen, X } from "lucide-react";
+import { Ellipsis, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { getBestTranslation } from "../lib/get-best-translation.client";
 import { sanitizeAndParseText } from "../lib/sanitize-and-parse-text.client";
@@ -14,7 +14,7 @@ function ToggleButton({
 	isExpanded,
 	onClick,
 }: { isExpanded: boolean; onClick: () => void }) {
-	const Icon = isExpanded ? X : SquarePen;
+	const Icon = isExpanded ? X : Ellipsis;
 	const label = isExpanded
 		? "Close translation options"
 		: "Show translation options";
@@ -22,12 +22,12 @@ function ToggleButton({
 	return (
 		<button
 			type="button"
-			className={`absolute -top-2 right-0  rounded-md p-1 ${isExpanded ? " z-20 bg-transparent" : "z-0 bg-gray-200 dark:bg-gray-800"}`}
+			className={`absolute top-0 right-2 rounded-md ${isExpanded ? " z-20 bg-transparent" : "z-0 "}`}
 			onClick={onClick}
 			aria-label={label}
 			title={label}
 		>
-			<Icon className="w-5 h-5" />
+			<Icon className="w-5 h-5 text-gray-400 " />
 		</button>
 	);
 }
@@ -73,7 +73,7 @@ export function Translation({
 				/>
 			</div>
 			{isExpanded && (
-				<div className="absolute -top-2 left-0 right-0 z-10  border bg-white dark:bg-gray-900 rounded-xl shadow-xl dark:shadow-white/10  transition-all duration-500 ease-in-out">
+				<div className="absolute -top-2 left-0 right-0 z-10  border bg-white dark:bg-gray-900 rounded-xl shadow-lg shadow-gray-800/10  dark:shadow-white/10  transition-all duration-500 ease-in-out">
 					<AddAndVoteTranslations
 						bestTranslationWithVote={bestTranslationWithVote}
 						alternativeTranslationsWithVotes={alternativeTranslationsWithVotes}

@@ -7,17 +7,13 @@ import {
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form } from "@remix-run/react";
-import { Link } from "@remix-run/react";
-import { useNavigation } from "@remix-run/react";
-import { ArrowLeft, Check, Loader2 } from "lucide-react";
-import { useState } from "react";
-import { useEffect } from "react";
+import { Form, Link, useNavigation } from "@remix-run/react";
+import { ArrowLeft, ArrowUpFromLine, Check, Key, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
 import { uploadImage } from "~/routes/$userName+/utils/uploadImage";
 import { GeminiApiKeyDialog } from "~/routes/resources+/gemini-api-key-dialog";
 import { authenticator, sanitizeUser } from "~/utils/auth.server";
@@ -122,12 +118,10 @@ export default function EditProfile() {
 			<Link to={`/${currentUser.userName}`}>
 				<ArrowLeft className="w-6 h-6 mb-5" />
 			</Link>
-			<div className="rounded-xl border p-4 shadow-md">
-				<div className="rounded-xl border p-4 ">
-					<h2 className="text-xl font-bold mb-3">Edit Profile</h2>
+			<div className="rounded-xl border p-4 shadow-md bg-gray-200 dark:bg-gray-900">
+				<div className="rounded-xl border p-4 shadow-md bg-white dark:bg-gray-800">
 					<Form method="post" {...getFormProps(form)} className="space-y-4">
 						<div>
-							<Label htmlFor="image-upload">Icon</Label>
 							<img
 								src={profileIconUrl}
 								alt="Preview"
@@ -138,7 +132,7 @@ export default function EditProfile() {
 								type="file"
 								accept="image/*"
 								onChange={handleProfileImageUpload}
-								className="mt-1"
+								className="mt-3 bg-white dark:bg-black/50 cursor-pointer"
 							/>
 							<div
 								id={fields.icon.errorId}
@@ -148,8 +142,10 @@ export default function EditProfile() {
 							</div>
 						</div>
 						<div>
-							<Label htmlFor={fields.displayName.id}>Display Name</Label>
-							<Input {...getInputProps(fields.displayName, { type: "text" })} />
+							<Input
+								{...getInputProps(fields.displayName, { type: "text" })}
+								className="w-full h-10 px-3 py-2 border rounded-lg  bg-white dark:bg-black/50 focus:outline-none"
+							/>
 							<div
 								id={fields.displayName.errorId}
 								className="text-red-500 text-sm mt-1"
@@ -158,10 +154,9 @@ export default function EditProfile() {
 							</div>
 						</div>
 						<div>
-							<Label htmlFor={fields.profile.id}>Profile</Label>
 							<textarea
 								{...getTextareaProps(fields.profile)}
-								className="w-full h-32 px-3 py-2  border rounded-lg focus:outline-none"
+								className="w-full h-32 px-3 py-2  border rounded-lg  bg-white dark:bg-black/50 focus:outline-none"
 							/>
 							<div
 								id={fields.profile.errorId}
@@ -181,13 +176,16 @@ export default function EditProfile() {
 							) : navigation.state === "submitting" ? (
 								<Loader2 className="w-6 h-6 animate-spin" />
 							) : (
-								"Save"
+								<ArrowUpFromLine className="w-6 h-6" />
 							)}
 						</Button>
 					</Form>
 				</div>
-				<div className="mt-10 rounded-xl border p-4 shadow-md">
-					<h2 className="text-xl font-bold mb-3">Gemini API Key</h2>
+				<div className="mt-10 rounded-xl border p-4 shadow-md bg-white dark:bg-gray-800">
+					<h2 className="text-xl font-bold mb-3 flex items-center gap-2">
+						<Key className="w-5 h-5" />
+						Gemini API Key
+					</h2>
 					<Button
 						className="w-full"
 						onClick={() => setIsGeminiApiKeyDialogOpen(true)}

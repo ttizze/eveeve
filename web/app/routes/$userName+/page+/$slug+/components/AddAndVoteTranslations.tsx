@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, ListTree } from "lucide-react";
+import { ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import type { TranslationWithVote } from "../types";
@@ -40,9 +40,8 @@ export function AddAndVoteTranslations({
 				showAuthor
 			/>
 			<div className="mt-4">
-				<p className="text-sm flex items-center justify-end gap-2">
-					<ListTree size={16} />
-					Alternative
+				<p className="text-gray-500 flex items-center justify-end mr-2">
+					<ArrowUpDown size={16} />
 				</p>
 				<AlternativeTranslations
 					translationsWithVotes={displayedTranslations}

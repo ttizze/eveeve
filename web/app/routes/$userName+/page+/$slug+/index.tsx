@@ -187,7 +187,7 @@ export default function ReaderView() {
 
 	return (
 		<div className=" w-full max-w-3xl  mx-auto">
-			<div className="mb-3 border rounded-xl p-4">
+			<div className="mb-3 border rounded-xl px-4 py-2">
 				<Form method="post">
 					<div className="flex flex-col space-y-2">
 						<div className="flex items-center space-x-2">

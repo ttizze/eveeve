@@ -4,10 +4,10 @@ import { redirect } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
 import { LogIn, LogOut, UserPen } from "lucide-react";
+import { ModeToggle } from "~/components/ModeToggle";
 import { Button } from "~/components/ui/button";
 import type { SanitizedUser } from "~/types";
 import { authenticator } from "~/utils/auth.server";
-
 interface FooterProps {
 	currentUser: SanitizedUser | null;
 }
@@ -43,12 +43,13 @@ export function Footer({ currentUser }: FooterProps) {
 		<footer className="border-t border-gray-200 dark:border-gray-700">
 			<div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
 				<div className="flex flex-col space-y-4">
-					<div className="flex justify-between items-center">
+					<div className="flex flex-col space-y-4">
+						<Link to="/">
+							<h1 className="text-4xl font-bold">EveEve</h1>
+						</Link>
 						<div className="flex items-center space-x-4">
-							<Link to="/">
-								<h1 className="text-4xl font-bold">EveEve</h1>
-							</Link>
-							{currentUser && (
+							<ModeToggle />
+							{currentUser ? (
 								<>
 									<Link to={`/${currentUser.userName}`}>
 										<Button variant="outline">
@@ -68,21 +69,22 @@ export function Footer({ currentUser }: FooterProps) {
 										</Button>
 									</Form>
 								</>
+							) : (
+								<>
+									<Form method="post" action="/resources/footer">
+										<Button
+											type="submit"
+											name="intent"
+											value="SignInWithGoogle"
+											variant="outline"
+										>
+											<LogIn className="w-4 h-4 mr-2" />
+											Log in
+										</Button>
+									</Form>
+								</>
 							)}
 						</div>
-						{!currentUser && (
-							<Form method="post" action="/resources/footer">
-								<Button
-									type="submit"
-									name="intent"
-									value="SignInWithGoogle"
-									variant="outline"
-								>
-									<LogIn className="w-4 h-4 mr-2" />
-									Log in
-								</Button>
-							</Form>
-						)}
 					</div>
 					<div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-300 mt-8">
 						<div className="flex space-x-4">

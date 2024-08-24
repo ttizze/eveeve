@@ -1,4 +1,4 @@
-import { ModeToggle } from "~/components/dark-mode-toggle";
+import { ModeToggle } from "~/components/ModeToggle";
 
 export function EditFooter() {
 	return (
