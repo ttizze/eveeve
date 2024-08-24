@@ -90,7 +90,7 @@ export default function UserProfile() {
 
 	return (
 		<div className="">
-			<Card className="mb-6 rounded-3xl w-full overflow-hidden shadow-md shadow-gray-500 dark:shadow-gray-600">
+			<div className="mb-6 rounded-3xl w-full overflow-hidden ">
 				<div className="grid grid-cols-4 gap-4 p-4">
 					<Link to={`${sanitizedUserWithPages.icon}`}>
 						<div className="col-span-1 flex  justify-start">
@@ -133,7 +133,7 @@ export default function UserProfile() {
 						</CardContent>
 					</div>
 				</div>
-			</Card>
+			</div>
 			<div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
 				{sanitizedUserWithPages.pages.map((page) => (
 					<Card

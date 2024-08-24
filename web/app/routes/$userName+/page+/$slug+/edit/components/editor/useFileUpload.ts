@@ -22,6 +22,7 @@ export async function handleFileUpload(
 		editor.commands.updateAttributes("image", {
 			src: url,
 		});
+		editor.commands.focus();
 	} catch (error) {
 		window.alert(UPLOAD_MESSAGES.UPLOAD_ERROR);
 	}
