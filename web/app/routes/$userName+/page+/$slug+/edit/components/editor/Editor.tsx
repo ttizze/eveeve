@@ -10,6 +10,7 @@ import {
 	Brackets,
 	Code,
 	Heading2,
+	ImageIcon,
 	Italic,
 	List,
 	ListOrdered,
@@ -24,6 +25,7 @@ import {
 	TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { configureEditor } from "./editorConfig";
+import { handleFileUpload } from "./useFileUpload";
 interface EditorProps {
 	initialContent: string;
 }
@@ -161,6 +163,49 @@ export function Editor({ initialContent }: EditorProps) {
 				</BubbleMenu>
 			)}
 			<EditorContent editor={editor} />
+			{editor && <FixedMenu editor={editor} />}
 		</>
+	);
+}
+
+function FixedMenu({ editor }: { editor: TiptapEditor }) {
+	const handleImageUpload = () => {
+		const input = document.createElement("input");
+		input.type = "file";
+		input.accept = "image/*";
+		input.onchange = async (event) => {
+			const file = (event.target as HTMLInputElement).files?.[0];
+			if (file) {
+				handleFileUpload(file, editor);
+			}
+		};
+		input.click();
+	};
+
+	return (
+		<TooltipProvider>
+			<ToggleGroup
+				type="multiple"
+				variant="default"
+				className="rounded-md flex justify-end"
+			>
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<ToggleGroupItem
+							value="image"
+							size="sm"
+							aria-label="Insert Image"
+							onClick={handleImageUpload}
+							className="bg-transparent text-foreground"
+						>
+							<ImageIcon className="h-5 w-5" />
+						</ToggleGroupItem>
+					</TooltipTrigger>
+					<TooltipContent>
+						<p>Insert Image</p>
+					</TooltipContent>
+				</Tooltip>
+			</ToggleGroup>
+		</TooltipProvider>
 	);
 }

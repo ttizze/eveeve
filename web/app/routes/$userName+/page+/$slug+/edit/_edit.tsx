@@ -139,8 +139,8 @@ export default function EditPage() {
 							</p>
 						))}
 					</div>
-					<hr className="my-10" />
-					<div className="mt-16">
+					<hr className="!mt-5 !mb-1" />
+					<div className="mt-12">
 						<Editor initialContent={page?.content || ""} />
 						{pageContent.errors?.map((error) => (
 							<p className="text-sm text-red-500" key={error}>
