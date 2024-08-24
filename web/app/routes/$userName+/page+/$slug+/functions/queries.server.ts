@@ -55,7 +55,7 @@ export async function fetchPageWithTranslations(
 					id: true,
 					number: true,
 					translateTexts: {
-						where: { targetLanguage },
+						where: { targetLanguage, isArchived: false },
 						select: {
 							id: true,
 							text: true,

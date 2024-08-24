@@ -41,7 +41,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 			if (element instanceof HTMLElement) {
 				const sourceTextId = element.getAttribute("data-source-text-id");
 				const contentWrapper = document.createElement("span");
-				contentWrapper.classList.add("inline-block", "px-2");
+				contentWrapper.classList.add("inline-block", "px-4");
 				contentWrapper.innerHTML = element.innerHTML;
 				element.innerHTML = "";
 				element.appendChild(contentWrapper);
@@ -89,7 +89,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 	return (
 		<>
 			<h1 className="!mb-5">
-				<div className="px-2">
+				<div className="px-2 md:px-4">
 					{!pageWithTranslations.isPublished && (
 						<Lock className="h-6 w-6 mr-1 inline" />
 					)}

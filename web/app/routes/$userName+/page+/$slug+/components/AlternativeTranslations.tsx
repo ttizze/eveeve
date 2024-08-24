@@ -1,5 +1,5 @@
+import { TranslationItem } from "~/routes/resources+/translation-item";
 import type { TranslationWithVote } from "../types";
-import { TranslationItem } from "./TranslationItem";
 
 interface AlternativeTranslationsProps {
 	translationsWithVotes: TranslationWithVote[];

@@ -1,4 +1,4 @@
-import { Ellipsis, X } from "lucide-react";
+import { MoreVertical, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { getBestTranslation } from "../lib/get-best-translation.client";
 import { sanitizeAndParseText } from "../lib/sanitize-and-parse-text.client";
@@ -14,7 +14,7 @@ function ToggleButton({
 	isExpanded,
 	onClick,
 }: { isExpanded: boolean; onClick: () => void }) {
-	const Icon = isExpanded ? X : Ellipsis;
+	const Icon = isExpanded ? X : MoreVertical;
 	const label = isExpanded
 		? "Close translation options"
 		: "Show translation options";
@@ -22,7 +22,7 @@ function ToggleButton({
 	return (
 		<button
 			type="button"
-			className={`absolute top-0 right-2 rounded-md ${isExpanded ? " z-20 bg-transparent" : "z-0 "}`}
+			className={`absolute top-2  right-1  rounded-md ${isExpanded ? " z-20 bg-transparent" : "z-0 "}`}
 			onClick={onClick}
 			aria-label={label}
 			title={label}
@@ -65,7 +65,7 @@ export function Translation({
 
 	return (
 		<div className="group relative rounded-xl bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-800 ">
-			<div className="notranslate mt-2 py-3 px-2">
+			<div className="notranslate mt-2 py-2  px-4">
 				{sanitizedAndParsedText}
 				<ToggleButton
 					isExpanded={isExpanded}
