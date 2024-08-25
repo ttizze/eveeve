@@ -2,6 +2,7 @@ import { useInputControl } from "@conform-to/react";
 import {
 	BubbleMenu,
 	EditorContent,
+	FloatingMenu,
 	type Editor as TiptapEditor,
 	useEditor,
 } from "@tiptap/react";
@@ -17,6 +18,7 @@ import {
 	Quote,
 	Strikethrough,
 } from "lucide-react";
+import { Button } from "~/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 import {
 	Tooltip,
@@ -49,7 +51,18 @@ export function Editor({ initialContent }: EditorProps) {
 		name: "pageContent",
 		formId: "edit-page",
 	});
-
+	const handleImageUpload = () => {
+		const input = document.createElement("input");
+		input.type = "file";
+		input.accept = "image/*";
+		input.onchange = async (event) => {
+			const file = (event.target as HTMLInputElement).files?.[0];
+			if (file && editor) {
+				handleFileUpload(file, editor);
+			}
+		};
+		input.click();
+	};
 	const editor = useEditor({
 		...configureEditor(initialContent),
 		onCreate: ({ editor }) => {
@@ -65,13 +78,13 @@ export function Editor({ initialContent }: EditorProps) {
 				<BubbleMenu
 					editor={editor}
 					tippyOptions={{ duration: 100 }}
-					className="rounded-md shadow-sm"
+					className="rounded-md shadow-sm bg-transparent"
 				>
 					<TooltipProvider>
 						<ToggleGroup
 							type="multiple"
 							variant="outline"
-							className="rounded-md shadow-sm "
+							className="rounded-md shadow-sm bg-transparent"
 						>
 							{[
 								{
@@ -162,50 +175,29 @@ export function Editor({ initialContent }: EditorProps) {
 					</TooltipProvider>
 				</BubbleMenu>
 			)}
-			<EditorContent editor={editor} />
-			{editor && <FixedMenu editor={editor} />}
-		</>
-	);
-}
-
-function FixedMenu({ editor }: { editor: TiptapEditor }) {
-	const handleImageUpload = () => {
-		const input = document.createElement("input");
-		input.type = "file";
-		input.accept = "image/*";
-		input.onchange = async (event) => {
-			const file = (event.target as HTMLInputElement).files?.[0];
-			if (file) {
-				handleFileUpload(file, editor);
-			}
-		};
-		input.click();
-	};
-
-	return (
-		<TooltipProvider>
-			<ToggleGroup
-				type="multiple"
-				variant="default"
-				className="rounded-md flex justify-end"
-			>
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<ToggleGroupItem
-							value="image"
-							size="sm"
-							aria-label="Insert Image"
+			{editor && (
+				<FloatingMenu
+					editor={editor}
+					tippyOptions={{
+						duration: 200,
+						placement: "left",
+						arrow: false,
+						theme: "custom-transparent",
+					}}
+				>
+					<div className="floating-menu">
+						<Button
+							variant="ghost"
+							size="icon"
 							onClick={handleImageUpload}
-							className="bg-transparent text-foreground"
+							className="bg-transparent"
 						>
 							<ImageIcon className="h-5 w-5" />
-						</ToggleGroupItem>
-					</TooltipTrigger>
-					<TooltipContent>
-						<p>Insert Image</p>
-					</TooltipContent>
-				</Tooltip>
-			</ToggleGroup>
-		</TooltipProvider>
+						</Button>
+					</div>
+				</FloatingMenu>
+			)}
+			<EditorContent editor={editor} />
+		</>
 	);
 }
