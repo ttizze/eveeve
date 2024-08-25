@@ -64,7 +64,7 @@ export function Translation({
 	}
 
 	return (
-		<div className="group relative rounded-xl bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-800 ">
+		<div className="group relative rounded-xl bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 ">
 			<div className="notranslate mt-2 py-2  px-4">
 				{sanitizedAndParsedText}
 				<ToggleButton
