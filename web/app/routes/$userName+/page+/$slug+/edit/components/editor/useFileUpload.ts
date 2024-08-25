@@ -7,23 +7,28 @@ export async function handleFileUpload(
 	editor: TiptapEditor,
 	pos?: number,
 ) {
+	const insertPos = pos ?? editor.state.selection.anchor;
+	const placeholderSrc =
+		"https://via.placeholder.com/300x200?text=Uploading...";
+
 	editor
 		.chain()
-		.insertContentAt(pos ?? editor.state.selection.anchor, {
+		.insertContentAt(insertPos, {
 			type: "image",
-			attrs: {
-				src: "https://via.placeholder.com/300x200?text=Uploading...",
-			},
+			attrs: { src: placeholderSrc },
 		})
-		.focus()
 		.run();
+
 	try {
 		const url = await uploadImage(file);
-		editor.commands.updateAttributes("image", {
-			src: url,
-		});
-		editor.commands.focus();
+		editor
+			.chain()
+			.updateAttributes("image", { src: url })
+			.createParagraphNear()
+			.focus()
+			.run();
 	} catch (error) {
+		console.error(error);
 		window.alert(UPLOAD_MESSAGES.UPLOAD_ERROR);
 	}
 }

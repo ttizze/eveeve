@@ -49,8 +49,8 @@ export function EditHeader({
 	}, [fetcher.state, showSuccess]);
 
 	return (
-		<header className="mb-10 z-10">
-			<div className="fixed top-4 left-2 right-2 grid grid-cols-3 items-center">
+		<header className="mb-10 z-10 bg-background">
+			<div className="grid grid-cols-3 items-center">
 				<div className="justify-self-start">
 					<Link
 						to={
