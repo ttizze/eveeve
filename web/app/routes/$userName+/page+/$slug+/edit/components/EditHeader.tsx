@@ -64,7 +64,7 @@ export function EditHeader({
 							{isLoading ? (
 								<Loader2 className="w-6 h-6 animate-spin" />
 							) : (
-								<ArrowLeft className="w-6 h-6" />
+								<ArrowLeft className="w-6 h-6 opacity-50" />
 							)}
 						</Button>
 					</Link>

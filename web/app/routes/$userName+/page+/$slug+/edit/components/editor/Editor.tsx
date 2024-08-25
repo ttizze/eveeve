@@ -37,10 +37,12 @@ export function Editor({ initialContent }: EditorProps) {
 					editor={editor}
 					tippyOptions={{
 						duration: 200,
-						placement: "left",
+						placement: "bottom-start",
+						offset: [0, 25],
 						arrow: false,
 						theme: "custom-transparent",
 					}}
+					className="w-5 h-5"
 				>
 					<div className="floating-menu">
 						<Button
@@ -48,9 +50,9 @@ export function Editor({ initialContent }: EditorProps) {
 							size="icon"
 							type="button"
 							onClick={() => document.getElementById("imageUpload")?.click()}
-							className="bg-transparent"
+							className="w-full h-full p-0"
 						>
-							<ImageIcon className="h-5 w-5" />
+							<ImageIcon className="w-full h-full opacity-50" />
 						</Button>
 					</div>
 				</FloatingMenu>
