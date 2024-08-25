@@ -3,6 +3,7 @@ import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
+import TextareaAutosize from "react-textarea-autosize";
 import { z } from "zod";
 import { authenticator } from "~/utils/auth.server";
 import { EditFooter } from "./components/EditFooter";
@@ -18,6 +19,7 @@ import { addNumbersToContent } from "./utils/addNumbersToContent";
 import { addSourceTextIdToContent } from "./utils/addSourceTextIdToContent";
 import { extractNumberedElements } from "./utils/extractNumberedElements";
 import { removeSourceTextIdDuplicates } from "./utils/removeSourceTextIdDuplicates";
+
 const schema = z.object({
 	title: z.string().min(1, "Required"),
 	pageContent: z.string().min(1, "Required Change something"),
@@ -123,12 +125,14 @@ export default function EditPage() {
 					fetcher={fetcher}
 				/>
 				<div className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg mt-32 mx-auto">
-					<div className="mt-10">
-						<h1 className="text-4xl font-bold">
-							<textarea
+					<div className="mt-10 h-auto">
+						<h1 className="text-4xl font-bold !mb-0 h-auto">
+							<TextareaAutosize
 								{...getTextareaProps(title)}
 								placeholder="input title..."
-								className="w-full outline-none bg-transparent  resize-none"
+								className="w-full outline-none bg-transparent resize-none overflow-hidden"
+								minRows={1}
+								maxRows={10}
 							/>
 						</h1>
 						{title.errors?.map((error) => (
@@ -137,7 +141,7 @@ export default function EditPage() {
 							</p>
 						))}
 					</div>
-					<hr className="!mt-5 !mb-1" />
+					<hr className="!mt-2 !mb-1" />
 					<div className="mt-12">
 						<Editor initialContent={page?.content || ""} />
 						{pageContent.errors?.map((error) => (
