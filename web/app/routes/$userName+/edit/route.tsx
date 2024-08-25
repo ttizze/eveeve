@@ -119,7 +119,7 @@ export default function EditProfile() {
 				<ArrowLeft className="w-6 h-6 mb-5" />
 			</Link>
 			<div className="rounded-xl border p-4 shadow-md bg-gray-200 dark:bg-gray-900">
-				<div className="rounded-xl border p-4 shadow-md bg-white dark:bg-gray-800">
+				<div className="rounded-xl border p-4 shadow-md dark:shadow-gray-700  bg-white dark:bg-gray-800">
 					<Form method="post" {...getFormProps(form)} className="space-y-4">
 						<div>
 							<img
@@ -181,7 +181,7 @@ export default function EditProfile() {
 						</Button>
 					</Form>
 				</div>
-				<div className="mt-10 rounded-xl border p-4 shadow-md bg-white dark:bg-gray-800">
+				<div className="mt-10 rounded-xl border p-4 shadow-md dark:shadow-gray-700 bg-white dark:bg-gray-800">
 					<h2 className="text-xl font-bold mb-3 flex items-center gap-2">
 						<Key className="w-5 h-5" />
 						Gemini API Key

@@ -55,11 +55,3 @@ export function configureEditor(initialContent: string) {
 		},
 	};
 }
-
-if (import.meta.hot) {
-	import.meta.hot.accept((newModule) => {
-		if (newModule) {
-			Object.assign(configureEditor, newModule.configureEditor);
-		}
-	});
-}
