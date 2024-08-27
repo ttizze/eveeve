@@ -14,7 +14,7 @@ export function AddAndVoteTranslations({
 	currentUserName,
 	sourceTextId,
 }: {
-	bestTranslationWithVote: TranslationWithVote;
+	bestTranslationWithVote: TranslationWithVote | null;
 	alternativeTranslationsWithVotes: TranslationWithVote[];
 	currentUserName: string | null;
 	sourceTextId: number;
@@ -33,12 +33,14 @@ export function AddAndVoteTranslations({
 	const toggleShowAll = () => setShowAll((prev) => !prev);
 
 	return (
-		<div className="p-4 ">
-			<TranslationItem
-				translation={bestTranslationWithVote}
-				currentUserName={currentUserName}
-				showAuthor
-			/>
+		<div className=" p-4">
+			{bestTranslationWithVote && (
+				<TranslationItem
+					translation={bestTranslationWithVote}
+					currentUserName={currentUserName}
+					showAuthor
+				/>
+			)}
 			<div className="mt-2">
 				<p className="text-gray-500 flex items-center justify-end mr-2">
 					<ArrowUpDown size={16} />

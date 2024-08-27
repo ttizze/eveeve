@@ -54,6 +54,7 @@ export async function fetchPageWithTranslations(
 				select: {
 					id: true,
 					number: true,
+					text: true,
 					translateTexts: {
 						where: { targetLanguage, isArchived: false },
 						select: {
@@ -99,6 +100,7 @@ export async function fetchPageWithTranslations(
 		sourceTextWithTranslations: page.sourceTexts.map((sourceText) => ({
 			sourceTextId: sourceText.id,
 			number: sourceText.number,
+			text: sourceText.text,
 			translationsWithVotes: sourceText.translateTexts.map((translateText) => ({
 				id: translateText.id,
 				text: translateText.text,

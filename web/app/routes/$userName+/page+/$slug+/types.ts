@@ -14,6 +14,7 @@ export type TranslationWithVote = Pick<
 
 export interface SourceTextWithTranslations {
 	sourceTextId: number;
+	text: string;
 	number: number;
 	translationsWithVotes: TranslationWithVote[];
 }

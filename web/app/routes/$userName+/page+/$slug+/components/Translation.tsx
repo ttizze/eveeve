@@ -22,12 +22,12 @@ function ToggleButton({
 	return (
 		<button
 			type="button"
-			className={`absolute top-2  right-1  rounded-md ${isExpanded ? " z-20 bg-transparent" : "z-0 "}`}
+			className={`absolute top-2  -right-1  rounded-md ${isExpanded ? " z-20 bg-transparent" : "z-0 "}`}
 			onClick={onClick}
 			aria-label={label}
 			title={label}
 		>
-			<Icon className="w-5 h-5 text-gray-400 " />
+			<Icon className="w-5 h-5 text-gray-500 " />
 		</button>
 	);
 }
@@ -40,7 +40,10 @@ export function Translation({
 	const [isExpanded, setIsExpanded] = useState(false);
 
 	const bestTranslationWithVote = useMemo(
-		() => getBestTranslation(translationsWithVotes),
+		() =>
+			translationsWithVotes.length > 0
+				? getBestTranslation(translationsWithVotes)
+				: null,
 		[translationsWithVotes],
 	);
 
@@ -55,25 +58,21 @@ export function Translation({
 	);
 
 	const sanitizedAndParsedText = useMemo(() => {
-		if (!bestTranslationWithVote) return null;
+		if (!bestTranslationWithVote) return "add translation";
 		return sanitizeAndParseText(bestTranslationWithVote.text);
 	}, [bestTranslationWithVote]);
 
-	if (!bestTranslationWithVote || !sanitizedAndParsedText) {
-		return null;
-	}
-
 	return (
-		<div className="group relative rounded-xl bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 ">
-			<div className="notranslate mt-2 py-2  px-4">
+		<div className="group relative">
+			<span className="notranslate mt-2 pl-4 pr-5 inline-block">
 				{sanitizedAndParsedText}
 				<ToggleButton
 					isExpanded={isExpanded}
 					onClick={() => setIsExpanded(!isExpanded)}
 				/>
-			</div>
+			</span>
 			{isExpanded && (
-				<div className="absolute -top-2 left-0 right-0 z-10  border bg-white dark:bg-gray-900 rounded-xl shadow-lg shadow-gray-800/10  dark:shadow-white/10  transition-all duration-500 ease-in-out">
+				<div className="mx-[-1rem] absolute -top-0 left-0 right-0 z-10  border bg-white dark:bg-gray-900 rounded-xl shadow-lg shadow-gray-800/10  dark:shadow-white/10  transition-all duration-500 ease-in-out">
 					<AddAndVoteTranslations
 						bestTranslationWithVote={bestTranslationWithVote}
 						alternativeTranslationsWithVotes={alternativeTranslationsWithVotes}

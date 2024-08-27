@@ -40,11 +40,15 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 		for (const element of elements) {
 			if (element instanceof HTMLElement) {
 				const sourceTextId = element.getAttribute("data-source-text-id");
-				const contentWrapper = document.createElement("span");
-				contentWrapper.classList.add("inline-block", "px-4");
-				contentWrapper.innerHTML = element.innerHTML;
+				const sourceTextWrapper = document.createElement("span");
+				sourceTextWrapper.classList.add(
+					"inline-block",
+					"text-slate-500",
+					"dark:text-slate-400",
+				);
+				sourceTextWrapper.innerHTML = element.innerHTML;
 				element.innerHTML = "";
-				element.appendChild(contentWrapper);
+				element.appendChild(sourceTextWrapper);
 				const translationElement = document.createElement("span");
 				translationElement.setAttribute(
 					"data-translation-id",
@@ -89,7 +93,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 	return (
 		<>
 			<h1 className="!mb-5">
-				<div className="px-2 md:px-4">
+				<div className=" text-slate-500 dark:text-slate-400">
 					{!pageWithTranslations.isPublished && (
 						<Lock className="h-6 w-6 mr-1 inline" />
 					)}
@@ -108,7 +112,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 				userAITranslationInfo={userAITranslationInfo}
 				hasGeminiApiKey={hasGeminiApiKey}
 			/>
-			<div className="flex items-center text-gray-500">
+			<div className="flex items-center">
 				<Link
 					to={`/${pageWithTranslations.user.userName}`}
 					className=" flex items-center mr-2 !no-underline hover:text-gray-700"

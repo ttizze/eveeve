@@ -29,3 +29,27 @@ export const deleteOwnTranslation = async (
 		data: { isArchived: true },
 	});
 };
+
+export async function addUserTranslation(
+	sourceTextId: number,
+	text: string,
+	userId: number,
+	targetLanguage: string,
+) {
+	const sourceText = await prisma.sourceText.findUnique({
+		where: { id: sourceTextId },
+	});
+
+	if (sourceText) {
+		await prisma.translateText.create({
+			data: {
+				targetLanguage,
+				text,
+				sourceTextId,
+				userId,
+			},
+		});
+	}
+
+	return json({ success: true });
+}

@@ -28,6 +28,11 @@ const formStrategy = new FormStrategy(async ({ form }) => {
 	if (!user || !user.password) {
 		throw new AuthorizationError("Invalid login credentials");
 	}
+	if (user.provider !== "Credentials") {
+		throw new AuthorizationError(
+			"This account cannot be accessed with a password",
+		);
+	}
 	const isValidPassword = await bcrypt.compare(String(password), user.password);
 	if (!isValidPassword) {
 		throw new AuthorizationError("Invalid login credentials");

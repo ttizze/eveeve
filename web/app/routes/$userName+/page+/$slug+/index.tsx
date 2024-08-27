@@ -35,7 +35,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const targetLanguage = await getTargetLanguage(request);
 	const pageWithTranslations = await fetchPageWithTranslations(
 		slug,
-		nonSanitizedUser?.id ?? 0,
+		currentUser?.id ?? 0,
 		targetLanguage,
 	);
 
