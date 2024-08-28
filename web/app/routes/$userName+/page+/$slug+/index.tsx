@@ -1,12 +1,13 @@
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
+import i18nServer from "~/i18n.server";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
 import { authenticator } from "~/utils/auth.server";
-import { getTargetLanguage } from "~/utils/target-language.server";
 import { ContentWithTranslations } from "./components/ContentWithTranslations";
 import { createUserAITranslationInfo } from "./functions/mutations.server";
 import {
@@ -16,6 +17,30 @@ import {
 } from "./functions/queries.server";
 import { actionSchema } from "./types";
 
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+	if (!data) {
+		return [{ title: "Page Not Found" }];
+	}
+	const { pageWithTranslations } = data;
+	const title = pageWithTranslations.title;
+	const description = `${pageWithTranslations.content.slice(0, 160)}...`;
+	const imageUrl =
+		pageWithTranslations.ogImageUrl ||
+		"https://example.com/default-og-image.jpg"; // OG画像URLがない場合はデフォルト画像を使用
+
+	return [
+		{ title: title },
+		{ name: "description", content: description },
+		{ property: "og:type", content: "article" },
+		{ property: "og:title", content: title },
+		{ property: "og:description", content: description },
+		{ property: "og:image", content: imageUrl },
+		{ name: "twitter:card", content: "summary_large_image" },
+		{ name: "twitter:title", content: title },
+		{ name: "twitter:description", content: description },
+		{ name: "twitter:image", content: imageUrl },
+	];
+};
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const { slug } = params;
 
@@ -28,7 +53,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		currentUser?.userName ?? "",
 	);
 	const hasGeminiApiKey = !!nonSanitizedUser?.geminiApiKey;
-	const targetLanguage = await getTargetLanguage(request);
+	const targetLanguage = await i18nServer.getLocale(request);
 	const pageWithTranslations = await fetchPageWithTranslations(
 		slug,
 		currentUser?.id ?? 0,
@@ -72,7 +97,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	if (!nonSanitizedUser) {
 		throw new Response("User not found", { status: 404 });
 	}
-	const targetLanguage = await getTargetLanguage(request);
+	const targetLanguage = await i18nServer.getLocale(request);
 
 	if (submission.status !== "success") {
 		return { intent: null, lastResult: submission.reply(), slug: null };
@@ -137,6 +162,7 @@ export default function ReaderView() {
 		currentUser,
 		hasGeminiApiKey,
 		userAITranslationInfo,
+		targetLanguage,
 	} = useTypedLoaderData<typeof loader>();
 	const actionData = useActionData<typeof action>();
 	const [form, fields] = useForm({
@@ -155,6 +181,7 @@ export default function ReaderView() {
 					currentUserName={currentUser?.userName ?? null}
 					hasGeminiApiKey={hasGeminiApiKey}
 					userAITranslationInfo={userAITranslationInfo}
+					currentLanguage={targetLanguage}
 				/>
 			</article>
 		</div>

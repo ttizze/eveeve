@@ -9,8 +9,8 @@ import { z } from "zod";
 import { LoginDialog } from "~/components/LoginDialog";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
+import i18nServer from "~/i18n.server";
 import { authenticator } from "~/utils/auth.server";
-import { getTargetLanguage } from "~/utils/target-language.server";
 import { addUserTranslation } from "./functions/mutations.server";
 
 const schema = z.object({
@@ -29,7 +29,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	const submission = parseWithZod(await request.formData(), {
 		schema,
 	});
-	const targetLanguage = await getTargetLanguage(request);
+	const targetLanguage = await i18nServer.getLocale(request);
 
 	if (submission.status !== "success") {
 		return { lastResult: submission.reply() };

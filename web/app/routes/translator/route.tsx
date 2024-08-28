@@ -3,6 +3,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useRevalidator } from "@remix-run/react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
+import i18nServer from "~/i18n.server";
 import { createOrUpdateSourceTexts } from "~/routes/$userName+/page+/$slug+/edit/functions/mutations.server";
 import { createOrUpdatePage } from "~/routes/$userName+/page+/$slug+/edit/functions/mutations.server";
 import { addNumbersToContent } from "~/routes/$userName+/page+/$slug+/edit/utils/addNumbersToContent";
@@ -11,14 +12,12 @@ import { extractArticle } from "~/routes/$userName+/page+/$slug+/edit/utils/extr
 import { extractNumberedElements } from "~/routes/$userName+/page+/$slug+/edit/utils/extractNumberedElements";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
 import { authenticator } from "~/utils/auth.server";
-import { getTargetLanguage } from "~/utils/target-language.server";
 import { TranslationInputForm } from "./components/TranslationInputForm";
 import { createUserAITranslationInfo } from "./functions/mutations.server";
 import { getOrCreatePage } from "./functions/mutations.server";
 import { translationInputSchema } from "./types";
 import { generateSlug } from "./utils/generate-slug.server";
 import { processUploadedFolder } from "./utils/process-uploaded-folder";
-
 export async function loader({ request }: LoaderFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/fail",
@@ -28,7 +27,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		currentUser.userName,
 	);
 	const hasGeminiApiKey = !!nonSanitizedUser?.geminiApiKey;
-	const targetLanguage = await getTargetLanguage(request);
+	const targetLanguage = await i18nServer.getLocale(request);
 
 	return typedjson({
 		currentUser,
@@ -63,7 +62,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	const geminiApiKey = nonSanitizedUser.geminiApiKey;
 
-	const targetLanguage = await getTargetLanguage(request);
+	const targetLanguage = await i18nServer.getLocale(request);
 	const queue = getTranslateUserQueue(nonSanitizedUser.id);
 	const slugs: string[] = [];
 

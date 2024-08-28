@@ -14,6 +14,7 @@ interface ContentWithTranslationsProps {
 	currentUserName: string | null;
 	hasGeminiApiKey: boolean;
 	userAITranslationInfo: UserAITranslationInfo | null;
+	currentLanguage: string;
 }
 
 export const ContentWithTranslations = memo(function ContentWithTranslations({
@@ -21,6 +22,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 	currentUserName,
 	hasGeminiApiKey,
 	userAITranslationInfo,
+	currentLanguage,
 }: ContentWithTranslationsProps) {
 	const isHydrated = useHydrated();
 	const localCreatedAt = isHydrated
@@ -118,6 +120,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 				pageId={pageWithTranslations.id}
 				userAITranslationInfo={userAITranslationInfo}
 				hasGeminiApiKey={hasGeminiApiKey}
+				currentLanguage={currentLanguage}
 			/>
 			<div className="flex items-center">
 				<Link

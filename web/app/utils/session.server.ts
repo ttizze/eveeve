@@ -3,7 +3,6 @@ import type { SanitizedUser } from "~/types";
 
 type Session = {
 	user?: SanitizedUser;
-	targetLanguage?: string;
 };
 
 export const sessionStorage = createCookieSessionStorage<Session>({
