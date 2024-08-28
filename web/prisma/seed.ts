@@ -4,40 +4,68 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function seed() {
-	if (process.env.NODE_ENV !== "development") {
-		console.log("Seeding is only allowed in development environment");
-		return;
+	await addRequiredData();
+
+	if (process.env.NODE_ENV === "development") {
+		await addDevelopmentData();
 	}
+}
 
-	const email = "dev@example.com";
-
-	// 既存のユーザーをチェック
-	const existingUser = await prisma.user.findUnique({
-		where: { email },
-	});
-
-	if (existingUser) {
-		console.log(`A user with email ${email} already exists`);
-		return;
-	}
-
-	const hashedPassword = await bcrypt.hash("devpassword", 10);
-
-	const user = await prisma.user.create({
-		data: {
-			email,
-			userName: "dev",
-			displayName: "Dev User",
-			password: hashedPassword,
-			icon: "",
-			provider: "password",
-			plan: "free",
-			totalPoints: 0,
-			isAI: false,
+async function addRequiredData() {
+	const eveeve = await prisma.user.upsert({
+		where: { userName: "eveeve" },
+		update: {},
+		create: {
+			userName: "eveeve",
+			displayName: "eveeve",
+			email: "eveeve@example.com",
+			icon: " ",
 		},
 	});
 
-	console.log(`Created dev user with email: ${user.email}`);
+	const evePage = await prisma.page.upsert({
+		where: { slug: "eveeve" },
+		update: {},
+		create: {
+			slug: "eveeve",
+			title: "eveeve",
+			content: "test",
+			isPublished: true,
+			userId: eveeve.id,
+		},
+	});
+
+	await prisma.sourceText.createMany({
+		data: [
+			{ text: "Write to the World", number: 0, pageId: evePage.id },
+			{
+				text: "EveEve is an innovative open-source platform that enables everyone to read articles in their native language, regardless of the original language. Through user-contributed content and collaborative translations, we break down language barriers, fostering global understanding and knowledge sharing.",
+				number: 1,
+				pageId: evePage.id,
+			},
+		],
+		skipDuplicates: true,
+	});
+
+	console.log("Required data added successfully");
+}
+async function addDevelopmentData() {
+	const email = "dev@example.com";
+
+	const devUser = await prisma.user.upsert({
+		where: { email },
+		update: {},
+		create: {
+			email,
+			userName: "dev",
+			displayName: "Dev User",
+			password: await bcrypt.hash("devpassword", 10),
+			provider: "Credentials",
+			icon: "",
+		},
+	});
+
+	console.log(`Created/Updated dev user with email: ${devUser.email}`);
 }
 
 seed()

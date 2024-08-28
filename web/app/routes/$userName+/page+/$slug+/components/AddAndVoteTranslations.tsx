@@ -1,9 +1,9 @@
 import { ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
-import { TranslationItem } from "~/routes/resources+/translation-item";
+import { AddTranslationForm } from "~/routes/resources+/add-translation-form";
+import { TranslationListItem } from "~/routes/resources+/translation-list-item";
 import type { TranslationWithVote } from "../types";
-import { AddTranslationForm } from "./AddTranslationForm";
 import { AlternativeTranslations } from "./AlternativeTranslations";
 
 const INITIAL_DISPLAY_COUNT = 3;
@@ -14,7 +14,7 @@ export function AddAndVoteTranslations({
 	currentUserName,
 	sourceTextId,
 }: {
-	bestTranslationWithVote: TranslationWithVote;
+	bestTranslationWithVote: TranslationWithVote | null;
 	alternativeTranslationsWithVotes: TranslationWithVote[];
 	currentUserName: string | null;
 	sourceTextId: number;
@@ -33,14 +33,16 @@ export function AddAndVoteTranslations({
 	const toggleShowAll = () => setShowAll((prev) => !prev);
 
 	return (
-		<div className="p-4 ">
-			<TranslationItem
-				translation={bestTranslationWithVote}
-				currentUserName={currentUserName}
-				showAuthor
-			/>
-			<div className="mt-2">
-				<p className="text-gray-500 flex items-center justify-end mr-2">
+		<div className=" p-4">
+			{bestTranslationWithVote && (
+				<TranslationListItem
+					translation={bestTranslationWithVote}
+					currentUserName={currentUserName}
+					showAuthor
+				/>
+			)}
+			<div>
+				<p className="text-gray-500 flex items-center justify-end mr-2 my-4">
 					<ArrowUpDown size={16} />
 				</p>
 				<AlternativeTranslations

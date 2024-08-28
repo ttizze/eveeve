@@ -8,11 +8,7 @@ import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server
 import { authenticator } from "~/utils/auth.server";
 import { getTargetLanguage } from "~/utils/target-language.server";
 import { ContentWithTranslations } from "./components/ContentWithTranslations";
-import {
-	createUserAITranslationInfo,
-	handleAddTranslationAction,
-	handleVoteAction,
-} from "./functions/mutations.server";
+import { createUserAITranslationInfo } from "./functions/mutations.server";
 import {
 	fetchLatestUserAITranslationInfo,
 	fetchPageWithSourceTexts,
@@ -35,7 +31,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const targetLanguage = await getTargetLanguage(request);
 	const pageWithTranslations = await fetchPageWithTranslations(
 		slug,
-		nonSanitizedUser?.id ?? 0,
+		currentUser?.id ?? 0,
 		targetLanguage,
 	);
 
@@ -83,29 +79,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	}
 	const { intent } = submission.value;
 	switch (intent) {
-		case "vote":
-			handleVoteAction(
-				submission.value.translateTextId,
-				submission.value.isUpvote,
-				nonSanitizedUser.id,
-			);
-			return {
-				intent,
-				lastResult: submission.reply({ resetForm: true }),
-				slug: null,
-			};
-		case "add":
-			handleAddTranslationAction(
-				submission.value.sourceTextId,
-				submission.value.text,
-				nonSanitizedUser.id,
-				targetLanguage,
-			);
-			return {
-				intent,
-				lastResult: submission.reply({ resetForm: true }),
-				slug: null,
-			};
 		case "translate": {
 			if (!nonSanitizedUser?.geminiApiKey) {
 				return {

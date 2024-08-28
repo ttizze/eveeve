@@ -2,26 +2,47 @@ import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import { redirect } from "@remix-run/node";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import { Form, useActionData } from "@remix-run/react";
 import { ArrowRight } from "lucide-react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
-import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
 import { authenticator } from "~/utils/auth.server";
 import { sanitizeUser } from "~/utils/auth.server";
 import { commitSession, getSession } from "~/utils/session.server";
 import { updateUserName } from "./functions/mutations.server";
 import { isUserNameTaken } from "./functions/queries.server";
+import reservedUsernames from "./reserved-usernames.json";
+
+function getAppRoutes() {
+	return [];
+}
+
+// 予約語リストの作成
+const RESERVED_USERNAMES = [
+	...new Set([...reservedUsernames, ...getAppRoutes()]),
+];
 
 const schema = z.object({
 	userName: z
 		.string()
 		.min(3, "Must be at least 3 characters")
 		.max(20, "Must be 20 characters or less")
-		.regex(/^[a-zA-Z0-9]+$/, "Use only alphabets, numbers, and hyphens"),
+		.regex(
+			/^[a-zA-Z][a-zA-Z0-9-]*$/,
+			"Must start with a letter and can only contain letters, numbers, and hyphens",
+		)
+		.refine(
+			(name) => !RESERVED_USERNAMES.includes(name.toLowerCase()),
+			"This username cannot be used",
+		)
+		.refine(
+			(name) => !/^\d+$/.test(name),
+			"Username cannot consist of only numbers",
+		),
 });
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/auth/login",
@@ -33,9 +54,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/auth/login",
 	});
-	const nonSanitizedUser = await getNonSanitizedUserbyUserName(
-		currentUser.userName,
-	);
 	const submission = parseWithZod(await request.formData(), { schema });
 
 	if (submission.status !== "success") {
@@ -50,7 +68,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	}
 
 	try {
-		const updatedUser = await updateUserName(nonSanitizedUser.id, userName);
+		const updatedUser = await updateUserName(currentUser.id, userName);
 		const session = await getSession(request.headers.get("Cookie"));
 		session.set("user", sanitizeUser(updatedUser));
 		return redirect(`/${userName}`, {
@@ -67,7 +85,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function Welcome() {
-	const { currentUser } = useLoaderData<typeof loader>();
 	const actionData = useActionData<typeof action>();
 
 	const [form, { userName }] = useForm({

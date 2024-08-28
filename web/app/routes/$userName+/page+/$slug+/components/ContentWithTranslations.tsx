@@ -4,11 +4,11 @@ import DOMPurify from "dompurify";
 import parse from "html-react-parser";
 import { Lock, SquarePen } from "lucide-react";
 import { memo, useMemo } from "react";
+import { useHydrated } from "remix-utils/use-hydrated";
 import { Button } from "~/components/ui/button";
 import type { PageWithTranslations } from "../types";
 import { TranslateButton } from "./TranslateButton";
-import { Translation } from "./Translation";
-
+import { TranslationSection } from "./TranslationSection";
 interface ContentWithTranslationsProps {
 	pageWithTranslations: PageWithTranslations;
 	currentUserName: string | null;
@@ -22,6 +22,10 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 	hasGeminiApiKey,
 	userAITranslationInfo,
 }: ContentWithTranslationsProps) {
+	const isHydrated = useHydrated();
+	const localCreatedAt = isHydrated
+		? pageWithTranslations.createdAt.toLocaleString()
+		: pageWithTranslations.createdAt.toISOString();
 	const bestTranslationTitle = useMemo(() => {
 		return pageWithTranslations.sourceTextWithTranslations.find(
 			(info) => info.number === 0,
@@ -29,74 +33,81 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 	}, [pageWithTranslations.sourceTextWithTranslations]);
 
 	const parsedContent = useMemo(() => {
-		if (typeof window === "undefined") {
-			return null;
-		}
+		if (isHydrated) {
+			const sanitizedContent = DOMPurify.sanitize(pageWithTranslations.content);
+			const doc = new DOMParser().parseFromString(
+				sanitizedContent,
+				"text/html",
+			);
 
-		const sanitizedContent = DOMPurify.sanitize(pageWithTranslations.content);
-		const doc = new DOMParser().parseFromString(sanitizedContent, "text/html");
-
-		const elements = doc.querySelectorAll("[data-source-text-id]");
-		for (const element of elements) {
-			if (element instanceof HTMLElement) {
-				const sourceTextId = element.getAttribute("data-source-text-id");
-				const contentWrapper = document.createElement("span");
-				contentWrapper.classList.add("inline-block", "px-4");
-				contentWrapper.innerHTML = element.innerHTML;
-				element.innerHTML = "";
-				element.appendChild(contentWrapper);
-				const translationElement = document.createElement("span");
-				translationElement.setAttribute(
-					"data-translation-id",
-					sourceTextId || "",
-				);
-				element.appendChild(translationElement);
-			}
-		}
-
-		return parse(doc.body.innerHTML, {
-			replace: (domNode) => {
-				if (domNode.type === "tag" && domNode.attribs["data-translation-id"]) {
-					const sourceTextId = domNode.attribs["data-translation-id"];
-					const translations =
-						pageWithTranslations.sourceTextWithTranslations.find(
-							(info) => info.sourceTextId.toString() === sourceTextId,
-						);
-					if (translations && translations.translationsWithVotes.length > 0) {
-						return (
-							<Translation
-								key={`translation-${sourceTextId}`}
-								translationsWithVotes={translations.translationsWithVotes}
-								currentUserName={currentUserName}
-								sourceTextId={translations.sourceTextId}
-							/>
-						);
-					}
+			const elements = doc.querySelectorAll("[data-source-text-id]");
+			for (const element of elements) {
+				if (
+					element instanceof HTMLElement &&
+					element.getAttribute("data-source-text-id")
+				) {
+					const sourceTextId = element.getAttribute(
+						"data-source-text-id",
+					) as string;
+					const sourceTextWrapper = document.createElement("span");
+					sourceTextWrapper.classList.add(
+						"inline-block",
+						"text-slate-500",
+						"dark:text-slate-400",
+					);
+					sourceTextWrapper.innerHTML = element.innerHTML;
+					element.innerHTML = "";
+					element.appendChild(sourceTextWrapper);
+					const translationElement = document.createElement("span");
+					translationElement.setAttribute("data-translation-id", sourceTextId);
+					element.appendChild(translationElement);
 				}
-				return domNode;
-			},
-		});
+			}
+
+			return parse(doc.body.innerHTML, {
+				replace: (domNode) => {
+					if (
+						domNode.type === "tag" &&
+						domNode.attribs["data-translation-id"]
+					) {
+						const sourceTextId = domNode.attribs["data-translation-id"];
+						const translations =
+							pageWithTranslations.sourceTextWithTranslations.find(
+								(info) => info.sourceTextId.toString() === sourceTextId,
+							);
+						if (translations) {
+							return (
+								<TranslationSection
+									key={`translation-${sourceTextId}`}
+									translationsWithVotes={translations.translationsWithVotes}
+									currentUserName={currentUserName}
+									sourceTextId={translations.sourceTextId}
+								/>
+							);
+						}
+					}
+					return domNode;
+				},
+			});
+		}
 	}, [
 		pageWithTranslations.content,
 		pageWithTranslations.sourceTextWithTranslations,
 		currentUserName,
+		isHydrated,
 	]);
-
-	if (typeof window === "undefined") {
-		return <div>Loading...</div>;
-	}
 
 	return (
 		<>
 			<h1 className="!mb-5">
-				<div className="px-2 md:px-4">
+				<div className=" text-slate-500 dark:text-slate-400">
 					{!pageWithTranslations.isPublished && (
 						<Lock className="h-6 w-6 mr-1 inline" />
 					)}
 					{pageWithTranslations.title}
 				</div>
 				{bestTranslationTitle && (
-					<Translation
+					<TranslationSection
 						translationsWithVotes={bestTranslationTitle.translationsWithVotes}
 						currentUserName={currentUserName}
 						sourceTextId={bestTranslationTitle.sourceTextId}
@@ -108,7 +119,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 				userAITranslationInfo={userAITranslationInfo}
 				hasGeminiApiKey={hasGeminiApiKey}
 			/>
-			<div className="flex items-center text-gray-500">
+			<div className="flex items-center">
 				<Link
 					to={`/${pageWithTranslations.user.userName}`}
 					className=" flex items-center mr-2 !no-underline hover:text-gray-700"
@@ -122,9 +133,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 						<span className="text-sm">
 							{pageWithTranslations.user.displayName}
 						</span>
-						<span className="text-xs text-gray-500">
-							{pageWithTranslations.createdAt.toLocaleString()}
-						</span>
+						<span className="text-xs text-gray-500">{localCreatedAt}</span>
 					</div>
 				</Link>
 				{pageWithTranslations.user.userName === currentUserName &&
