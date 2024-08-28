@@ -1,4 +1,4 @@
-import { TranslationItem } from "~/routes/resources+/translation-item";
+import { TranslationListItem } from "~/routes/resources+/translation-list-item";
 import type { TranslationWithVote } from "../types";
 
 interface AlternativeTranslationsProps {
@@ -15,7 +15,7 @@ export function AlternativeTranslations({
 	return (
 		<div className="space-y-3">
 			{translationsWithVotes.map((translation) => (
-				<TranslationItem
+				<TranslationListItem
 					key={translation.id}
 					translation={translation}
 					currentUserName={currentUserName}

@@ -91,6 +91,11 @@
   word-break: break-word;
 }
 
+.prose blockquote p::before,
+.prose blockquote p::after {
+  content: none !important;
+}
+
 .tippy-box[data-theme~='custom-transparent'] {
   background-color: transparent;
   border: none;

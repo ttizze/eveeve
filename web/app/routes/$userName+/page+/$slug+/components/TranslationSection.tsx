@@ -1,10 +1,13 @@
 import { MoreVertical, X } from "lucide-react";
+import { Languages, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
-import { getBestTranslation } from "../lib/get-best-translation.client";
+import { useHydrated } from "remix-utils/use-hydrated";
+import { getBestTranslation } from "../lib/get-best-translation";
 import { sanitizeAndParseText } from "../lib/sanitize-and-parse-text.client";
 import type { TranslationWithVote } from "../types";
 import { AddAndVoteTranslations } from "./AddAndVoteTranslations";
-interface TranslationProps {
+
+interface TranslationSectionProps {
 	translationsWithVotes: TranslationWithVote[];
 	currentUserName: string | null;
 	sourceTextId: number;
@@ -22,7 +25,7 @@ function ToggleButton({
 	return (
 		<button
 			type="button"
-			className={`absolute top-2  -right-1  rounded-md ${isExpanded ? " z-20 bg-transparent" : "z-0 "}`}
+			className={`absolute top-2  -right-1 border-r-4  border-indigo-200  ${isExpanded ? " z-20 bg-transparent" : "z-0 "}`}
 			onClick={onClick}
 			aria-label={label}
 			title={label}
@@ -32,13 +35,13 @@ function ToggleButton({
 	);
 }
 
-export function Translation({
+export function TranslationSection({
 	translationsWithVotes,
 	currentUserName,
 	sourceTextId,
-}: TranslationProps) {
+}: TranslationSectionProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
-
+	const isHydrated = useHydrated();
 	const bestTranslationWithVote = useMemo(
 		() =>
 			translationsWithVotes.length > 0
@@ -58,13 +61,30 @@ export function Translation({
 	);
 
 	const sanitizedAndParsedText = useMemo(() => {
-		if (!bestTranslationWithVote) return "add translation";
-		return sanitizeAndParseText(bestTranslationWithVote.text);
-	}, [bestTranslationWithVote]);
+		if (!bestTranslationWithVote)
+			return (
+				<span className="flex items-center gap-2">
+					<Plus size={24} />
+					<Languages size={24} />
+				</span>
+			);
+		if (isHydrated) {
+			return sanitizeAndParseText(bestTranslationWithVote.text);
+		}
+		return bestTranslationWithVote.text;
+	}, [bestTranslationWithVote, isHydrated]);
 
 	return (
-		<div className="group relative">
-			<span className="notranslate mt-2 pl-4 pr-5 inline-block">
+		<span className="group relative block">
+			<span
+				className="notranslate mt-2 pl-4 pr-5 inline-block cursor-pointer "
+				onClick={() => setIsExpanded(!isExpanded)}
+				onKeyDown={(e) => {
+					if (e.key === "Enter" || e.key === " ") {
+						setIsExpanded(!isExpanded);
+					}
+				}}
+			>
 				{sanitizedAndParsedText}
 				<ToggleButton
 					isExpanded={isExpanded}
@@ -81,6 +101,6 @@ export function Translation({
 					/>
 				</div>
 			)}
-		</div>
+		</span>
 	);
 }

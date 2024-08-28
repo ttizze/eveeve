@@ -2,12 +2,13 @@ import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Form } from "@remix-run/react";
+import { LogIn } from "lucide-react";
 import { FaDiscord, FaGithub } from "react-icons/fa";
 import { useTypedLoaderData } from "remix-typedjson";
 import { Button } from "~/components/ui/button";
 import i18nServer from "~/i18n.server";
 import { authenticator } from "~/utils/auth.server";
-import { Translation } from "../$userName+/page+/$slug+/components/Translation";
+import { TranslationSection } from "../$userName+/page+/$slug+/components/TranslationSection";
 import { fetchPageWithTranslations } from "../$userName+/page+/$slug+/functions/queries.server";
 import type { PageWithTranslations } from "../$userName+/page+/$slug+/types";
 
@@ -50,45 +51,47 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function Index() {
 	const { currentUser, topPageWithTranslations } =
 		useTypedLoaderData<typeof loader>();
+	const sourceTextWithTranslations =
+		topPageWithTranslations.sourceTextWithTranslations;
 
 	return (
-		<div className="min-h-screen bg-gradient-to-b ">
-			<main className="container mx-auto px-4 py-20 text-slate-500 dark:text-slate-400">
-				<div className="max-w-4xl mx-auto text-center">
-					<h1 className="text-7xl font-bold mb-6">
-						{topPageWithTranslations.sourceTextWithTranslations[0].text}
-					</h1>
-					<Translation
-						translationsWithVotes={
-							topPageWithTranslations.sourceTextWithTranslations[0]
-								.translationsWithVotes
-						}
-						currentUserName={currentUser?.userName || null}
-						sourceTextId={
-							topPageWithTranslations.sourceTextWithTranslations[0].sourceTextId
-						}
-					/>
-					<p className="text-xl mb-12">
-						{topPageWithTranslations?.sourceTextWithTranslations[1].text}
-						<Translation
+		<div className="min-h-screen flex flex-col justify-between">
+			<main className="container mx-auto px-4 py-20 flex flex-col items-center justify-center flex-grow">
+				<div className="max-w-4xl w-full">
+					<h1 className="text-7xl font-bold mb-20 text-center">
+						<span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+							{sourceTextWithTranslations[0].text}
+						</span>
+						<TranslationSection
 							translationsWithVotes={
-								topPageWithTranslations.sourceTextWithTranslations[1]
-									.translationsWithVotes
+								sourceTextWithTranslations[0].translationsWithVotes
 							}
 							currentUserName={currentUser?.userName || null}
-							sourceTextId={
-								topPageWithTranslations.sourceTextWithTranslations[1]
-									.sourceTextId
+							sourceTextId={sourceTextWithTranslations[0].sourceTextId}
+						/>
+					</h1>
+
+					<p className="text-xl mb-12 text-justify">
+						<span className="text-slate-500 dark:text-slate-400">
+							{sourceTextWithTranslations[1].text}
+						</span>
+						<TranslationSection
+							translationsWithVotes={
+								sourceTextWithTranslations[1].translationsWithVotes
 							}
+							currentUserName={currentUser?.userName || null}
+							sourceTextId={sourceTextWithTranslations[1].sourceTextId}
 						/>
 					</p>
-					<div className="flex justify-center gap-4 mb-8">
-						<Form method="POST" className="w-full ">
-							<Button type="submit" variant="default">
-								Start
+
+					<div className="mb-12 flex justify-center">
+						<Form method="POST">
+							<Button type="submit" variant="default" size="lg">
+								<LogIn />
 							</Button>
 						</Form>
 					</div>
+
 					<div className="flex justify-center gap-6">
 						<a
 							href="https://github.com/ttizze/eveeve"

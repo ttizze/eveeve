@@ -34,6 +34,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	if (submission.status !== "success") {
 		return { lastResult: submission.reply() };
 	}
+
 	await addUserTranslation(
 		submission.value.sourceTextId,
 		submission.value.text,
@@ -76,7 +77,11 @@ export function AddTranslationForm({
 
 	return (
 		<div className="mt-4">
-			<fetcher.Form method="post" {...getFormProps(form)}>
+			<fetcher.Form
+				method="post"
+				{...getFormProps(form)}
+				action={"/resources/add-translation-form"}
+			>
 				{form.errors}
 				<input type="hidden" name="sourceTextId" value={sourceTextId} />
 				<Textarea

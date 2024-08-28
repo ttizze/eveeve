@@ -1,13 +1,41 @@
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
+import type { ActionFunctionArgs } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
 import { memo, useMemo } from "react";
 import { useState } from "react";
+import { z } from "zod";
 import { LoginDialog } from "~/components/LoginDialog";
+import { VoteButton } from "~/routes/$userName+/page+/$slug+/components/VoteButton";
+import type { TranslationWithVote } from "~/routes/$userName+/page+/$slug+/types";
+import { authenticator } from "~/utils/auth.server";
 import { cn } from "~/utils/cn";
-import type { TranslationWithVote } from "../types";
-import { voteSchema } from "../types";
-import { VoteButton } from "./VoteButton";
+import { handleVote } from "./functions/mutations.server";
+
+export const schema = z.object({
+	translateTextId: z.number(),
+	isUpvote: z.preprocess((val) => val === "true", z.boolean()),
+});
+
+export async function action({ request }: ActionFunctionArgs) {
+	const currentUser = await authenticator.isAuthenticated(request, {
+		failureRedirect: "/auth/login",
+	});
+	const submission = parseWithZod(await request.formData(), {
+		schema,
+	});
+	if (submission.status !== "success") {
+		return { lastResult: submission.reply() };
+	}
+	await handleVote(
+		submission.value.translateTextId,
+		submission.value.isUpvote,
+		currentUser.id,
+	);
+	return {
+		lastResult: submission.reply({ resetForm: true }),
+	};
+}
 
 interface VoteButtonsProps {
 	translationWithVote: TranslationWithVote;
@@ -25,7 +53,7 @@ export const VoteButtons = memo(function VoteButtons({
 		onValidate: useMemo(
 			() =>
 				({ formData }: { formData: FormData }) => {
-					return parseWithZod(formData, { schema: voteSchema });
+					return parseWithZod(formData, { schema });
 				},
 			[],
 		),
@@ -57,12 +85,9 @@ export const VoteButtons = memo(function VoteButtons({
 			<fetcher.Form
 				method="post"
 				{...getFormProps(form)}
+				action="/resources/vote-buttons"
 				className="space-x-2 flex"
 			>
-				<input
-					value="vote"
-					{...getInputProps(fields.intent, { type: "hidden" })}
-				/>
 				<input
 					value={translationWithVote.id.toString()}
 					{...getInputProps(fields.translateTextId, { type: "hidden" })}

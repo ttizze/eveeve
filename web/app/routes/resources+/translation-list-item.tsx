@@ -12,11 +12,11 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { VoteButtons } from "~/routes/$userName+/page+/$slug+/components/VoteButtons";
 import { sanitizeAndParseText } from "~/routes/$userName+/page+/$slug+/lib/sanitize-and-parse-text.client";
 import type { TranslationWithVote } from "~/routes/$userName+/page+/$slug+/types";
 import { authenticator } from "~/utils/auth.server";
 import { deleteOwnTranslation } from "./functions/mutations.server";
+import { VoteButtons } from "./vote-buttons";
 
 const schema = z.object({
 	translationId: z.number(),
@@ -45,7 +45,7 @@ interface TranslationItemProps {
 	showAuthor?: boolean;
 }
 
-export function TranslationItem({
+export function TranslationListItem({
 	translation,
 	currentUserName,
 	showAuthor = false,
@@ -56,7 +56,7 @@ export function TranslationItem({
 	const onDelete = () => {
 		fetcher.submit(
 			{ translationId: translation.id },
-			{ method: "post", action: "/resources/translation-item" },
+			{ method: "post", action: "/resources/translation-list-item" },
 		);
 	};
 
