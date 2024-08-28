@@ -36,7 +36,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	};
 }
 export async function action({ request }: ActionFunctionArgs) {
-	const currentUser = await authenticator.isAuthenticated(request);
+	const currentUser = await authenticator.authenticate("google", request);
 
 	if (currentUser) {
 		if (currentUser.userName) {
@@ -87,7 +87,7 @@ export default function Index() {
 					<div className="mb-12 flex justify-center">
 						<Form method="POST">
 							<Button type="submit" variant="default" size="lg">
-								<LogIn />
+								<LogIn className="w-48 " />
 							</Button>
 						</Form>
 					</div>
