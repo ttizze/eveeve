@@ -21,27 +21,26 @@ function getAppRoutes() {
 
 // 予約語リストの作成
 const RESERVED_USERNAMES = [
-	...new Set([
-		...reservedUsernames,
-		...getAppRoutes(),
-	])
+	...new Set([...reservedUsernames, ...getAppRoutes()]),
 ];
-
 
 const schema = z.object({
 	userName: z
 		.string()
 		.min(3, "Must be at least 3 characters")
 		.max(20, "Must be 20 characters or less")
-		.regex(/^[a-zA-Z][a-zA-Z0-9-]*$/, "Must start with a letter and can only contain letters, numbers, and hyphens")
+		.regex(
+			/^[a-zA-Z][a-zA-Z0-9-]*$/,
+			"Must start with a letter and can only contain letters, numbers, and hyphens",
+		)
 		.refine(
 			(name) => !RESERVED_USERNAMES.includes(name.toLowerCase()),
-			"This username cannot be used"
+			"This username cannot be used",
 		)
 		.refine(
 			(name) => !/^\d+$/.test(name),
-			"Username cannot consist of only numbers"
-		)
+			"Username cannot consist of only numbers",
+		),
 });
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
