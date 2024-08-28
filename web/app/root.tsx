@@ -13,7 +13,7 @@ import { useChangeLanguage } from "remix-i18next/react";
 import { typedjson } from "remix-typedjson";
 import { useTypedLoaderData } from "remix-typedjson";
 import { ThemeProvider } from "~/components/theme-provider";
-import i18next from "~/i18n.server";
+import i18nServer, { localeCookie } from "~/i18n.server";
 import { Footer } from "~/routes/resources+/footer";
 import { Header } from "~/routes/resources+/header";
 import tailwind from "~/tailwind.css?url";
@@ -21,8 +21,11 @@ import { authenticator } from "~/utils/auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request);
-	const locale = await i18next.getLocale(request);
-	return typedjson({ currentUser, locale });
+	const locale = await i18nServer.getLocale(request);
+	return typedjson(
+		{ currentUser, locale },
+		{ headers: { "Set-Cookie": await localeCookie.serialize(locale) } },
+	);
 }
 
 export const handle = {

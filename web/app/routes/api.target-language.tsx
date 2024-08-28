@@ -1,21 +1,23 @@
 import { json } from "@remix-run/node";
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import {
-	getTargetLanguage,
-	setTargetLanguage,
-} from "~/utils/target-language.server";
+import type { ActionFunction } from "@remix-run/node";
 
-export const loader: LoaderFunction = async ({ request }) => {
-	const targetLanguage = await getTargetLanguage(request);
-	return json({ targetLanguage });
-};
+import { localeCookie } from "~/i18n.server";
 
 export const action: ActionFunction = async ({ request }) => {
 	const formData = await request.formData();
 	const targetLanguage = formData.get("targetLanguage");
+
 	if (typeof targetLanguage === "string") {
-		const headers = await setTargetLanguage(request, targetLanguage);
-		return json({ success: true }, { headers });
+		const serializedCookie = await localeCookie.serialize(targetLanguage);
+
+		return json(
+			{ success: true },
+			{
+				headers: {
+					"Set-Cookie": serializedCookie,
+				},
+			},
+		);
 	}
 
 	return json({ success: false }, { status: 400 });

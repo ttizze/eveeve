@@ -15,15 +15,20 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "~/components/ui/popover";
+import { targetLanguages } from "~/constants/languages";
 import { cn } from "~/utils/cn";
-import { targetLanguages } from "../constants/languages";
 
-export default function TargetLanguageSelector() {
+interface TargetLanguageSelectorProps {
+	targetLanguage: string;
+}
+
+export default function TargetLanguageSelector({
+	targetLanguage,
+}: TargetLanguageSelectorProps) {
 	const fetcher = useFetcher<{ targetLanguage: string }>();
 	const [open, setOpen] = useState(false);
-	const [currentLanguage, setCurrentLanguage] = useState(
-		fetcher.data?.targetLanguage ?? "ja",
-	);
+
+	const [currentLanguage, setCurrentLanguage] = useState(targetLanguage);
 
 	const loadLanguage = useCallback(() => {
 		if (fetcher.state === "idle" && !fetcher.data) {
@@ -36,7 +41,6 @@ export default function TargetLanguageSelector() {
 	useEffect(() => {
 		loadLanguage();
 	}, [loadLanguage]);
-
 	const handleLanguageChange = (value: string) => {
 		setCurrentLanguage(value);
 		setOpen(false);
