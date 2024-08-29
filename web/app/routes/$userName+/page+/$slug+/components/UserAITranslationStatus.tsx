@@ -13,7 +13,7 @@ export function UserAITranslationStatus({
 }: UserAITranslationStatusProps) {
 	const revalidator = useRevalidator();
 	useEffect(() => {
-		if (userAITranslationInfo?.aiTranslationStatus === "completed") {
+		if (!userAITranslationInfo|| userAITranslationInfo?.aiTranslationStatus === "completed") {
 			return;
 		}
 
