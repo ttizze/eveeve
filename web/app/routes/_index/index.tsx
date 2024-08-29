@@ -66,8 +66,8 @@ export default function Index() {
 						{targetLanguage !== "en" && (
 							<TranslationSection
 								translationsWithVotes={
-								sourceTextWithTranslations[0].translationsWithVotes
-							}
+									sourceTextWithTranslations[0].translationsWithVotes
+								}
 								currentUserName={currentUser?.userName || null}
 								sourceTextId={sourceTextWithTranslations[0].sourceTextId}
 							/>
@@ -81,9 +81,9 @@ export default function Index() {
 						{targetLanguage !== "en" && (
 							<TranslationSection
 								translationsWithVotes={
-								sourceTextWithTranslations[1].translationsWithVotes
-							}
-							currentUserName={currentUser?.userName || null}
+									sourceTextWithTranslations[1].translationsWithVotes
+								}
+								currentUserName={currentUser?.userName || null}
 								sourceTextId={sourceTextWithTranslations[1].sourceTextId}
 							/>
 						)}
