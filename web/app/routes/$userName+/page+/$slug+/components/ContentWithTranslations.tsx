@@ -9,12 +9,13 @@ import { Button } from "~/components/ui/button";
 import type { PageWithTranslations } from "../types";
 import { TranslateButton } from "./TranslateButton";
 import { TranslationSection } from "./TranslationSection";
+
 interface ContentWithTranslationsProps {
 	pageWithTranslations: PageWithTranslations;
 	currentUserName: string | null;
 	hasGeminiApiKey: boolean;
 	userAITranslationInfo: UserAITranslationInfo | null;
-	currentLanguage: string;
+	targetLanguage: string;
 }
 
 export const ContentWithTranslations = memo(function ContentWithTranslations({
@@ -22,16 +23,24 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 	currentUserName,
 	hasGeminiApiKey,
 	userAITranslationInfo,
-	currentLanguage,
+	targetLanguage,
 }: ContentWithTranslationsProps) {
 	const isHydrated = useHydrated();
 	const localCreatedAt = isHydrated
 		? pageWithTranslations.createdAt.toLocaleString()
 		: pageWithTranslations.createdAt.toISOString();
 	const bestTranslationTitle = useMemo(() => {
-		return pageWithTranslations.sourceTextWithTranslations.find(
-			(info) => info.number === 0,
-		);
+		const sourceTextWithTranslations =
+			pageWithTranslations.sourceTextWithTranslations.find(
+				(info) => info.number === 0,
+			);
+		if (
+			sourceTextWithTranslations &&
+			sourceTextWithTranslations?.translationsWithVotes.length > 0
+		) {
+			return sourceTextWithTranslations;
+		}
+		return null;
 	}, [pageWithTranslations.sourceTextWithTranslations]);
 
 	const parsedContent = useMemo(() => {
@@ -77,7 +86,13 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 							pageWithTranslations.sourceTextWithTranslations.find(
 								(info) => info.sourceTextId.toString() === sourceTextId,
 							);
-						if (translations) {
+						console.log("translations", translations);
+						// sourceLanguageがtargetLanguageと異なる場合は翻訳が存在しない場合でも表示する
+						if (
+							translations &&
+							(translations.translationsWithVotes.length > 0 ||
+								pageWithTranslations.sourceLanguage !== targetLanguage)
+						) {
 							return (
 								<TranslationSection
 									key={`translation-${sourceTextId}`}
@@ -95,6 +110,8 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 	}, [
 		pageWithTranslations.content,
 		pageWithTranslations.sourceTextWithTranslations,
+		pageWithTranslations.sourceLanguage,
+		targetLanguage,
 		currentUserName,
 		isHydrated,
 	]);
@@ -120,7 +137,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 				pageId={pageWithTranslations.id}
 				userAITranslationInfo={userAITranslationInfo}
 				hasGeminiApiKey={hasGeminiApiKey}
-				currentLanguage={currentLanguage}
+				targetLanguage={targetLanguage}
 			/>
 			<div className="flex items-center">
 				<Link

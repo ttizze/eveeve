@@ -29,23 +29,49 @@ async function addRequiredData() {
 		create: {
 			slug: "eveeve",
 			title: "eveeve",
+			sourceLanguage: "en",
 			content: "test",
 			isPublished: true,
 			userId: eveeve.id,
 		},
 	});
 
-	await prisma.sourceText.createMany({
-		data: [
-			{ text: "Write to the World", number: 0, pageId: evePage.id },
-			{
-				text: "EveEve is an innovative open-source platform that enables everyone to read articles in their native language, regardless of the original language. Through user-contributed content and collaborative translations, we break down language barriers, fostering global understanding and knowledge sharing.",
-				number: 1,
-				pageId: evePage.id,
+	const sourceTexts = [
+		{
+			text: "Write to the World",
+			number: 0,
+			pageId: evePage.id,
+		},
+		{
+			text: "EveEve is an innovative open-source platform that enables everyone to read articles in their native language, regardless of the original language. Through user-contributed content and collaborative translations, we break down language barriers, fostering global understanding and knowledge sharing.",
+			number: 1,
+			pageId: evePage.id,
+		},
+	];
+	for (const sourceText of sourceTexts) {
+		const existingSourceText = await prisma.sourceText.findFirst({
+			where: {
+				pageId: sourceText.pageId,
+				number: sourceText.number,
 			},
-		],
-		skipDuplicates: true,
-	});
+			orderBy: {
+				createdAt: "desc",
+			},
+		});
+
+		if (existingSourceText) {
+			await prisma.sourceText.update({
+				where: { id: existingSourceText.id },
+				data: {
+					text: sourceText.text,
+				},
+			});
+		} else {
+			await prisma.sourceText.create({
+				data: sourceText,
+			});
+		}
+	}
 
 	console.log("Required data added successfully");
 }

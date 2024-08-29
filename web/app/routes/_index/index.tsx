@@ -33,6 +33,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	return {
 		currentUser,
 		topPageWithTranslations: topPageWithTranslations as PageWithTranslations,
+		targetLanguage,
 	};
 }
 export async function action({ request }: ActionFunctionArgs) {
@@ -49,7 +50,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Index() {
-	const { currentUser, topPageWithTranslations } =
+	const { currentUser, topPageWithTranslations, targetLanguage } =
 		useTypedLoaderData<typeof loader>();
 	const sourceTextWithTranslations =
 		topPageWithTranslations.sourceTextWithTranslations;
@@ -62,26 +63,30 @@ export default function Index() {
 						<span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
 							{sourceTextWithTranslations[0].text}
 						</span>
-						<TranslationSection
-							translationsWithVotes={
-								sourceTextWithTranslations[0].translationsWithVotes
-							}
-							currentUserName={currentUser?.userName || null}
-							sourceTextId={sourceTextWithTranslations[0].sourceTextId}
-						/>
+						{targetLanguage !== "en" && (
+							<TranslationSection
+								translationsWithVotes={
+									sourceTextWithTranslations[0].translationsWithVotes
+								}
+								currentUserName={currentUser?.userName || null}
+								sourceTextId={sourceTextWithTranslations[0].sourceTextId}
+							/>
+						)}
 					</h1>
 
-					<p className="text-xl mb-12 text-justify">
+					<p className="text-xl mb-12 w-full">
 						<span className="text-slate-500 dark:text-slate-400">
 							{sourceTextWithTranslations[1].text}
 						</span>
-						<TranslationSection
-							translationsWithVotes={
-								sourceTextWithTranslations[1].translationsWithVotes
-							}
-							currentUserName={currentUser?.userName || null}
-							sourceTextId={sourceTextWithTranslations[1].sourceTextId}
-						/>
+						{targetLanguage !== "en" && (
+							<TranslationSection
+								translationsWithVotes={
+									sourceTextWithTranslations[1].translationsWithVotes
+								}
+								currentUserName={currentUser?.userName || null}
+								sourceTextId={sourceTextWithTranslations[1].sourceTextId}
+							/>
+						)}
 					</p>
 
 					<div className="mb-12 flex justify-center">

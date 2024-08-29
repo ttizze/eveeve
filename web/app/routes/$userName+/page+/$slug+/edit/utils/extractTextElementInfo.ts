@@ -1,14 +1,19 @@
 import { JSDOM } from "jsdom";
-import type { NumberedElement } from "../types";
+import type { TextElementInfo } from "../types";
 
-export async function extractNumberedElements(
+export async function extractTextElementInfo(
 	content: string,
 	title: string,
 	titleSourceTextId: number | null,
-): Promise<Array<NumberedElement>> {
+): Promise<Array<TextElementInfo>> {
 	const doc = new JSDOM(content);
-	const numberedElements: Array<NumberedElement> = [
-		{ number: 0, text: title, sourceTextId: titleSourceTextId },
+
+	const textElements: Array<TextElementInfo> = [
+		{
+			number: 0,
+			text: title,
+			sourceTextId: titleSourceTextId,
+		},
 	];
 	// <br>のみを改行とする
 	doc.window.document.body.innerHTML = doc.window.document.body.innerHTML
@@ -21,7 +26,7 @@ export async function extractNumberedElements(
 		const dataNumber = element.getAttribute("data-number");
 		const dataSourceTextId = element.getAttribute("data-source-text-id");
 		if (dataNumber !== null) {
-			numberedElements.push({
+			textElements.push({
 				number: Number.parseInt(dataNumber, 10),
 				text: element.textContent?.trim() || "",
 				sourceTextId: dataSourceTextId
@@ -30,6 +35,5 @@ export async function extractNumberedElements(
 			});
 		}
 	}
-
-	return numberedElements.sort((a, b) => a.number - b.number);
+	return textElements.sort((a, b) => a.number - b.number);
 }

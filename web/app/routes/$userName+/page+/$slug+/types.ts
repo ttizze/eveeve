@@ -22,6 +22,7 @@ export interface SourceTextWithTranslations {
 export interface PageWithTranslations {
 	id: number;
 	title: string;
+	sourceLanguage: string;
 	translationTitle: string | null;
 	user: { displayName: string; userName: string; icon: string };
 	createdAt: Date;

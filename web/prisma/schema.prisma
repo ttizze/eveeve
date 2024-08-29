@@ -81,6 +81,7 @@ model Page {
   slug                String                @unique
   title               String
   content             String
+  sourceLanguage      String                @default("unknown")
   isPublished         Boolean               @default(false) @map("is_published")
   isArchived          Boolean               @default(false) @map("is_archived")
   createdAt           DateTime              @default(now()) @map("created_at")

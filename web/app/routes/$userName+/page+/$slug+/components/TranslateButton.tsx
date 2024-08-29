@@ -14,14 +14,14 @@ type TranslateButtonProps = {
 	pageId: number;
 	userAITranslationInfo: UserAITranslationInfo | null;
 	hasGeminiApiKey: boolean;
-	currentLanguage: string;
+	targetLanguage: string;
 };
 
 export function TranslateButton({
 	pageId,
 	userAITranslationInfo,
 	hasGeminiApiKey,
-	currentLanguage,
+	targetLanguage,
 }: TranslateButtonProps) {
 	const [selectedModel, setSelectedModel] = useState("gemini-1.5-flash");
 	const navigation = useNavigation();
@@ -32,7 +32,7 @@ export function TranslateButton({
 			<div className="mb-5  rounded-xl px-4 py-4 bg-gray-100 dark:bg-gray-900 shadow-inner">
 				<div className="flex flex-col space-y-2">
 					<div className="flex items-center space-x-1 h-10">
-						<TargetLanguageSelector targetLanguage={currentLanguage} />
+						<TargetLanguageSelector targetLanguage={targetLanguage} />
 						<AIModelSelector
 							onModelSelect={setSelectedModel}
 							className="bg-background"
@@ -59,10 +59,12 @@ export function TranslateButton({
 									)}
 								</Button>
 							) : (
-								<Button onClick={() => setIsDialogOpen(true)}>
+								<Button
+									onClick={() => setIsDialogOpen(true)}
+									className="w-full h-full"
+								>
 									<div className="flex items-center justify-center w-full">
 										<Languages className="w-5 h-5" />
-										<p>Add Translation</p>
 									</div>
 								</Button>
 							)}

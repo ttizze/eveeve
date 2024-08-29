@@ -1,7 +1,7 @@
 import { prisma } from "~/utils/prisma";
 import type { PageWithTranslations } from "../types";
 
-//sourceTextsは同一numberが複数存在するため､distinctを使用している
+//編集前のデータも記録として保存しておきたいため、sourceTextsは同一numberが複数存在する仕様になっているので､distinctを使用している
 export async function fetchPageWithSourceTexts(pageId: number) {
 	const pageWithSourceTexts = await prisma.page.findFirst({
 		where: { id: pageId },
@@ -38,6 +38,7 @@ export async function fetchPageWithTranslations(
 		select: {
 			id: true,
 			title: true,
+			sourceLanguage: true,
 			user: { select: { displayName: true, userName: true, icon: true } },
 			slug: true,
 			content: true,
@@ -86,6 +87,7 @@ export async function fetchPageWithTranslations(
 	return {
 		id: page.id,
 		title: page.title,
+		sourceLanguage: page.sourceLanguage,
 		user: {
 			displayName: page.user.displayName,
 			userName: page.user.userName,
