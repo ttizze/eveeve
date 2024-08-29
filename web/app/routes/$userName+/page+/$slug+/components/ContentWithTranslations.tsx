@@ -81,24 +81,29 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 						domNode.type === "tag" &&
 						domNode.attribs["data-translation-id"]
 					) {
-						const sourceTextId = domNode.attribs["data-translation-id"];
-						const translations =
+						const sourceTextId = Number(domNode.attribs["data-translation-id"]);
+						const sourceTextWithTranslations =
 							pageWithTranslations.sourceTextWithTranslations.find(
-								(info) => info.sourceTextId.toString() === sourceTextId,
+								(info) => info.sourceTextId === sourceTextId,
 							);
-						console.log("translations", translations);
+						console.log(
+							"sourceTextWithTranslations",
+							sourceTextWithTranslations,
+						);
 						// sourceLanguageがtargetLanguageと異なる場合は翻訳が存在しない場合でも表示する
 						if (
-							translations &&
-							(translations.translationsWithVotes.length > 0 ||
+							sourceTextWithTranslations &&
+							(sourceTextWithTranslations.translationsWithVotes.length > 0 ||
 								pageWithTranslations.sourceLanguage !== targetLanguage)
 						) {
 							return (
 								<TranslationSection
 									key={`translation-${sourceTextId}`}
-									translationsWithVotes={translations.translationsWithVotes}
+									translationsWithVotes={
+										sourceTextWithTranslations.translationsWithVotes
+									}
 									currentUserName={currentUserName}
-									sourceTextId={translations.sourceTextId}
+									sourceTextId={sourceTextId}
 								/>
 							);
 						}

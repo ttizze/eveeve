@@ -41,6 +41,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 		{ name: "twitter:image", content: imageUrl },
 	];
 };
+
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const { slug } = params;
 
