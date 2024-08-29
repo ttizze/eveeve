@@ -1,4 +1,4 @@
-import { franc } from "franc";
+
 import { JSDOM } from "jsdom";
 import type { TextElementInfo } from "../types";
 
@@ -8,12 +8,12 @@ export async function extractTextElementInfo(
 	titleSourceTextId: number | null,
 ): Promise<Array<TextElementInfo>> {
 	const doc = new JSDOM(content);
+
 	const textElements: Array<TextElementInfo> = [
 		{
 			number: 0,
 			text: title,
 			sourceTextId: titleSourceTextId,
-			language: franc(title),
 		},
 	];
 	// <br>のみを改行とする
@@ -30,13 +30,11 @@ export async function extractTextElementInfo(
 			textElements.push({
 				number: Number.parseInt(dataNumber, 10),
 				text: element.textContent?.trim() || "",
-				language: franc(element.textContent?.trim() || ""),
 				sourceTextId: dataSourceTextId
 					? Number.parseInt(dataSourceTextId, 10)
 					: null,
 			});
 		}
 	}
-
 	return textElements.sort((a, b) => a.number - b.number);
 }

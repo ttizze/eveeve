@@ -1,7 +1,6 @@
 export type TextElementInfo = {
 	number: number;
 	text: string;
-	language: string;
 	sourceTextId: number | null;
 };
 

@@ -29,6 +29,7 @@ async function addRequiredData() {
 		create: {
 			slug: "eveeve",
 			title: "eveeve",
+			sourceLanguage: "en",
 			content: "test",
 			isPublished: true,
 			userId: eveeve.id,
@@ -39,13 +40,11 @@ async function addRequiredData() {
 		{
 			text: "Write to the World",
 			number: 0,
-			language: "en",
 			pageId: evePage.id,
 		},
 		{
 			text: "EveEve is an innovative open-source platform that enables everyone to read articles in their native language, regardless of the original language. Through user-contributed content and collaborative translations, we break down language barriers, fostering global understanding and knowledge sharing.",
 			number: 1,
-			language: "en",
 			pageId: evePage.id,
 		},
 	];
@@ -65,7 +64,6 @@ async function addRequiredData() {
 				where: { id: existingSourceText.id },
 				data: {
 					text: sourceText.text,
-					language: sourceText.language,
 				},
 			});
 		} else {

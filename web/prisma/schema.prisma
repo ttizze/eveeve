@@ -81,6 +81,7 @@ model Page {
   slug                String                @unique
   title               String
   content             String
+  sourceLanguage      String                @default("unknown")
   isPublished         Boolean               @default(false) @map("is_published")
   isArchived          Boolean               @default(false) @map("is_archived")
   createdAt           DateTime              @default(now()) @map("created_at")
@@ -137,7 +138,6 @@ model SourceText {
   id              Int              @id @default(autoincrement())
   text            String
   number          Int
-  language        String @default("unknown")
   translateTexts  TranslateText[]
   page            Page             @relation(fields: [pageId], references: [id])
   pageId          Int              @map("page_id")

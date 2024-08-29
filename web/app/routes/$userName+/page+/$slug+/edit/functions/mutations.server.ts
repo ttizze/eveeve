@@ -7,6 +7,7 @@ export async function createOrUpdatePage(
 	title: string,
 	content: string,
 	isPublished: boolean,
+	sourceLanguage: string,
 ) {
 	const page = await prisma.page.upsert({
 		where: {
@@ -16,6 +17,7 @@ export async function createOrUpdatePage(
 			title,
 			content,
 			isPublished,
+			sourceLanguage,
 		},
 		create: {
 			userId,
@@ -23,6 +25,7 @@ export async function createOrUpdatePage(
 			title,
 			content,
 			isPublished,
+			sourceLanguage,
 		},
 	});
 
@@ -42,7 +45,6 @@ export async function createOrUpdateSourceTexts(
 						data: {
 							number: element.number,
 							text: element.text,
-							language: element.language,
 						},
 					});
 					return { number: element.number, sourceTextId: sourceText.id };
@@ -52,7 +54,6 @@ export async function createOrUpdateSourceTexts(
 						pageId,
 						number: element.number,
 						text: element.text,
-						language: element.language,
 					},
 				});
 				return { number: element.number, sourceTextId: sourceText.id };

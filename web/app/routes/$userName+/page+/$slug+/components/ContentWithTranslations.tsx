@@ -9,12 +9,13 @@ import { Button } from "~/components/ui/button";
 import type { PageWithTranslations } from "../types";
 import { TranslateButton } from "./TranslateButton";
 import { TranslationSection } from "./TranslationSection";
+
 interface ContentWithTranslationsProps {
 	pageWithTranslations: PageWithTranslations;
 	currentUserName: string | null;
 	hasGeminiApiKey: boolean;
 	userAITranslationInfo: UserAITranslationInfo | null;
-	currentLanguage: string;
+	targetLanguage: string;
 }
 
 export const ContentWithTranslations = memo(function ContentWithTranslations({
@@ -22,7 +23,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 	currentUserName,
 	hasGeminiApiKey,
 	userAITranslationInfo,
-	currentLanguage,
+	targetLanguage,
 }: ContentWithTranslationsProps) {
 	const isHydrated = useHydrated();
 	const localCreatedAt = isHydrated
@@ -77,7 +78,11 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 							pageWithTranslations.sourceTextWithTranslations.find(
 								(info) => info.sourceTextId.toString() === sourceTextId,
 							);
-						if (translations) {
+						console.log("translations", translations);
+						if (
+							translations?.translationsWithVotes.length &&
+							pageWithTranslations.sourceLanguage === targetLanguage
+						) {
 							return (
 								<TranslationSection
 									key={`translation-${sourceTextId}`}
@@ -120,7 +125,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 				pageId={pageWithTranslations.id}
 				userAITranslationInfo={userAITranslationInfo}
 				hasGeminiApiKey={hasGeminiApiKey}
-				currentLanguage={currentLanguage}
+				targetLanguage={targetLanguage}
 			/>
 			<div className="flex items-center">
 				<Link

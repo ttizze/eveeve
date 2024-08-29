@@ -19,6 +19,7 @@ import { addNumbersToContent } from "./utils/addNumbersToContent";
 import { addSourceTextIdToContent } from "./utils/addSourceTextIdToContent";
 import { extractTextElementInfo } from "./utils/extractTextElementInfo";
 import { removeSourceTextIdDuplicates } from "./utils/removeSourceTextIdDuplicates";
+import { getPageSourceLanguage } from "./utils/getPageSourceLanguage";
 
 const schema = z.object({
 	title: z.string().min(1, "Required"),
@@ -72,12 +73,15 @@ export const action: ActionFunction = async ({ request, params }) => {
 		title,
 		titleSourceTextId,
 	);
+	
+	const sourceLanguage = await getPageSourceLanguage(textElements);
 	const page = await createOrUpdatePage(
 		currentUser.id,
 		slug,
 		title,
 		numberedContent,
 		isPublished,
+		sourceLanguage,
 	);
 
 	const sourceTextsIdWithNumber = await createOrUpdateSourceTexts(
@@ -94,6 +98,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 		title,
 		contentWithSourceTextId,
 		isPublished,
+		sourceLanguage,
 	);
 	return null;
 };

@@ -181,7 +181,7 @@ export default function ReaderView() {
 					currentUserName={currentUser?.userName ?? null}
 					hasGeminiApiKey={hasGeminiApiKey}
 					userAITranslationInfo={userAITranslationInfo}
-					currentLanguage={targetLanguage}
+					targetLanguage={targetLanguage}
 				/>
 			</article>
 		</div>
