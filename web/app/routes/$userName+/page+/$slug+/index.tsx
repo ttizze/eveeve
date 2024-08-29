@@ -16,17 +16,17 @@ import {
 	fetchPageWithTranslations,
 } from "./functions/queries.server";
 import { actionSchema } from "./types";
+import { stripHtmlTags } from "../../utils/stripHtmlTags";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	if (!data) {
 		return [{ title: "Page Not Found" }];
 	}
+	
 	const { pageWithTranslations } = data;
 	const title = pageWithTranslations.title;
-	const description = `${pageWithTranslations.content.slice(0, 160)}...`;
-	const imageUrl =
-		pageWithTranslations.ogImageUrl ||
-		"https://example.com/default-og-image.jpg"; // OG画像URLがない場合はデフォルト画像を使用
+	const description = stripHtmlTags(pageWithTranslations.content).slice(0, 200);
+	const imageUrl = pageWithTranslations.user.icon;
 
 	return [
 		{ title: title },
@@ -35,7 +35,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 		{ property: "og:title", content: title },
 		{ property: "og:description", content: description },
 		{ property: "og:image", content: imageUrl },
-		{ name: "twitter:card", content: "summary_large_image" },
+		{ name: "twitter:card", content: "summary" },
 		{ name: "twitter:title", content: title },
 		{ name: "twitter:description", content: description },
 		{ name: "twitter:image", content: imageUrl },

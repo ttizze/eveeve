@@ -30,9 +30,16 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 		? pageWithTranslations.createdAt.toLocaleString()
 		: pageWithTranslations.createdAt.toISOString();
 	const bestTranslationTitle = useMemo(() => {
-		return pageWithTranslations.sourceTextWithTranslations.find(
+		const sourceTextWithTranslations = pageWithTranslations.sourceTextWithTranslations.find(
 			(info) => info.number === 0,
 		);
+		if (
+			sourceTextWithTranslations &&
+			sourceTextWithTranslations?.translationsWithVotes.length > 0
+		) {
+			return sourceTextWithTranslations;
+		}
+		return null;
 	}, [pageWithTranslations.sourceTextWithTranslations]);
 
 	const parsedContent = useMemo(() => {
@@ -79,9 +86,11 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 								(info) => info.sourceTextId.toString() === sourceTextId,
 							);
 						console.log("translations", translations);
+						// sourceLanguageがtargetLanguageと異なる場合は翻訳が存在しない場合でも表示する
 						if (
-							translations?.translationsWithVotes.length &&
-							pageWithTranslations.sourceLanguage === targetLanguage
+							translations &&
+							(translations.translationsWithVotes.length > 0 ||
+								pageWithTranslations.sourceLanguage !== targetLanguage)
 						) {
 							return (
 								<TranslationSection

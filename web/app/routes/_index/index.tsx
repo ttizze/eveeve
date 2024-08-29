@@ -71,7 +71,7 @@ export default function Index() {
 						/>
 					</h1>
 
-					<p className="text-xl mb-12 text-justify">
+					<p className="text-xl mb-12 w-full">
 						<span className="text-slate-500 dark:text-slate-400">
 							{sourceTextWithTranslations[1].text}
 						</span>
