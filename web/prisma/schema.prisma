@@ -137,6 +137,7 @@ model SourceText {
   id              Int              @id @default(autoincrement())
   text            String
   number          Int
+  language        String @default("unknown")
   translateTexts  TranslateText[]
   page            Page             @relation(fields: [pageId], references: [id])
   pageId          Int              @map("page_id")

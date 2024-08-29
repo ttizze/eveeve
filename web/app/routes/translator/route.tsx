@@ -9,7 +9,6 @@ import { createOrUpdatePage } from "~/routes/$userName+/page+/$slug+/edit/functi
 import { addNumbersToContent } from "~/routes/$userName+/page+/$slug+/edit/utils/addNumbersToContent";
 import { addSourceTextIdToContent } from "~/routes/$userName+/page+/$slug+/edit/utils/addSourceTextIdToContent";
 import { extractArticle } from "~/routes/$userName+/page+/$slug+/edit/utils/extractArticle";
-import { extractNumberedElements } from "~/routes/$userName+/page+/$slug+/edit/utils/extractNumberedElements";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
 import { authenticator } from "~/utils/auth.server";
 import { TranslationInputForm } from "./components/TranslationInputForm";

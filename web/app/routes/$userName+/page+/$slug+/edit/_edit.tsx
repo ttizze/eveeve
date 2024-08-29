@@ -13,11 +13,11 @@ import { createOrUpdateSourceTexts } from "./functions/mutations.server";
 import { createOrUpdatePage } from "./functions/mutations.server";
 import {
 	getPageBySlug,
-	getPageWithSourceTexts,
+	getTitleSourceTextId,
 } from "./functions/queries.server";
 import { addNumbersToContent } from "./utils/addNumbersToContent";
 import { addSourceTextIdToContent } from "./utils/addSourceTextIdToContent";
-import { extractNumberedElements } from "./utils/extractNumberedElements";
+import { extractTextElementInfo } from "./utils/extractTextElementInfo";
 import { removeSourceTextIdDuplicates } from "./utils/removeSourceTextIdDuplicates";
 
 const schema = z.object({
@@ -62,14 +62,12 @@ export const action: ActionFunction = async ({ request, params }) => {
 	}
 
 	const { title, pageContent, isPublished } = submission.value;
-	const existingPage = await getPageWithSourceTexts(slug);
-	const titleSourceTextId =
-		existingPage?.sourceTexts.find((st) => st.number === 0)?.id || null;
+	const titleSourceTextId = await getTitleSourceTextId(slug);
 	//tiptapが既存の要素を引き継いで重複したsourceTextIdを追加してしまうため、重複を削除
 	const numberedContent = await removeSourceTextIdDuplicates(
 		addNumbersToContent(pageContent),
 	);
-	const numberedElements = await extractNumberedElements(
+	const textElements = await extractTextElementInfo(
 		numberedContent,
 		title,
 		titleSourceTextId,
@@ -83,7 +81,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 	);
 
 	const sourceTextsIdWithNumber = await createOrUpdateSourceTexts(
-		numberedElements,
+		textElements,
 		page.id,
 	);
 	const contentWithSourceTextId = addSourceTextIdToContent(

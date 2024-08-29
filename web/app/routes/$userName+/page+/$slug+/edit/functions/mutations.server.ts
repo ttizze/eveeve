@@ -1,5 +1,5 @@
 import { prisma } from "~/utils/prisma";
-import type { NumberedElement } from "../types";
+import type { TextElementInfo } from "../types";
 
 export async function createOrUpdatePage(
 	userId: number,
@@ -28,20 +28,21 @@ export async function createOrUpdatePage(
 
 	return page;
 }
-//sourceTextIdがあればupdate、なければcreate
+
 export async function createOrUpdateSourceTexts(
-	numberedElements: NumberedElement[],
+	textElements: TextElementInfo[],
 	pageId: number,
 ): Promise<Array<{ number: number; sourceTextId: number }>> {
 	return await prisma.$transaction(async (tx) => {
 		const results = await Promise.all(
-			numberedElements.map(async (element) => {
+			textElements.map(async (element) => {
 				if (element.sourceTextId) {
 					const sourceText = await tx.sourceText.update({
 						where: { id: element.sourceTextId },
 						data: {
 							number: element.number,
 							text: element.text,
+							language: element.language,
 						},
 					});
 					return { number: element.number, sourceTextId: sourceText.id };
@@ -51,6 +52,7 @@ export async function createOrUpdateSourceTexts(
 						pageId,
 						number: element.number,
 						text: element.text,
+						language: element.language,
 					},
 				});
 				return { number: element.number, sourceTextId: sourceText.id };
