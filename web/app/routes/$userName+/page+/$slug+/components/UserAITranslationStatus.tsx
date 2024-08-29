@@ -13,13 +13,13 @@ export function UserAITranslationStatus({
 }: UserAITranslationStatusProps) {
 	const revalidator = useRevalidator();
 	useEffect(() => {
-		if (userAITranslationInfo?.aiTranslationStatus === 'completed') {
-		  return;
+		if (userAITranslationInfo?.aiTranslationStatus === "completed") {
+			return;
 		}
-	  
+
 		const intervalId = setInterval(revalidator.revalidate, 3000);
 		return () => clearInterval(intervalId);
-	  }, [userAITranslationInfo?.aiTranslationStatus, revalidator]);
+	}, [userAITranslationInfo?.aiTranslationStatus, revalidator]);
 
 	return (
 		<div className="h-[15px] flex mt-1 items-center space-y-1">

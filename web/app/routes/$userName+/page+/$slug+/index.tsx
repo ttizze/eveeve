@@ -8,6 +8,7 @@ import { getTranslateUserQueue } from "~/features/translate/translate-user-queue
 import i18nServer from "~/i18n.server";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
 import { authenticator } from "~/utils/auth.server";
+import { stripHtmlTags } from "../../utils/stripHtmlTags";
 import { ContentWithTranslations } from "./components/ContentWithTranslations";
 import { createUserAITranslationInfo } from "./functions/mutations.server";
 import {
@@ -16,13 +17,12 @@ import {
 	fetchPageWithTranslations,
 } from "./functions/queries.server";
 import { actionSchema } from "./types";
-import { stripHtmlTags } from "../../utils/stripHtmlTags";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	if (!data) {
 		return [{ title: "Page Not Found" }];
 	}
-	
+
 	const { pageWithTranslations } = data;
 	const title = pageWithTranslations.title;
 	const description = stripHtmlTags(pageWithTranslations.content).slice(0, 200);

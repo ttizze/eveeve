@@ -1,4 +1,3 @@
-
 import { JSDOM } from "jsdom";
 import type { TextElementInfo } from "../types";
 

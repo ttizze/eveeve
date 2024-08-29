@@ -30,9 +30,10 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 		? pageWithTranslations.createdAt.toLocaleString()
 		: pageWithTranslations.createdAt.toISOString();
 	const bestTranslationTitle = useMemo(() => {
-		const sourceTextWithTranslations = pageWithTranslations.sourceTextWithTranslations.find(
-			(info) => info.number === 0,
-		);
+		const sourceTextWithTranslations =
+			pageWithTranslations.sourceTextWithTranslations.find(
+				(info) => info.number === 0,
+			);
 		if (
 			sourceTextWithTranslations &&
 			sourceTextWithTranslations?.translationsWithVotes.length > 0
@@ -109,6 +110,8 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 	}, [
 		pageWithTranslations.content,
 		pageWithTranslations.sourceTextWithTranslations,
+		pageWithTranslations.sourceLanguage,
+		targetLanguage,
 		currentUserName,
 		isHydrated,
 	]);
