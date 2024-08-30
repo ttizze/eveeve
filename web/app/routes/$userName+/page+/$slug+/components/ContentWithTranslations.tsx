@@ -61,11 +61,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 						"data-source-text-id",
 					) as string;
 					const sourceTextWrapper = document.createElement("span");
-					sourceTextWrapper.classList.add(
-						"inline-block",
-						"text-slate-500",
-						"dark:text-slate-400",
-					);
+					sourceTextWrapper.classList.add("inline-block", "px-4");
 					sourceTextWrapper.innerHTML = element.innerHTML;
 					element.innerHTML = "";
 					element.appendChild(sourceTextWrapper);
@@ -124,7 +120,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 	return (
 		<>
 			<h1 className="!mb-5">
-				<div className=" text-slate-500 dark:text-slate-400">
+				<div className=" px-4 mb-2">
 					{!pageWithTranslations.isPublished && (
 						<Lock className="h-6 w-6 mr-1 inline" />
 					)}
