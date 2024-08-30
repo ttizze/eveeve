@@ -60,7 +60,7 @@ export default function Index() {
 			<main className="container mx-auto px-4 py-20 flex flex-col items-center justify-center flex-grow">
 				<div className="max-w-4xl w-full">
 					<h1 className="text-7xl font-bold mb-20 text-center">
-						<span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+						<span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent inline-block mb-2">
 							{sourceTextWithTranslations[0].text}
 						</span>
 						{targetLanguage !== "en" && (
@@ -75,7 +75,7 @@ export default function Index() {
 					</h1>
 
 					<p className="text-xl mb-12 w-full">
-						<span className="text-slate-500 dark:text-slate-400">
+						<span className="text-slate-500 dark:text-slate-400 inline-block mb-2">
 							{sourceTextWithTranslations[1].text}
 						</span>
 						{targetLanguage !== "en" && (

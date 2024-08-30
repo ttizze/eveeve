@@ -25,7 +25,7 @@ function ToggleButton({
 	return (
 		<button
 			type="button"
-			className={`absolute top-2  -right-1 border-r-4  border-indigo-200  ${isExpanded ? " z-20 bg-transparent" : "z-0 "}`}
+			className={`absolute top-2 right-0 md:right-1 ${isExpanded ? " z-20 bg-transparent" : "z-0 "}`}
 			onClick={onClick}
 			aria-label={label}
 			title={label}
@@ -75,9 +75,9 @@ export function TranslationSection({
 	}, [bestTranslationWithVote, isHydrated]);
 
 	return (
-		<span className="group relative block">
+		<span className="group relative block rounded-md  bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 ">
 			<span
-				className="notranslate mt-2 pl-4 pr-5 inline-block cursor-pointer "
+				className="notranslate  inline-block cursor-pointer pl-4 pr-5 py-2"
 				onClick={() => setIsExpanded(!isExpanded)}
 				onKeyDown={(e) => {
 					if (e.key === "Enter" || e.key === " ") {
