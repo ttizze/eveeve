@@ -129,10 +129,7 @@ export default function EditPage() {
 		if (fetcher.state !== "submitting") {
 			fetcher.submit(formData, { method: "post" });
 		}
-	}, [
-		fetcher,
-		fields
-	]);
+	}, [fetcher, fields]);
 
 	const debouncedAutoSave = useDebouncedCallback(handleAutoSave, 1000);
 
