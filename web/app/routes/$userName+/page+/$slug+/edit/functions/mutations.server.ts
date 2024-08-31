@@ -40,14 +40,19 @@ export async function createOrUpdateSourceTexts(
 		const results = await Promise.all(
 			textElements.map(async (element) => {
 				if (element.sourceTextId) {
-					const sourceText = await tx.sourceText.update({
-						where: { id: element.sourceTextId },
-						data: {
-							number: element.number,
-							text: element.text,
-						},
+					const existingSourceText = await tx.sourceText.findUnique({
+						where: { id: element.sourceTextId, pageId },
 					});
-					return { number: element.number, sourceTextId: sourceText.id };
+					if (existingSourceText) {
+						const sourceText = await tx.sourceText.update({
+							where: { id: element.sourceTextId },
+							data: {
+								number: element.number,
+								text: element.text,
+							},
+						});
+						return { number: element.number, sourceTextId: sourceText.id };
+					}
 				}
 				const sourceText = await tx.sourceText.create({
 					data: {

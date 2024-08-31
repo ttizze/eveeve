@@ -170,10 +170,6 @@ export default function ReaderView() {
 		lastResult: actionData?.lastResult,
 	});
 
-	if (!pageWithTranslations) {
-		return <div>Loading...</div>;
-	}
-
 	return (
 		<div className=" w-full max-w-3xl  mx-auto">
 			<article className="w-full prose dark:prose-invert sm:prose lg:prose-lg mx-auto mb-20">

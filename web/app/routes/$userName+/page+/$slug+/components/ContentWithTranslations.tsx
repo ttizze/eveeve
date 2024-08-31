@@ -2,7 +2,7 @@ import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import DOMPurify from "dompurify";
 import parse from "html-react-parser";
-import { Lock, SquarePen } from "lucide-react";
+import { Loader2, Lock, SquarePen } from "lucide-react";
 import { memo, useMemo } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
 import { Button } from "~/components/ui/button";
@@ -82,10 +82,6 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 							pageWithTranslations.sourceTextWithTranslations.find(
 								(info) => info.sourceTextId === sourceTextId,
 							);
-						console.log(
-							"sourceTextWithTranslations",
-							sourceTextWithTranslations,
-						);
 						// sourceLanguageがtargetLanguageと異なる場合は翻訳が存在しない場合でも表示する
 						if (
 							sourceTextWithTranslations &&
@@ -108,6 +104,11 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 				},
 			});
 		}
+		return (
+			<div className="w-full h-full flex items-center justify-center">
+				<Loader2 className="w-10 h-10 animate-spin" />
+			</div>
+		);
 	}, [
 		pageWithTranslations.content,
 		pageWithTranslations.sourceTextWithTranslations,
