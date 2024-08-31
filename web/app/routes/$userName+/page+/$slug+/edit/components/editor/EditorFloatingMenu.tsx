@@ -3,7 +3,6 @@ import { FloatingMenu } from "@tiptap/react";
 import { ImageIcon } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { handleFileUpload } from "./useFileUpload";
-import { Label } from '~/components/ui/label';
 
 interface EditorFloatingMenuProps {
 	editor: Editor;
