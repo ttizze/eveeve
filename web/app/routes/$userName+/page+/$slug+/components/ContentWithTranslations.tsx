@@ -32,7 +32,8 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 	const bestTranslationTitle = useMemo(() => {
 		const sourceTextWithTranslations =
 			pageWithTranslations.sourceTextWithTranslations.find(
-				(info) => info.number === 0,
+				(sourceTextWithTranslation) =>
+					sourceTextWithTranslation.sourceText.number === 0,
 			);
 		if (
 			sourceTextWithTranslations &&
@@ -80,7 +81,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 						const sourceTextId = Number(domNode.attribs["data-translation-id"]);
 						const sourceTextWithTranslations =
 							pageWithTranslations.sourceTextWithTranslations.find(
-								(info) => info.sourceTextId === sourceTextId,
+								(info) => info.sourceText.id === sourceTextId,
 							);
 						// sourceLanguageがtargetLanguageと異なる場合は翻訳が存在しない場合でも表示する
 						if (
@@ -131,7 +132,7 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 					<TranslationSection
 						translationsWithVotes={bestTranslationTitle.translationsWithVotes}
 						currentUserName={currentUserName}
-						sourceTextId={bestTranslationTitle.sourceTextId}
+						sourceTextId={bestTranslationTitle.sourceText.id}
 					/>
 				)}
 			</h1>

@@ -45,16 +45,15 @@ export async function fetchPageWithTranslations(
 			createdAt: true,
 			isPublished: true,
 			isArchived: true,
-			pageTranslationInfo: {
-				where: { targetLanguage },
-				select: { translationTitle: true },
-			},
 			sourceTexts: {
+				distinct: ["number"],
 				orderBy: { createdAt: "desc" },
 				select: {
 					id: true,
 					number: true,
 					text: true,
+					createdAt: true,
+					pageId: true,
 					translateTexts: {
 						where: { targetLanguage, isArchived: false },
 						select: {
@@ -92,16 +91,19 @@ export async function fetchPageWithTranslations(
 			userName: page.user.userName,
 			icon: page.user.icon,
 		},
-		translationTitle: page.pageTranslationInfo[0]?.translationTitle,
 		slug: page.slug,
 		content: page.content,
 		createdAt: page.createdAt,
 		isPublished: page.isPublished,
 		isArchived: page.isArchived,
 		sourceTextWithTranslations: page.sourceTexts.map((sourceText) => ({
-			sourceTextId: sourceText.id,
-			number: sourceText.number,
-			text: sourceText.text,
+			sourceText: {
+				id: sourceText.id,
+				number: sourceText.number,
+				text: sourceText.text,
+				createdAt: sourceText.createdAt,
+				pageId: sourceText.pageId,
+			},
 			translationsWithVotes: sourceText.translateTexts.map((translateText) => ({
 				id: translateText.id,
 				text: translateText.text,

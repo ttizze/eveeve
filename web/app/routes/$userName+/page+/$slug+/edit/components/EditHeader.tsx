@@ -1,5 +1,5 @@
 import { Link } from "@remix-run/react";
-import type { Fetcher } from "@remix-run/react";
+import type { FetcherWithComponents } from "@remix-run/react";
 import {
 	ArrowDownToLine,
 	ArrowLeft,
@@ -18,11 +18,12 @@ import {
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import type { SanitizedUser } from "~/types";
+
 interface EditHeaderProps {
 	currentUser: SanitizedUser | null;
 	pageSlug: string | null;
 	initialIsPublished: boolean;
-	fetcher: Fetcher;
+	fetcher: FetcherWithComponents<unknown>;
 }
 
 export function EditHeader({

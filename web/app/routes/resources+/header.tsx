@@ -25,10 +25,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		const user = await authenticator.authenticate("google", request);
 
 		if (user) {
-			if (user.userName) {
-				return redirect(`/${user.userName}`);
-			}
-			return redirect("/welcome");
+			return redirect(`/${user.userName}`);
 		}
 
 		return redirect("/auth/login");
@@ -60,7 +57,7 @@ export function Header({ currentUser }: HeaderProps) {
 								type="button"
 								variant="ghost"
 							>
-								<Link to={`/${currentUser.userName}`}>
+								<Link prefetch="render" to={`/${currentUser.userName}`}>
 									<img
 										src={currentUser.icon}
 										alt={currentUser.displayName}

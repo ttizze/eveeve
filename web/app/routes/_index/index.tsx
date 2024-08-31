@@ -22,9 +22,22 @@ export const meta: MetaFunction = () => {
 		},
 	];
 };
+
 export async function loader({ request }: LoaderFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request);
 	const targetLanguage = await i18nServer.getLocale(request);
+	if (targetLanguage === "en") {
+		const topPageWithTranslations = await fetchPageWithTranslations(
+			"eveeve-ja",
+			currentUser?.id ?? 0,
+			targetLanguage,
+		);
+		return {
+			currentUser,
+			topPageWithTranslations: topPageWithTranslations as PageWithTranslations,
+			targetLanguage,
+		};
+	}
 	const topPageWithTranslations = await fetchPageWithTranslations(
 		"eveeve",
 		currentUser?.id ?? 0,
@@ -40,10 +53,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	const currentUser = await authenticator.authenticate("google", request);
 
 	if (currentUser) {
-		if (currentUser.userName) {
-			return redirect(`/${currentUser.userName}`);
-		}
-		return redirect("/welcome");
+		return redirect(`/${currentUser.userName}`);
 	}
 
 	return redirect("/auth/login");
@@ -61,33 +71,35 @@ export default function Index() {
 				<div className="max-w-4xl w-full">
 					<h1 className="text-7xl font-bold mb-20 text-center">
 						<span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent inline-block mb-2">
-							{sourceTextWithTranslations[0].text}
+							{sourceTextWithTranslations.find(
+								(SourceTextWithTranslation) =>
+									SourceTextWithTranslation.sourceText.number === 0,
+							)?.sourceText.text ?? ""}
 						</span>
-						{targetLanguage !== "en" && (
-							<TranslationSection
-								translationsWithVotes={
-									sourceTextWithTranslations[0].translationsWithVotes
-								}
-								currentUserName={currentUser?.userName || null}
-								sourceTextId={sourceTextWithTranslations[0].sourceTextId}
-							/>
-						)}
+						<TranslationSection
+							translationsWithVotes={
+								sourceTextWithTranslations[0].translationsWithVotes
+							}
+							currentUserName={currentUser?.userName || null}
+							sourceTextId={sourceTextWithTranslations[0].sourceText.id}
+						/>
 					</h1>
 
-					<p className="text-xl mb-12 w-full">
+					<span className="text-xl mb-12 w-full">
 						<span className="text-slate-500 dark:text-slate-400 inline-block mb-2">
-							{sourceTextWithTranslations[1].text}
+							{sourceTextWithTranslations.find(
+								(SourceTextWithTranslation) =>
+									SourceTextWithTranslation.sourceText.number === 1,
+							)?.sourceText.text ?? ""}
 						</span>
-						{targetLanguage !== "en" && (
-							<TranslationSection
-								translationsWithVotes={
-									sourceTextWithTranslations[1].translationsWithVotes
-								}
-								currentUserName={currentUser?.userName || null}
-								sourceTextId={sourceTextWithTranslations[1].sourceTextId}
-							/>
-						)}
-					</p>
+						<TranslationSection
+							translationsWithVotes={
+								sourceTextWithTranslations[1].translationsWithVotes
+							}
+							currentUserName={currentUser?.userName || null}
+							sourceTextId={sourceTextWithTranslations[1].sourceText.id}
+						/>
+					</span>
 
 					<div className="mb-12 flex justify-center">
 						<Form method="POST">
@@ -116,66 +128,6 @@ export default function Index() {
 						</a>
 					</div>
 				</div>
-
-				{/* <div className="mt-20">
-					<div className="">
-						<Card className="border-gray-700">
-							<CardContent className="p-6">
-								<div className="text-center">
-									<h3 className="text-2xl font-semibold mb-2 flex items-center justify-center gap-2">
-										<SquarePen size={24} />
-									</h3>
-									<div className="relative">
-										<div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg transform -rotate-6 scale-105 opacity-30 blur-sm" />
-										<img
-											src="/write.png"
-											alt="Write"
-											className="relative w-full rounded-lg shadow-xl transform -translate-y-2"
-										/>
-									</div>
-									<p className="">
-										Simple interface for effortless article posting.
-									</p>
-								</div>
-							</CardContent>
-						</Card>
-						<Card className="border-gray-700">
-							<CardContent className="p-6">
-								<div className="text-center">
-									<h3 className="text-2xl font-semibold mb-2 flex items-center justify-center gap-2">
-										<BookOpen size={24} />
-									</h3>
-									<img
-										src="/read.png"
-										alt="Read"
-										className="w-full border-4 shadow-lg rounded-lg"
-									/>
-									<p className="">
-										Read articles in your native language, regardless of the
-										original language.
-									</p>
-								</div>
-							</CardContent>
-						</Card>
-						<Card className="border-gray-700">
-							<CardContent className="p-6">
-								<div className="text-center">
-									<h3 className="text-2xl font-semibold mb-2 flex items-center justify-center gap-2">
-										<Languages size={24} />
-									</h3>
-									<img
-										src="/translate.png"
-										alt="Translate"
-										className="w-full border-4 shadow-lg rounded-lg"
-									/>
-									<p className="">
-										Translate articles into your native language.
-									</p>
-								</div>
-							</CardContent>
-						</Card>
-					</div>
-				</div> */}
 			</main>
 		</div>
 	);

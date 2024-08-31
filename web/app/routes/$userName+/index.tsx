@@ -26,7 +26,6 @@ import {
 	togglePagePublicStatus,
 } from "./functions/mutations.server";
 import { getSanitizedUserWithPages } from "./functions/queries.server";
-import type { sanitizedUserWithPages } from "./types";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const { userName } = params;
@@ -39,8 +38,11 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		isOwner,
 	);
 	if (!sanitizedUserWithPages) throw new Response("Not Found", { status: 404 });
+	const pageCreatedAt = new Date(
+		sanitizedUserWithPages.createdAt,
+	).toLocaleDateString();
 
-	return { sanitizedUserWithPages, isOwner };
+	return { sanitizedUserWithPages, isOwner, pageCreatedAt };
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -64,10 +66,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function UserProfile() {
 	const navigate = useNavigate();
-	const { sanitizedUserWithPages, isOwner } = useLoaderData<{
-		sanitizedUserWithPages: sanitizedUserWithPages;
-		isOwner: boolean;
-	}>();
+	const { sanitizedUserWithPages, isOwner, pageCreatedAt } =
+		useLoaderData<typeof loader>();
 
 	const fetcher = useFetcher();
 
@@ -181,9 +181,7 @@ export default function UserProfile() {
 									{page.isPublished ? "" : <Lock className="h-4 w-4 mr-2" />}
 									{page.title}
 								</CardTitle>
-								<CardDescription>
-									{new Date(page.createdAt).toLocaleDateString()}
-								</CardDescription>
+								<CardDescription>{pageCreatedAt}</CardDescription>
 							</CardHeader>
 							<CardContent className="flex-grow overflow-hidden px-4">
 								<p className="text-sm text-gray-600 line-clamp-4 break-all overflow-wrap-anywhere hyphens-auto">

@@ -36,6 +36,19 @@ async function addRequiredData() {
 		},
 	});
 
+	const eveeveJapanese = await prisma.page.upsert({
+		where: { slug: "eveeve-ja" },
+		update: {},
+		create: {
+			slug: "eveeve-ja",
+			title: "eveeve-ja",
+			sourceLanguage: "ja",
+			content: "test",
+			isPublished: true,
+			userId: eveeve.id,
+		},
+	});
+
 	const sourceTexts = [
 		{
 			text: "Write to the World",
@@ -46,6 +59,16 @@ async function addRequiredData() {
 			text: "EveEve is an innovative open-source platform that enables everyone to read articles in their native language, regardless of the original language. Through user-contributed content and collaborative translations, we break down language barriers, fostering global understanding and knowledge sharing.",
 			number: 1,
 			pageId: evePage.id,
+		},
+		{
+			text: "世界に向けて書く",
+			number: 0,
+			pageId: eveeveJapanese.id,
+		},
+		{
+			text: "EveEveは、誰もが自分の母国語で文章を読めるようにする革新的なオープンソースプラットフォームです。ユーザーによる投稿と翻訳を通じて、言語の障壁を取り除き、世界中の理解と知識の共有を促進します。",
+			number: 1,
+			pageId: eveeveJapanese.id,
 		},
 	];
 	for (const sourceText of sourceTexts) {
