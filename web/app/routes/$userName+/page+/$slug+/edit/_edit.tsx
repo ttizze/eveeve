@@ -3,7 +3,9 @@ import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
+import { useCallback } from "react";
 import TextareaAutosize from "react-textarea-autosize";
+import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
 import { authenticator } from "~/utils/auth.server";
 import { EditFooter } from "./components/EditFooter";
@@ -107,7 +109,7 @@ export default function EditPage() {
 	const { currentUser, page } = useLoaderData<typeof loader>();
 	const fetcher = useFetcher<typeof action>();
 
-	const [form, { title, pageContent, isPublished }] = useForm({
+	const [form, fields] = useForm({
 		id: "edit-page",
 		lastResult: fetcher.data?.lastResult,
 		constraint: getZodConstraint(schema),
@@ -117,6 +119,19 @@ export default function EditPage() {
 			isPublished: page?.isPublished,
 		},
 	});
+
+	const handleAutoSave = useCallback(() => {
+		const formData = new FormData();
+		formData.set("title", fields.title.value as string);
+		formData.set("pageContent", fields.pageContent.value as string);
+		formData.set("isPublished", fields.isPublished.value as string);
+
+		if (fetcher.state !== "submitting") {
+			fetcher.submit(formData, { method: "post" });
+		}
+	}, [fetcher, fields]);
+
+	const debouncedAutoSave = useDebouncedCallback(handleAutoSave, 1000);
 
 	return (
 		<div>
@@ -131,14 +146,15 @@ export default function EditPage() {
 					<div className="mt-10 h-auto">
 						<h1 className="text-4xl font-bold !mb-0 h-auto">
 							<TextareaAutosize
-								{...getTextareaProps(title)}
+								{...getTextareaProps(fields.title)}
 								placeholder="input title..."
 								className="w-full outline-none bg-transparent resize-none overflow-hidden"
 								minRows={1}
 								maxRows={10}
+								onChange={debouncedAutoSave}
 							/>
 						</h1>
-						{title.errors?.map((error) => (
+						{fields.title.errors?.map((error) => (
 							<p className="text-sm text-red-500" key={error}>
 								{error}
 							</p>
@@ -146,8 +162,11 @@ export default function EditPage() {
 					</div>
 					<hr className="!mt-2 !mb-1" />
 					<div className="mt-12">
-						<Editor initialContent={page?.content || ""} />
-						{pageContent.errors?.map((error) => (
+						<Editor
+							initialContent={page?.content || ""}
+							handleAutoSave={debouncedAutoSave}
+						/>
+						{fields.pageContent.errors?.map((error) => (
 							<p className="text-sm text-red-500" key={error}>
 								{error}
 							</p>

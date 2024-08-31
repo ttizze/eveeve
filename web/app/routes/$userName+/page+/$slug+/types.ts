@@ -1,4 +1,4 @@
-import type { TranslateText, Vote } from "@prisma/client";
+import type { SourceText, TranslateText, Vote } from "@prisma/client";
 import { z } from "zod";
 
 export type UserVote = Pick<Vote, "id" | "isUpvote" | "updatedAt">;
@@ -13,17 +13,14 @@ export type TranslationWithVote = Pick<
 };
 
 export interface SourceTextWithTranslations {
-	sourceTextId: number;
-	text: string;
-	number: number;
+	sourceText: SourceText;
 	translationsWithVotes: TranslationWithVote[];
 }
 
-export interface PageWithTranslations {
+export type PageWithTranslations = {
 	id: number;
 	title: string;
 	sourceLanguage: string;
-	translationTitle: string | null;
 	user: { displayName: string; userName: string; icon: string };
 	createdAt: Date;
 	slug: string;
@@ -31,7 +28,7 @@ export interface PageWithTranslations {
 	isPublished: boolean;
 	isArchived: boolean;
 	sourceTextWithTranslations: SourceTextWithTranslations[];
-}
+};
 
 export const translateSchema = z.object({
 	intent: z.literal("translate"),
