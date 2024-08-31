@@ -75,9 +75,9 @@ export function TranslationSection({
 	}, [bestTranslationWithVote, isHydrated]);
 
 	return (
-		<span className="group relative block rounded-md  bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 ">
+		<span className="group relative block rounded-md">
 			<span
-				className="notranslate  inline-block cursor-pointer pl-4 pr-5 py-2"
+				className="notranslate  inline-block cursor-pointer pl-4 pr-5 py-2  "
 				onClick={() => setIsExpanded(!isExpanded)}
 				onKeyDown={(e) => {
 					if (e.key === "Enter" || e.key === " ") {
@@ -85,21 +85,23 @@ export function TranslationSection({
 					}
 				}}
 			>
-				{sanitizedAndParsedText}
+				<span className="bg-gradient-to-b from-transparent from-60%  to-blue-gray-300 to-60% dark:to-blue-gray-700 hover:to-blue-gray-300 dark:hover:to-blue-gray-600 ">
+					{sanitizedAndParsedText}
+				</span>
 				<ToggleButton
 					isExpanded={isExpanded}
 					onClick={() => setIsExpanded(!isExpanded)}
 				/>
 			</span>
 			{isExpanded && (
-				<div className="mx-[-1rem] absolute -top-0 left-0 right-0 z-10  border bg-white dark:bg-gray-900 rounded-xl shadow-lg shadow-gray-800/10  dark:shadow-white/10  transition-all duration-500 ease-in-out">
+				<span className="mx-[-1rem] absolute -top-0 left-0 right-0 z-10  border bg-white dark:bg-gray-900 rounded-xl shadow-lg shadow-gray-800/10  dark:shadow-white/10  transition-all duration-500 ease-in-out">
 					<AddAndVoteTranslations
 						bestTranslationWithVote={bestTranslationWithVote}
 						alternativeTranslationsWithVotes={alternativeTranslationsWithVotes}
 						currentUserName={currentUserName}
 						sourceTextId={sourceTextId}
 					/>
-				</div>
+				</span>
 			)}
 		</span>
 	);
