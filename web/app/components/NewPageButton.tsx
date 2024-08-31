@@ -1,5 +1,5 @@
 import { useNavigate } from "@remix-run/react";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 interface NewPageButtonProps {
@@ -13,12 +13,15 @@ export function NewPageButton({ userName }: NewPageButtonProps) {
 		setIsLoading(true);
 		const newSlug = crypto.randomUUID();
 		navigate(`/${userName}/page/${newSlug}/edit`);
-		setIsLoading(false);
 	};
 
 	return (
 		<Button onClick={handleNewPage} variant="ghost" disabled={isLoading}>
-			<PlusCircle className="h-6 w-6" />
+			{isLoading ? (
+				<Loader2 className="h-6 w-6 animate-spin" />
+			) : (
+				<PlusCircle className="h-6 w-6" />
+			)}
 		</Button>
 	);
 }
