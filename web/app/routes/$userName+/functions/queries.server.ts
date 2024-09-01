@@ -32,3 +32,9 @@ export async function getSanitizedUserWithPages(
 		pages,
 	};
 }
+
+export async function getPageById(pageId: number) {
+	return prisma.page.findUnique({
+		where: { id: pageId },
+	});
+}

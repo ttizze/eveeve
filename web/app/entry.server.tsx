@@ -18,6 +18,19 @@ import * as i18n from "./utils/i18n";
 
 const ABORT_DELAY = 5_000;
 
+function setSecurityHeaders(headers: Headers) {
+  headers.set(
+    "Strict-Transport-Security",
+    "max-age=31536000; includeSubDomains; preload"
+  );
+  headers.set(
+		"Content-Security-Policy",
+		"frame-ancestors 'self';",
+	);
+	headers.set("X-Content-Type-Options", "nosniff");
+}
+
+
 export default async function handleRequest(
 	request: Request,
 	responseStatusCode: number,
@@ -77,6 +90,7 @@ async function handleBotRequest(
 					const stream = createReadableStreamFromReadable(body);
 
 					responseHeaders.set("Content-Type", "text/html");
+					setSecurityHeaders(responseHeaders);
 
 					resolve(
 						new Response(stream, {
@@ -140,7 +154,7 @@ async function handleBrowserRequest(
 					const stream = createReadableStreamFromReadable(body);
 
 					responseHeaders.set("Content-Type", "text/html");
-
+					setSecurityHeaders(responseHeaders);
 					resolve(
 						new Response(stream, {
 							headers: responseHeaders,

@@ -11,6 +11,12 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { authenticator } from "~/utils/auth.server";
 import { searchTitle } from "./functions/queries.server";
+import type { MetaFunction } from "@remix-run/react";
+
+export const meta: MetaFunction = () => {
+	return [{ title: "Search" }, { name: "robots", content: "noindex" }];
+};
+
 
 const schema = z.object({
 	query: z.string().min(1, "Search query is required"),

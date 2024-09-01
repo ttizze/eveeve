@@ -1,7 +1,6 @@
 import { prisma } from "../../../utils/prisma";
 import { updateUserAITranslationInfo } from "../functions/mutations.server";
 import { getOrCreateAIUser } from "../functions/mutations.server";
-import { getOrCreatePageTranslationInfo } from "../functions/mutations.server";
 import { getLatestSourceTexts } from "../functions/mutations.server";
 import { getGeminiModelResponse } from "../services/gemini";
 import type { NumberedElement } from "../types";
@@ -74,11 +73,6 @@ export async function translateChunk(
 	);
 
 	const extractedTranslations = extractTranslations(translatedText);
-	await getOrCreatePageTranslationInfo(
-		pageId,
-		targetLanguage,
-		extractedTranslations[0].text,
-	);
 
 	await saveTranslations(
 		extractedTranslations,

@@ -22,6 +22,14 @@ import { addSourceTextIdToContent } from "./utils/addSourceTextIdToContent";
 import { extractTextElementInfo } from "./utils/extractTextElementInfo";
 import { getPageSourceLanguage } from "./utils/getPageSourceLanguage";
 import { removeSourceTextIdDuplicates } from "./utils/removeSourceTextIdDuplicates";
+import type { MetaFunction } from "@remix-run/react";
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+	if (!data) {
+		return [{ title: "Edit Page" }];
+	}
+	return [{ title: `Edit ${data.page?.title}` }];
+};
 
 const schema = z.object({
 	title: z.string().min(1, "Required"),

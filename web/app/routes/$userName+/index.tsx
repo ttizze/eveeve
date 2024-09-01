@@ -25,7 +25,15 @@ import {
 	archivePage,
 	togglePagePublicStatus,
 } from "./functions/mutations.server";
-import { getSanitizedUserWithPages } from "./functions/queries.server";
+import { getSanitizedUserWithPages, getPageById } from "./functions/queries.server";
+import type { MetaFunction } from "@remix-run/react";
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+	if (!data) {
+		return [{ title: "Profile" }];
+	}
+	return [{ title: data.sanitizedUserWithPages.displayName }];
+};
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const { userName } = params;
@@ -46,6 +54,9 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
+	const currentUser = await authenticator.isAuthenticated(request, {
+		failureRedirect: "/login",
+	});
 	const formData = await request.formData();
 	const intent = formData.get("intent");
 	const pageId = formData.get("pageId");
@@ -53,7 +64,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	if (!pageId) {
 		return { error: "Page ID is required" };
 	}
-
+	const page = await getPageById(Number(pageId));
+	if (!page) {
+		return { error: "Page not found" };
+	}
+	if (page.userId !== currentUser.id) {
+		return { error: "Unauthorized" };
+	}
 	switch (intent) {
 		case "togglePublish":
 			return await togglePagePublicStatus(Number(pageId));

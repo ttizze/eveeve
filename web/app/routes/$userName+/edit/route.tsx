@@ -20,6 +20,11 @@ import { authenticator, sanitizeUser } from "~/utils/auth.server";
 import { commitSession, getSession } from "~/utils/session.server";
 import { updateUser } from "./functions/mutations.server";
 import { getUserByUserName } from "./functions/queries.server";
+import type { MetaFunction } from "@remix-run/react";
+
+export const meta: MetaFunction = () => {
+	return [{ title: "Edit Profile" }];
+};
 
 const schema = z.object({
 	displayName: z
