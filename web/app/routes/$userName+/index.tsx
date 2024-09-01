@@ -4,6 +4,7 @@ import { useLoaderData } from "@remix-run/react";
 import { Link } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
 import { useNavigate } from "@remix-run/react";
+import type { MetaFunction } from "@remix-run/react";
 import Linkify from "linkify-react";
 import { Lock, MoreVertical, Settings } from "lucide-react";
 import { Button } from "~/components/ui/button";
@@ -25,8 +26,10 @@ import {
 	archivePage,
 	togglePagePublicStatus,
 } from "./functions/mutations.server";
-import { getSanitizedUserWithPages, getPageById } from "./functions/queries.server";
-import type { MetaFunction } from "@remix-run/react";
+import {
+	getPageById,
+	getSanitizedUserWithPages,
+} from "./functions/queries.server";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	if (!data) {

@@ -8,6 +8,7 @@ import {
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link, useNavigation } from "@remix-run/react";
+import type { MetaFunction } from "@remix-run/react";
 import { ArrowLeft, ArrowUpFromLine, Check, Key, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
@@ -20,7 +21,6 @@ import { authenticator, sanitizeUser } from "~/utils/auth.server";
 import { commitSession, getSession } from "~/utils/session.server";
 import { updateUser } from "./functions/mutations.server";
 import { getUserByUserName } from "./functions/queries.server";
-import type { MetaFunction } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
 	return [{ title: "Edit Profile" }];
