@@ -101,7 +101,7 @@ export default function Index() {
 						/>
 					</span>
 
-					<div className="mb-12 flex justify-center">
+					<div className="mb-12 flex justify-center mt-10">
 						<Form method="POST">
 							<Button type="submit" variant="default" size="lg">
 								<LogIn className="w-48 " />

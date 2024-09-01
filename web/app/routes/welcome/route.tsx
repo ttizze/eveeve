@@ -102,7 +102,7 @@ export default function Welcome() {
 			<Card className="w-[350px] mx-auto">
 				<CardHeader>
 					<CardTitle className="flex items-center justify-center">
-						Set your name
+						Welcome to eveeve
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
