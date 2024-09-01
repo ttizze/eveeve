@@ -42,29 +42,25 @@ export function Header({ currentUser }: HeaderProps) {
 					<h1 className="text-2xl font-bold">EveEve</h1>
 				</Link>
 				<div className="grid grid-cols-3 gap-0 items-center">
-					<Button variant="ghost" type="button">
-						<Link
-							to="/search"
-							className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white justify-self-start"
-						>
-							<Search className="w-6 h-6" />
-						</Link>
-					</Button>
+					<Link
+						to="/search"
+						className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white justify-self-center"
+					>
+						<Search className="w-6 h-6" />
+					</Link>
 					{currentUser ? (
 						<>
-							<Button
+							<Link
+								prefetch="render"
+								to={`/${currentUser.userName}`}
 								className="col-span-1 justify-self-center"
-								type="button"
-								variant="ghost"
 							>
-								<Link prefetch="render" to={`/${currentUser.userName}`}>
-									<img
-										src={currentUser.icon}
-										alt={currentUser.displayName}
-										className="w-6 h-6 rounded-full"
-									/>
-								</Link>
-							</Button>
+								<img
+									src={currentUser.icon}
+									alt={currentUser.displayName}
+									className="w-6 h-6 rounded-full"
+								/>
+							</Link>
 							<div className="col-span-1">
 								<NewPageButton userName={currentUser.userName} />
 							</div>
