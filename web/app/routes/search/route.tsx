@@ -5,12 +5,17 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useActionData, useNavigation } from "@remix-run/react";
 import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
+import type { MetaFunction } from "@remix-run/react";
 import { typedjson } from "remix-typedjson";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { authenticator } from "~/utils/auth.server";
 import { searchTitle } from "./functions/queries.server";
+
+export const meta: MetaFunction = () => {
+	return [{ title: "Search" }, { name: "robots", content: "noindex" }];
+};
 
 const schema = z.object({
 	query: z.string().min(1, "Search query is required"),

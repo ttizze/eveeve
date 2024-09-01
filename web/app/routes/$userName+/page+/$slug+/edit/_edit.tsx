@@ -3,6 +3,7 @@ import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
+import type { MetaFunction } from "@remix-run/react";
 import { useCallback } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import { useDebouncedCallback } from "use-debounce";
@@ -22,6 +23,13 @@ import { addSourceTextIdToContent } from "./utils/addSourceTextIdToContent";
 import { extractTextElementInfo } from "./utils/extractTextElementInfo";
 import { getPageSourceLanguage } from "./utils/getPageSourceLanguage";
 import { removeSourceTextIdDuplicates } from "./utils/removeSourceTextIdDuplicates";
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+	if (!data) {
+		return [{ title: "Edit Page" }];
+	}
+	return [{ title: `Edit ${data.page?.title}` }];
+};
 
 const schema = z.object({
 	title: z.string().min(1, "Required"),
