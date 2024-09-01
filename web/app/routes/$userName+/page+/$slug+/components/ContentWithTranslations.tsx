@@ -6,12 +6,16 @@ import { Loader2, Lock, SquarePen } from "lucide-react";
 import { memo, useMemo } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
 import { Button } from "~/components/ui/button";
-import type { PageWithTranslations } from "../types";
+import type {
+	PageWithTranslations,
+	SourceTextWithTranslations,
+} from "../types";
 import { TranslateButton } from "./TranslateButton";
 import { TranslationSection } from "./TranslationSection";
 
 interface ContentWithTranslationsProps {
 	pageWithTranslations: PageWithTranslations;
+	sourceTitle: SourceTextWithTranslations | null;
 	currentUserName: string | null;
 	hasGeminiApiKey: boolean;
 	userAITranslationInfo: UserAITranslationInfo | null;
@@ -20,6 +24,7 @@ interface ContentWithTranslationsProps {
 
 export const ContentWithTranslations = memo(function ContentWithTranslations({
 	pageWithTranslations,
+	sourceTitle,
 	currentUserName,
 	hasGeminiApiKey,
 	userAITranslationInfo,
@@ -29,20 +34,6 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 	const localCreatedAt = isHydrated
 		? pageWithTranslations.createdAt.toLocaleString()
 		: pageWithTranslations.createdAt.toISOString();
-	const bestTranslationTitle = useMemo(() => {
-		const sourceTextWithTranslations =
-			pageWithTranslations.sourceTextWithTranslations.find(
-				(sourceTextWithTranslation) =>
-					sourceTextWithTranslation.sourceText.number === 0,
-			);
-		if (
-			sourceTextWithTranslations &&
-			sourceTextWithTranslations?.translationsWithVotes.length > 0
-		) {
-			return sourceTextWithTranslations;
-		}
-		return null;
-	}, [pageWithTranslations.sourceTextWithTranslations]);
 
 	const parsedContent = useMemo(() => {
 		if (isHydrated) {
@@ -128,11 +119,11 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 					)}
 					{pageWithTranslations.title}
 				</div>
-				{bestTranslationTitle && (
+				{sourceTitle && (
 					<TranslationSection
-						translationsWithVotes={bestTranslationTitle.translationsWithVotes}
+						translationsWithVotes={sourceTitle.translationsWithVotes}
 						currentUserName={currentUserName}
-						sourceTextId={bestTranslationTitle.sourceText.id}
+						sourceTextId={sourceTitle.sourceText.id}
 					/>
 				)}
 			</h1>
