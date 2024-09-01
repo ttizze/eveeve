@@ -140,7 +140,7 @@ export default function EditPage() {
 					initialIsPublished={page?.isPublished}
 					fetcher={fetcher}
 				/>
-				<div className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg mt-32 mx-auto">
+				<div className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg mt-2 md:mt-20 mx-auto">
 					<div className="mt-10 h-auto">
 						<h1 className="text-4xl font-bold !mb-0 h-auto">
 							<TextareaAutosize
