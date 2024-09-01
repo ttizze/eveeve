@@ -50,7 +50,7 @@ export function EditHeader({
 	}, [fetcher.state, showSuccess]);
 
 	return (
-		<header className="mb-10 z-10 bg-background">
+		<header className="z-10 bg-background">
 			<div className="grid grid-cols-3 items-center">
 				<div className="justify-self-start">
 					<Link
