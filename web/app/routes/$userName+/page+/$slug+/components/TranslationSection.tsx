@@ -2,9 +2,9 @@ import { MoreVertical, X } from "lucide-react";
 import { Languages, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
-import { getBestTranslation } from "../lib/get-best-translation";
-import { sanitizeAndParseText } from "../lib/sanitize-and-parse-text.client";
 import type { TranslationWithVote } from "../types";
+import { getBestTranslation } from "../utils/get-best-translation";
+import { sanitizeAndParseText } from "../utils/sanitize-and-parse-text.client";
 import { AddAndVoteTranslations } from "./AddAndVoteTranslations";
 
 interface TranslationSectionProps {
