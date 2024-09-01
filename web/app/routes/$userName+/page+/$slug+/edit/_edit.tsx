@@ -108,7 +108,6 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function EditPage() {
 	const { currentUser, page } = useLoaderData<typeof loader>();
 	const fetcher = useFetcher<typeof action>();
-
 	const [form, fields] = useForm({
 		id: "edit-page",
 		lastResult: fetcher.data?.lastResult,
@@ -125,13 +124,12 @@ export default function EditPage() {
 		formData.set("title", fields.title.value as string);
 		formData.set("pageContent", fields.pageContent.value as string);
 		formData.set("isPublished", fields.isPublished.value as string);
-
 		if (fetcher.state !== "submitting") {
 			fetcher.submit(formData, { method: "post" });
 		}
 	}, [fetcher, fields]);
 
-	const debouncedAutoSave = useDebouncedCallback(handleAutoSave, 1000);
+	const debouncedAutoSave = useDebouncedCallback(handleAutoSave, 3000);
 
 	return (
 		<div>

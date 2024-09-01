@@ -12,8 +12,8 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { sanitizeAndParseText } from "~/routes/$userName+/page+/$slug+/lib/sanitize-and-parse-text.client";
 import type { TranslationWithVote } from "~/routes/$userName+/page+/$slug+/types";
+import { sanitizeAndParseText } from "~/routes/$userName+/page+/$slug+/utils/sanitize-and-parse-text.client";
 import { authenticator } from "~/utils/auth.server";
 import { deleteOwnTranslation } from "./functions/mutations.server";
 import { VoteButtons } from "./vote-buttons";
@@ -61,7 +61,7 @@ export function TranslationListItem({
 	};
 
 	return (
-		<div className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800">
+		<div className="px-3 mt-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800">
 			{isOwner && (
 				<div className="justify-end flex mr-2">
 					<DropdownMenu modal={false}>

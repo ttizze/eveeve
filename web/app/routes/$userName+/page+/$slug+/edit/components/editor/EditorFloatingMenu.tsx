@@ -36,7 +36,6 @@ export function EditorFloatingMenu({ editor }: EditorFloatingMenuProps) {
 						type="button"
 						onClick={() => document.getElementById("imageUpload")?.click()}
 						className="w-full h-full p-0"
-            area-Label="Upload image"
 					>
 						<ImageIcon className="w-full h-full opacity-50" />
 					</Button>

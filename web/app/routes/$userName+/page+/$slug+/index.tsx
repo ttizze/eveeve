@@ -1,8 +1,8 @@
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import type { MetaFunction } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
+import type { MetaFunction } from "@remix-run/react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import i18nServer from "~/i18n.server";
@@ -10,6 +10,7 @@ import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server
 import { authenticator } from "~/utils/auth.server";
 import { stripHtmlTags } from "../../utils/stripHtmlTags";
 import { ContentWithTranslations } from "./components/ContentWithTranslations";
+import { ShareDialog } from "./components/ShareDialog";
 import { createUserAITranslationInfo } from "./functions/mutations.server";
 import {
 	fetchLatestUserAITranslationInfo,
@@ -17,14 +18,20 @@ import {
 	fetchPageWithTranslations,
 } from "./functions/queries.server";
 import { actionSchema } from "./types";
+import { getBestTranslation } from "./utils/get-best-translation";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	if (!data) {
 		return [{ title: "Page Not Found" }];
 	}
 
-	const { pageWithTranslations } = data;
-	const title = pageWithTranslations.title;
+	let title: string;
+	const { pageWithTranslations, bestTranslationTitle } = data;
+	if (bestTranslationTitle) {
+		title = bestTranslationTitle.text;
+	} else {
+		title = pageWithTranslations.title;
+	}
 	const description = stripHtmlTags(pageWithTranslations.content).slice(0, 200);
 	const imageUrl = pageWithTranslations.user.icon;
 
@@ -71,6 +78,20 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	if (!isOwner && !pageWithTranslations.isPublished) {
 		throw new Response("Page not found", { status: 404 });
 	}
+	const sourceTitle = pageWithTranslations.sourceTextWithTranslations
+		.filter((item) => item.sourceText?.number === 0)
+		.sort((a, b) => {
+			if (a.sourceText && b.sourceText) {
+				return (
+					new Date(b.sourceText.createdAt).getTime() -
+					new Date(a.sourceText.createdAt).getTime()
+				);
+			}
+			return 0;
+		})[0];
+	const bestTranslationTitle = getBestTranslation(
+		sourceTitle.translationsWithVotes,
+	);
 	const userAITranslationInfo = await fetchLatestUserAITranslationInfo(
 		pageWithTranslations.id,
 		nonSanitizedUser?.id ?? 0,
@@ -82,6 +103,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		currentUser,
 		hasGeminiApiKey,
 		userAITranslationInfo,
+		sourceTitle,
+		bestTranslationTitle,
 	});
 };
 
@@ -163,6 +186,7 @@ export default function ReaderView() {
 		currentUser,
 		hasGeminiApiKey,
 		userAITranslationInfo,
+		sourceTitle,
 		targetLanguage,
 	} = useTypedLoaderData<typeof loader>();
 	const actionData = useActionData<typeof action>();
@@ -170,17 +194,24 @@ export default function ReaderView() {
 		lastResult: actionData?.lastResult,
 	});
 
+	const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+	const title = pageWithTranslations.title;
+
 	return (
 		<div className=" w-full max-w-3xl  mx-auto">
 			<article className="w-full prose dark:prose-invert sm:prose lg:prose-lg mx-auto mb-20">
 				<ContentWithTranslations
 					pageWithTranslations={pageWithTranslations}
+					sourceTitle={sourceTitle}
 					currentUserName={currentUser?.userName ?? null}
 					hasGeminiApiKey={hasGeminiApiKey}
 					userAITranslationInfo={userAITranslationInfo}
 					targetLanguage={targetLanguage}
 				/>
 			</article>
+			<div className="flex justify-center space-x-4 mt-8">
+				<ShareDialog url={shareUrl} title={title} />
+			</div>
 		</div>
 	);
 }

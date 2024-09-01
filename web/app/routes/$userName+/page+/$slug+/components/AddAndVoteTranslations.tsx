@@ -4,7 +4,6 @@ import { Button } from "~/components/ui/button";
 import { AddTranslationForm } from "~/routes/resources+/add-translation-form";
 import { TranslationListItem } from "~/routes/resources+/translation-list-item";
 import type { TranslationWithVote } from "../types";
-import { AlternativeTranslations } from "./AlternativeTranslations";
 
 const INITIAL_DISPLAY_COUNT = 3;
 
@@ -45,10 +44,13 @@ export function AddAndVoteTranslations({
 				<p className="text-gray-500 flex items-center justify-end mr-2 my-4">
 					<ArrowUpDown size={16} />
 				</p>
-				<AlternativeTranslations
-					translationsWithVotes={displayedTranslations}
-					currentUserName={currentUserName}
-				/>
+				{displayedTranslations.map((displayedTranslation) => (
+					<TranslationListItem
+						key={displayedTranslation.id}
+						translation={displayedTranslation}
+						currentUserName={currentUserName}
+					/>
+				))}
 				{hasMoreTranslations && (
 					<Button
 						variant="link"

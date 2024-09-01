@@ -46,7 +46,6 @@ export async function fetchPageWithTranslations(
 			isPublished: true,
 			isArchived: true,
 			sourceTexts: {
-				distinct: ["number"],
 				orderBy: { createdAt: "desc" },
 				select: {
 					id: true,
