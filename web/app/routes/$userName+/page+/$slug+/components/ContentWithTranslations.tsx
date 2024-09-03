@@ -1,7 +1,11 @@
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import DOMPurify from "dompurify";
-import parse from "html-react-parser";
+import parse, {
+	domToReact,
+	type HTMLReactParserOptions,
+	type DOMNode,
+} from "html-react-parser";
 import { Loader2, Lock, SquarePen } from "lucide-react";
 import { memo, useMemo } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
@@ -58,16 +62,12 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 				) as string;
 				const sourceTextWrapper = document.createElement("span");
 				sourceTextWrapper.classList.add("inline-block", "px-4");
-				sourceTextWrapper.innerHTML = element.innerHTML;
-				element.innerHTML = "";
+				sourceTextWrapper.setAttribute("data-translation-id", sourceTextId);
 				element.appendChild(sourceTextWrapper);
-				const translationElement = document.createElement("span");
-				translationElement.setAttribute("data-translation-id", sourceTextId);
-				element.appendChild(translationElement);
 			}
 		}
 
-		return parse(doc.body.innerHTML, {
+		const options: HTMLReactParserOptions = {
 			replace: (domNode) => {
 				if (domNode.type === "tag" && domNode.attribs["data-translation-id"]) {
 					const sourceTextId = Number(domNode.attribs["data-translation-id"]);
@@ -76,21 +76,40 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 							(info) => info.sourceText.id === sourceTextId,
 						);
 					return (
-						<MemoizedTranslationSection
-							key={`translation-${sourceTextId}`}
-							translationsWithVotes={
-								sourceTextWithTranslations?.translationsWithVotes
-							}
-							currentUserName={currentUserName}
-							sourceTextId={sourceTextId}
-							sourceLanguage={pageWithTranslations.sourceLanguage}
-							targetLanguage={targetLanguage}
+						<>
+							{domToReact(domNode.children as DOMNode[], options)}
+							<MemoizedTranslationSection
+								key={`translation-${sourceTextId}`}
+								translationsWithVotes={
+									sourceTextWithTranslations?.translationsWithVotes
+								}
+								currentUserName={currentUserName}
+								sourceTextId={sourceTextId}
+								sourceLanguage={pageWithTranslations.sourceLanguage}
+								targetLanguage={targetLanguage}
+							/>
+						</>
+					);
+				}
+				if (domNode.type === "tag" && domNode.name === "img") {
+					const { src, alt, width, height, ...otherAttribs } = domNode.attribs;
+					return (
+						//otherAttribs がbiomeのlintに引っかかる
+						// biome-ignore lint/a11y/useAltText: <explanation>
+						<img
+							src={src}
+							alt={alt || ""}
+							width={width || "100%"}
+							height={height || "auto"}
+							className="aspect-ratio-img"
+							{...otherAttribs}
 						/>
 					);
 				}
 				return domNode;
 			},
-		});
+		};
+		return parse(doc.body.innerHTML, options);
 	}, [
 		pageWithTranslations.content,
 		pageWithTranslations.sourceTextWithTranslations,
