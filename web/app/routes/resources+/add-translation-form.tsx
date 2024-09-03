@@ -48,7 +48,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 interface AddTranslationFormProps {
 	sourceTextId: number;
-	currentUserName: string | null;
+	currentUserName: string | undefined;
 }
 
 export function AddTranslationForm({

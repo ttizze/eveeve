@@ -39,7 +39,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 interface VoteButtonsProps {
 	translationWithVote: TranslationWithVote;
-	currentUserName: string | null;
+	currentUserName: string | undefined;
 }
 
 export const VoteButtons = memo(function VoteButtons({

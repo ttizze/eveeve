@@ -1,6 +1,6 @@
 import { MoreVertical, X } from "lucide-react";
 import { Languages, Plus } from "lucide-react";
-import { useMemo, useState } from "react";
+import { memo, useState } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
 import type { TranslationWithVote } from "../types";
 import { getBestTranslation } from "../utils/get-best-translation";
@@ -8,9 +8,11 @@ import { sanitizeAndParseText } from "../utils/sanitize-and-parse-text.client";
 import { AddAndVoteTranslations } from "./AddAndVoteTranslations";
 
 interface TranslationSectionProps {
-	translationsWithVotes: TranslationWithVote[];
-	currentUserName: string | null;
+	translationsWithVotes: TranslationWithVote[] | undefined;
+	currentUserName: string | undefined;
 	sourceTextId: number;
+	sourceLanguage: string;
+	targetLanguage: string;
 }
 
 function ToggleButton({
@@ -39,40 +41,34 @@ export function TranslationSection({
 	translationsWithVotes,
 	currentUserName,
 	sourceTextId,
+	sourceLanguage,
+	targetLanguage,
 }: TranslationSectionProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const isHydrated = useHydrated();
-	const bestTranslationWithVote = useMemo(
-		() =>
-			translationsWithVotes.length > 0
-				? getBestTranslation(translationsWithVotes)
-				: null,
-		[translationsWithVotes],
-	);
 
-	const alternativeTranslationsWithVotes = useMemo(
-		() =>
-			bestTranslationWithVote
-				? translationsWithVotes.filter(
-						(t) => t.id !== bestTranslationWithVote.id,
-					)
-				: [],
-		[translationsWithVotes, bestTranslationWithVote],
-	);
+	if (!translationsWithVotes || sourceLanguage === targetLanguage) {
+		return null;
+	}
 
-	const sanitizedAndParsedText = useMemo(() => {
-		if (!bestTranslationWithVote)
-			return (
-				<span className="flex items-center gap-2">
-					<Plus size={24} />
-					<Languages size={24} />
-				</span>
-			);
-		if (isHydrated) {
-			return sanitizeAndParseText(bestTranslationWithVote.text);
-		}
-		return bestTranslationWithVote.text;
-	}, [bestTranslationWithVote, isHydrated]);
+	const bestTranslationWithVote = getBestTranslation(translationsWithVotes);
+
+	const alternativeTranslationsWithVotes = bestTranslationWithVote
+		? translationsWithVotes.filter((t) => t.id !== bestTranslationWithVote.id)
+		: [];
+
+	const sanitizedAndParsedText = bestTranslationWithVote ? (
+		isHydrated ? (
+			sanitizeAndParseText(bestTranslationWithVote.text)
+		) : (
+			bestTranslationWithVote.text
+		)
+	) : (
+		<span className="flex items-center gap-2">
+			<Plus size={24} />
+			<Languages size={24} />
+		</span>
+	);
 
 	return (
 		<span className="group relative block rounded-md  bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 ">
@@ -104,3 +100,5 @@ export function TranslationSection({
 		</span>
 	);
 }
+
+export const MemoizedTranslationSection = memo(TranslationSection);

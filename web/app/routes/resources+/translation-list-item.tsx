@@ -41,7 +41,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 interface TranslationItemProps {
 	translation: TranslationWithVote;
-	currentUserName: string | null;
+	currentUserName: string | undefined;
 	showAuthor?: boolean;
 }
 

@@ -11,12 +11,12 @@ import type {
 	SourceTextWithTranslations,
 } from "../types";
 import { TranslateButton } from "./TranslateButton";
-import { TranslationSection } from "./TranslationSection";
+import { MemoizedTranslationSection } from "./TranslationSection";
 
 interface ContentWithTranslationsProps {
 	pageWithTranslations: PageWithTranslations;
 	sourceTitle: SourceTextWithTranslations | null;
-	currentUserName: string | null;
+	currentUserName: string | undefined;
 	hasGeminiApiKey: boolean;
 	userAITranslationInfo: UserAITranslationInfo | null;
 	targetLanguage: string;
@@ -36,71 +36,61 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 		: pageWithTranslations.createdAt.toISOString();
 
 	const parsedContent = useMemo(() => {
-		if (isHydrated) {
-			const sanitizedContent = DOMPurify.sanitize(pageWithTranslations.content);
-			const doc = new DOMParser().parseFromString(
-				sanitizedContent,
-				"text/html",
+		if (!isHydrated) {
+			return (
+				<div className="w-full h-full flex items-center justify-center">
+					<Loader2 className="w-10 h-10 animate-spin" />
+				</div>
 			);
-
-			const elements = doc.querySelectorAll("[data-source-text-id]");
-			for (const element of elements) {
-				if (
-					element instanceof HTMLElement &&
-					element.getAttribute("data-source-text-id")
-				) {
-					const sourceTextId = element.getAttribute(
-						"data-source-text-id",
-					) as string;
-					const sourceTextWrapper = document.createElement("span");
-					sourceTextWrapper.classList.add("inline-block", "px-4");
-					sourceTextWrapper.innerHTML = element.innerHTML;
-					element.innerHTML = "";
-					element.appendChild(sourceTextWrapper);
-					const translationElement = document.createElement("span");
-					translationElement.setAttribute("data-translation-id", sourceTextId);
-					element.appendChild(translationElement);
-				}
-			}
-
-			return parse(doc.body.innerHTML, {
-				replace: (domNode) => {
-					if (
-						domNode.type === "tag" &&
-						domNode.attribs["data-translation-id"]
-					) {
-						const sourceTextId = Number(domNode.attribs["data-translation-id"]);
-						const sourceTextWithTranslations =
-							pageWithTranslations.sourceTextWithTranslations.find(
-								(info) => info.sourceText.id === sourceTextId,
-							);
-						// sourceLanguageがtargetLanguageと異なる場合は翻訳が存在しない場合でも表示する
-						if (
-							sourceTextWithTranslations &&
-							(sourceTextWithTranslations.translationsWithVotes.length > 0 ||
-								pageWithTranslations.sourceLanguage !== targetLanguage)
-						) {
-							return (
-								<TranslationSection
-									key={`translation-${sourceTextId}`}
-									translationsWithVotes={
-										sourceTextWithTranslations.translationsWithVotes
-									}
-									currentUserName={currentUserName}
-									sourceTextId={sourceTextId}
-								/>
-							);
-						}
-					}
-					return domNode;
-				},
-			});
 		}
-		return (
-			<div className="w-full h-full flex items-center justify-center">
-				<Loader2 className="w-10 h-10 animate-spin" />
-			</div>
-		);
+
+		const sanitizedContent = DOMPurify.sanitize(pageWithTranslations.content);
+		const doc = new DOMParser().parseFromString(sanitizedContent, "text/html");
+
+		const elements = doc.querySelectorAll("[data-source-text-id]");
+		for (const element of elements) {
+			if (
+				element instanceof HTMLElement &&
+				element.getAttribute("data-source-text-id")
+			) {
+				const sourceTextId = element.getAttribute(
+					"data-source-text-id",
+				) as string;
+				const sourceTextWrapper = document.createElement("span");
+				sourceTextWrapper.classList.add("inline-block", "px-4");
+				sourceTextWrapper.innerHTML = element.innerHTML;
+				element.innerHTML = "";
+				element.appendChild(sourceTextWrapper);
+				const translationElement = document.createElement("span");
+				translationElement.setAttribute("data-translation-id", sourceTextId);
+				element.appendChild(translationElement);
+			}
+		}
+
+		return parse(doc.body.innerHTML, {
+			replace: (domNode) => {
+				if (domNode.type === "tag" && domNode.attribs["data-translation-id"]) {
+					const sourceTextId = Number(domNode.attribs["data-translation-id"]);
+					const sourceTextWithTranslations =
+						pageWithTranslations.sourceTextWithTranslations.find(
+							(info) => info.sourceText.id === sourceTextId,
+						);
+					return (
+						<MemoizedTranslationSection
+							key={`translation-${sourceTextId}`}
+							translationsWithVotes={
+								sourceTextWithTranslations?.translationsWithVotes
+							}
+							currentUserName={currentUserName}
+							sourceTextId={sourceTextId}
+							sourceLanguage={pageWithTranslations.sourceLanguage}
+							targetLanguage={targetLanguage}
+						/>
+					);
+				}
+				return domNode;
+			},
+		});
 	}, [
 		pageWithTranslations.content,
 		pageWithTranslations.sourceTextWithTranslations,
@@ -117,13 +107,15 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 					{!pageWithTranslations.isPublished && (
 						<Lock className="h-6 w-6 mr-1 inline" />
 					)}
-					{pageWithTranslations.title}
+					{sourceTitle?.sourceText.text}
 				</div>
 				{sourceTitle && (
-					<TranslationSection
+					<MemoizedTranslationSection
 						translationsWithVotes={sourceTitle.translationsWithVotes}
 						currentUserName={currentUserName}
 						sourceTextId={sourceTitle.sourceText.id}
+						sourceLanguage={pageWithTranslations.sourceLanguage}
+						targetLanguage={targetLanguage}
 					/>
 				)}
 			</h1>

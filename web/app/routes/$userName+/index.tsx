@@ -197,17 +197,12 @@ export default function UserProfile() {
 							className="h-full"
 						>
 							<CardHeader>
-								<CardTitle className="line-clamp-2 flex items-center">
+								<CardTitle className="flex items-center pr-3 break-all overflow-wrap-anywhere">
 									{page.isPublished ? "" : <Lock className="h-4 w-4 mr-2" />}
 									{page.title}
 								</CardTitle>
 								<CardDescription>{pageCreatedAt}</CardDescription>
 							</CardHeader>
-							<CardContent className="flex-grow overflow-hidden px-4">
-								<p className="text-sm text-gray-600 line-clamp-4 break-all overflow-wrap-anywhere hyphens-auto">
-									{page.content}
-								</p>
-							</CardContent>
 						</Link>
 					</Card>
 				))}
