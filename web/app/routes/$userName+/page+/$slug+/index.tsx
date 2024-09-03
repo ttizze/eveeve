@@ -25,13 +25,8 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 		return [{ title: "Page Not Found" }];
 	}
 
-	let title: string;
-	const { pageWithTranslations, bestTranslationTitle } = data;
-	if (bestTranslationTitle) {
-		title = bestTranslationTitle.text;
-	} else {
-		title = pageWithTranslations.title;
-	}
+	const { pageWithTranslations, title } = data;
+
 	const description = stripHtmlTags(pageWithTranslations.content).slice(0, 200);
 	const imageUrl = pageWithTranslations.user.icon;
 
@@ -97,6 +92,9 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		nonSanitizedUser?.id ?? 0,
 		targetLanguage,
 	);
+	const title = bestTranslationTitle
+		? `${sourceTitle.sourceText.text} - ${bestTranslationTitle.text}`
+		: sourceTitle.sourceText.text;
 	return typedjson({
 		targetLanguage,
 		pageWithTranslations,
@@ -104,7 +102,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		hasGeminiApiKey,
 		userAITranslationInfo,
 		sourceTitle,
-		bestTranslationTitle,
+		title,
 	});
 };
 
@@ -180,13 +178,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	}
 };
 
-export default function ReaderView() {
+export default function Page() {
 	const {
 		pageWithTranslations,
 		currentUser,
 		hasGeminiApiKey,
 		userAITranslationInfo,
 		sourceTitle,
+		title,
 		targetLanguage,
 	} = useTypedLoaderData<typeof loader>();
 	const actionData = useActionData<typeof action>();
@@ -195,7 +194,6 @@ export default function ReaderView() {
 	});
 
 	const shareUrl = typeof window !== "undefined" ? window.location.href : "";
-	const title = pageWithTranslations.title;
 
 	return (
 		<div className=" w-full max-w-3xl  mx-auto">
@@ -203,7 +201,7 @@ export default function ReaderView() {
 				<ContentWithTranslations
 					pageWithTranslations={pageWithTranslations}
 					sourceTitle={sourceTitle}
-					currentUserName={currentUser?.userName ?? null}
+					currentUserName={currentUser?.userName}
 					hasGeminiApiKey={hasGeminiApiKey}
 					userAITranslationInfo={userAITranslationInfo}
 					targetLanguage={targetLanguage}

@@ -15,7 +15,7 @@ export function AddAndVoteTranslations({
 }: {
 	bestTranslationWithVote: TranslationWithVote | null;
 	alternativeTranslationsWithVotes: TranslationWithVote[];
-	currentUserName: string | null;
+	currentUserName: string | undefined;
 	sourceTextId: number;
 }) {
 	const [showAll, setShowAll] = useState(false);

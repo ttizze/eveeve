@@ -1,8 +1,6 @@
-import type { Page } from "@prisma/client";
 import { sanitizeUser } from "~/utils/auth.server";
 import { prisma } from "~/utils/prisma";
-import type { sanitizedUserWithPages } from "../types";
-import { stripHtmlTags } from "../utils/stripHtmlTags";
+import type { PageListItem, sanitizedUserWithPages } from "../types";
 
 export async function getSanitizedUserWithPages(
 	userName: string,
@@ -12,6 +10,13 @@ export async function getSanitizedUserWithPages(
 		where: { userName },
 		include: {
 			pages: {
+				select: {
+					id: true,
+					title: true,
+					slug: true,
+					isPublished: true,
+					createdAt: true,
+				},
 				where: {
 					isArchived: false,
 					...(isOwnProfile ? {} : { isPublished: true }),
@@ -23,9 +28,8 @@ export async function getSanitizedUserWithPages(
 
 	if (!user) return null;
 
-	const pages: Page[] = user.pages.map((page) => ({
+	const pages: PageListItem[] = user.pages.map((page) => ({
 		...page,
-		content: stripHtmlTags(page.content).slice(0, 200),
 	}));
 	return {
 		...sanitizeUser(user),
