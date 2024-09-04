@@ -21,18 +21,18 @@ export const handle: SEOHandle = {
 	getSitemapEntries: async (request: Request) => {
 		const [pages, users] = await Promise.all([
 			fetchAllPublishedPages(),
-    fetchAllUsersName()
-  ]);
+			fetchAllUsersName(),
+		]);
 
-  const pageEntries = pages.map((page) => ({
-    route: `/${page.user.userName}/page/${page.slug}`,
-    lastmod: page.updatedAt.toISOString(),
-  }));
+		const pageEntries = pages.map((page) => ({
+			route: `/${page.user.userName}/page/${page.slug}`,
+			lastmod: page.updatedAt.toISOString(),
+		}));
 
-  const userEntries = users.map((user) => ({
-    route: `/${user.userName}`,
-    lastmod: user.updatedAt.toISOString(),
-  }));
+		const userEntries = users.map((user) => ({
+			route: `/${user.userName}`,
+			lastmod: user.updatedAt.toISOString(),
+		}));
 
 		return [...pageEntries, ...userEntries];
 	},
