@@ -1,5 +1,6 @@
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
+import type { SEOHandle } from "@nasa-gcn/remix-seo";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
@@ -13,6 +14,7 @@ import { ContentWithTranslations } from "./components/ContentWithTranslations";
 import { ShareDialog } from "./components/ShareDialog";
 import { createUserAITranslationInfo } from "./functions/mutations.server";
 import {
+	fetchAllPublishedPages,
 	fetchLatestUserAITranslationInfo,
 	fetchPageWithSourceTexts,
 	fetchPageWithTranslations,
@@ -44,6 +46,16 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	];
 };
 
+export const handle: SEOHandle = {
+	getSitemapEntries: async () => {
+		const pages = await fetchAllPublishedPages();
+		return pages.map((page) => ({
+			route: `/${page.user.userName}/page/${page.slug}`,
+			priority: 0.6,
+			lastmod: page.updatedAt.toISOString(),
+		}));
+	},
+};
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const { slug } = params;
 

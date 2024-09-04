@@ -1,3 +1,4 @@
+import type { SEOHandle } from "@nasa-gcn/remix-seo";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
@@ -27,8 +28,9 @@ import {
 	togglePagePublicStatus,
 } from "./functions/mutations.server";
 import {
-	getPageById,
-	getSanitizedUserWithPages,
+	fetchAllUsersName,
+	fetchPageById,
+	fetchSanitizedUserWithPages,
 } from "./functions/queries.server";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -37,14 +39,23 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	}
 	return [{ title: data.sanitizedUserWithPages.displayName }];
 };
-
+export const handle: SEOHandle = {
+	getSitemapEntries: async () => {
+		const users = await fetchAllUsersName();
+		return users.map((user) => ({
+			route: `/${user.userName}`,
+			priority: 0.8,
+			lastmod: user.updatedAt.toISOString(),
+		}));
+	},
+};
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const { userName } = params;
 	if (!userName) throw new Error("Username is required");
 	const currentUser = await authenticator.isAuthenticated(request);
 	const isOwner = currentUser?.userName === userName;
 
-	const sanitizedUserWithPages = await getSanitizedUserWithPages(
+	const sanitizedUserWithPages = await fetchSanitizedUserWithPages(
 		userName,
 		isOwner,
 	);
@@ -67,7 +78,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	if (!pageId) {
 		return { error: "Page ID is required" };
 	}
-	const page = await getPageById(Number(pageId));
+	const page = await fetchPageById(Number(pageId));
 	if (!page) {
 		return { error: "Page not found" };
 	}
