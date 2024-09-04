@@ -1,4 +1,3 @@
-import type { SEOHandle } from "@nasa-gcn/remix-seo";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
@@ -28,7 +27,6 @@ import {
 	togglePagePublicStatus,
 } from "./functions/mutations.server";
 import {
-	fetchAllUsersName,
 	fetchPageById,
 	fetchSanitizedUserWithPages,
 } from "./functions/queries.server";
@@ -39,16 +37,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	}
 	return [{ title: data.sanitizedUserWithPages.displayName }];
 };
-export const handle: SEOHandle = {
-	getSitemapEntries: async () => {
-		const users = await fetchAllUsersName();
-		return users.map((user) => ({
-			route: `/${user.userName}`,
-			priority: 0.8,
-			lastmod: user.updatedAt.toISOString(),
-		}));
-	},
-};
+
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const { userName } = params;
 	if (!userName) throw new Error("Username is required");

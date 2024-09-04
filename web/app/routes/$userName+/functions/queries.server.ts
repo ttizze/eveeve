@@ -42,12 +42,3 @@ export async function fetchPageById(pageId: number) {
 		where: { id: pageId },
 	});
 }
-
-export async function fetchAllUsersName() {
-	return prisma.user.findMany({
-		select: {
-			userName: true,
-			updatedAt: true,
-		},
-	});
-}

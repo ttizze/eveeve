@@ -8,3 +8,26 @@ export async function getNonSanitizedUserbyUserName(
 		where: { userName },
 	});
 }
+
+export async function fetchAllPublishedPages() {
+	return prisma.page.findMany({
+		where: { isPublished: true, isArchived: false },
+		select: {
+			id: true,
+			title: true,
+			slug: true,
+			createdAt: true,
+			updatedAt: true,
+			user: { select: { userName: true } },
+		},
+	});
+}
+
+export async function fetchAllUsersName() {
+	return prisma.user.findMany({
+		select: {
+			userName: true,
+			updatedAt: true,
+		},
+	});
+}
