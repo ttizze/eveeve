@@ -1,6 +1,6 @@
 import { useFetcher } from "@remix-run/react";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import {
 	Command,
@@ -30,23 +30,12 @@ export default function TargetLanguageSelector({
 
 	const [currentLanguage, setCurrentLanguage] = useState(targetLanguage);
 
-	const loadLanguage = useCallback(() => {
-		if (fetcher.state === "idle" && !fetcher.data) {
-			fetcher.load("/api/target-language");
-		} else if (fetcher.state === "idle" && fetcher.data?.targetLanguage) {
-			setCurrentLanguage(fetcher.data.targetLanguage);
-		}
-	}, [fetcher]);
-
-	useEffect(() => {
-		loadLanguage();
-	}, [loadLanguage]);
 	const handleLanguageChange = (value: string) => {
 		setCurrentLanguage(value);
 		setOpen(false);
 		fetcher.submit(
 			{ targetLanguage: value },
-			{ method: "post", action: "/api/target-language" },
+			{ method: "post", action: "/resources/api/target-language" },
 		);
 	};
 

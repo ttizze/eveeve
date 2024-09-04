@@ -73,19 +73,20 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	if (!isOwner && !pageWithTranslations.isPublished) {
 		throw new Response("Page not found", { status: 404 });
 	}
-	const sourceTitle = pageWithTranslations.sourceTextWithTranslations
-		.filter((item) => item.sourceText?.number === 0)
-		.sort((a, b) => {
-			if (a.sourceText && b.sourceText) {
-				return (
-					new Date(b.sourceText.createdAt).getTime() -
-					new Date(a.sourceText.createdAt).getTime()
-				);
-			}
-			return 0;
-		})[0];
+	const sourceTitleWithTranslations =
+		pageWithTranslations.sourceTextWithTranslations
+			.filter((item) => item.sourceText?.number === 0)
+			.sort((a, b) => {
+				if (a.sourceText && b.sourceText) {
+					return (
+						new Date(b.sourceText.createdAt).getTime() -
+						new Date(a.sourceText.createdAt).getTime()
+					);
+				}
+				return 0;
+			})[0];
 	const bestTranslationTitle = getBestTranslation(
-		sourceTitle.translationsWithVotes,
+		sourceTitleWithTranslations.translationsWithVotes,
 	);
 	const userAITranslationInfo = await fetchLatestUserAITranslationInfo(
 		pageWithTranslations.id,
@@ -93,15 +94,15 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		targetLanguage,
 	);
 	const title = bestTranslationTitle
-		? `${sourceTitle.sourceText.text} - ${bestTranslationTitle.text}`
-		: sourceTitle.sourceText.text;
+		? `${sourceTitleWithTranslations.sourceText.text} - ${bestTranslationTitle.text}`
+		: sourceTitleWithTranslations.sourceText.text;
 	return typedjson({
 		targetLanguage,
 		pageWithTranslations,
 		currentUser,
 		hasGeminiApiKey,
 		userAITranslationInfo,
-		sourceTitle,
+		sourceTitleWithTranslations,
 		title,
 	});
 };
@@ -184,7 +185,7 @@ export default function Page() {
 		currentUser,
 		hasGeminiApiKey,
 		userAITranslationInfo,
-		sourceTitle,
+		sourceTitleWithTranslations,
 		title,
 		targetLanguage,
 	} = useTypedLoaderData<typeof loader>();
@@ -200,7 +201,7 @@ export default function Page() {
 			<article className="w-full prose dark:prose-invert sm:prose lg:prose-lg mx-auto mb-20">
 				<ContentWithTranslations
 					pageWithTranslations={pageWithTranslations}
-					sourceTitle={sourceTitle}
+					sourceTitleWithTranslations={sourceTitleWithTranslations}
 					currentUserName={currentUser?.userName}
 					hasGeminiApiKey={hasGeminiApiKey}
 					userAITranslationInfo={userAITranslationInfo}

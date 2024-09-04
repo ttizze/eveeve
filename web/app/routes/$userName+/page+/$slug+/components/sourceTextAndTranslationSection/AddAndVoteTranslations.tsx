@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { AddTranslationForm } from "~/routes/resources+/add-translation-form";
 import { TranslationListItem } from "~/routes/resources+/translation-list-item";
-import type { TranslationWithVote } from "../types";
+import type { TranslationWithVote } from "../../types";
 
 const INITIAL_DISPLAY_COUNT = 3;
 

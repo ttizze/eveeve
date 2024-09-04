@@ -1,14 +1,14 @@
 import { MoreVertical, X } from "lucide-react";
 import { Languages, Plus } from "lucide-react";
-import { memo, useState } from "react";
+import { useState } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
-import type { TranslationWithVote } from "../types";
-import { getBestTranslation } from "../utils/get-best-translation";
-import { sanitizeAndParseText } from "../utils/sanitize-and-parse-text.client";
+import type { TranslationWithVote } from "../../types";
+import { getBestTranslation } from "../../utils/get-best-translation";
+import { sanitizeAndParseText } from "../../utils/sanitize-and-parse-text.client";
 import { AddAndVoteTranslations } from "./AddAndVoteTranslations";
 
 interface TranslationSectionProps {
-	translationsWithVotes: TranslationWithVote[] | undefined;
+	translationsWithVotes: TranslationWithVote[];
 	currentUserName: string | undefined;
 	sourceTextId: number;
 	sourceLanguage: string;
@@ -46,10 +46,6 @@ export function TranslationSection({
 }: TranslationSectionProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const isHydrated = useHydrated();
-
-	if (!translationsWithVotes || sourceLanguage === targetLanguage) {
-		return null;
-	}
 
 	const bestTranslationWithVote = getBestTranslation(translationsWithVotes);
 
@@ -100,5 +96,3 @@ export function TranslationSection({
 		</span>
 	);
 }
-
-export const MemoizedTranslationSection = memo(TranslationSection);
