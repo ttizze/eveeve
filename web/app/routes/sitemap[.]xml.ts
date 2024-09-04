@@ -3,11 +3,11 @@ import { routes } from "virtual:remix/server-build";
 import { generateSitemap } from "@nasa-gcn/remix-seo";
 import type { SEOHandle } from "@nasa-gcn/remix-seo";
 import type { LoaderFunctionArgs } from "@remix-run/node";
+import { serverOnly$ } from "vite-env-only/macros";
 import {
 	fetchAllPublishedPages,
 	fetchAllUsersName,
 } from "./functions/queries.server";
-import { serverOnly$ } from "vite-env-only/macros"
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	return generateSitemap(request, routes, {

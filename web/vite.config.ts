@@ -1,8 +1,8 @@
 import { vitePlugin as remix } from "@remix-run/dev";
 import { flatRoutes } from "remix-flat-routes";
 import { defineConfig } from "vite";
+import { envOnlyMacros } from "vite-env-only";
 import tsconfigPaths from "vite-tsconfig-paths";
-import { envOnlyMacros  } from "vite-env-only"
 
 export default defineConfig({
 	build: {
