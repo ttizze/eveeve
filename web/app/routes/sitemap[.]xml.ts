@@ -3,6 +3,7 @@ import { routes } from "virtual:remix/server-build";
 import { generateSitemap } from "@nasa-gcn/remix-seo";
 import type { SEOHandle } from "@nasa-gcn/remix-seo";
 import type { LoaderFunctionArgs } from "@remix-run/node";
+import { serverOnly$ } from "vite-env-only/macros";
 import {
 	fetchAllPublishedPages,
 	fetchAllUsersName,
@@ -18,7 +19,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export const handle: SEOHandle = {
-	getSitemapEntries: async (request: Request) => {
+	getSitemapEntries: serverOnly$(async () => {
 		const [pages, users] = await Promise.all([
 			fetchAllPublishedPages(),
 			fetchAllUsersName(),
@@ -35,5 +36,5 @@ export const handle: SEOHandle = {
 		}));
 
 		return [...pageEntries, ...userEntries];
-	},
+	}),
 };
