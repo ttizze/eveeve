@@ -142,17 +142,3 @@ export async function fetchLatestUserAITranslationInfo(
 		orderBy: { createdAt: "desc" },
 	});
 }
-
-export async function fetchAllPublishedPages() {
-	return prisma.page.findMany({
-		where: { isPublished: true, isArchived: false },
-		select: {
-			id: true,
-			title: true,
-			slug: true,
-			createdAt: true,
-			updatedAt: true,
-			user: { select: { userName: true } },
-		},
-	});
-}

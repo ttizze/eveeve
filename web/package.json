@@ -101,6 +101,7 @@
 		"minio": "^8.0.1",
 		"postcss": "^8.4.41",
 		"prisma": "^5.19.0",
+		"remix-development-tools": "^4.4.1",
 		"remix-flat-routes": "^0.6.5",
 		"tailwindcss": "^3.4.10",
 		"tsx": "^4.17.0",
