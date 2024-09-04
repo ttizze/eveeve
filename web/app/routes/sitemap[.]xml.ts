@@ -7,6 +7,7 @@ import {
 	fetchAllPublishedPages,
 	fetchAllUsersName,
 } from "./functions/queries.server";
+import { serverOnly$ } from "vite-env-only/macros"
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	return generateSitemap(request, routes, {
@@ -18,7 +19,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export const handle: SEOHandle = {
-	getSitemapEntries: async (request: Request) => {
+	getSitemapEntries: serverOnly$(async () => {
 		const [pages, users] = await Promise.all([
 			fetchAllPublishedPages(),
 			fetchAllUsersName(),
@@ -35,5 +36,5 @@ export const handle: SEOHandle = {
 		}));
 
 		return [...pageEntries, ...userEntries];
-	},
+	}),
 };
