@@ -2,7 +2,7 @@ import { sanitizeUser } from "~/utils/auth.server";
 import { prisma } from "~/utils/prisma";
 import type { PageListItem, sanitizedUserWithPages } from "../types";
 
-export async function getSanitizedUserWithPages(
+export async function fetchSanitizedUserWithPages(
 	userName: string,
 	isOwnProfile: boolean,
 ): Promise<sanitizedUserWithPages | null> {
@@ -37,8 +37,17 @@ export async function getSanitizedUserWithPages(
 	};
 }
 
-export async function getPageById(pageId: number) {
+export async function fetchPageById(pageId: number) {
 	return prisma.page.findUnique({
 		where: { id: pageId },
+	});
+}
+
+export async function fetchAllUsersName() {
+	return prisma.user.findMany({
+		select: {
+			userName: true,
+			updatedAt: true,
+		},
 	});
 }
