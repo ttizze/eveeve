@@ -11,10 +11,12 @@ import {
 } from "@remix-run/react";
 import { useLocation } from "@remix-run/react";
 import { useLoaderData, useRouteLoaderData } from "@remix-run/react";
+import { useEffect } from "react";
 import { useChangeLanguage } from "remix-i18next/react";
 import { typedjson } from "remix-typedjson";
 import { useTypedLoaderData } from "remix-typedjson";
 import { ThemeProvider } from "~/components/theme-provider";
+import * as gtag from "~/gtags.client";
 import i18nServer, { localeCookie } from "~/i18n.server";
 import { Footer } from "~/routes/resources+/footer";
 import { Header } from "~/routes/resources+/header";
@@ -22,10 +24,14 @@ import tailwind from "~/tailwind.css?url";
 import { authenticator } from "~/utils/auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+	const gaTrackingId =
+		process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test"
+			? process.env.GOOGLE_ANALYTICS_ID ?? ""
+			: "";
 	const currentUser = await authenticator.isAuthenticated(request);
 	const locale = await i18nServer.getLocale(request);
 	return typedjson(
-		{ currentUser, locale },
+		{ currentUser, locale, gaTrackingId },
 		{ headers: { "Set-Cookie": await localeCookie.serialize(locale) } },
 	);
 }
@@ -39,7 +45,13 @@ export const links: LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
-	const { locale } = useRouteLoaderData<typeof loader>("root");
+	const { locale, gaTrackingId } = useRouteLoaderData<typeof loader>("root");
+	const location = useLocation();
+	useEffect(() => {
+		if (gaTrackingId?.length) {
+			gtag.pageview(location.pathname, gaTrackingId);
+		}
+	}, [location, gaTrackingId]);
 	return (
 		<html lang={locale ?? "en"} suppressHydrationWarning={true}>
 			<head>
@@ -52,6 +64,29 @@ export function Layout({ children }: { children: React.ReactNode }) {
 				<Links />
 			</head>
 			<body>
+				{!gaTrackingId ? null : (
+					<>
+						<script
+							async
+							src={`https://www.googletagmanager.com/gtag/js?id=${gaTrackingId}`}
+						/>
+						<script
+							async
+							id="gtag-init"
+							// biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation>
+							dangerouslySetInnerHTML={{
+								__html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${gaTrackingId}', {
+                  page_path: window.location.pathname,
+                });
+              `,
+							}}
+						/>
+					</>
+				)}
 				{children}
 				<ScrollRestoration />
 				<Scripts />
