@@ -1,25 +1,20 @@
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
-import DOMPurify from "dompurify";
-import parse, {
-	domToReact,
-	type HTMLReactParserOptions,
-	type DOMNode,
-} from "html-react-parser";
-import { Loader2, Lock, SquarePen } from "lucide-react";
-import { memo, useMemo } from "react";
+import { Loader2, SquarePen } from "lucide-react";
+import { memo } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
 import { Button } from "~/components/ui/button";
 import type {
 	PageWithTranslations,
 	SourceTextWithTranslations,
 } from "../types";
-import { TranslateButton } from "./TranslateButton";
-import { MemoizedTranslationSection } from "./TranslationSection";
+import { ParsedContent } from "./ParsedContent";
+import { SourceTextAndTranslationSection } from "./sourceTextAndTranslationSection/SourceTextAndTranslationSection";
+import { TranslateButton } from "./translateButton/TranslateButton";
 
 interface ContentWithTranslationsProps {
 	pageWithTranslations: PageWithTranslations;
-	sourceTitle: SourceTextWithTranslations | null;
+	sourceTitleWithTranslations: SourceTextWithTranslations | null;
 	currentUserName: string | undefined;
 	hasGeminiApiKey: boolean;
 	userAITranslationInfo: UserAITranslationInfo | null;
@@ -28,7 +23,7 @@ interface ContentWithTranslationsProps {
 
 export const ContentWithTranslations = memo(function ContentWithTranslations({
 	pageWithTranslations,
-	sourceTitle,
+	sourceTitleWithTranslations,
 	currentUserName,
 	hasGeminiApiKey,
 	userAITranslationInfo,
@@ -39,100 +34,14 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 		? pageWithTranslations.createdAt.toLocaleString()
 		: pageWithTranslations.createdAt.toISOString();
 
-	const parsedContent = useMemo(() => {
-		if (!isHydrated) {
-			return (
-				<div className="w-full h-full flex items-center justify-center">
-					<Loader2 className="w-10 h-10 animate-spin" />
-				</div>
-			);
-		}
-
-		const sanitizedContent = DOMPurify.sanitize(pageWithTranslations.content);
-		const doc = new DOMParser().parseFromString(sanitizedContent, "text/html");
-
-		const elements = doc.querySelectorAll("[data-source-text-id]");
-		for (const element of elements) {
-			if (
-				element instanceof HTMLElement &&
-				element.getAttribute("data-source-text-id")
-			) {
-				const sourceTextId = element.getAttribute(
-					"data-source-text-id",
-				) as string;
-				const sourceTextWrapper = document.createElement("span");
-				sourceTextWrapper.classList.add("inline-block", "px-4");
-				sourceTextWrapper.setAttribute("data-translation-id", sourceTextId);
-				element.appendChild(sourceTextWrapper);
-			}
-		}
-
-		const options: HTMLReactParserOptions = {
-			replace: (domNode) => {
-				if (domNode.type === "tag" && domNode.attribs["data-translation-id"]) {
-					const sourceTextId = Number(domNode.attribs["data-translation-id"]);
-					const sourceTextWithTranslations =
-						pageWithTranslations.sourceTextWithTranslations.find(
-							(info) => info.sourceText.id === sourceTextId,
-						);
-					return (
-						<>
-							{domToReact(domNode.children as DOMNode[], options)}
-							<MemoizedTranslationSection
-								key={`translation-${sourceTextId}`}
-								translationsWithVotes={
-									sourceTextWithTranslations?.translationsWithVotes
-								}
-								currentUserName={currentUserName}
-								sourceTextId={sourceTextId}
-								sourceLanguage={pageWithTranslations.sourceLanguage}
-								targetLanguage={targetLanguage}
-							/>
-						</>
-					);
-				}
-				if (domNode.type === "tag" && domNode.name === "img") {
-					const { src, alt, width, height, ...otherAttribs } = domNode.attribs;
-					return (
-						//otherAttribs がbiomeのlintに引っかかる
-						// biome-ignore lint/a11y/useAltText: <explanation>
-						<img
-							src={src}
-							alt={alt || ""}
-							width={width || "100%"}
-							height={height || "auto"}
-							className="aspect-ratio-img"
-							{...otherAttribs}
-						/>
-					);
-				}
-				return domNode;
-			},
-		};
-		return parse(doc.body.innerHTML, options);
-	}, [
-		pageWithTranslations.content,
-		pageWithTranslations.sourceTextWithTranslations,
-		pageWithTranslations.sourceLanguage,
-		targetLanguage,
-		currentUserName,
-		isHydrated,
-	]);
-
 	return (
 		<>
 			<h1 className="!mb-5">
-				<div className=" px-4 mb-2">
-					{!pageWithTranslations.isPublished && (
-						<Lock className="h-6 w-6 mr-1 inline" />
-					)}
-					{sourceTitle?.sourceText.text}
-				</div>
-				{sourceTitle && (
-					<MemoizedTranslationSection
-						translationsWithVotes={sourceTitle.translationsWithVotes}
+				{sourceTitleWithTranslations && (
+					<SourceTextAndTranslationSection
+						sourceTextWithTranslation={sourceTitleWithTranslations}
+						isPublished={pageWithTranslations.isPublished}
 						currentUserName={currentUserName}
-						sourceTextId={sourceTitle.sourceText.id}
 						sourceLanguage={pageWithTranslations.sourceLanguage}
 						targetLanguage={targetLanguage}
 					/>
@@ -174,7 +83,18 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 						</div>
 					)}
 			</div>
-			{parsedContent}
+			{!isHydrated ? (
+				<div className="w-full h-full flex items-center justify-center">
+					<Loader2 className="w-10 h-10 animate-spin" />
+				</div>
+			) : (
+				<ParsedContent
+					pageWithTranslations={pageWithTranslations}
+					sourceLanguage={pageWithTranslations.sourceLanguage}
+					targetLanguage={targetLanguage}
+					currentUserName={currentUserName}
+				/>
+			)}
 		</>
 	);
 });

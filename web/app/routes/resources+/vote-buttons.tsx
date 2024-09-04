@@ -6,7 +6,7 @@ import { memo, useMemo } from "react";
 import { useState } from "react";
 import { z } from "zod";
 import { LoginDialog } from "~/components/LoginDialog";
-import { VoteButton } from "~/routes/$userName+/page+/$slug+/components/VoteButton";
+import { VoteButton } from "~/routes/$userName+/page+/$slug+/components/sourceTextAndTranslationSection/VoteButton";
 import type { TranslationWithVote } from "~/routes/$userName+/page+/$slug+/types";
 import { authenticator } from "~/utils/auth.server";
 import { cn } from "~/utils/cn";

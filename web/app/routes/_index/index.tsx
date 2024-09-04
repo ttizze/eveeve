@@ -3,14 +3,13 @@ import { redirect } from "@remix-run/node";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Form } from "@remix-run/react";
 import { LogIn } from "lucide-react";
-import { FaDiscord, FaGithub } from "react-icons/fa";
+import { FaDiscord, FaGithub, FaGoogle } from "react-icons/fa";
 import { useTypedLoaderData } from "remix-typedjson";
 import { Button } from "~/components/ui/button";
 import i18nServer from "~/i18n.server";
 import { authenticator } from "~/utils/auth.server";
-import { MemoizedTranslationSection } from "../$userName+/page+/$slug+/components/TranslationSection";
+import { SourceTextAndTranslationSection } from "../$userName+/page+/$slug+/components/sourceTextAndTranslationSection/SourceTextAndTranslationSection";
 import { fetchPageWithTranslations } from "../$userName+/page+/$slug+/functions/queries.server";
-
 export const meta: MetaFunction = () => {
 	return [
 		{ title: "EveEve" },
@@ -69,30 +68,24 @@ export default function Index() {
 		useTypedLoaderData<typeof loader>();
 
 	return (
-		<div className="min-h-screen flex flex-col justify-between">
+		<div className="flex flex-col justify-between">
 			<main className="container mx-auto px-4 py-20 flex flex-col items-center justify-center flex-grow">
 				<div className="max-w-4xl w-full">
 					<h1 className="text-7xl font-bold mb-20 text-center">
-						<span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent inline-block mb-2">
-							{heroTitle?.sourceText.text}
-						</span>
-						<MemoizedTranslationSection
-							translationsWithVotes={heroTitle.translationsWithVotes}
+						<SourceTextAndTranslationSection
+							sourceTextWithTranslation={heroTitle}
+							sourceTextClassName="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent mb-2"
 							currentUserName={currentUser?.userName}
-							sourceTextId={heroTitle.sourceText.id}
 							sourceLanguage={sourceLanguage}
 							targetLanguage={targetLanguage}
 						/>
 					</h1>
 
 					<span className="text-xl mb-12 w-full">
-						<span className="text-slate-500 dark:text-slate-400 inline-block mb-2">
-							{heroText?.sourceText.text}
-						</span>
-						<MemoizedTranslationSection
-							translationsWithVotes={heroText.translationsWithVotes}
+						<SourceTextAndTranslationSection
+							sourceTextWithTranslation={heroText}
+							sourceTextClassName="mb-2"
 							currentUserName={currentUser?.userName}
-							sourceTextId={heroText.sourceText.id}
 							sourceLanguage={sourceLanguage}
 							targetLanguage={targetLanguage}
 						/>
@@ -100,8 +93,14 @@ export default function Index() {
 
 					<div className="mb-12 flex justify-center mt-10">
 						<Form method="POST">
-							<Button type="submit" variant="default" size="lg">
-								<LogIn className="w-48 " />
+							<Button
+								type="submit"
+								variant="default"
+								size="lg"
+								className="w-60 h-12"
+							>
+								<FaGoogle className=" mr-2" />
+								<LogIn />
 							</Button>
 						</Form>
 					</div>
