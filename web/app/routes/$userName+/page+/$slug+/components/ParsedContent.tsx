@@ -1,5 +1,9 @@
 import DOMPurify from "dompurify";
-import parse, { type HTMLReactParserOptions } from "html-react-parser";
+import parse, {
+	type HTMLReactParserOptions,
+	domToReact,
+	type DOMNode,
+} from "html-react-parser";
 import type { PageWithTranslations } from "../types";
 import { SourceTextAndTranslationSection } from "./sourceTextAndTranslationSection/SourceTextAndTranslationSection";
 
@@ -29,6 +33,16 @@ export function ParsedContent({
 					);
 				if (!sourceTextWithTranslation) {
 					return null;
+				}
+				if (domNode.name === "a") {
+					return (
+						<a
+							href={domNode.attribs.href}
+							className="underline underline-offset-4 decoration-blue-500"
+						>
+							{domToReact(domNode.children as DOMNode[], options)}
+						</a>
+					);
 				}
 				const DynamicTag = domNode.name as keyof JSX.IntrinsicElements;
 				const { class: className, ...otherAttribs } = domNode.attribs;
