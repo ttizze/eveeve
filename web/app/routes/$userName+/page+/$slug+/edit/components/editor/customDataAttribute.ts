@@ -5,7 +5,7 @@ export const CustomDataAttribute = Extension.create({
 	addGlobalAttributes() {
 		return [
 			{
-				types: ["paragraph", "heading"],
+				types: ["paragraph", "heading", "link"],
 				attributes: {
 					"data-source-text-id": {
 						default: null,

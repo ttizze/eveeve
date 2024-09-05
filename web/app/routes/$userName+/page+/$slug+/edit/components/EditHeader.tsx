@@ -24,6 +24,7 @@ interface EditHeaderProps {
 	pageSlug: string | null;
 	initialIsPublished: boolean;
 	fetcher: FetcherWithComponents<unknown>;
+	hasUnsavedChanges: boolean;
 }
 
 export function EditHeader({
@@ -31,6 +32,7 @@ export function EditHeader({
 	pageSlug,
 	initialIsPublished,
 	fetcher,
+	hasUnsavedChanges,
 }: EditHeaderProps) {
 	const isSubmitting = fetcher.state === "submitting";
 	const isLoading = fetcher.state === "loading";
@@ -43,14 +45,38 @@ export function EditHeader({
 	useEffect(() => {
 		if (fetcher.state === "loading") {
 			setShowSuccess(true);
-		} else if (fetcher.state === "idle" && showSuccess) {
-			const timer = setTimeout(() => setShowSuccess(false), 500);
-			return () => clearTimeout(timer);
 		}
-	}, [fetcher.state, showSuccess]);
+		if (hasUnsavedChanges) {
+			setShowSuccess(false);
+		}
+	}, [fetcher.state, hasUnsavedChanges]);
+
+	const renderButtonIcon = () => {
+		if (isSubmitting) {
+			return <Loader2 className="w-6 h-6 animate-spin" />;
+		}
+		if (showSuccess) {
+			return <Check className="w-6 h-6" />;
+		}
+		return (
+			<>
+				{isPublished ? (
+					<div className="flex justify-center items-center space-x-2">
+						<ArrowUpFromLine className="w-5 h-5 mr-2" />
+						Publish
+					</div>
+				) : (
+					<div className="flex justify-center items-center space-x-2">
+						<ArrowDownToLine className="w-5 h-5 mr-2" />
+						Save
+					</div>
+				)}
+			</>
+		);
+	};
 
 	return (
-		<header className="z-10 bg-background">
+		<header className="sticky top-0 z-10 pt-2 bg-blur">
 			<div className="grid grid-cols-3 items-center">
 				<div className="justify-self-start">
 					<Link
@@ -71,26 +97,12 @@ export function EditHeader({
 					</Link>
 				</div>
 				<div className="justify-self-center">
-					<Button type="submit" variant="ghost" disabled={isSubmitting}>
-						{isSubmitting ? (
-							<Loader2 className="w-6 h-6 animate-spin" />
-						) : showSuccess ? (
-							<Check className="w-6 h-6" />
-						) : (
-							<>
-								{isPublished ? (
-									<div className="flex justify-center items-center space-x-2">
-										<ArrowUpFromLine className="w-5 h-5 mr-2" />
-										Publish
-									</div>
-								) : (
-									<div className="flex justify-center items-center space-x-2">
-										<ArrowDownToLine className="w-5 h-5 mr-2" />
-										Save
-									</div>
-								)}
-							</>
-						)}
+					<Button
+						type="submit"
+						variant="ghost"
+						disabled={isSubmitting || !hasUnsavedChanges}
+					>
+						{renderButtonIcon()}
 					</Button>
 					<input
 						type="hidden"

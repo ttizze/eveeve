@@ -1,15 +1,14 @@
 import { useInputControl } from "@conform-to/react";
 import { EditorContent, useEditor } from "@tiptap/react";
-import { useEffect } from "react";
 import { EditorBubbleMenu } from "./EditorBubbleMenu";
 import { EditorFloatingMenu } from "./EditorFloatingMenu";
 import { configureEditor } from "./editorConfig";
 interface EditorProps {
 	initialContent: string;
-	handleAutoSave: () => void;
+	handleContentChange: () => void;
 }
 
-export function Editor({ initialContent, handleAutoSave }: EditorProps) {
+export function Editor({ initialContent, handleContentChange }: EditorProps) {
 	const pageContentControl = useInputControl({
 		name: "pageContent",
 		formId: "edit-page",
@@ -21,14 +20,9 @@ export function Editor({ initialContent, handleAutoSave }: EditorProps) {
 		},
 		onUpdate: ({ editor }) => {
 			pageContentControl.change(editor.getHTML());
-			handleAutoSave();
+			handleContentChange();
 		},
 	});
-	useEffect(() => {
-		if (editor && editor.getHTML() !== initialContent) {
-			editor.commands.setContent(initialContent);
-		}
-	}, [editor, initialContent]);
 
 	return (
 		<>
