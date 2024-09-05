@@ -24,6 +24,8 @@ interface EditHeaderProps {
 	pageSlug: string | null;
 	initialIsPublished: boolean;
 	fetcher: FetcherWithComponents<unknown>;
+	hasUnsavedChanges: boolean;
+	setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
 }
 
 export function EditHeader({
@@ -31,26 +33,47 @@ export function EditHeader({
 	pageSlug,
 	initialIsPublished,
 	fetcher,
+	hasUnsavedChanges,
+	setHasUnsavedChanges,
 }: EditHeaderProps) {
 	const isSubmitting = fetcher.state === "submitting";
-	const isLoading = fetcher.state === "loading";
 	const [isPublished, setIsPublished] = useState(initialIsPublished);
-	const [showSuccess, setShowSuccess] = useState(false);
 
 	const handlePublishToggle = (newPublishState: boolean) => {
 		setIsPublished(newPublishState);
 	};
 	useEffect(() => {
 		if (fetcher.state === "loading") {
-			setShowSuccess(true);
-		} else if (fetcher.state === "idle" && showSuccess) {
-			const timer = setTimeout(() => setShowSuccess(false), 500);
-			return () => clearTimeout(timer);
+			setHasUnsavedChanges(false);
 		}
-	}, [fetcher.state, showSuccess]);
+	}, [fetcher.state, setHasUnsavedChanges]);
+
+	const renderButtonIcon = () => {
+		if (isSubmitting) {
+			return <Loader2 className="w-6 h-6 animate-spin" />;
+		}
+		if (!hasUnsavedChanges) {
+			return <Check className="w-6 h-6" />;
+		}
+		return (
+			<>
+				{isPublished ? (
+					<div className="flex justify-center items-center space-x-2">
+						<ArrowUpFromLine className="w-5 h-5 mr-2" />
+						Publish
+					</div>
+				) : (
+					<div className="flex justify-center items-center space-x-2">
+						<ArrowDownToLine className="w-5 h-5 mr-2" />
+						Save
+					</div>
+				)}
+			</>
+		);
+	};
 
 	return (
-		<header className="z-10 bg-background">
+		<header className="sticky top-0 z-10 pt-2 bg-blur">
 			<div className="grid grid-cols-3 items-center">
 				<div className="justify-self-start">
 					<Link
@@ -61,36 +84,17 @@ export function EditHeader({
 						}
 						className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
 					>
-						<Button variant="ghost" type="button">
-							{isLoading ? (
-								<Loader2 className="w-6 h-6 animate-spin" />
-							) : (
-								<ArrowLeft className="w-6 h-6 opacity-50" />
-							)}
-						</Button>
+						<ArrowLeft className="w-6 h-6 opacity-50" />
 					</Link>
 				</div>
 				<div className="justify-self-center">
-					<Button type="submit" variant="ghost" disabled={isSubmitting}>
-						{isSubmitting ? (
-							<Loader2 className="w-6 h-6 animate-spin" />
-						) : showSuccess ? (
-							<Check className="w-6 h-6" />
-						) : (
-							<>
-								{isPublished ? (
-									<div className="flex justify-center items-center space-x-2">
-										<ArrowUpFromLine className="w-5 h-5 mr-2" />
-										Publish
-									</div>
-								) : (
-									<div className="flex justify-center items-center space-x-2">
-										<ArrowDownToLine className="w-5 h-5 mr-2" />
-										Save
-									</div>
-								)}
-							</>
-						)}
+					<Button
+						type="submit"
+						variant="default"
+						className="rounded-full"
+						disabled={isSubmitting || !hasUnsavedChanges}
+					>
+						{renderButtonIcon()}
 					</Button>
 					<input
 						type="hidden"
