@@ -25,6 +25,7 @@ interface EditHeaderProps {
 	initialIsPublished: boolean;
 	fetcher: FetcherWithComponents<unknown>;
 	hasUnsavedChanges: boolean;
+	setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
 }
 
 export function EditHeader({
@@ -33,29 +34,25 @@ export function EditHeader({
 	initialIsPublished,
 	fetcher,
 	hasUnsavedChanges,
+	setHasUnsavedChanges,
 }: EditHeaderProps) {
 	const isSubmitting = fetcher.state === "submitting";
-	const isLoading = fetcher.state === "loading";
 	const [isPublished, setIsPublished] = useState(initialIsPublished);
-	const [showSuccess, setShowSuccess] = useState(false);
 
 	const handlePublishToggle = (newPublishState: boolean) => {
 		setIsPublished(newPublishState);
 	};
 	useEffect(() => {
 		if (fetcher.state === "loading") {
-			setShowSuccess(true);
+			setHasUnsavedChanges(false);
 		}
-		if (hasUnsavedChanges) {
-			setShowSuccess(false);
-		}
-	}, [fetcher.state, hasUnsavedChanges]);
+	}, [fetcher.state, setHasUnsavedChanges]);
 
 	const renderButtonIcon = () => {
 		if (isSubmitting) {
 			return <Loader2 className="w-6 h-6 animate-spin" />;
 		}
-		if (showSuccess) {
+		if (!hasUnsavedChanges) {
 			return <Check className="w-6 h-6" />;
 		}
 		return (
@@ -87,19 +84,14 @@ export function EditHeader({
 						}
 						className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
 					>
-						<Button variant="ghost" type="button">
-							{isLoading ? (
-								<Loader2 className="w-6 h-6 animate-spin" />
-							) : (
-								<ArrowLeft className="w-6 h-6 opacity-50" />
-							)}
-						</Button>
+						<ArrowLeft className="w-6 h-6 opacity-50" />
 					</Link>
 				</div>
 				<div className="justify-self-center">
 					<Button
 						type="submit"
-						variant="ghost"
+						variant="default"
+						className="rounded-full"
 						disabled={isSubmitting || !hasUnsavedChanges}
 					>
 						{renderButtonIcon()}

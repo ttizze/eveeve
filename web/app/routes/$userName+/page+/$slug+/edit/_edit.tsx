@@ -4,10 +4,8 @@ import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
-import { useCallback } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
-import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
 import { authenticator } from "~/utils/auth.server";
 import { EditFooter } from "./components/EditFooter";
@@ -130,29 +128,6 @@ export default function EditPage() {
 	});
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-	const handleAutoSave = useCallback(() => {
-		const formData = new FormData();
-		formData.set("title", fields.title.value as string);
-		formData.set("pageContent", fields.pageContent.value as string);
-		formData.set("isPublished", fields.isPublished.value as string);
-		if (fetcher.state !== "submitting") {
-			fetcher.submit(formData, { method: "post" });
-		}
-	}, [fetcher, fields]);
-
-	const debouncedAutoSave = useDebouncedCallback(handleAutoSave, 1000);
-
-	const handleContentChange = useCallback(() => {
-		setHasUnsavedChanges(true);
-		debouncedAutoSave();
-	}, [debouncedAutoSave]);
-
-	useEffect(() => {
-		if (fetcher.state === "loading") {
-			setHasUnsavedChanges(false);
-		}
-	}, [fetcher.state]);
-
 	return (
 		<div>
 			<fetcher.Form method="post" {...getFormProps(form)}>
@@ -162,6 +137,7 @@ export default function EditPage() {
 					initialIsPublished={page?.isPublished}
 					fetcher={fetcher}
 					hasUnsavedChanges={hasUnsavedChanges}
+					setHasUnsavedChanges={setHasUnsavedChanges}
 				/>
 				<div className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg mt-2 md:mt-20 mx-auto">
 					<div className="mt-10 h-auto">
@@ -172,7 +148,7 @@ export default function EditPage() {
 								className="w-full outline-none bg-transparent resize-none overflow-hidden"
 								minRows={1}
 								maxRows={10}
-								onChange={handleContentChange}
+								onChange={(e) => setHasUnsavedChanges(true)}
 							/>
 						</h1>
 						{fields.title.errors?.map((error) => (
@@ -185,7 +161,7 @@ export default function EditPage() {
 					<div className="mt-12">
 						<Editor
 							initialContent={page?.content || ""}
-							handleContentChange={handleContentChange}
+							setHasUnsavedChanges={setHasUnsavedChanges}
 						/>
 						{fields.pageContent.errors?.map((error) => (
 							<p className="text-sm text-red-500" key={error}>
