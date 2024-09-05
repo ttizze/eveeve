@@ -21,7 +21,7 @@ import { addNumbersToContent } from "./utils/addNumbersToContent";
 import { addSourceTextIdToContent } from "./utils/addSourceTextIdToContent";
 import { extractTextElementInfo } from "./utils/extractTextElementInfo";
 import { getPageSourceLanguage } from "./utils/getPageSourceLanguage";
-import { removeSourceTextIdDuplicates } from "./utils/removeSourceTextIdDuplicates";
+import { removeSourceTextIdDuplicatesAndEmptyElements } from "./utils/removeSourceTextIdDuplicates";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	if (!data) {
@@ -74,7 +74,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 	const { title, pageContent, isPublished } = submission.value;
 	const titleSourceTextId = await getTitleSourceTextId(slug);
 	//tiptapが既存の要素を引き継いで重複したsourceTextIdを追加してしまうため、重複を削除
-	const numberedContent = await removeSourceTextIdDuplicates(
+	const numberedContent = await removeSourceTextIdDuplicatesAndEmptyElements(
 		addNumbersToContent(pageContent),
 	);
 	const textElements = await extractTextElementInfo(

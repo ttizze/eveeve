@@ -2,7 +2,7 @@ import DOMPurify from "isomorphic-dompurify";
 import { JSDOM } from "jsdom";
 const { Node } = new JSDOM().window;
 
-export async function removeSourceTextIdDuplicates(
+export async function removeSourceTextIdDuplicatesAndEmptyElements(
 	content: string,
 ): Promise<string> {
 	const sanitizedContent = DOMPurify.sanitize(content);
@@ -19,6 +19,9 @@ export async function removeSourceTextIdDuplicates(
 					element.removeAttribute("data-source-text-id");
 				} else {
 					usedSourceTextIds.add(sourceTextId);
+				}
+				if (element.textContent?.trim() === "") {
+					element.remove();
 				}
 			}
 
