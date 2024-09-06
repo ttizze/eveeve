@@ -26,8 +26,7 @@ export function SourceTextAndTranslationSection({
 				{isPublished === false && <Lock className="h-6 w-6 mr-1 inline" />}
 				{sourceTextWithTranslation.sourceText.text}
 			</span>
-			{!sourceTextWithTranslation?.translationsWithVotes ||
-			sourceLanguage === targetLanguage ? null : (
+			{sourceTextWithTranslation.translationsWithVotes.length > 0 ? (
 				<TranslationSection
 					key={`translation-${sourceTextWithTranslation.sourceText.id}`}
 					translationsWithVotes={
@@ -38,7 +37,7 @@ export function SourceTextAndTranslationSection({
 					sourceLanguage={sourceLanguage}
 					targetLanguage={targetLanguage}
 				/>
-			)}
+			) : null}
 		</>
 	);
 }

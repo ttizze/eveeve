@@ -83,7 +83,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 		titleSourceTextId,
 	);
 
-	const sourceLanguage = await getPageSourceLanguage(textElements);
+	const sourceLanguage = await getPageSourceLanguage(numberedContent, title);
 	//pageIdを使用するため､ここで一旦pageを作成する
 	const page = await createOrUpdatePage(
 		currentUser.id,

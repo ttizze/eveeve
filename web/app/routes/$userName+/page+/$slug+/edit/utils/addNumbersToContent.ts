@@ -22,6 +22,7 @@ export function shouldProcessElement(element: Element): boolean {
 		"noscript",
 		"iframe",
 		"source",
+		"a",
 	].includes(element.nodeName.toLowerCase());
 	const isVisible = htmlElement.style.display !== "none";
 	const isVisiblyHidden = htmlElement.style.visibility !== "hidden";
