@@ -1,4 +1,5 @@
 import { vitePlugin as remix } from "@remix-run/dev";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { flatRoutes } from "remix-flat-routes";
 import { defineConfig } from "vite";
 import { envOnlyMacros } from "vite-env-only";
@@ -22,5 +23,10 @@ export default defineConfig({
 			},
 		}),
 		tsconfigPaths(),
+		sentryVitePlugin({
+			org: "reimei",
+			project: "eveeve",
+			url: "https://sentry.io/",
+		}),
 	],
 });

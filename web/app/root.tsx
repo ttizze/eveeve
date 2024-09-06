@@ -11,6 +11,7 @@ import {
 } from "@remix-run/react";
 import { useLocation } from "@remix-run/react";
 import { useLoaderData, useRouteLoaderData } from "@remix-run/react";
+import { captureRemixErrorBoundaryError, withSentry } from "@sentry/remix";
 import { useEffect } from "react";
 import { useChangeLanguage } from "remix-i18next/react";
 import { typedjson } from "remix-typedjson";
@@ -95,7 +96,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 	);
 }
 
-export default function App() {
+function App() {
 	const { locale } = useLoaderData<typeof loader>();
 	useChangeLanguage(locale);
 	const location = useLocation();
@@ -116,6 +117,8 @@ export default function App() {
 		</ThemeProvider>
 	);
 }
+
+export default withSentry(App);
 
 function CommonLayout({
 	children,
@@ -138,6 +141,8 @@ function CommonLayout({
 
 export function ErrorBoundary() {
 	const error = useRouteError();
+
+	captureRemixErrorBoundaryError(error);
 
 	return (
 		<html lang="ja">
