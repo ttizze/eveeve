@@ -47,8 +47,6 @@ export default function SentryExamplePage() {
 					Throw error!
 				</button>
 
-				<p>
-				</p>
 				<p style={{ marginTop: "24px" }}>
 					For more information, see{" "}
 					<a href="https://docs.sentry.io/platforms/javascript/guides/remix/">
