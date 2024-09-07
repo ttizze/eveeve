@@ -1,6 +1,6 @@
 import { prisma } from "~/utils/prisma";
 import type { PageWithTranslations } from "../types";
-
+import { getBestTranslation } from "../utils/getBestTranslation";
 //編集前のデータも記録として保存しておきたいため、sourceTextsは同一numberが複数存在する仕様になっているので､distinctを使用している
 export async function fetchPageWithSourceTexts(pageId: number) {
 	const pageWithSourceTexts = await prisma.page.findFirst({
@@ -80,7 +80,6 @@ export async function fetchPageWithTranslations(
 	});
 
 	if (!page) return null;
-
 	return {
 		id: page.id,
 		title: page.title,
@@ -95,24 +94,33 @@ export async function fetchPageWithTranslations(
 		createdAt: page.createdAt,
 		isPublished: page.isPublished,
 		isArchived: page.isArchived,
-		sourceTextWithTranslations: page.sourceTexts.map((sourceText) => ({
-			sourceText: {
-				id: sourceText.id,
-				number: sourceText.number,
-				text: sourceText.text,
-				createdAt: sourceText.createdAt,
-				pageId: sourceText.pageId,
-			},
-			translationsWithVotes: sourceText.translateTexts.map((translateText) => ({
-				id: translateText.id,
-				text: translateText.text,
-				point: translateText.point,
-				userName: translateText.user.userName,
-				displayName: translateText.user.displayName,
-				userVote: translateText.votes[0] || null,
-				createdAt: translateText.createdAt,
-			})),
-		})),
+		sourceTextWithTranslations: page.sourceTexts.map((sourceText) => {
+			const translationsWithVotes = sourceText.translateTexts.map(
+				(translateText) => ({
+					id: translateText.id,
+					text: translateText.text,
+					point: translateText.point,
+					userName: translateText.user.userName,
+					displayName: translateText.user.displayName,
+					userVote: translateText.votes[0] || null,
+					createdAt: translateText.createdAt,
+				}),
+			);
+
+			const bestTranslationWithVote = getBestTranslation(translationsWithVotes);
+
+			return {
+				sourceText: {
+					id: sourceText.id,
+					number: sourceText.number,
+					text: sourceText.text,
+					createdAt: sourceText.createdAt,
+					pageId: sourceText.pageId,
+				},
+				translationsWithVotes,
+				bestTranslationWithVote,
+			};
+		}),
 	};
 }
 

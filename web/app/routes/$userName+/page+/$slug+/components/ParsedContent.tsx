@@ -4,21 +4,25 @@ import parse, {
 	domToReact,
 	type DOMNode,
 } from "html-react-parser";
+import { memo } from "react";
 import type { PageWithTranslations } from "../types";
 import { SourceTextAndTranslationSection } from "./sourceTextAndTranslationSection/SourceTextAndTranslationSection";
-
 interface ParsedContentProps {
 	pageWithTranslations: PageWithTranslations;
 	sourceLanguage: string;
 	targetLanguage: string;
 	currentUserName: string | undefined;
+	onOpenAddAndVoteTranslations: (sourceTextId: number) => void;
 }
+
+export const MemoizedParsedContent = memo(ParsedContent);
 
 export function ParsedContent({
 	pageWithTranslations,
 	sourceLanguage,
 	targetLanguage,
 	currentUserName,
+	onOpenAddAndVoteTranslations,
 }: ParsedContentProps) {
 	const sanitizedContent = DOMPurify.sanitize(pageWithTranslations.content);
 	const doc = new DOMParser().parseFromString(sanitizedContent, "text/html");
@@ -50,10 +54,11 @@ export function ParsedContent({
 					<DynamicTag {...otherAttribs} className={className}>
 						<SourceTextAndTranslationSection
 							key={`translation-${sourceTextId}`}
-							sourceTextWithTranslation={sourceTextWithTranslation}
+							sourceTextWithTranslations={sourceTextWithTranslation}
 							currentUserName={currentUserName}
 							sourceLanguage={sourceLanguage}
 							targetLanguage={targetLanguage}
+							onOpenAddAndVoteTranslations={onOpenAddAndVoteTranslations}
 						/>
 					</DynamicTag>
 				);

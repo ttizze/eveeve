@@ -15,21 +15,23 @@ import { I18nextProvider, initReactI18next } from "react-i18next";
 import { getInitialNamespaces } from "remix-i18next/client";
 import * as i18n from "~/utils/i18n";
 
-Sentry.init({
-	dsn: process.env.SENTRY_DSN,
-	tracesSampleRate: 1,
-	replaysSessionSampleRate: 0.1,
-	replaysOnErrorSampleRate: 1,
+if (import.meta.env.ENVIRONMENT === "production") {
+	Sentry.init({
+		dsn: import.meta.env.VITE_SENTRY_DSN,
+		tracesSampleRate: 1,
+		replaysSessionSampleRate: 0.1,
+		replaysOnErrorSampleRate: 1,
 
-	integrations: [
-		Sentry.browserTracingIntegration({
-			useEffect,
-			useLocation,
-			useMatches,
-		}),
-		Sentry.replayIntegration(),
-	],
-});
+		integrations: [
+			Sentry.browserTracingIntegration({
+				useEffect,
+				useLocation,
+				useMatches,
+			}),
+			Sentry.replayIntegration(),
+		],
+	});
+}
 
 async function main() {
 	await i18next

@@ -1,14 +1,16 @@
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import { Loader2, SquarePen } from "lucide-react";
-import { memo } from "react";
+import { useState } from "react";
+import { useCallback } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
 import { Button } from "~/components/ui/button";
 import type {
 	PageWithTranslations,
 	SourceTextWithTranslations,
 } from "../types";
-import { ParsedContent } from "./ParsedContent";
+import { MemoizedParsedContent } from "./ParsedContent";
+import { AddAndVoteTranslations } from "./sourceTextAndTranslationSection/AddAndVoteTranslations";
 import { SourceTextAndTranslationSection } from "./sourceTextAndTranslationSection/SourceTextAndTranslationSection";
 import { TranslateButton } from "./translateButton/TranslateButton";
 
@@ -21,7 +23,7 @@ interface ContentWithTranslationsProps {
 	targetLanguage: string;
 }
 
-export const ContentWithTranslations = memo(function ContentWithTranslations({
+export function ContentWithTranslations({
 	pageWithTranslations,
 	sourceTitleWithTranslations,
 	currentUserName,
@@ -34,16 +36,36 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 		? pageWithTranslations.createdAt.toLocaleString()
 		: pageWithTranslations.createdAt.toISOString();
 
+	const [selectedSourceTextId, setSelectedSourceTextId] = useState<
+		number | null
+	>(null);
+
+	const handleOpenAddAndVoteTranslations = useCallback(
+		(sourceTextId: number) => {
+			setSelectedSourceTextId(sourceTextId);
+		},
+		[],
+	);
+
+	const handleCloseAddAndVoteTranslations = useCallback(() => {
+		setSelectedSourceTextId(null);
+	}, []);
+
+	const selectedSourceTextWithTranslations =
+		pageWithTranslations.sourceTextWithTranslations.find(
+			(stw) => stw.sourceText.id === selectedSourceTextId,
+		);
 	return (
 		<>
 			<h1 className="!mb-5">
 				{sourceTitleWithTranslations && (
 					<SourceTextAndTranslationSection
-						sourceTextWithTranslation={sourceTitleWithTranslations}
+						sourceTextWithTranslations={sourceTitleWithTranslations}
 						isPublished={pageWithTranslations.isPublished}
 						currentUserName={currentUserName}
 						sourceLanguage={pageWithTranslations.sourceLanguage}
 						targetLanguage={targetLanguage}
+						onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 					/>
 				)}
 			</h1>
@@ -88,13 +110,29 @@ export const ContentWithTranslations = memo(function ContentWithTranslations({
 					<Loader2 className="w-10 h-10 animate-spin" />
 				</div>
 			) : (
-				<ParsedContent
-					pageWithTranslations={pageWithTranslations}
-					sourceLanguage={pageWithTranslations.sourceLanguage}
-					targetLanguage={targetLanguage}
-					currentUserName={currentUserName}
-				/>
+				<>
+					<MemoizedParsedContent
+						pageWithTranslations={pageWithTranslations}
+						sourceLanguage={pageWithTranslations.sourceLanguage}
+						targetLanguage={targetLanguage}
+						currentUserName={currentUserName}
+						onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
+					/>
+					{selectedSourceTextWithTranslations && (
+						<AddAndVoteTranslations
+							key={`add-and-vote-translations-${selectedSourceTextWithTranslations.sourceText.id}`}
+							open={true}
+							onOpenChange={(open) => {
+								if (!open) {
+									handleCloseAddAndVoteTranslations();
+								}
+							}}
+							currentUserName={currentUserName}
+							sourceTextWithTranslations={selectedSourceTextWithTranslations}
+						/>
+					)}
+				</>
 			)}
 		</>
 	);
-});
+}

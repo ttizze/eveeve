@@ -3,13 +3,16 @@ import { redirect } from "@remix-run/node";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Form } from "@remix-run/react";
 import { LogIn } from "lucide-react";
+import { useState } from "react";
 import { FaDiscord, FaGithub, FaGoogle } from "react-icons/fa";
 import { useTypedLoaderData } from "remix-typedjson";
 import { Button } from "~/components/ui/button";
 import i18nServer from "~/i18n.server";
 import { authenticator } from "~/utils/auth.server";
+import { AddAndVoteTranslations } from "../$userName+/page+/$slug+/components/sourceTextAndTranslationSection/AddAndVoteTranslations";
 import { SourceTextAndTranslationSection } from "../$userName+/page+/$slug+/components/sourceTextAndTranslationSection/SourceTextAndTranslationSection";
 import { fetchPageWithTranslations } from "../$userName+/page+/$slug+/functions/queries.server";
+
 export const meta: MetaFunction = () => {
 	return [
 		{ title: "EveEve" },
@@ -34,19 +37,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		throw new Response("Not Found", { status: 404 });
 	}
 	const sourceLanguage = topPageWithTranslations.sourceLanguage;
-	const heroTitle = topPageWithTranslations.sourceTextWithTranslations.find(
-		(SourceTextWithTranslation) =>
-			SourceTextWithTranslation.sourceText.number === 0,
-	);
-	const heroText = topPageWithTranslations.sourceTextWithTranslations.find(
-		(SourceTextWithTranslation) =>
-			SourceTextWithTranslation.sourceText.number === 1,
-	);
+
+	const [heroTitle, heroText] =
+		topPageWithTranslations.sourceTextWithTranslations
+			.filter((st) => st.sourceText.number === 0 || st.sourceText.number === 1)
+			.sort((a, b) => a.sourceText.number - b.sourceText.number);
+
 	if (!heroTitle || !heroText) {
 		throw new Response("Not Found", { status: 404 });
 	}
 	return {
 		currentUser,
+		topPageWithTranslations,
 		heroTitle,
 		heroText,
 		sourceLanguage,
@@ -55,17 +57,36 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 export async function action({ request }: ActionFunctionArgs) {
 	const currentUser = await authenticator.authenticate("google", request);
-
-	if (currentUser) {
-		return redirect(`/${currentUser.userName}`);
-	}
-
-	return redirect("/auth/login");
+	return currentUser
+		? redirect(`/${currentUser.userName}`)
+		: redirect("/auth/login");
 }
 
 export default function Index() {
-	const { currentUser, heroTitle, heroText, sourceLanguage, targetLanguage } =
-		useTypedLoaderData<typeof loader>();
+	const {
+		currentUser,
+		topPageWithTranslations,
+		heroTitle,
+		heroText,
+		sourceLanguage,
+		targetLanguage,
+	} = useTypedLoaderData<typeof loader>();
+	const [selectedSourceTextId, setSelectedSourceTextId] = useState<
+		number | null
+	>(null);
+
+	const handleOpenAddAndVoteTranslations = (sourceTextId: number) => {
+		setSelectedSourceTextId(sourceTextId);
+	};
+
+	const handleCloseAddAndVoteTranslations = () => {
+		setSelectedSourceTextId(null);
+	};
+
+	const selectedSourceTextWithTranslations =
+		topPageWithTranslations.sourceTextWithTranslations.find(
+			(stw) => stw.sourceText.id === selectedSourceTextId,
+		);
 
 	return (
 		<div className="flex flex-col justify-between">
@@ -73,21 +94,23 @@ export default function Index() {
 				<div className="max-w-4xl w-full">
 					<h1 className="text-7xl font-bold mb-20 text-center">
 						<SourceTextAndTranslationSection
-							sourceTextWithTranslation={heroTitle}
+							sourceTextWithTranslations={heroTitle}
 							sourceTextClassName="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent mb-2"
 							currentUserName={currentUser?.userName}
 							sourceLanguage={sourceLanguage}
 							targetLanguage={targetLanguage}
+							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 						/>
 					</h1>
 
 					<span className="text-xl mb-12 w-full">
 						<SourceTextAndTranslationSection
-							sourceTextWithTranslation={heroText}
+							sourceTextWithTranslations={heroText}
 							sourceTextClassName="mb-2"
 							currentUserName={currentUser?.userName}
 							sourceLanguage={sourceLanguage}
 							targetLanguage={targetLanguage}
+							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 						/>
 					</span>
 
@@ -124,6 +147,19 @@ export default function Index() {
 						</a>
 					</div>
 				</div>
+				{selectedSourceTextWithTranslations && (
+					<AddAndVoteTranslations
+						key={`add-and-vote-translations-${selectedSourceTextWithTranslations.sourceText.id}`}
+						open={true}
+						onOpenChange={(open) => {
+							if (!open) {
+								handleCloseAddAndVoteTranslations();
+							}
+						}}
+						currentUserName={currentUser?.userName}
+						sourceTextWithTranslations={selectedSourceTextWithTranslations}
+					/>
+				)}
 			</main>
 		</div>
 	);

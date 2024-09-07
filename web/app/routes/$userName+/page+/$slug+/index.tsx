@@ -18,7 +18,7 @@ import {
 	fetchPageWithTranslations,
 } from "./functions/queries.server";
 import { actionSchema } from "./types";
-import { getBestTranslation } from "./utils/get-best-translation";
+import { getBestTranslation } from "./utils/getBestTranslation";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	if (!data) {
