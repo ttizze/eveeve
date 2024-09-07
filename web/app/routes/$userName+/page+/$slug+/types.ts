@@ -15,6 +15,7 @@ export type TranslationWithVote = Pick<
 export interface SourceTextWithTranslations {
 	sourceText: SourceText;
 	translationsWithVotes: TranslationWithVote[];
+	bestTranslationWithVote: TranslationWithVote | null;
 }
 
 export type PageWithTranslations = {

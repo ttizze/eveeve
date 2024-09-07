@@ -1,58 +1,21 @@
-import { MoreVertical, X } from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import { Languages, Plus } from "lucide-react";
-import { useState } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
-import type { TranslationWithVote } from "../../types";
-import { getBestTranslation } from "../../utils/get-best-translation";
+import type { SourceTextWithTranslations } from "../../types";
 import { sanitizeAndParseText } from "../../utils/sanitize-and-parse-text.client";
-import { AddAndVoteTranslations } from "./AddAndVoteTranslations";
 
 interface TranslationSectionProps {
-	translationsWithVotes: TranslationWithVote[];
-	currentUserName: string | undefined;
-	sourceTextId: number;
-	sourceLanguage: string;
-	targetLanguage: string;
-}
-
-function ToggleButton({
-	isExpanded,
-	onClick,
-}: { isExpanded: boolean; onClick: () => void }) {
-	const Icon = isExpanded ? X : MoreVertical;
-	const label = isExpanded
-		? "Close translation options"
-		: "Show translation options";
-
-	return (
-		<button
-			type="button"
-			className={`absolute top-2 right-0 md:right-1 ${isExpanded ? " z-20 bg-transparent" : "z-0 "}`}
-			onClick={onClick}
-			aria-label={label}
-			title={label}
-		>
-			<Icon className="w-5 h-5 text-gray-500 " />
-		</button>
-	);
+	sourceTextWithTranslations: SourceTextWithTranslations;
+	onOpenAddAndVoteTranslations: (sourceTextId: number) => void;
 }
 
 export function TranslationSection({
-	translationsWithVotes,
-	currentUserName,
-	sourceTextId,
-	sourceLanguage,
-	targetLanguage,
+	sourceTextWithTranslations,
+	onOpenAddAndVoteTranslations,
 }: TranslationSectionProps) {
-	const [isExpanded, setIsExpanded] = useState(false);
 	const isHydrated = useHydrated();
 
-	const bestTranslationWithVote = getBestTranslation(translationsWithVotes);
-
-	const alternativeTranslationsWithVotes = bestTranslationWithVote
-		? translationsWithVotes.filter((t) => t.id !== bestTranslationWithVote.id)
-		: [];
-
+	const { bestTranslationWithVote, sourceText } = sourceTextWithTranslations;
 	const sanitizedAndParsedText = bestTranslationWithVote ? (
 		isHydrated ? (
 			sanitizeAndParseText(bestTranslationWithVote.text)
@@ -68,31 +31,39 @@ export function TranslationSection({
 
 	return (
 		<span className="group relative block rounded-md  bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 ">
-			<span
-				className="notranslate  inline-block cursor-pointer pl-4 pr-5 py-2"
-				onClick={() => setIsExpanded(!isExpanded)}
-				onKeyDown={(e) => {
-					if (e.key === "Enter" || e.key === " ") {
-						setIsExpanded(!isExpanded);
-					}
-				}}
-			>
+			<span className="notranslate  inline-block pl-4 pr-5 py-2">
 				{sanitizedAndParsedText}
 				<ToggleButton
-					isExpanded={isExpanded}
-					onClick={() => setIsExpanded(!isExpanded)}
+					className="group-hover:text-gray-800 dark:group-hover:text-gray-300 "
+					onClick={() => {
+						onOpenAddAndVoteTranslations(sourceText.id);
+					}}
 				/>
 			</span>
-			{isExpanded && (
-				<div className="mx-[-1rem] absolute -top-0 left-0 right-0 z-10  border bg-white dark:bg-gray-900 rounded-xl shadow-lg shadow-gray-800/10  dark:shadow-white/10  transition-all duration-500 ease-in-out">
-					<AddAndVoteTranslations
-						bestTranslationWithVote={bestTranslationWithVote}
-						alternativeTranslationsWithVotes={alternativeTranslationsWithVotes}
-						currentUserName={currentUserName}
-						sourceTextId={sourceTextId}
-					/>
-				</div>
-			)}
 		</span>
+	);
+}
+
+function ToggleButton({
+	className,
+	onClick,
+}: {
+	className?: string;
+	onClick: () => void;
+}) {
+	const label = "Show translation options";
+
+	return (
+		<button
+			type="button"
+			className={"absolute top-2 right-0 md:right-1"}
+			onClick={onClick}
+			aria-label={label}
+			title={label}
+		>
+			<MoreVertical
+				className={`w-5 h-5 text-gray-500 rounded-md ${className}`}
+			/>
+		</button>
 	);
 }
