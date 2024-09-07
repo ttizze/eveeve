@@ -26,14 +26,15 @@ import tailwind from "~/tailwind.css?url";
 import { authenticator } from "~/utils/auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	const gaTrackingId =
-		process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test"
-			? process.env.GOOGLE_ANALYTICS_ID ?? ""
-			: "";
+	const isDevelopment = process.env.NODE_ENV === "development";
+
+	const gaTrackingId = isDevelopment
+		? ""
+		: process.env.GOOGLE_ANALYTICS_ID ?? "";
 	const currentUser = await authenticator.isAuthenticated(request);
 	const locale = (await i18nServer.getLocale(request)) || "en";
 	return typedjson(
-		{ currentUser, locale, gaTrackingId },
+		{ isDevelopment, currentUser, locale, gaTrackingId },
 		{ headers: { "Set-Cookie": await localeCookie.serialize(locale) } },
 	);
 }
@@ -141,9 +142,25 @@ function CommonLayout({
 }
 
 export function ErrorBoundary() {
+	const isDevelopment = useRouteLoaderData<typeof loader>("root").isDevelopment;
 	const error = useRouteError();
 	const isHydrated = useHydrated();
 	captureRemixErrorBoundaryError(error);
+
+	if (isDevelopment) {
+		console.error(error);
+		return (
+			<div className="text-left p-4 bg-red-100 border border-red-400 rounded">
+				<pre className="whitespace-pre-wrap break-words">
+					{isRouteErrorResponse(error)
+						? `${error.status} ${error.statusText}`
+						: error instanceof Error
+							? error.stack
+							: JSON.stringify(error, null, 2)}
+				</pre>
+			</div>
+		);
+	}
 
 	return !isHydrated ? null : (
 		<div className="text-center flex flex-col items-center justify-center min-h-screen bg-gray-100">

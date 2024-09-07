@@ -150,3 +150,16 @@ export async function fetchLatestUserAITranslationInfo(
 		orderBy: { createdAt: "desc" },
 	});
 }
+
+export async function fetchLikeCount(pageId: number) {
+	const likeCount = await prisma.pageLike.count({
+		where: { pageId },
+	});
+	return likeCount;
+}
+export async function fetchIsLikedByUser(pageId: number, userId: number) {
+	const like = await prisma.pageLike.findFirst({
+		where: { pageId, userId },
+	});
+	return !!like;
+}

@@ -31,6 +31,7 @@ model User {
   votes                 Vote[]
   userAITranslationInfo UserAITranslationInfo[]
   customAIModels        CustomAIModel[]
+  pageLikes             PageLike[]
 
   @@map("users")
 }
@@ -94,8 +95,20 @@ model Page {
   userReadHistory     UserReadHistory[]
   genres              GenrePage[]
   tags                TagPage[]
-
+  likes               PageLike[]
   @@map("pages")
+}
+
+model PageLike {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  pageId    Int      @map("page_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
+  page      Page     @relation(fields: [pageId], references: [id])
+
+  @@unique([userId, pageId])
+  @@map("page_likes")
 }
 
 
