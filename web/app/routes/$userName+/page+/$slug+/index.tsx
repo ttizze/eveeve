@@ -7,13 +7,16 @@ import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import i18nServer from "~/i18n.server";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
+import { LikeButton } from "~/routes/resources+/like-button";
 import { authenticator } from "~/utils/auth.server";
 import { stripHtmlTags } from "../../utils/stripHtmlTags";
 import { ContentWithTranslations } from "./components/ContentWithTranslations";
 import { ShareDialog } from "./components/ShareDialog";
 import { createUserAITranslationInfo } from "./functions/mutations.server";
 import {
+	fetchIsLikedByUser,
 	fetchLatestUserAITranslationInfo,
+	fetchLikeCount,
 	fetchPageWithSourceTexts,
 	fetchPageWithTranslations,
 } from "./functions/queries.server";
@@ -96,6 +99,11 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const title = bestTranslationTitle
 		? `${sourceTitleWithTranslations.sourceText.text} - ${bestTranslationTitle.text}`
 		: sourceTitleWithTranslations.sourceText.text;
+	const likeCount = await fetchLikeCount(pageWithTranslations.id);
+	const isLikedByUser = await fetchIsLikedByUser(
+		pageWithTranslations.id,
+		currentUser?.id ?? 0,
+	);
 	return typedjson({
 		targetLanguage,
 		pageWithTranslations,
@@ -104,6 +112,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		userAITranslationInfo,
 		sourceTitleWithTranslations,
 		title,
+		likeCount,
+		isLikedByUser,
 	});
 };
 
@@ -188,6 +198,8 @@ export default function Page() {
 		sourceTitleWithTranslations,
 		title,
 		targetLanguage,
+		likeCount,
+		isLikedByUser,
 	} = useTypedLoaderData<typeof loader>();
 	const actionData = useActionData<typeof action>();
 	const [form, fields] = useForm({
@@ -207,10 +219,15 @@ export default function Page() {
 					userAITranslationInfo={userAITranslationInfo}
 					targetLanguage={targetLanguage}
 				/>
-			</article>
-			<div className="flex justify-center space-x-4 mt-8">
+			<div className="flex justify-between items-center mt-8 mx-4">
+				<LikeButton
+					liked={isLikedByUser}
+					likeCount={likeCount}
+					slug={pageWithTranslations.slug}
+				/>
 				<ShareDialog url={shareUrl} title={title} />
 			</div>
+			</article>
 		</div>
 	);
 }

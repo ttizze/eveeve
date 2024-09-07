@@ -18,6 +18,7 @@
 		"@aws-sdk/client-s3": "^3.637.0",
 		"@conform-to/react": "^1.1.5",
 		"@conform-to/zod": "^1.1.5",
+		"@google-analytics/data": "^4.8.0",
 		"@google-cloud/vertexai": "^1.6.0",
 		"@google/generative-ai": "^0.17.1",
 		"@mozilla/readability": "^0.5.0",

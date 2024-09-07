@@ -96,3 +96,33 @@ export async function handleVote(
 
 	return json({ success: true });
 }
+
+export async function toggleLike(userId: number, slug: string) {
+	const page = await prisma.page.findUnique({ where: { slug } });
+	if (!page) {
+		throw new Error("Page not found");
+	}
+
+	const existingLike = await prisma.pageLike.findUnique({
+		where: {
+			userId_pageId: {
+				userId,
+				pageId: page.id,
+			},
+		},
+	});
+
+	if (existingLike) {
+		await prisma.pageLike.delete({
+			where: { id: existingLike.id },
+		});
+		return { liked: false };
+	}
+	await prisma.pageLike.create({
+		data: {
+			userId,
+			pageId: page.id,
+		},
+	});
+	return { liked: true };
+}
