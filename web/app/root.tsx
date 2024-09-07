@@ -10,7 +10,7 @@ import {
 	useRouteError,
 } from "@remix-run/react";
 import { useLocation } from "@remix-run/react";
-import { useLoaderData, useRouteLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { captureRemixErrorBoundaryError, withSentry } from "@sentry/remix";
 import { useEffect } from "react";
 import { useChangeLanguage } from "remix-i18next/react";
@@ -46,7 +46,7 @@ export const links: LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
-	const { locale, gaTrackingId } = useRouteLoaderData<typeof loader>("root");
+	const { locale, gaTrackingId } = useLoaderData<typeof loader>();
 	const location = useLocation();
 	useEffect(() => {
 		if (gaTrackingId?.length) {
