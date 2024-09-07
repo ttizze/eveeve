@@ -219,14 +219,14 @@ export default function Page() {
 					userAITranslationInfo={userAITranslationInfo}
 					targetLanguage={targetLanguage}
 				/>
-			<div className="flex justify-between items-center mt-8 mx-4">
-				<LikeButton
-					liked={isLikedByUser}
-					likeCount={likeCount}
-					slug={pageWithTranslations.slug}
-				/>
-				<ShareDialog url={shareUrl} title={title} />
-			</div>
+				<div className="flex justify-between items-center mt-8 mx-4">
+					<LikeButton
+						liked={isLikedByUser}
+						likeCount={likeCount}
+						slug={pageWithTranslations.slug}
+					/>
+					<ShareDialog url={shareUrl} title={title} />
+				</div>
 			</article>
 		</div>
 	);
