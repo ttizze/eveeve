@@ -3,16 +3,16 @@ import type { SourceTextWithTranslations } from "../../types";
 import { TranslationSection } from "./TranslationSection";
 export function SourceTextAndTranslationSection({
 	sourceTextWithTranslations,
+	elements,
 	isPublished,
-	currentUserName,
 	sourceLanguage,
 	targetLanguage,
 	sourceTextClassName,
 	onOpenAddAndVoteTranslations,
 }: {
 	sourceTextWithTranslations: SourceTextWithTranslations;
+	elements: string | React.ReactNode | React.ReactNode[];
 	isPublished?: boolean;
-	currentUserName: string | undefined;
 	sourceLanguage: string;
 	targetLanguage: string;
 	sourceTextClassName?: string;
@@ -26,7 +26,7 @@ export function SourceTextAndTranslationSection({
 		<>
 			<span className={spanClassName}>
 				{isPublished === false && <Lock className="h-6 w-6 mr-1 inline" />}
-				{sourceTextWithTranslations.sourceText.text}
+				{elements}
 			</span>
 			{sourceLanguage === targetLanguage ||
 			sourceTextWithTranslations.translationsWithVotes.length === 0 ? null : (

@@ -96,7 +96,7 @@ export default function Index() {
 						<SourceTextAndTranslationSection
 							sourceTextWithTranslations={heroTitle}
 							sourceTextClassName="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent mb-2"
-							currentUserName={currentUser?.userName}
+							elements={heroTitle.sourceText.text}
 							sourceLanguage={sourceLanguage}
 							targetLanguage={targetLanguage}
 							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
@@ -107,7 +107,7 @@ export default function Index() {
 						<SourceTextAndTranslationSection
 							sourceTextWithTranslations={heroText}
 							sourceTextClassName="mb-2"
-							currentUserName={currentUser?.userName}
+							elements={heroText.sourceText.text}
 							sourceLanguage={sourceLanguage}
 							targetLanguage={targetLanguage}
 							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}

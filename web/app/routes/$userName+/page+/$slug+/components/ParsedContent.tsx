@@ -55,7 +55,7 @@ export function ParsedContent({
 						<SourceTextAndTranslationSection
 							key={`translation-${sourceTextId}`}
 							sourceTextWithTranslations={sourceTextWithTranslation}
-							currentUserName={currentUserName}
+							elements={domToReact(domNode.children as DOMNode[], options)}
 							sourceLanguage={sourceLanguage}
 							targetLanguage={targetLanguage}
 							onOpenAddAndVoteTranslations={onOpenAddAndVoteTranslations}
