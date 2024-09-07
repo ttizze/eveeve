@@ -62,7 +62,7 @@ export function ContentWithTranslations({
 					<SourceTextAndTranslationSection
 						sourceTextWithTranslations={sourceTitleWithTranslations}
 						isPublished={pageWithTranslations.isPublished}
-						currentUserName={currentUserName}
+						elements={sourceTitleWithTranslations.sourceText.text}
 						sourceLanguage={pageWithTranslations.sourceLanguage}
 						targetLanguage={targetLanguage}
 						onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
