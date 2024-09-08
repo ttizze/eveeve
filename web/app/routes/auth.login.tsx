@@ -25,14 +25,14 @@ const loginSchema = z.object({
 	password: z.string().min(4, "パスワードは4文字以上である必要があります"),
 });
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export async function loader({ request }: LoaderFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
 		successRedirect: "/",
 	});
 	return json({ currentUser });
-};
+}
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.clone().formData();
 	const intent = String(formData.get("intent"));
 	const submission = parseWithZod(formData, { schema: loginSchema });
@@ -56,7 +56,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	} catch (error) {
 		return submission.reply({ formErrors: [error as string] });
 	}
-};
+}
 
 const LoginPage = () => {
 	const lastResult = useActionData<typeof action>();

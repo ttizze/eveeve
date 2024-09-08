@@ -11,7 +11,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		const session = await getSession(request.headers.get("Cookie"));
 		session.set("user", user);
 
-		console.log(user.userName);
 		const redirectTo = user.userName.startsWith("new-user-")
 			? "/welcome"
 			: `/${user.userName}`;

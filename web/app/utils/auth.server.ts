@@ -54,7 +54,6 @@ const googleStrategy = new GoogleStrategy<SanitizedUser>(
 			where: { email: profile.emails[0].value },
 		});
 		if (user) {
-			console.log("User found", user);
 			return sanitizeUser(user);
 		}
 

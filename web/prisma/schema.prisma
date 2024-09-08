@@ -1,3 +1,16 @@
+generator zod {
+  provider                         = "zod-prisma-types"
+  output                           = "../app/prisma/generated/zod"
+  writeBarrelFiles                 = false
+  createInputTypes                 = false
+  createModelTypes                 = true
+  addInputTypeValidation           = true
+  createOptionalDefaultValuesTypes = true
+  createRelationValuesTypes        = true
+  createPartialTypes               = true
+  useDefaultValidators             = false
+}
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,7 +26,7 @@ model User {
   userName              String                  @unique @map("user_name")
   displayName           String                  @map("display_name")
   password              String?
-  icon                 String
+  icon                  String
   profile               String                  @default("")
   plan                  String                  @default("free")
   totalPoints           Int                     @default(0) @map("total_points")
@@ -31,7 +44,7 @@ model User {
   votes                 Vote[]
   userAITranslationInfo UserAITranslationInfo[]
   customAIModels        CustomAIModel[]
-  pageLikes             PageLike[]
+  likePages             LikePage[]
 
   @@map("users")
 }
@@ -78,28 +91,29 @@ model PageTranslationInfo {
 }
 
 model Page {
-  id                  Int                   @id @default(autoincrement())
-  slug                String                @unique
-  title               String
-  content             String
-  sourceLanguage      String                @default("unknown")
-  isPublished         Boolean               @default(false) @map("is_published")
-  isArchived          Boolean               @default(false) @map("is_archived")
-  createdAt           DateTime              @default(now()) @map("created_at")
-  updatedAt           DateTime              @updatedAt @map("updated_at")
-  user                User                  @relation(fields: [userId], references: [id])
-  userId              Int                   @map("user_id")
+  id                    Int                     @id @default(autoincrement())
+  slug                  String                  @unique
+  title                 String
+  content               String
+  sourceLanguage        String                  @default("unknown")
+  isPublished           Boolean                 @default(false) @map("is_published")
+  isArchived            Boolean                 @default(false) @map("is_archived")
+  createdAt             DateTime                @default(now()) @map("created_at")
+  updatedAt             DateTime                @updatedAt @map("updated_at")
+  user                  User                    @relation(fields: [userId], references: [id])
+  userId                Int                     @map("user_id")
   userAITranslationInfo UserAITranslationInfo[]
-  sourceTexts     SourceText[]
-  pageTranslationInfo PageTranslationInfo[]
-  userReadHistory     UserReadHistory[]
-  genres              GenrePage[]
-  tags                TagPage[]
-  likes               PageLike[]
+  sourceTexts           SourceText[]
+  pageTranslationInfo   PageTranslationInfo[]
+  userReadHistory       UserReadHistory[]
+  genrePages            GenrePage[]
+  tagPages              TagPage[]
+  likePages             LikePage[]
+
   @@map("pages")
 }
 
-model PageLike {
+model LikePage {
   id        Int      @id @default(autoincrement())
   userId    Int      @map("user_id")
   pageId    Int      @map("page_id")
@@ -108,9 +122,8 @@ model PageLike {
   page      Page     @relation(fields: [pageId], references: [id])
 
   @@unique([userId, pageId])
-  @@map("page_likes")
+  @@map("like_pages")
 }
-
 
 model Genre {
   id    Int         @id @default(autoincrement())
@@ -129,10 +142,9 @@ model GenrePage {
   @@id([genreId, pageId])
   @@map("genre_pages")
 }
-
 model Tag {
   id    Int       @id @default(autoincrement())
-  name  String    @unique
+  name  String    @unique /// @zod.string.regex(/^[a-zA-Z0-9-_]+$/, {message: "Tag can only contain letters, numbers, - and _",})
   pages TagPage[]
 
   @@map("tags")
@@ -149,13 +161,13 @@ model TagPage {
 }
 
 model SourceText {
-  id              Int              @id @default(autoincrement())
-  text            String
-  number          Int
-  translateTexts  TranslateText[]
-  page            Page             @relation(fields: [pageId], references: [id])
-  pageId          Int              @map("page_id")
-  createdAt       DateTime         @default(now()) @map("created_at")
+  id             Int             @id @default(autoincrement())
+  text           String
+  number         Int
+  translateTexts TranslateText[]
+  page           Page            @relation(fields: [pageId], references: [id])
+  pageId         Int             @map("page_id")
+  createdAt      DateTime        @default(now()) @map("created_at")
 
   @@index([pageId, number])
   @@map("source_texts")

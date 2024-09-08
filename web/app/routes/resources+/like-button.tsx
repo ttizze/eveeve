@@ -5,7 +5,7 @@ import { Button } from "~/components/ui/button";
 import { authenticator } from "~/utils/auth.server";
 import { toggleLike } from "./functions/mutations.server";
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
+export async function action({ params, request }: ActionFunctionArgs) {
 	const user = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/auth/login",
 	});
@@ -13,7 +13,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 	const slug = formData.get("slug") as string;
 	const liked = await toggleLike(user.id, slug);
 	return { liked };
-};
+}
 
 type LikeButtonProps = {
 	liked: boolean;

@@ -1,21 +1,17 @@
-import { type LoaderFunction, json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { type LoaderFunctionArgs, json } from "@remix-run/node";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export async function loader({ request }: LoaderFunctionArgs) {
 	// ルートローダーを実行したい場合はここで行います
 	// const rootData = await loadRootData(request);
 
 	// 404エラーをスローします
 	throw json({ message: "Not Found" }, { status: 404 });
-};
+}
 
 export default function CatchAllRoute() {
-	// このコンポーネントは通常レンダリングされません（エラーがスローされるため）
-	// しかし、エラーバウンダリを使用しない場合はここでカスタム404ページをレンダリングできます
-	const data = useLoaderData<typeof loader>();
 	return (
 		<div>
-			<p>{data.message}</p>
+			<p>Not Found</p>
 		</div>
 	);
 }

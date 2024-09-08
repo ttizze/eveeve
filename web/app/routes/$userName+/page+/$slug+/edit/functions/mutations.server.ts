@@ -67,3 +67,44 @@ export async function createOrUpdateSourceTexts(
 		return results;
 	});
 }
+
+export async function upsertTags(
+	tags: { id?: number; name: string }[],
+	pageId: number,
+) {
+	const upsertPromises = tags.map(async (tag) => {
+		const upsertedTag = await prisma.tag.upsert({
+			where: { name: tag.name },
+			update: {},
+			create: { name: tag.name },
+		});
+
+		await prisma.tagPage.upsert({
+			where: {
+				tagId_pageId: {
+					tagId: upsertedTag.id,
+					pageId: pageId,
+				},
+			},
+			update: {},
+			create: {
+				tagId: upsertedTag.id,
+				pageId: pageId,
+			},
+		});
+
+		return upsertedTag;
+	});
+
+	const updatedTags = await Promise.all(upsertPromises);
+
+	const tagIdsToKeep = updatedTags.map((tag) => tag.id);
+	await prisma.tagPage.deleteMany({
+		where: {
+			pageId,
+			tagId: { notIn: tagIdsToKeep },
+		},
+	});
+
+	return updatedTags;
+}

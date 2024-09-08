@@ -43,14 +43,14 @@ const schema = z.object({
 		),
 });
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export async function loader({ request }: LoaderFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/auth/login",
 	});
 	return { currentUser };
-};
+}
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export async function action({ request }: ActionFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/auth/login",
 	});
@@ -82,7 +82,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 			formErrors: ["An error occurred while updating your username."],
 		});
 	}
-};
+}
 
 export default function Welcome() {
 	const actionData = useActionData<typeof action>();
