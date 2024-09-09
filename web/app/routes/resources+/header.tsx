@@ -38,7 +38,7 @@ export function Header({ currentUser }: HeaderProps) {
 	return (
 		<header className="shadow-sm z-10 ">
 			<div className="max-w-7xl mx-auto py-2 md:py-4 px-2 md:px-6 lg:px-8 flex justify-between items-center">
-				<Link to="/">
+				<Link to="/home">
 					<h1 className="text-2xl font-bold">EveEve</h1>
 				</Link>
 				<div className="grid grid-cols-3 gap-0 items-center">
