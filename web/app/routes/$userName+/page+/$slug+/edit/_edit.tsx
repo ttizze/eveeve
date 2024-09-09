@@ -41,7 +41,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 export const editPageSchema = z.object({
 	title: z.string().min(1, "Required"),
 	pageContent: z.string().min(1, "Required Change something"),
-	isPublished: z.boolean(),
+	isPublished: z.enum(["true", "false"]),
 	tags: z
 		.array(z.object({ id: z.number().optional(), name: z.string() }))
 		.optional(),
@@ -83,6 +83,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	}
 
 	const { title, pageContent, isPublished, tags } = submission.value;
+	const isPublishedBool = isPublished === "true";
 	const titleSourceTextId = await getTitleSourceTextId(slug);
 	//tiptapが既存の要素を引き継いで重複したsourceTextIdを追加してしまうため、重複を削除
 	const numberedContent = await removeSourceTextIdDuplicatesAndEmptyElements(
@@ -101,7 +102,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		slug,
 		title,
 		numberedContent,
-		isPublished,
+		isPublishedBool,
 		sourceLanguage,
 	);
 	if (tags) {
@@ -120,7 +121,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		slug,
 		title,
 		contentWithSourceTextId,
-		isPublished,
+		isPublishedBool,
 		sourceLanguage,
 	);
 	return null;
@@ -136,6 +137,15 @@ export default function EditPage() {
 		id: "edit-page",
 		lastResult: fetcher.data?.lastResult,
 		constraint: getZodConstraint(editPageSchema),
+		defaultValue: {
+			title: page?.title,
+			pageContent: page?.content,
+			isPublished: page?.isPublished.toString(),
+			tags: page?.tagPages.map((tagPage) => ({
+				id: tagPage.tagId,
+				name: tagPage.tag.name,
+			})),
+		},
 	});
 
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -160,6 +170,7 @@ export default function EditPage() {
 							<h1 className="text-4xl font-bold !mb-0 h-auto">
 								<TextareaAutosize
 									{...getTextareaProps(fields.title)}
+									defaultValue={page?.title}
 									placeholder="input title..."
 									className="w-full outline-none bg-transparent resize-none overflow-hidden"
 									minRows={1}

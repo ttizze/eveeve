@@ -1,7 +1,6 @@
 import {
 	type FieldMetadata,
 	type FormId,
-	getInputProps,
 	useFormMetadata,
 } from "@conform-to/react";
 import { Link } from "@remix-run/react";
@@ -12,10 +11,8 @@ import {
 	ArrowUpFromLine,
 	Check,
 	Globe,
-	Hash,
 	Loader2,
 	Lock,
-	Plus,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { z } from "zod";
@@ -26,12 +23,6 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { Input } from "~/components/ui/input";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "~/components/ui/popover";
 import type { SanitizedUser } from "~/types";
 import type { editPageSchema } from "../_edit";
 
@@ -61,19 +52,11 @@ export function EditHeader({
 	const isSubmitting = fetcher.state === "submitting";
 	const [isPublished, setIsPublished] = useState(initialIsPublished);
 
-	const [tagInput, setTagInput] = useState("");
-
-	const handleAddTag = () => {
-		if (tagInput.trim()) {
-			const newTags = [...(tagsMeta.value || []), { name: tagInput.trim() }];
-			setTagInput("");
-			setHasUnsavedChanges(true);
-		}
-	};
-
 	const handlePublishToggle = (newPublishState: boolean) => {
 		setIsPublished(newPublishState);
+		setHasUnsavedChanges(true);
 	};
+
 	useEffect(() => {
 		if (fetcher.state === "loading") {
 			setHasUnsavedChanges(false);
@@ -135,83 +118,56 @@ export function EditHeader({
 					/>
 				</div>
 				<div className="justify-self-end flex items-center">
-					<Popover>
+					{/* <Popover>
 						<PopoverTrigger asChild>
 							<Button variant="outline" className="ml-2 px-2">
 								<Hash className="w-4 h-4 mr-1" />
 								<span className="text-gray-500 text-sm">{tags.length}</span>
 							</Button>
 						</PopoverTrigger>
-						<PopoverContent className="w-80">
-							<div className="space-y-4">
-								<div className=" flex items-center">
-									<Hash className="w-4 h-4 mr-2" />
-									<Input
-										type="text"
-										className="mt-0"
-										placeholder="Add a tag"
-										value={tagInput}
-										onChange={(e) => setTagInput(e.target.value)}
-										onKeyDown={(e) => e.key === "Enter" && handleAddTag()}
-									/>
+						<PopoverContent className="w-80 p-4">
+							<div className="space-y-4 flex flex-col justify-center">
+								<div className="space-y-2">
 									{tags.map((tag, index) => {
 										const tagFields = tag.getFieldset();
 										return (
-											<>
-												<span
-													key={tag.key}
-													className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-full text-sm flex items-center"
-												>
-													#{tag.name}
-													<button
+											<div key={tag.key} className="flex items-center ">
+												<Hash className="w-5 h-5 mr-2 text-gray-500" />
+												<div className="bg-gray-300  rounded-full flex items-center">
+													<input
+														{...getInputProps(tagFields.name, { type: "text" })}
+														onChange={() => setHasUnsavedChanges(true)}
+														className="bg-transparent text-gray-900 text-sm  w-full p-2 focus:outline-none"
+													/>
+													<Button
+														variant="ghost"
+														size="icon"
 														{...form.remove.getButtonProps({
 															name: tagsMeta.name,
 															index,
 														})}
-														key={tag.key}
 														onClick={() => setHasUnsavedChanges(true)}
+														className="rounded-full text-gray-500"
 													>
-														x
-													</button>
-													<input type="hidden" value={JSON.stringify(tag)} />
-												</span>
-												<Input
-													{...getInputProps(tagFields.name, { type: "text" })}
-													key={tag.key}
-													onChange={(e) => setHasUnsavedChanges(true)}
-												/>
-												{tagFields.name.errors?.map((error) => (
-													<p className="text-sm text-red-500" key={error}>
-														{error}
-													</p>
-												))}
-												<button
-													{...form.remove.getButtonProps({
-														name: tagsMeta.name,
-														index,
-													})}
-													key={tag.key}
-													onClick={() => setHasUnsavedChanges(true)}
-												>
-													x
-												</button>
-											</>
+														×
+													</Button>
+												</div>
+											</div>
 										);
 									})}
-									<button
-										{...form.insert.getButtonProps({
-											name: tagsMeta.name,
-										})}
-										onClick={() => setHasUnsavedChanges(true)}
-										type="button"
-										className=""
-									>
-										<Plus className="w-4 h-4" />
-									</button>
 								</div>
+								<Button
+									variant="default"
+									size="lg"
+									{...form.insert.getButtonProps({ name: tagsMeta.name })}
+									onClick={() => setHasUnsavedChanges(true)}
+									className="text-center rounded-full"
+								>
+									<Plus className="w-5 h-5" />
+								</Button>
 							</div>
 						</PopoverContent>
-					</Popover>
+					</Popover> */}
 					<div>
 						<DropdownMenu modal={false}>
 							<DropdownMenuTrigger asChild>
