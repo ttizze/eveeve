@@ -1,7 +1,16 @@
 import { prisma } from "~/utils/prisma";
 
 export async function getPageBySlug(slug: string) {
-	return await prisma.page.findUnique({ where: { slug } });
+	return await prisma.page.findUnique({
+		where: { slug },
+		include: {
+			tagPages: {
+				include: {
+					tag: true,
+				},
+			},
+		},
+	});
 }
 
 export async function getTitleSourceTextId(slug: string) {

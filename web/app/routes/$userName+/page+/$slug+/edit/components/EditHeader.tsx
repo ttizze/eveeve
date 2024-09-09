@@ -1,3 +1,8 @@
+import {
+	type FieldMetadata,
+	type FormId,
+	useFormMetadata,
+} from "@conform-to/react";
 import { Link } from "@remix-run/react";
 import type { FetcherWithComponents } from "@remix-run/react";
 import {
@@ -10,6 +15,7 @@ import {
 	Lock,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
 	DropdownMenu,
@@ -18,14 +24,17 @@ import {
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import type { SanitizedUser } from "~/types";
+import type { editPageSchema } from "../_edit";
 
 interface EditHeaderProps {
 	currentUser: SanitizedUser | null;
-	pageSlug: string | null;
-	initialIsPublished: boolean;
+	pageSlug: string | undefined;
+	initialIsPublished: boolean | undefined;
 	fetcher: FetcherWithComponents<unknown>;
 	hasUnsavedChanges: boolean;
 	setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
+	tagsMeta: FieldMetadata<z.infer<typeof editPageSchema>["tags"]>;
+	formId: FormId<z.infer<typeof editPageSchema>>;
 }
 
 export function EditHeader({
@@ -35,13 +44,19 @@ export function EditHeader({
 	fetcher,
 	hasUnsavedChanges,
 	setHasUnsavedChanges,
+	tagsMeta,
+	formId,
 }: EditHeaderProps) {
+	const form = useFormMetadata(formId);
+	const tags = tagsMeta.getFieldList();
 	const isSubmitting = fetcher.state === "submitting";
 	const [isPublished, setIsPublished] = useState(initialIsPublished);
 
 	const handlePublishToggle = (newPublishState: boolean) => {
 		setIsPublished(newPublishState);
+		setHasUnsavedChanges(true);
 	};
+
 	useEffect(() => {
 		if (fetcher.state === "loading") {
 			setHasUnsavedChanges(false);
@@ -102,33 +117,85 @@ export function EditHeader({
 						value={isPublished ? "true" : "false"}
 					/>
 				</div>
-				<div className="justify-self-end">
-					<DropdownMenu modal={false}>
-						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" className="ml-auto" type="button">
-								{isPublished ? (
-									<Globe className="w-5 h-5  mr-2" />
-								) : (
-									<Lock className="w-5 h-5 text-gray-500 mr-2" />
-								)}
-								{isPublished ? (
-									"Public"
-								) : (
-									<span className="text-gray-500">Private</span>
-								)}
+				<div className="justify-self-end flex items-center">
+					{/* <Popover>
+						<PopoverTrigger asChild>
+							<Button variant="outline" className="ml-2 px-2">
+								<Hash className="w-4 h-4 mr-1" />
+								<span className="text-gray-500 text-sm">{tags.length}</span>
 							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							<DropdownMenuItem onSelect={() => handlePublishToggle(false)}>
-								<Lock className="mr-2 h-4 w-4" />
-								<span className="text-gray-500">Set to Private</span>
-							</DropdownMenuItem>
-							<DropdownMenuItem onSelect={() => handlePublishToggle(true)}>
-								<Globe className="mr-2 h-4 w-4" />
-								<span>Set to Public</span>
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+						</PopoverTrigger>
+						<PopoverContent className="w-80 p-4">
+							<div className="space-y-4 flex flex-col justify-center">
+								<div className="space-y-2">
+									{tags.map((tag, index) => {
+										const tagFields = tag.getFieldset();
+										return (
+											<div key={tag.key} className="flex items-center ">
+												<Hash className="w-5 h-5 mr-2 text-gray-500" />
+												<div className="bg-gray-300  rounded-full flex items-center">
+													<input
+														{...getInputProps(tagFields.name, { type: "text" })}
+														onChange={() => setHasUnsavedChanges(true)}
+														className="bg-transparent text-gray-900 text-sm  w-full p-2 focus:outline-none"
+													/>
+													<Button
+														variant="ghost"
+														size="icon"
+														{...form.remove.getButtonProps({
+															name: tagsMeta.name,
+															index,
+														})}
+														onClick={() => setHasUnsavedChanges(true)}
+														className="rounded-full text-gray-500"
+													>
+														×
+													</Button>
+												</div>
+											</div>
+										);
+									})}
+								</div>
+								<Button
+									variant="default"
+									size="lg"
+									{...form.insert.getButtonProps({ name: tagsMeta.name })}
+									onClick={() => setHasUnsavedChanges(true)}
+									className="text-center rounded-full"
+								>
+									<Plus className="w-5 h-5" />
+								</Button>
+							</div>
+						</PopoverContent>
+					</Popover> */}
+					<div>
+						<DropdownMenu modal={false}>
+							<DropdownMenuTrigger asChild>
+								<Button variant="ghost" className="ml-auto" type="button">
+									{isPublished ? (
+										<Globe className="w-5 h-5  mr-2" />
+									) : (
+										<Lock className="w-5 h-5 text-gray-500 mr-2" />
+									)}
+									{isPublished ? (
+										"Public"
+									) : (
+										<span className="text-gray-500">Private</span>
+									)}
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								<DropdownMenuItem onSelect={() => handlePublishToggle(false)}>
+									<Lock className="mr-2 h-4 w-4" />
+									<span className="text-gray-500">Set to Private</span>
+								</DropdownMenuItem>
+								<DropdownMenuItem onSelect={() => handlePublishToggle(true)}>
+									<Globe className="mr-2 h-4 w-4" />
+									<span>Set to Public</span>
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
 				</div>
 			</div>
 		</header>

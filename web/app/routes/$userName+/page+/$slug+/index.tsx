@@ -47,7 +47,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	];
 };
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export async function loader({ params, request }: LoaderFunctionArgs) {
 	const { slug } = params;
 
 	if (!slug) {
@@ -115,9 +115,9 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		likeCount,
 		isLikedByUser,
 	});
-};
+}
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export async function action({ request }: ActionFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/auth/login",
 	});
@@ -187,7 +187,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 		default:
 			throw new Error("Invalid Intent");
 	}
-};
+}
 
 export default function Page() {
 	const {

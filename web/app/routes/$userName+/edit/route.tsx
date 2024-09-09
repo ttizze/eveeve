@@ -35,7 +35,7 @@ const schema = z.object({
 	icon: z.string(),
 });
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export async function loader({ params, request }: LoaderFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/login",
 	});
@@ -47,9 +47,9 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 		throw new Response("Not Found", { status: 404 });
 	}
 	return typedjson({ currentUser: updatedUser });
-};
+}
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export async function action({ request }: ActionFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/login",
 	});
@@ -69,7 +69,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	session.set("user", sanitizeUser(updatedUser));
 	await commitSession(session);
 	return null;
-};
+}
 
 export default function EditProfile() {
 	const { currentUser } = useTypedLoaderData<typeof loader>();

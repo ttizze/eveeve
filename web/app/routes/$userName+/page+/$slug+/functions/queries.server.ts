@@ -152,13 +152,13 @@ export async function fetchLatestUserAITranslationInfo(
 }
 
 export async function fetchLikeCount(pageId: number) {
-	const likeCount = await prisma.pageLike.count({
+	const likeCount = await prisma.likePage.count({
 		where: { pageId },
 	});
 	return likeCount;
 }
 export async function fetchIsLikedByUser(pageId: number, userId: number) {
-	const like = await prisma.pageLike.findFirst({
+	const like = await prisma.likePage.findFirst({
 		where: { pageId, userId },
 	});
 	return !!like;

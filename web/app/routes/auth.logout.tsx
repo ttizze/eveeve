@@ -10,17 +10,18 @@ import {
 	CardTitle,
 } from "~/components/ui/card";
 import { authenticator } from "../utils/auth.server";
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+
+export async function loader({ request }: LoaderFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/auth/login",
 	});
 
 	return json({ currentUser });
-};
+}
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export async function action({ request }: ActionFunctionArgs) {
 	return await authenticator.logout(request, { redirectTo: "/" });
-};
+}
 export default function Logout() {
 	const { currentUser } = useLoaderData<typeof loader>();
 	return (

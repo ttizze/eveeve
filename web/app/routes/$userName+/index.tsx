@@ -38,7 +38,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	return [{ title: data.sanitizedUserWithPages.displayName }];
 };
 
-export const loader = async ({ params, request }: LoaderFunctionArgs) => {
+export async function loader({ params, request }: LoaderFunctionArgs) {
 	const { userName } = params;
 	if (!userName) throw new Error("Username is required");
 	const currentUser = await authenticator.isAuthenticated(request);
@@ -54,9 +54,9 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	).toLocaleDateString();
 
 	return { sanitizedUserWithPages, isOwner, pageCreatedAt };
-};
+}
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export async function action({ request }: ActionFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/login",
 	});
@@ -82,7 +82,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 		default:
 			return { error: "Invalid action" };
 	}
-};
+}
 
 export default function UserProfile() {
 	const navigate = useNavigate();

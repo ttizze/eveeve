@@ -103,7 +103,7 @@ export async function toggleLike(userId: number, slug: string) {
 		throw new Error("Page not found");
 	}
 
-	const existingLike = await prisma.pageLike.findUnique({
+	const existingLike = await prisma.likePage.findUnique({
 		where: {
 			userId_pageId: {
 				userId,
@@ -113,12 +113,12 @@ export async function toggleLike(userId: number, slug: string) {
 	});
 
 	if (existingLike) {
-		await prisma.pageLike.delete({
+		await prisma.likePage.delete({
 			where: { id: existingLike.id },
 		});
 		return { liked: false };
 	}
-	await prisma.pageLike.create({
+	await prisma.likePage.create({
 		data: {
 			userId,
 			pageId: page.id,

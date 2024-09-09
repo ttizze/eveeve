@@ -1,11 +1,12 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { type ActionFunction, json } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import {
 	unstable_createMemoryUploadHandler,
 	unstable_parseMultipartFormData,
 } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
 
-export const action: ActionFunction = async ({ request }) => {
+export async function action({ request }: ActionFunctionArgs) {
 	const uploadHandler = unstable_createMemoryUploadHandler({
 		maxPartSize: 1024 * 1024 * 10,
 	});
@@ -20,7 +21,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 	const url = await uploadToR2(file);
 	return json({ url });
-};
+}
 
 const isProduction = process.env.NODE_ENV === "production";
 
