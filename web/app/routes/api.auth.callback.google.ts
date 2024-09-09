@@ -13,7 +13,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 		const redirectTo = user.userName.startsWith("new-user-")
 			? "/welcome"
-			: `/${user.userName}`;
+			: "/home";
 
 		// セッションをコミットしてリダイレクト
 		return redirect(redirectTo, {

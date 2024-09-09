@@ -44,7 +44,7 @@ export function Footer({ currentUser }: FooterProps) {
 			<div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
 				<div className="flex flex-col space-y-4">
 					<div className="flex flex-col space-y-4">
-						<Link to="/">
+						<Link to="/home">
 							<h1 className="text-4xl font-bold">EveEve</h1>
 						</Link>
 						<div className="flex items-center space-x-4">
