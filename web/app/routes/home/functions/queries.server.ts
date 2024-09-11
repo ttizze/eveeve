@@ -1,39 +1,57 @@
 import { prisma } from "~/utils/prisma";
 
-export async function fetchLatestPublicPages(
-	limit = 10,
-	currentUserId?: number,
+export async function fetchPaginatedPublicPages(
+	page = 1,
+	pageSize = 9,
+	currentUserId?: number
 ) {
-	return prisma.page.findMany({
-		where: {
-			isPublished: true,
-			isArchived: false,
-		},
-		orderBy: {
-			createdAt: "desc",
-		},
-		take: limit,
-		include: {
-			user: {
-				select: {
-					userName: true,
-					displayName: true,
-					icon: true,
+	const skip = (page - 1) * pageSize;
+	const [pages, totalCount] = await Promise.all([
+		prisma.page.findMany({
+			where: {
+				isPublished: true,
+				isArchived: false,
+			},
+			orderBy: {
+				createdAt: "desc",
+			},
+			skip,
+			take: pageSize,
+			include: {
+				user: {
+					select: {
+						userName: true,
+						displayName: true,
+						icon: true,
+					},
+				},
+				likePages: {
+					where: {
+						userId: currentUserId,
+					},
+					select: {
+						userId: true,
+					},
+				},
+				_count: {
+					select: {
+						likePages: true,
+					},
 				},
 			},
-			likePages: {
-				where: {
-					userId: currentUserId,
-				},
-				select: {
-					userId: true,
-				},
+		}),
+		prisma.page.count({
+			where: {
+				isPublished: true,
+				isArchived: false,
 			},
-			_count: {
-				select: {
-					likePages: true,
-				},
-			},
-		},
-	});
+		}),
+	]);
+	
+
+	return {
+		pages,
+		totalPages: Math.ceil(totalCount / pageSize),
+		currentPage: page,
+	};
 }

@@ -58,7 +58,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
 	const currentUser = await authenticator.authenticate("google", request);
 	return currentUser
-		? redirect(`/${currentUser.userName}`)
+		? redirect("/home")
 		: redirect("/auth/login");
 }
 
