@@ -3,7 +3,7 @@ import { prisma } from "~/utils/prisma";
 export async function fetchPaginatedPublicPages(
 	page = 1,
 	pageSize = 9,
-	currentUserId?: number
+	currentUserId?: number,
 ) {
 	const skip = (page - 1) * pageSize;
 	const [pages, totalCount] = await Promise.all([
@@ -47,7 +47,6 @@ export async function fetchPaginatedPublicPages(
 			},
 		}),
 	]);
-	
 
 	return {
 		pages,

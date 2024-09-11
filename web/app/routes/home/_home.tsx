@@ -1,13 +1,26 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, useSearchParams, Link } from "@remix-run/react";
+import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import type { MetaFunction } from "@remix-run/react";
+import { CalendarPlus } from "lucide-react";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "~/components/ui/card";
+import {
+	Pagination,
+	PaginationContent,
+	PaginationItem,
+	PaginationLink,
+	PaginationNext,
+	PaginationPrevious,
+} from "~/components/ui/pagination";
 import { LikeButton } from "~/routes/resources+/like-button";
 import { authenticator } from "~/utils/auth.server";
 import { fetchPaginatedPublicPages } from "./functions/queries.server";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "~/components/ui/card";
-import type { MetaFunction } from "@remix-run/react";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "~/components/ui/pagination";
-import { CalendarPlus } from "lucide-react";
 export const meta: MetaFunction = () => {
 	return [{ title: "Home - Latest Pages" }];
 };
@@ -16,12 +29,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
 	const page = Number.parseInt(url.searchParams.get("page") || "1", 10);
 	const currentUser = await authenticator.isAuthenticated(request);
-	const { pages, totalPages, currentPage } = await fetchPaginatedPublicPages(page, 9, currentUser?.id);
+	const { pages, totalPages, currentPage } = await fetchPaginatedPublicPages(
+		page,
+		9,
+		currentUser?.id,
+	);
 	return json({ pages, totalPages, currentPage, currentUser });
 }
 
 export default function Home() {
-	const { pages, totalPages, currentPage, currentUser } = useLoaderData<typeof loader>();
+	const { pages, totalPages, currentPage, currentUser } =
+		useLoaderData<typeof loader>();
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const handlePageChange = (newPage: number) => {
@@ -30,7 +48,10 @@ export default function Home() {
 
 	return (
 		<div className="container mx-auto px-4">
-			<h1 className="text-3xl font-bold mb-6 flex items-center gap-2"><CalendarPlus />New</h1>
+			<h1 className="text-3xl font-bold mb-6 flex items-center gap-2">
+				<CalendarPlus />
+				New
+			</h1>
 			<div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
 				{pages.map((page) => (
 					<Card
@@ -90,22 +111,28 @@ export default function Home() {
 					<PaginationContent>
 						{currentPage > 1 && (
 							<PaginationItem>
-								<PaginationPrevious onClick={() => handlePageChange(currentPage - 1)} />
+								<PaginationPrevious
+									onClick={() => handlePageChange(currentPage - 1)}
+								/>
 							</PaginationItem>
 						)}
-						{Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-							<PaginationItem key={pageNum}>
-								<PaginationLink
-									onClick={() => handlePageChange(pageNum)}
-									isActive={pageNum === currentPage}
-								>
-									{pageNum}
-								</PaginationLink>
-							</PaginationItem>
-						))}
+						{Array.from({ length: totalPages }, (_, i) => i + 1).map(
+							(pageNum) => (
+								<PaginationItem key={pageNum}>
+									<PaginationLink
+										onClick={() => handlePageChange(pageNum)}
+										isActive={pageNum === currentPage}
+									>
+										{pageNum}
+									</PaginationLink>
+								</PaginationItem>
+							),
+						)}
 						{currentPage < totalPages && (
 							<PaginationItem>
-								<PaginationNext onClick={() => handlePageChange(currentPage + 1)} />
+								<PaginationNext
+									onClick={() => handlePageChange(currentPage + 1)}
+								/>
 							</PaginationItem>
 						)}
 					</PaginationContent>
