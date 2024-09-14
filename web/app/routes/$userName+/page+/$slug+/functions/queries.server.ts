@@ -1,6 +1,8 @@
 import { prisma } from "~/utils/prisma";
+import { sanitizeUser } from "~/utils/sanitizeUser";
 import type { PageWithTranslations } from "../types";
 import { getBestTranslation } from "../utils/getBestTranslation";
+
 //編集前のデータも記録として保存しておきたいため、sourceTextsは同一numberが複数存在する仕様になっているので､distinctを使用している
 export async function fetchPageWithSourceTexts(pageId: number) {
 	const pageWithSourceTexts = await prisma.page.findFirst({
@@ -35,39 +37,17 @@ export async function fetchPageWithTranslations(
 ): Promise<PageWithTranslations | null> {
 	const page = await prisma.page.findFirst({
 		where: { slug },
-		select: {
-			id: true,
-			title: true,
-			sourceLanguage: true,
-			user: { select: { displayName: true, userName: true, icon: true } },
-			slug: true,
-			content: true,
-			createdAt: true,
-			isPublished: true,
-			isArchived: true,
+		include: {
+			user: true,
 			sourceTexts: {
 				orderBy: { createdAt: "desc" },
-				select: {
-					id: true,
-					number: true,
-					text: true,
-					createdAt: true,
-					pageId: true,
+				include: {
 					translateTexts: {
 						where: { targetLanguage, isArchived: false },
-						select: {
-							id: true,
-							text: true,
-							point: true,
-							createdAt: true,
-							user: { select: { displayName: true, userName: true } },
+						include: {
+							user: true,
 							votes: {
 								where: currentUserId ? { userId: currentUserId } : undefined,
-								select: {
-									id: true,
-									isUpvote: true,
-									updatedAt: true,
-								},
 								orderBy: { updatedAt: "desc" },
 								take: 1,
 							},
@@ -76,47 +56,33 @@ export async function fetchPageWithTranslations(
 					},
 				},
 			},
+			tagPages: {
+				include: {
+					tag: true,
+				},
+			},
 		},
 	});
 
 	if (!page) return null;
+
 	return {
-		id: page.id,
-		title: page.title,
-		sourceLanguage: page.sourceLanguage,
-		user: {
-			displayName: page.user.displayName,
-			userName: page.user.userName,
-			icon: page.user.icon,
-		},
-		slug: page.slug,
-		content: page.content,
-		createdAt: page.createdAt,
-		isPublished: page.isPublished,
-		isArchived: page.isArchived,
+		page: page,
+		user: sanitizeUser(page.user),
+		tagPages: page.tagPages,
 		sourceTextWithTranslations: page.sourceTexts.map((sourceText) => {
 			const translationsWithVotes = sourceText.translateTexts.map(
 				(translateText) => ({
-					id: translateText.id,
-					text: translateText.text,
-					point: translateText.point,
-					userName: translateText.user.userName,
-					displayName: translateText.user.displayName,
-					userVote: translateText.votes[0] || null,
-					createdAt: translateText.createdAt,
+					translateText,
+					user: sanitizeUser(translateText.user),
+					Vote: translateText.votes[0] || null,
 				}),
 			);
 
 			const bestTranslationWithVote = getBestTranslation(translationsWithVotes);
 
 			return {
-				sourceText: {
-					id: sourceText.id,
-					number: sourceText.number,
-					text: sourceText.text,
-					createdAt: sourceText.createdAt,
-					pageId: sourceText.pageId,
-				},
+				sourceText,
 				translationsWithVotes,
 				bestTranslationWithVote,
 			};

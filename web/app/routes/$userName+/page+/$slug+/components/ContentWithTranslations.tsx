@@ -33,8 +33,8 @@ export function ContentWithTranslations({
 }: ContentWithTranslationsProps) {
 	const isHydrated = useHydrated();
 	const localCreatedAt = isHydrated
-		? pageWithTranslations.createdAt.toLocaleString()
-		: pageWithTranslations.createdAt.toISOString();
+		? pageWithTranslations.page.createdAt.toLocaleString()
+		: pageWithTranslations.page.createdAt.toISOString();
 
 	const [selectedSourceTextId, setSelectedSourceTextId] = useState<
 		number | null
@@ -61,16 +61,16 @@ export function ContentWithTranslations({
 				{sourceTitleWithTranslations && (
 					<SourceTextAndTranslationSection
 						sourceTextWithTranslations={sourceTitleWithTranslations}
-						isPublished={pageWithTranslations.isPublished}
+						isPublished={pageWithTranslations.page.isPublished}
 						elements={sourceTitleWithTranslations.sourceText.text}
-						sourceLanguage={pageWithTranslations.sourceLanguage}
+						sourceLanguage={pageWithTranslations.page.sourceLanguage}
 						targetLanguage={targetLanguage}
 						onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 					/>
 				)}
 			</h1>
 			<TranslateButton
-				pageId={pageWithTranslations.id}
+				pageId={pageWithTranslations.page.id}
 				userAITranslationInfo={userAITranslationInfo}
 				hasGeminiApiKey={hasGeminiApiKey}
 				targetLanguage={targetLanguage}
@@ -97,7 +97,7 @@ export function ContentWithTranslations({
 						<div className="ml-auto">
 							<Button asChild variant="ghost">
 								<Link
-									to={`/${currentUserName}/page/${pageWithTranslations.slug}/edit`}
+									to={`/${currentUserName}/page/${pageWithTranslations.page.slug}/edit`}
 								>
 									<SquarePen className="w-5 h-5" />
 								</Link>
@@ -113,7 +113,7 @@ export function ContentWithTranslations({
 				<>
 					<MemoizedParsedContent
 						pageWithTranslations={pageWithTranslations}
-						sourceLanguage={pageWithTranslations.sourceLanguage}
+						sourceLanguage={pageWithTranslations.page.sourceLanguage}
 						targetLanguage={targetLanguage}
 						currentUserName={currentUserName}
 						onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}

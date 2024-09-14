@@ -36,7 +36,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	if (!topPageWithTranslations) {
 		throw new Response("Not Found", { status: 404 });
 	}
-	const sourceLanguage = topPageWithTranslations.sourceLanguage;
+	const sourceLanguage = topPageWithTranslations.page.sourceLanguage;
 
 	const [heroTitle, heroText] =
 		topPageWithTranslations.sourceTextWithTranslations

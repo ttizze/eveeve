@@ -18,9 +18,9 @@ export function TranslationSection({
 	const { bestTranslationWithVote, sourceText } = sourceTextWithTranslations;
 	const sanitizedAndParsedText = bestTranslationWithVote ? (
 		isHydrated ? (
-			sanitizeAndParseText(bestTranslationWithVote.text)
+			sanitizeAndParseText(bestTranslationWithVote.translateText.text)
 		) : (
-			bestTranslationWithVote.text
+			bestTranslationWithVote.translateText.text
 		)
 	) : (
 		<span className="flex items-center gap-2">

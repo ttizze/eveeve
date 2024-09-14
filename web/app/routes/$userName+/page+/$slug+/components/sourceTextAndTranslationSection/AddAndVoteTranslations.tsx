@@ -28,7 +28,7 @@ export function AddAndVoteTranslations({
 	const { bestTranslationWithVote, translationsWithVotes, sourceText } =
 		sourceTextWithTranslations;
 	const alternativeTranslationsWithVotes = translationsWithVotes.filter(
-		(t) => t.id !== bestTranslationWithVote?.id,
+		(t) => t.translateText.id !== bestTranslationWithVote?.translateText.id,
 	);
 
 	const displayedTranslations = useMemo(() => {
@@ -65,7 +65,7 @@ export function AddAndVoteTranslations({
 						</p>
 						{displayedTranslations.map((displayedTranslation) => (
 							<TranslationListItem
-								key={displayedTranslation.id}
+								key={displayedTranslation.translateText.id}
 								translation={displayedTranslation}
 								currentUserName={currentUserName}
 							/>

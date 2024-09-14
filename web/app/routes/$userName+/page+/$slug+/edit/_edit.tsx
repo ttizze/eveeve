@@ -22,6 +22,7 @@ import {
 	upsertTags,
 } from "./functions/mutations.server";
 import {
+	getAllTags,
 	getPageBySlug,
 	getTitleSourceTextId,
 } from "./functions/queries.server";
@@ -42,9 +43,7 @@ export const editPageSchema = z.object({
 	title: z.string().min(1, "Required"),
 	pageContent: z.string().min(1, "Required Change something"),
 	isPublished: z.enum(["true", "false"]),
-	tags: z
-		.array(z.object({ id: z.number().optional(), name: z.string() }))
-		.optional(),
+	tags: z.array(z.string()).optional(),
 });
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
@@ -60,8 +59,9 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 	}
 
 	const page = await getPageBySlug(slug);
+	const allTags = await getAllTags();
 
-	return typedjson({ currentUser, page });
+	return typedjson({ currentUser, page, allTags });
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
@@ -128,7 +128,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function EditPage() {
-	const { currentUser, page } = useTypedLoaderData<typeof loader>();
+	const { currentUser, page, allTags } = useTypedLoaderData<typeof loader>();
 	const fetcher = useFetcher<typeof action>();
 	const [form, fields] = useForm({
 		onValidate({ formData }) {
@@ -141,13 +141,9 @@ export default function EditPage() {
 			title: page?.title,
 			pageContent: page?.content,
 			isPublished: page?.isPublished.toString(),
-			tags: page?.tagPages.map((tagPage) => ({
-				id: tagPage.tagId,
-				name: tagPage.tag.name,
-			})),
+			tags: page?.tagPages.map((tagPage) => tagPage.tag.name) || [],
 		},
 	});
-
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
 	return (
@@ -163,6 +159,13 @@ export default function EditPage() {
 						setHasUnsavedChanges={setHasUnsavedChanges}
 						formId={form.id}
 						tagsMeta={fields.tags}
+						initialTags={
+							page?.tagPages.map((tagPage) => ({
+								id: tagPage.tagId,
+								name: tagPage.tag.name,
+							})) || []
+						}
+						allTags={allTags}
 					/>
 
 					<div className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg mt-2 md:mt-20 mx-auto">

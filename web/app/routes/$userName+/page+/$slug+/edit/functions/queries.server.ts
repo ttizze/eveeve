@@ -33,3 +33,7 @@ export async function getTitleSourceTextId(slug: string) {
 	});
 	return titleSourceText?.sourceTexts[0]?.id || null;
 }
+
+export async function getAllTags() {
+	return await prisma.tag.findMany();
+}
