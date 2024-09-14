@@ -67,16 +67,12 @@ export async function createOrUpdateSourceTexts(
 		return results;
 	});
 }
-
-export async function upsertTags(
-	tags: { id?: number; name: string }[],
-	pageId: number,
-) {
-	const upsertPromises = tags.map(async (tag) => {
+export async function upsertTags(tags: string[], pageId: number) {
+	const upsertPromises = tags.map(async (tagName) => {
 		const upsertedTag = await prisma.tag.upsert({
-			where: { name: tag.name },
+			where: { name: tagName },
 			update: {},
-			create: { name: tag.name },
+			create: { name: tagName },
 		});
 
 		await prisma.tagPage.upsert({

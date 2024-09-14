@@ -1,33 +1,33 @@
-import type { SourceText, TranslateText, Vote } from "@prisma/client";
-import { z } from "zod";
-
-export type UserVote = Pick<Vote, "id" | "isUpvote" | "updatedAt">;
-
-export type TranslationWithVote = Pick<
+import type {
+	Page,
+	SourceText,
+	Tag,
+	TagPage,
 	TranslateText,
-	"id" | "text" | "point" | "createdAt"
-> & {
-	displayName: string;
-	userName: string;
-	userVote: UserVote | null;
+	Vote,
+} from "@prisma/client";
+import { z } from "zod";
+import type { SanitizedUser } from "~/types";
+
+export type TranslationWithVote = {
+	translateText: TranslateText;
+	user: SanitizedUser;
+	Vote: Vote | null;
 };
 
-export interface SourceTextWithTranslations {
+export type SourceTextWithTranslations = {
 	sourceText: SourceText;
 	translationsWithVotes: TranslationWithVote[];
 	bestTranslationWithVote: TranslationWithVote | null;
-}
+};
+export type TagPageWithTag = TagPage & {
+	tag: Tag;
+};
 
 export type PageWithTranslations = {
-	id: number;
-	title: string;
-	sourceLanguage: string;
-	user: { displayName: string; userName: string; icon: string };
-	createdAt: Date;
-	slug: string;
-	content: string;
-	isPublished: boolean;
-	isArchived: boolean;
+	page: Page;
+	user: SanitizedUser;
+	tagPages: TagPageWithTag[];
 	sourceTextWithTranslations: SourceTextWithTranslations[];
 };
 

@@ -24,7 +24,9 @@ export function ParsedContent({
 	currentUserName,
 	onOpenAddAndVoteTranslations,
 }: ParsedContentProps) {
-	const sanitizedContent = DOMPurify.sanitize(pageWithTranslations.content);
+	const sanitizedContent = DOMPurify.sanitize(
+		pageWithTranslations.page.content,
+	);
 	const doc = new DOMParser().parseFromString(sanitizedContent, "text/html");
 
 	const options: HTMLReactParserOptions = {

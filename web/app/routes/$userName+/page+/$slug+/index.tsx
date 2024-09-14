@@ -70,10 +70,10 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		throw new Response("Failed to fetch article", { status: 500 });
 	}
 	const isOwner = pageWithTranslations?.user.userName === currentUser?.userName;
-	if (pageWithTranslations.isArchived) {
+	if (pageWithTranslations.page.isArchived) {
 		throw new Response("Page not found", { status: 404 });
 	}
-	if (!isOwner && !pageWithTranslations.isPublished) {
+	if (!isOwner && !pageWithTranslations.page.isPublished) {
 		throw new Response("Page not found", { status: 404 });
 	}
 	const sourceTitleWithTranslations =
@@ -92,16 +92,16 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		sourceTitleWithTranslations.translationsWithVotes,
 	);
 	const userAITranslationInfo = await fetchLatestUserAITranslationInfo(
-		pageWithTranslations.id,
+		pageWithTranslations.page.id,
 		nonSanitizedUser?.id ?? 0,
 		targetLanguage,
 	);
 	const title = bestTranslationTitle
-		? `${sourceTitleWithTranslations.sourceText.text} - ${bestTranslationTitle.text}`
+		? `${sourceTitleWithTranslations.sourceText.text} - ${bestTranslationTitle.translateText.text}`
 		: sourceTitleWithTranslations.sourceText.text;
-	const likeCount = await fetchLikeCount(pageWithTranslations.id);
+	const likeCount = await fetchLikeCount(pageWithTranslations.page.id);
 	const isLikedByUser = await fetchIsLikedByUser(
-		pageWithTranslations.id,
+		pageWithTranslations.page.id,
 		currentUser?.id ?? 0,
 	);
 	return typedjson({
@@ -219,11 +219,21 @@ export default function Page() {
 					userAITranslationInfo={userAITranslationInfo}
 					targetLanguage={targetLanguage}
 				/>
+				<div className="flex flex-wrap gap-2">
+					{pageWithTranslations.tagPages.map((tagPage) => (
+						<div
+							key={tagPage.tag.id}
+							className="text-sm text-muted-foreground rounded-md px-2 py-1 bg-muted"
+						>
+							{tagPage.tag.name}
+						</div>
+					))}
+				</div>
 				<div className="flex justify-between items-center mt-8 mx-4">
 					<LikeButton
 						liked={isLikedByUser}
 						likeCount={likeCount}
-						slug={pageWithTranslations.slug}
+						slug={pageWithTranslations.page.slug}
 					/>
 					<ShareDialog url={shareUrl} title={title} />
 				</div>

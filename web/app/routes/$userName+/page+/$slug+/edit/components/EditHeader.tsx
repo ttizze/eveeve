@@ -3,6 +3,7 @@ import {
 	type FormId,
 	useFormMetadata,
 } from "@conform-to/react";
+import type { Tag } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import type { FetcherWithComponents } from "@remix-run/react";
 import {
@@ -11,10 +12,12 @@ import {
 	ArrowUpFromLine,
 	Check,
 	Globe,
+	Hash,
 	Loader2,
 	Lock,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import CreatableSelect from "react-select/creatable";
 import type { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
@@ -34,7 +37,9 @@ interface EditHeaderProps {
 	hasUnsavedChanges: boolean;
 	setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
 	tagsMeta: FieldMetadata<z.infer<typeof editPageSchema>["tags"]>;
+	initialTags: Tag[];
 	formId: FormId<z.infer<typeof editPageSchema>>;
+	allTags: Tag[];
 }
 
 export function EditHeader({
@@ -45,13 +50,13 @@ export function EditHeader({
 	hasUnsavedChanges,
 	setHasUnsavedChanges,
 	tagsMeta,
+	initialTags,
 	formId,
+	allTags,
 }: EditHeaderProps) {
 	const form = useFormMetadata(formId);
-	const tags = tagsMeta.getFieldList();
 	const isSubmitting = fetcher.state === "submitting";
 	const [isPublished, setIsPublished] = useState(initialIsPublished);
-
 	const handlePublishToggle = (newPublishState: boolean) => {
 		setIsPublished(newPublishState);
 		setHasUnsavedChanges(true);
@@ -118,56 +123,31 @@ export function EditHeader({
 					/>
 				</div>
 				<div className="justify-self-end flex items-center">
-					{/* <Popover>
-						<PopoverTrigger asChild>
-							<Button variant="outline" className="ml-2 px-2">
-								<Hash className="w-4 h-4 mr-1" />
-								<span className="text-gray-500 text-sm">{tags.length}</span>
-							</Button>
-						</PopoverTrigger>
-						<PopoverContent className="w-80 p-4">
-							<div className="space-y-4 flex flex-col justify-center">
-								<div className="space-y-2">
-									{tags.map((tag, index) => {
-										const tagFields = tag.getFieldset();
-										return (
-											<div key={tag.key} className="flex items-center ">
-												<Hash className="w-5 h-5 mr-2 text-gray-500" />
-												<div className="bg-gray-300  rounded-full flex items-center">
-													<input
-														{...getInputProps(tagFields.name, { type: "text" })}
-														onChange={() => setHasUnsavedChanges(true)}
-														className="bg-transparent text-gray-900 text-sm  w-full p-2 focus:outline-none"
-													/>
-													<Button
-														variant="ghost"
-														size="icon"
-														{...form.remove.getButtonProps({
-															name: tagsMeta.name,
-															index,
-														})}
-														onClick={() => setHasUnsavedChanges(true)}
-														className="rounded-full text-gray-500"
-													>
-														×
-													</Button>
-												</div>
-											</div>
-										);
-									})}
-								</div>
-								<Button
-									variant="default"
-									size="lg"
-									{...form.insert.getButtonProps({ name: tagsMeta.name })}
-									onClick={() => setHasUnsavedChanges(true)}
-									className="text-center rounded-full"
-								>
-									<Plus className="w-5 h-5" />
-								</Button>
-							</div>
-						</PopoverContent>
-					</Popover> */}
+					<div className="flex items-center">
+						<Hash className="w-5 h-5 mr-2 text-gray-500" />
+						<CreatableSelect
+							placeholder="tags"
+							isMulti
+							name={tagsMeta.name}
+							options={allTags.map((tag) => ({
+								value: tag.name,
+								label: tag.name,
+							}))}
+							defaultValue={initialTags.map((tag) => ({
+								value: tag.name,
+								label: tag.name,
+							}))}
+							onChange={(value) => {
+								setHasUnsavedChanges(true);
+								const newTags = value.map((item) => item.value);
+								form.update({
+									name: tagsMeta.name,
+									value: newTags,
+								});
+							}}
+							className="bg-transparent text-gray-900 text-sm  w-full p-2 focus:outline-none"
+						/>
+					</div>
 					<div>
 						<DropdownMenu modal={false}>
 							<DropdownMenuTrigger asChild>

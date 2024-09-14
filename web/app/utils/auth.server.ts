@@ -1,10 +1,10 @@
-import type { User } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { Authenticator, AuthorizationError } from "remix-auth";
 import { FormStrategy } from "remix-auth-form";
 import { GoogleStrategy } from "remix-auth-google";
 import type { SanitizedUser } from "../types";
 import { prisma } from "./prisma";
+import { sanitizeUser } from "./sanitizeUser";
 import { sessionStorage } from "./session.server";
 const SESSION_SECRET = process.env.SESSION_SECRET;
 
@@ -72,20 +72,6 @@ const googleStrategy = new GoogleStrategy<SanitizedUser>(
 		return sanitizeUser(newUser);
 	},
 );
-
-export function sanitizeUser(user: User): SanitizedUser {
-	const {
-		password,
-		geminiApiKey,
-		openAIApiKey,
-		claudeApiKey,
-		email,
-		provider,
-		plan,
-		...sanitizedUser
-	} = user;
-	return sanitizedUser;
-}
 
 authenticator.use(googleStrategy);
 export { authenticator };
