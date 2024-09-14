@@ -36,7 +36,7 @@ export function LikeButton({ liked, likeCount, slug }: LikeButtonProps) {
 				} transition-all duration-200 ease-in-out transform active:scale-110 hover:scale-105`}
 				disabled={fetcher.state === "submitting"}
 			>
-				<Heart className="h-8 w-8" fill={liked ? "currentColor" : "none"} />
+				<Heart className="h-6 w-6" fill={liked ? "currentColor" : "none"} />
 				<span>{likeCount}</span>
 			</Button>
 		</fetcher.Form>
