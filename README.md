@@ -2,145 +2,114 @@
 
 # EveEve
 
-## 概要
+[日本語版はこちら](README.ja.md)
 
-EveEve（Everyone Translate Everything）は、パブリックドメインのテクストに､対訳､脚注､解説を付け、美しいレイアウトで提供し､知識と文化の交流を促進することを目指すオープンソースプロジェクトです。
+## Overview
 
-このプロジェクトの目的は、世界中の人々に、物語と知識への扉を開くことです。
+EveEve (Everyone Translate Everything) is an open-source project aimed at facilitating knowledge and cultural exchange by providing translations, footnotes, and explanations for user-submitted texts in a beautiful layout.
 
-## プロジェクト名の由来
+The goal of this project is to open doors to stories and knowledge for people around the world.
 
-「EveEve」は "Everyone Translate Everything" の略です。この名前は、世界中の人々が協力して、あらゆるテクストを翻訳し、知識を共有するというプロジェクトの理念を体現しています。
+## Project Name Origin
 
-## 現在の機能
+"EveEve" stands for "Everyone Translate Everything". This name embodies the project's philosophy of people worldwide collaborating to translate all kinds of texts and share knowledge.
 
-- HTML 翻訳
-- LLM（大規模言語モデル）を使用した翻訳
-- 翻訳結果の保存
-- 翻訳結果への投票
-- 翻訳の投稿
-- リーダーモード
+## Current Features
 
-## 開発中の機能
+- Article submission
+- Translation using Large Language Models (LLMs)
+- Saving translation results
+- Voting on translation results
+- User-submitted translations
+- Reader mode
 
-- 読みやすいレイアウト：対訳を見やすく配置（改善中）
-- 脚注の追加（計画段階）
-- ハイライト機能（計画段階）
-- 複数フォーマット対応：HTML、PDF、EPUB、プレーンテクスト（計画段階）
-- chrome 拡張機能(計画段階)
-- 高度な自然言語処理機能の統合(計画段階)
-  - 文章から重要な部分を抜き出し、辞書から訳を検索する等
+## Features in Development
 
-## 翻訳時の理想のユーザ体験
+- Improved readable layout: Better positioning of parallel translations
+- Addition of footnotes (planning stage)
+- Highlighting feature (planning stage)
+- Multi-format support: HTML, PDF, EPUB, plain text (planning stage)
+- Chrome extension (planning stage)
+- Integration of advanced natural language processing features (planning stage)
+  - Extracting important parts from text and searching for translations from dictionaries, etc.
 
-1. テクストの入力
+## System Architecture
 
-   - ユーザがインターネット上のテクスト(html､pdf､epub etc･･･)を母国語で読みたいと思い､chrome 拡張､または eveeve の translator ページで URL を入力する
-   - ローカルファイルの場合､chrome 拡張､または eveeve の translator ページでファイルを選択し､アップロードする
-   - ユーザが直接テクストを入力したい場合､eveeve の translator ページでタイトル､本文､著者､ライセンスを入力する
+- React (Remix SSR mode)
+- Translation engine: Gemini (currently used exclusively due to its context length advantage)
 
-2. テクストの処理
+## Getting Started
 
-   - インターネット上のもの､またはローカルファイルの場合､入力されたデータから LLM が自動でタイトル､本文､著者､ライセンスを抜き出す
-   - ユーザが直接テクストを入力した場合､入力されたデータをそのまま使用する
-
-3. テクストの同定
-
-   - 既存のものに同様のタイトルがあった場合､それとの比較を表示する
-   - ユーザがタイトルは同じだが別のものだと判断した場合､または同様のタイトルがなかった場合､新しいものとして登録し､翻訳を開始する
-   - 既存のデータの場合､リーダページへのリンクを表示する
-
-4. テクストの翻訳
-
-   - 新規テクストが読み込まれると、テクストのそれぞれに LLM で翻訳を付ける
-
-5. テクストの表示
-   - リーダーページが読み込まれると、対訳表示､訳文のみ表示､等カスタマイズ可能な形でテクストが表示される
-   - ユーザがいい翻訳だと思った場合 good に投票､他にもっと良い翻訳がある場合､他の翻訳候補を表示し､投票すると､その翻訳が表示される
-   - 良い翻訳がなかった場合は、ユーザが翻訳を投稿するとその翻訳が表示される
-   - このサイクルが繰り返されることで、より良い翻訳が生まれる
-
-## 対象テクスト
-
-このプロジェクトでは、インターネット上で公開されているテクストを対象としています。ただし、著作権法を遵守し、適切な許可なく著作物を使用しないよう細心の注意を払ってください｡
-
-## システム構成
-
-- React (Remix SSR モード)
-- 翻訳エンジン: Gemini（現在はコンテクスト長のメリットからこれのみを使用）
-
-## 使用方法
-
-1. このリポジトリをクローンします：
+1. Clone this repository:
    ```
    git clone https://github.com/ttizze/eveeve.git
    ```
-2. 必要な依存関係をインストールします：
 
+2. Install dependencies:
    ```
    cd eveeve
    cd web
    bun i
    ```
 
-3. 環境変数ファイルを作成し、必要な値を設定します：
-
+3. Create and set up the environment variables file:
    ```
    cp .env.example .env
    ```
-
-   以下のコマンドを実行してください
-
+   Run the following command:
    ```
    openssl rand -base64 32
    ```
+   Set the generated string as `SESSION_SECRET` in the `.env` file.
 
-   このコマンドで生成された文字列を`.env`ファイルの`SESSION_SECRET`に設定してください:
-
-   - SESSION_SECRET
-
-4. docker を起動します：
+4. Start Docker:
    ```
    docker compose up -d
    ```
-5. db の設定を行います：
+
+5. Set up the database:
    ```
    bunx prisma migrate dev
    ```
-6. seed を実行します：
+
+6. Run the seed:
    ```
    bun run seed
    ```
-7. 起動します：
+
+7. Start the development server:
    ```
    bun run dev
    ```
-8. ブラウザで `http://localhost:5173` にアクセスして、eveeve を使用開始します:
-9. ローカル開発環境では、認証プロセスが簡略化されています：
 
-   - `http://localhost:5173/auth/login` にアクセスして、dev@example.comと devpassword でログインしてください。
+8. Access EveEve at `http://localhost:5173` in your browser.
 
-   注意: この簡易認証は開発環境でのみ機能し、本番環境では無効になります。本番環境では通常の Google 認証フローが使用されます。
+9. For local development, authentication is simplified:
+   - Visit `http://localhost:5173/auth/login` and log in with dev@example.com and devpassword.
+   
+   Note: This simplified authentication works only in the development environment and is disabled in production. The normal Google authentication flow is used in production.
 
-## 貢献方法
+## How to Contribute
 
-翻訳、プログラミング、デザイン、ドキュメンテーションなど、あらゆる形の貢献を歓迎します。現在特に以下の分野での貢献を求めています：
+We welcome contributions in all forms, including translation, programming, design, and documentation. We are particularly seeking contributions in the following areas:
 
-- PDF 等､複数フォーマット入力対応の実装
-- 文字サイズや色の変更機能
+- Implementation of multi-format input support (e.g., PDF)
+- Features for changing font size and colors
 
-## 既知の制限事項
+Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
-- 出力フォーマットは現在限られています。
-- 長文テクストの処理に制限があります。
+## Known Limitations
 
-## ライセンス
+- Output formats are currently limited.
+- There are restrictions on processing long texts.
 
-このプロジェクトは MIT ライセンスの下で公開されています。詳細は LICENSE ファイルをご覧ください。
+## License
 
-## コンタクト
+This project is released under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-質問や提案がある場合は、Issue を作成するか、プロジェクトの discord に参加してください。
+## Contact
+
+If you have questions or suggestions, please create an issue or join our project Discord:
 https://discord.gg/2JfhZdu9zW
 
-## 一緒に、世界中の人々に物語と知識への扉を開くビジョンを実現しましょう！
+## Let's work together to realize the vision of opening doors to stories and knowledge for people around the world!
