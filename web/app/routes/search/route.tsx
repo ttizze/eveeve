@@ -60,7 +60,7 @@ export default function Search() {
 					<div className="flex gap-2">
 						<Input
 							{...getInputProps(fields.query, { type: "text" })}
-							placeholder="Search for page titles or translations..."
+							placeholder="Titles or translation titles..."
 							className="w-full"
 						/>
 						<Button type="submit" disabled={isSearching}>
