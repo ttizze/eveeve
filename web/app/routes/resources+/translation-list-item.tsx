@@ -50,12 +50,12 @@ export function TranslationListItem({
 	currentUserName,
 	showAuthor = false,
 }: TranslationItemProps) {
-	const isOwner = currentUserName === translation.userName;
+	const isOwner = currentUserName === translation.user.userName;
 	const fetcher = useFetcher();
 
 	const onDelete = () => {
 		fetcher.submit(
-			{ translationId: translation.id },
+			{ translationId: translation.translateText.id },
 			{ method: "post", action: "/resources/translation-list-item" },
 		);
 	};
@@ -76,11 +76,14 @@ export function TranslationListItem({
 					</DropdownMenu>
 				</div>
 			)}
-			<div className="mb-2">{sanitizeAndParseText(translation.text)}</div>
+			<div className="mb-2">
+				{sanitizeAndParseText(translation.translateText.text)}
+			</div>
 			{showAuthor && (
-				<Link to={`/${translation.userName}`} className="!no-underline">
+				<Link to={`/${translation.user.userName}`} className="!no-underline">
 					<p className="text-sm text-gray-500 text-right flex justify-end items-center  ">
-						<Languages className="w-5 h-5 mr-2" /> by: {translation.displayName}
+						<Languages className="w-5 h-5 mr-2" /> by:{" "}
+						{translation.user.displayName}
 					</p>
 				</Link>
 			)}

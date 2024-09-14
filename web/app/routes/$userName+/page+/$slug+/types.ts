@@ -12,7 +12,7 @@ import type { SanitizedUser } from "~/types";
 export type TranslationWithVote = {
 	translateText: TranslateText;
 	user: SanitizedUser;
-	Vote: Vote | null;
+	vote: Vote | null;
 };
 
 export type SourceTextWithTranslations = {

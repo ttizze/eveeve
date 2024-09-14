@@ -7,20 +7,23 @@ export function getBestTranslation(
 		return null;
 	}
 	const upvotedTranslations = translationsWithVotes.filter(
-		(t) => t.userVote?.isUpvote,
+		(t) => t.vote?.isUpvote,
 	);
 	if (upvotedTranslations.length > 0) {
 		return upvotedTranslations.reduce((prev, current) => {
-			const currentUpdatedAt = current.userVote?.updatedAt ?? new Date(0);
-			const prevUpdatedAt = prev.userVote?.updatedAt ?? new Date(0);
+			const currentUpdatedAt = current.vote?.updatedAt ?? new Date(0);
+			const prevUpdatedAt = prev.vote?.updatedAt ?? new Date(0);
 			return currentUpdatedAt > prevUpdatedAt ? current : prev;
 		});
 	}
 	return translationsWithVotes.reduce((prev, current) => {
-		if (prev.point !== current.point) {
-			return prev.point > current.point ? prev : current;
+		if (prev.translateText.point !== current.translateText.point) {
+			return prev.translateText.point > current.translateText.point
+				? prev
+				: current;
 		}
-		return new Date(current.createdAt) > new Date(prev.createdAt)
+		return new Date(current.translateText.createdAt) >
+			new Date(prev.translateText.createdAt)
 			? current
 			: prev;
 	});
