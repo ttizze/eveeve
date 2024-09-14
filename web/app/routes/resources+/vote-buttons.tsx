@@ -49,7 +49,7 @@ export const VoteButtons = memo(function VoteButtons({
 	const fetcher = useFetcher();
 	const [showLoginDialog, setShowLoginDialog] = useState(false);
 	const [form, fields] = useForm({
-		id: `vote-form-${translationWithVote.id}`,
+		id: `vote-form-${translationWithVote.translateText.id}`,
 		onValidate: useMemo(
 			() =>
 				({ formData }: { formData: FormData }) => {
@@ -64,14 +64,14 @@ export const VoteButtons = memo(function VoteButtons({
 		() => ({
 			upVote: cn(
 				"mr-2 h-4 w-4",
-				translationWithVote.userVote?.isUpvote === true && "text-blue-500",
+				translationWithVote.vote?.isUpvote === true && "text-blue-500",
 			),
 			downVote: cn(
 				"mr-2 h-4 w-4",
-				translationWithVote.userVote?.isUpvote === false && "text-red-500",
+				translationWithVote.vote?.isUpvote === false && "text-red-500",
 			),
 		}),
-		[translationWithVote.userVote?.isUpvote],
+		[translationWithVote.vote?.isUpvote],
 	);
 	const handleVoteClick = (e: React.MouseEvent) => {
 		if (!currentUserName) {
@@ -89,13 +89,13 @@ export const VoteButtons = memo(function VoteButtons({
 				className="space-x-2 flex"
 			>
 				<input
-					value={translationWithVote.id.toString()}
+					value={translationWithVote.translateText.id.toString()}
 					{...getInputProps(fields.translateTextId, { type: "hidden" })}
 				/>
 				<VoteButton
 					isUpvote={true}
 					isDisabled={isVoting}
-					point={translationWithVote.point}
+					point={translationWithVote.translateText.point}
 					iconClass={buttonClasses.upVote}
 					onClick={handleVoteClick}
 				/>
