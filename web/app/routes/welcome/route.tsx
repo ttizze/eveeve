@@ -9,7 +9,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { authenticator } from "~/utils/auth.server";
-import { sanitizeUser } from "~/utils/auth.server";
+import { sanitizeUser } from "~/utils/sanitizeUser";
 import { commitSession, getSession } from "~/utils/session.server";
 import { updateUserName } from "./functions/mutations.server";
 import { isUserNameTaken } from "./functions/queries.server";
