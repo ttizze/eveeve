@@ -30,7 +30,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	const gaTrackingId = isDevelopment
 		? ""
-		: process.env.GOOGLE_ANALYTICS_ID ?? "";
+		: (process.env.GOOGLE_ANALYTICS_ID ?? "");
 	const currentUser = await authenticator.isAuthenticated(request);
 	const locale = (await i18nServer.getLocale(request)) || "en";
 	return typedjson(
