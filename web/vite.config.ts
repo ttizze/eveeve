@@ -29,6 +29,9 @@ export default defineConfig({
 			org: "reimei",
 			project: "eveeve",
 			url: "https://sentry.io/",
+			sourcemaps: {
+				filesToDeleteAfterUpload: "true",
+			},
 		}),
 	],
 });

@@ -1,5 +1,5 @@
 import type { SanitizedUser } from "~/types";
-import { sanitizeUser } from "~/utils/auth.server";
+import { sanitizeUser } from "~/utils/sanitizeUser";
 import { prisma } from "~/utils/prisma";
 
 export async function getUserByUserName(

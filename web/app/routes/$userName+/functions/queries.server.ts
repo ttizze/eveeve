@@ -1,6 +1,6 @@
-import { sanitizeUser } from "~/utils/auth.server";
 import { prisma } from "~/utils/prisma";
 import type { PageListItem, sanitizedUserWithPages } from "../types";
+import { sanitizeUser } from "~/utils/sanitizeUser";
 
 export async function fetchSanitizedUserWithPages(
 	userName: string,
