@@ -43,7 +43,19 @@ export const editPageSchema = z.object({
 	title: z.string().min(1, "Required"),
 	pageContent: z.string().min(1, "Required Change something"),
 	isPublished: z.enum(["true", "false"]),
-	tags: z.array(z.string()).optional(),
+	tags: z
+		.array(
+			z
+				.string()
+				.regex(
+					/^[^\s!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]+$/,
+					"symbol and space can not be used",
+				)
+				.min(1, "tag can be min 1")
+				.max(15, "tag can be max 15 characters"),
+		)
+		.max(5, "tags can be max 5")
+		.optional(),
 });
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
@@ -137,6 +149,7 @@ export default function EditPage() {
 		id: "edit-page",
 		lastResult: fetcher.data?.lastResult,
 		constraint: getZodConstraint(editPageSchema),
+		shouldValidate: "onInput",
 		defaultValue: {
 			title: page?.title,
 			pageContent: page?.content,

@@ -125,28 +125,43 @@ export function EditHeader({
 				<div className="justify-self-end flex items-center">
 					<div className="flex items-center">
 						<Hash className="w-5 h-5 mr-2 text-gray-500" />
-						<CreatableSelect
-							placeholder="tags"
-							isMulti
-							name={tagsMeta.name}
-							options={allTags.map((tag) => ({
-								value: tag.name,
-								label: tag.name,
-							}))}
-							defaultValue={initialTags.map((tag) => ({
-								value: tag.name,
-								label: tag.name,
-							}))}
-							onChange={(value) => {
-								setHasUnsavedChanges(true);
-								const newTags = value.map((item) => item.value);
-								form.update({
-									name: tagsMeta.name,
-									value: newTags,
-								});
-							}}
-							className="bg-transparent text-gray-900 text-sm  w-full p-2 focus:outline-none"
-						/>
+						<div>
+							<CreatableSelect
+								placeholder="tags"
+								isMulti
+								name={tagsMeta.name}
+								options={allTags.map((tag) => ({
+									value: tag.name,
+									label: tag.name,
+								}))}
+								defaultValue={initialTags.map((tag) => ({
+									value: tag.name,
+									label: tag.name,
+								}))}
+								onChange={(value) => {
+									setHasUnsavedChanges(true);
+									const newTags = value.map((item) => item.value);
+									form.update({
+										name: tagsMeta.name,
+										value: newTags,
+									});
+								}}
+								className="bg-transparent text-gray-900 text-sm  w-full p-2 focus:outline-none"
+							/>
+							{tagsMeta.allErrors && (
+								<div>
+									{Object.entries(tagsMeta.allErrors).map(([key, errors]) => (
+										<div key={key}>
+											{errors.map((error, index) => (
+												<p key={key} className="text-sm text-red-500">
+													{error}
+												</p>
+											))}
+										</div>
+									))}
+								</div>
+							)}
+						</div>
 					</div>
 					<div>
 						<DropdownMenu modal={false}>
