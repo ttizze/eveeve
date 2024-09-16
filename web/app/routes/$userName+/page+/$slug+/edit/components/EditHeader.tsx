@@ -72,21 +72,21 @@ export function EditHeader({
 
 	const renderButtonIcon = () => {
 		if (isSubmitting) {
-			return <Loader2 className="w-6 h-6 animate-spin" />;
+			return <Loader2 className="w-4 h-4 animate-spin" />;
 		}
 		if (!hasUnsavedChanges) {
-			return <Check className="w-6 h-6" />;
+			return <Check className="w-4 h-4" />;
 		}
 		return (
 			<>
 				{isPublished ? (
-					<div className="flex justify-center items-center space-x-2">
-						<ArrowUpFromLine className="w-5 h-5 mr-2" />
+					<div className="flex justify-center items-center space-x-2 text-sm">
+						<ArrowUpFromLine className="w-4 h-4 mr-2" />
 						Publish
 					</div>
 				) : (
-					<div className="flex justify-center items-center space-x-2">
-						<ArrowDownToLine className="w-5 h-5 mr-2" />
+					<div className="flex justify-center items-center space-x-2 text-sm ">
+						<ArrowDownToLine className="w-4 h-4 mr-2" />
 						Save
 					</div>
 				)}
@@ -95,7 +95,7 @@ export function EditHeader({
 	};
 
 	return (
-		<header className="sticky top-0 z-10 pt-2 bg-blur">
+		<header className="sticky top-0 z-10 p-2 bg-background bg-opacity-50 backdrop-blur-md border-b">
 			<div className="flex items-center justify-between">
 				<div className="flex items-center">
 					<Link
@@ -111,6 +111,7 @@ export function EditHeader({
 					<Button
 						type="submit"
 						variant="default"
+						size="sm"
 						className="rounded-full md:absolute md:left-1/2 md:transform md:-translate-x-1/2"
 						disabled={isSubmitting || !hasUnsavedChanges}
 					>

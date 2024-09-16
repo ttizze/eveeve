@@ -113,7 +113,7 @@ function App() {
 			enableSystem
 			disableTransitionOnChange
 		>
-			<CommonLayout showHeaderFooter={!isSpecialLayout}>
+			<CommonLayout isSpecialLayout={isSpecialLayout}>
 				<Outlet />
 			</CommonLayout>
 		</ThemeProvider>
@@ -124,18 +124,22 @@ export default withSentry(App);
 
 function CommonLayout({
 	children,
-	showHeaderFooter = true,
-}: { children: React.ReactNode; showHeaderFooter?: boolean }) {
+	isSpecialLayout = true,
+}: { children: React.ReactNode; isSpecialLayout: boolean }) {
 	const { currentUser } = useTypedLoaderData<typeof loader>();
+
+	if (isSpecialLayout) {
+		return <>{children}</>;
+	}
 
 	return (
 		<>
-			{showHeaderFooter && <Header currentUser={currentUser} />}
+			<Header currentUser={currentUser} />
 			<div className="flex flex-col min-h-screen">
 				<main className="flex-grow mb-10 mt-3 md:mt-5">
 					<div className="mx-auto px-2 md:container">{children}</div>
 				</main>
-				{showHeaderFooter && <Footer currentUser={currentUser} />}
+				<Footer currentUser={currentUser} />
 			</div>
 		</>
 	);
