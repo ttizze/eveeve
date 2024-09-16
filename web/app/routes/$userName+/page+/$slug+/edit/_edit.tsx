@@ -170,7 +170,6 @@ export default function EditPage() {
 						fetcher={fetcher}
 						hasUnsavedChanges={hasUnsavedChanges}
 						setHasUnsavedChanges={setHasUnsavedChanges}
-						formId={form.id}
 						tagsMeta={fields.tags}
 						initialTags={
 							page?.tagPages.map((tagPage) => ({
