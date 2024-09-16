@@ -1,4 +1,3 @@
-import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
@@ -48,31 +47,57 @@ export const VoteButtons = memo(function VoteButtons({
 }: VoteButtonsProps) {
 	const fetcher = useFetcher();
 	const [showLoginDialog, setShowLoginDialog] = useState(false);
-	const [form, fields] = useForm({
-		id: `vote-form-${translationWithVote.translateText.id}`,
-		onValidate: useMemo(
-			() =>
-				({ formData }: { formData: FormData }) => {
-					return parseWithZod(formData, { schema });
-				},
-			[],
-		),
-	});
+
 	const isVoting = fetcher.state !== "idle";
+
+	const optimisticVote = useMemo(() => {
+		if (fetcher.formData) {
+			const newVote = fetcher.formData.get("isUpvote") === "true";
+			if (translationWithVote.vote?.isUpvote === newVote) {
+				return null;
+			}
+			return { isUpvote: newVote };
+		}
+		return translationWithVote.vote;
+	}, [fetcher.formData, translationWithVote.vote]);
+
+	const optimisticPoint = useMemo(() => {
+		if (fetcher.formData) {
+			const newVote = fetcher.formData.get("isUpvote") === "true";
+			const currentPoint = translationWithVote.translateText.point;
+			const currentVote = translationWithVote.vote;
+
+			if (currentVote) {
+				if (currentVote.isUpvote === newVote) {
+					return newVote ? currentPoint - 1 : currentPoint + 1;
+				}
+				return newVote ? currentPoint + 2 : currentPoint - 2;
+			}
+			return newVote ? currentPoint + 1 : currentPoint - 1;
+		}
+		return translationWithVote.translateText.point;
+	}, [
+		fetcher.formData,
+		translationWithVote.translateText.point,
+		translationWithVote.vote,
+	]);
 
 	const buttonClasses = useMemo(
 		() => ({
 			upVote: cn(
-				"mr-2 h-4 w-4",
-				translationWithVote.vote?.isUpvote === true && "text-blue-500",
+				"mr-2 h-4 w-4 transition-all duration-300",
+				optimisticVote?.isUpvote === true && "text-blue-500",
+				isVoting && "animate-bounce",
 			),
 			downVote: cn(
-				"mr-2 h-4 w-4",
-				translationWithVote.vote?.isUpvote === false && "text-red-500",
+				"mr-2 h-4 w-4 transition-all duration-300",
+				optimisticVote?.isUpvote === false && "text-red-500",
+				isVoting && "animate-bounce",
 			),
 		}),
-		[translationWithVote.vote?.isUpvote],
+		[optimisticVote?.isUpvote, isVoting],
 	);
+
 	const handleVoteClick = (e: React.MouseEvent, isUpvote: boolean) => {
 		if (!currentUserName) {
 			setShowLoginDialog(true);
@@ -96,7 +121,7 @@ export const VoteButtons = memo(function VoteButtons({
 				<VoteButton
 					isUpvote={true}
 					isDisabled={isVoting}
-					point={translationWithVote.translateText.point}
+					point={optimisticPoint}
 					iconClass={buttonClasses.upVote}
 					onClick={handleVoteClick}
 				/>
