@@ -1,4 +1,4 @@
-import { getFormProps, getInputProps, useForm } from "@conform-to/react";
+import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
@@ -73,25 +73,26 @@ export const VoteButtons = memo(function VoteButtons({
 		}),
 		[translationWithVote.vote?.isUpvote],
 	);
-	const handleVoteClick = (e: React.MouseEvent) => {
+	const handleVoteClick = (e: React.MouseEvent, isUpvote: boolean) => {
 		if (!currentUserName) {
 			setShowLoginDialog(true);
 			e.preventDefault();
 		}
+		const formData = new FormData();
+		formData.append(
+			"translateTextId",
+			translationWithVote.translateText.id.toString(),
+		);
+		formData.append("isUpvote", isUpvote.toString());
+		fetcher.submit(formData, {
+			method: "post",
+			action: "/resources/vote-buttons",
+		});
 	};
 
 	return (
 		<div className="flex justify-end items-center mt-2">
-			<fetcher.Form
-				method="post"
-				{...getFormProps(form)}
-				action="/resources/vote-buttons"
-				className="space-x-2 flex"
-			>
-				<input
-					value={translationWithVote.translateText.id.toString()}
-					{...getInputProps(fields.translateTextId, { type: "hidden" })}
-				/>
+			<div className="space-x-2 flex">
 				<VoteButton
 					isUpvote={true}
 					isDisabled={isVoting}
@@ -105,7 +106,7 @@ export const VoteButtons = memo(function VoteButtons({
 					iconClass={buttonClasses.downVote}
 					onClick={handleVoteClick}
 				/>
-			</fetcher.Form>
+			</div>
 			<LoginDialog isOpen={showLoginDialog} onOpenChange={setShowLoginDialog} />
 		</div>
 	);
