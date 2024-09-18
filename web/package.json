@@ -5,7 +5,7 @@
 	"scripts": {
 		"build": "remix vite:build",
 		"install-and-build": "bun install && bun run build",
-		"dev": "remix vite:dev",
+		"dev": "remix vite:dev --host 0.0.0.0",
 		"start": "NODE_OPTIONS='--import ./instrumentation.server.mjs' remix-serve ./build/server/index.js",
 		"typecheck": "tsc --noEmit",
 		"check": "bunx @biomejs/biome check --write .",

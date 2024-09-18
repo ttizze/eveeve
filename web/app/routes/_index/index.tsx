@@ -93,7 +93,7 @@ export default function Index() {
 					<h1 className="text-7xl font-bold mb-20 text-center">
 						<SourceTextAndTranslationSection
 							sourceTextWithTranslations={heroTitle}
-							sourceTextClassName="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent mb-2"
+							sourceTextClassName="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text !text-transparent mb-2"
 							elements={heroTitle.sourceText.text}
 							sourceLanguage={sourceLanguage}
 							targetLanguage={targetLanguage}
