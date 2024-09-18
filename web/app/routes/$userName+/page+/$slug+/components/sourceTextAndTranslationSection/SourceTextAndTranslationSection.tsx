@@ -20,7 +20,7 @@ export function SourceTextAndTranslationSection({
 }) {
 	return (
 		<>
-			<span className={`inline-block text-slate-500 ${sourceTextClassName}`}>
+			<span className={`inline-block text-gray-500 ${sourceTextClassName}`}>
 				{isPublished === false && <Lock className="h-6 w-6 mr-1 inline" />}
 				{elements}
 			</span>
