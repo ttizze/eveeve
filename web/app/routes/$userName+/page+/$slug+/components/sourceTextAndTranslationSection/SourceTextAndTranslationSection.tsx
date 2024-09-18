@@ -18,13 +18,9 @@ export function SourceTextAndTranslationSection({
 	sourceTextClassName?: string;
 	onOpenAddAndVoteTranslations: (sourceTextId: number) => void;
 }) {
-	const spanClassName = sourceTextClassName
-		? `inline-block px-4 ${sourceTextClassName}`
-		: "inline-block px-4";
-
 	return (
 		<>
-			<span className={spanClassName}>
+			<span className={`inline-block text-slate-500 ${sourceTextClassName}`}>
 				{isPublished === false && <Lock className="h-6 w-6 mr-1 inline" />}
 				{elements}
 			</span>
