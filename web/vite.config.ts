@@ -21,7 +21,9 @@ export default defineConfig({
 			},
 			ignoredRouteFiles: ["**/*"],
 			routes: async (defineRoutes) => {
-				return flatRoutes("routes", defineRoutes);
+				return flatRoutes("routes", defineRoutes, {
+					ignoredRouteFiles: ["**/*.test.{js,jsx,ts,tsx}"],
+				});
 			},
 		}),
 		tsconfigPaths(),
