@@ -7,6 +7,8 @@ import { useNavigate } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
 import Linkify from "linkify-react";
 import { Lock, MoreVertical, Settings } from "lucide-react";
+import { BookOpen, Trash } from "lucide-react";
+import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import {
 	Card,
@@ -15,6 +17,14 @@ import {
 	CardHeader,
 	CardTitle,
 } from "~/components/ui/card";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "~/components/ui/dialog";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -84,10 +94,12 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 }
 
-export default function UserProfile() {
+export default function UserPage() {
 	const navigate = useNavigate();
 	const { sanitizedUserWithPages, isOwner, pageCreatedAt } =
 		useLoaderData<typeof loader>();
+	const [dialogOpen, setDialogOpen] = useState(false);
+	const [pageToDelete, setPageToDelete] = useState<number | null>(null);
 
 	const fetcher = useFetcher();
 
@@ -99,15 +111,18 @@ export default function UserProfile() {
 	};
 
 	const handleArchive = (pageId: number) => {
-		if (
-			confirm(
-				"Are you sure you want to delete this page? This action cannot be undone.",
-			)
-		) {
-			fetcher.submit({ intent: "archive", pageId: pageId }, { method: "post" });
-		}
+		setPageToDelete(pageId);
+		setDialogOpen(true);
 	};
-
+	const confirmArchive = () => {
+		if (pageToDelete) {
+			fetcher.submit(
+				{ intent: "archive", pageId: pageToDelete },
+				{ method: "post" },
+			);
+		}
+		setDialogOpen(false);
+	};
 	return (
 		<div className="">
 			<div className="mb-6 rounded-3xl w-full overflow-hidden ">
@@ -213,6 +228,29 @@ export default function UserProfile() {
 					{isOwner ? "You haven't created any pages yet." : "No pages yet."}
 				</p>
 			)}
+			<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle className="flex items-center">
+							<Trash className="w-4 h-4 mr-2" />
+							<BookOpen className="w-4 h-4 mr-2" />
+						</DialogTitle>
+						<DialogDescription>
+							This action cannot be undone. Are you sure you want to delete this
+							page?
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter>
+						<Button variant="outline" onClick={() => setDialogOpen(false)}>
+							Cancel
+						</Button>
+						<Button variant="destructive" onClick={confirmArchive}>
+							<Trash className="w-4 h-4 mr-2" />
+							Delete
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }
