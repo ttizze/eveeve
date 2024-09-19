@@ -181,6 +181,7 @@ export default function UserPage() {
 									<Button
 										variant="ghost"
 										className="h-8 w-8 p-0 absolute top-2 right-2"
+										aria-label="More options"
 									>
 										<MoreVertical className="h-4 w-4" />
 									</Button>

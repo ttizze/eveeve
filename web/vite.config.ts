@@ -19,9 +19,10 @@ export default defineConfig({
 				v3_relativeSplatPath: true,
 				v3_throwAbortReason: true,
 			},
-			ignoredRouteFiles: ["**/*"],
 			routes: async (defineRoutes) => {
-				return flatRoutes("routes", defineRoutes);
+				return flatRoutes("routes", defineRoutes, {
+					ignoredRouteFiles: ["**/*.test.{js,jsx,ts,tsx}"],
+				});
 			},
 		}),
 		tsconfigPaths(),
