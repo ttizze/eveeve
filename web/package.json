@@ -89,8 +89,7 @@
 		"tailwind-merge": "^2.5.2",
 		"tailwindcss-animate": "^1.0.7",
 		"use-debounce": "^10.0.3",
-		"use-interval": "^1.4.0",
-		"zod-prisma-types": "^3.1.8"
+		"use-interval": "^1.4.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.0",
