@@ -162,7 +162,7 @@ export default function EditPage() {
 	return (
 		<div>
 			<FormProvider context={form.context}>
-				<fetcher.Form method="post" {...getFormProps(form)}>
+				<fetcher.Form method="post" {...getFormProps(form)} className="pb-20">
 					<EditHeader
 						currentUser={currentUser}
 						pageSlug={page?.slug}
