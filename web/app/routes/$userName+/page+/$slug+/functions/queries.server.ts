@@ -3,19 +3,15 @@ import { sanitizeUser } from "~/utils/sanitizeUser";
 import type { PageWithTranslations } from "../types";
 import { getBestTranslation } from "../utils/getBestTranslation";
 
-//編集前のデータも記録として保存しておきたいため、sourceTextsは同一numberが複数存在する仕様になっているので､distinctを使用している
 export async function fetchPageWithSourceTexts(pageId: number) {
 	const pageWithSourceTexts = await prisma.page.findFirst({
 		where: { id: pageId },
 		select: {
 			id: true,
-			title: true,
 			slug: true,
 			content: true,
 			createdAt: true,
 			sourceTexts: {
-				distinct: ["number"],
-				orderBy: { createdAt: "desc" },
 				select: {
 					id: true,
 					number: true,
@@ -40,7 +36,6 @@ export async function fetchPageWithTranslations(
 		include: {
 			user: true,
 			sourceTexts: {
-				orderBy: { createdAt: "desc" },
 				include: {
 					translateTexts: {
 						where: { targetLanguage, isArchived: false },

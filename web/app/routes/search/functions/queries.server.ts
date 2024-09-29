@@ -10,11 +10,15 @@ export async function searchTitle(query: string) {
 				},
 				{
 					OR: [
-						{ title: { contains: query, mode: "insensitive" } },
 						{
-							pageTranslationInfo: {
+							sourceTexts: {
 								some: {
-									translationTitle: { contains: query, mode: "insensitive" },
+									text: { contains: query, mode: "insensitive" },
+									translateTexts: {
+										some: {
+											text: { contains: query, mode: "insensitive" },
+										},
+									},
 								},
 							},
 						},
@@ -27,13 +31,19 @@ export async function searchTitle(query: string) {
 		},
 		select: {
 			id: true,
-			title: true,
 			slug: true,
 			user: {
 				select: { userName: true },
 			},
-			pageTranslationInfo: {
-				select: { id: true, targetLanguage: true, translationTitle: true },
+			sourceTexts: {
+				select: {
+					id: true,
+					text: true,
+					number: true,
+					translateTexts: {
+						select: { id: true, text: true },
+					},
+				},
 			},
 		},
 	});

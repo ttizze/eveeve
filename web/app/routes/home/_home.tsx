@@ -64,7 +64,7 @@ export default function Home() {
 								className="block"
 							>
 								<CardTitle className="flex items-center pr-3 break-all overflow-wrap-anywhere">
-									{page.title}
+									{page.sourceTexts.filter((item) => item.number === 0)[0].text}
 								</CardTitle>
 								<CardDescription>
 									{new Date(page.createdAt).toLocaleDateString()}

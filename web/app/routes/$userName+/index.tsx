@@ -215,7 +215,7 @@ export default function UserPage() {
 							<CardHeader>
 								<CardTitle className="flex items-center pr-3 break-all overflow-wrap-anywhere">
 									{page.isPublished ? "" : <Lock className="h-4 w-4 mr-2" />}
-									{page.title}
+									{page.sourceTexts.filter((item) => item.number === 0)[0].text}
 								</CardTitle>
 								<CardDescription>{pageCreatedAt}</CardDescription>
 							</CardHeader>

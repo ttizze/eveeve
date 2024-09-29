@@ -41,7 +41,6 @@ export async function getLatestSourceTexts(pageId: number) {
 		orderBy: {
 			createdAt: "desc",
 		},
-		distinct: ["number"],
 		select: {
 			id: true,
 			number: true,

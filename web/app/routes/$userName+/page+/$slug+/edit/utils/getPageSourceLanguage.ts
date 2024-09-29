@@ -1,6 +1,5 @@
 import { franc } from "franc";
 import { JSDOM } from "jsdom";
-import type { TextElementInfo } from "../types";
 
 export async function getPageSourceLanguage(
 	numberedContent: string,
@@ -12,11 +11,10 @@ export async function getPageSourceLanguage(
 		el.remove();
 	}
 
-	const textElements: Array<TextElementInfo> = [
+	const textElements = [
 		{
 			number: 0,
 			text: title,
-			sourceTextId: null,
 		},
 	];
 
@@ -26,9 +24,8 @@ export async function getPageSourceLanguage(
 		const dataNumber = element.getAttribute("data-number");
 		if (dataNumber !== null) {
 			textElements.push({
-				number: Number.parseInt(dataNumber, 10),
+				number: Number(dataNumber),
 				text: element.textContent?.trim() || "",
-				sourceTextId: null,
 			});
 		}
 	}

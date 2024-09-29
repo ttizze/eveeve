@@ -83,12 +83,13 @@ export default function Search() {
 											to={`/${result.user.userName}/page/${encodeURIComponent(result.slug)}`}
 											className="block p-2 text-inherit no-underline"
 										>
-											<h3 className="font-bold">{result.title}</h3>
-											{result.pageTranslationInfo.map((info) => (
-												<p key={info.id} className="text-sm ">
-													{info.translationTitle}
-												</p>
-											))}
+											<h3 className="font-bold">
+												{
+													result.sourceTexts.filter(
+														(item) => item.number === 0,
+													)[0].text
+												}
+											</h3>
 										</Link>
 									</li>
 								))}

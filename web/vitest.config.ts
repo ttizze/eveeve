@@ -9,6 +9,8 @@ export default VitestConfig.defineConfig({
 		environmentOptions: {
 			vprisma: {
 				baseEnv: "jsdom",
+				databaseUrl:
+					"postgresql://postgres:password@localhost:5433/postgres?schema=public",
 			},
 		},
 	},

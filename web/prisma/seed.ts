@@ -28,7 +28,6 @@ async function addRequiredData() {
 		update: {},
 		create: {
 			slug: "eveeve",
-			title: "eveeve",
 			sourceLanguage: "en",
 			content: "test",
 			isPublished: true,
@@ -41,7 +40,6 @@ async function addRequiredData() {
 		update: {},
 		create: {
 			slug: "eveeve-ja",
-			title: "eveeve-ja",
 			sourceLanguage: "ja",
 			content: "test",
 			isPublished: true,

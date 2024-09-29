@@ -25,6 +25,15 @@ export async function fetchPaginatedPublicPages(
 						icon: true,
 					},
 				},
+				sourceTexts: {
+					where: {
+						number: 0,
+					},
+					select: {
+						number: true,
+						text: true,
+					},
+				},
 				likePages: {
 					where: {
 						userId: currentUserId,

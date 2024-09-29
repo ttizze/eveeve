@@ -1,16 +1,3 @@
-generator zod {
-  provider                         = "zod-prisma-types"
-  output                           = "../app/prisma/generated/zod"
-  writeBarrelFiles                 = false
-  createInputTypes                 = false
-  createModelTypes                 = true
-  addInputTypeValidation           = true
-  createOptionalDefaultValuesTypes = true
-  createRelationValuesTypes        = true
-  createPartialTypes               = true
-  useDefaultValidators             = false
-}
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -58,8 +45,8 @@ model UserAITranslationInfo {
   aiTranslationStatus   String   @default("pending") @map("ai_translation_status")
   aiTranslationProgress Int      @default(0) @map("ai_translation_progress")
   createdAt             DateTime @default(now()) @map("created_at")
-  user                  User     @relation(fields: [userId], references: [id])
-  page                  Page     @relation(fields: [pageId], references: [id])
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  page                  Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([pageId, targetLanguage])
@@ -72,8 +59,8 @@ model UserReadHistory {
   pageId             Int      @map("page_id")
   readAt             DateTime @default(now()) @map("read_at")
   lastReadDataNumber Int      @default(0) @map("last_read_data_number")
-  user               User     @relation(fields: [userId], references: [id])
-  page               Page     @relation(fields: [pageId], references: [id])
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  page               Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
 
   @@unique([userId, pageId])
   @@map("user_read_history")
@@ -84,7 +71,7 @@ model PageTranslationInfo {
   pageId           Int    @map("page_id")
   targetLanguage   String @map("target_language")
   translationTitle String @map("translation_title")
-  page             Page   @relation(fields: [pageId], references: [id])
+  page             Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
 
   @@unique([pageId, targetLanguage])
   @@map("page_translation_info")
@@ -93,14 +80,13 @@ model PageTranslationInfo {
 model Page {
   id                    Int                     @id @default(autoincrement())
   slug                  String                  @unique
-  title                 String
   content               String
   sourceLanguage        String                  @default("unknown")
   isPublished           Boolean                 @default(false) @map("is_published")
   isArchived            Boolean                 @default(false) @map("is_archived")
   createdAt             DateTime                @default(now()) @map("created_at")
   updatedAt             DateTime                @updatedAt @map("updated_at")
-  user                  User                    @relation(fields: [userId], references: [id])
+  user                  User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId                Int                     @map("user_id")
   userAITranslationInfo UserAITranslationInfo[]
   sourceTexts           SourceText[]
@@ -118,8 +104,8 @@ model LikePage {
   userId    Int      @map("user_id")
   pageId    Int      @map("page_id")
   createdAt DateTime @default(now()) @map("created_at")
-  user      User     @relation(fields: [userId], references: [id])
-  page      Page     @relation(fields: [pageId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  page      Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
 
   @@unique([userId, pageId])
   @@map("like_pages")
@@ -144,7 +130,7 @@ model GenrePage {
 }
 model Tag {
   id    Int       @id @default(autoincrement())
-  name  String    @unique /// @zod.string.regex(/^[a-zA-Z0-9-_]+$/, {message: "Tag can only contain letters, numbers, - and _",})
+  name  String    @unique
   pages TagPage[]
 
   @@map("tags")
@@ -165,11 +151,11 @@ model SourceText {
   text           String
   number         Int
   translateTexts TranslateText[]
-  page           Page            @relation(fields: [pageId], references: [id])
+  page           Page            @relation(fields: [pageId], references: [id], onDelete: Cascade)
   pageId         Int             @map("page_id")
   createdAt      DateTime        @default(now()) @map("created_at")
 
-  @@index([pageId, number])
+  @@unique([pageId, number])
   @@map("source_texts")
 }
 
@@ -182,8 +168,8 @@ model TranslateText {
   point          Int        @default(0)
   isArchived     Boolean    @default(false) @map("is_archived")
   createdAt      DateTime   @default(now()) @map("created_at")
-  sourceText     SourceText @relation(fields: [sourceTextId], references: [id])
-  user           User       @relation(fields: [userId], references: [id])
+  sourceText     SourceText @relation(fields: [sourceTextId], references: [id], onDelete: Cascade)
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   votes          Vote[]
 
   @@map("translate_texts")
@@ -196,8 +182,8 @@ model Vote {
   isUpvote        Boolean       @map("is_upvote")
   createdAt       DateTime      @default(now()) @map("created_at")
   updatedAt       DateTime      @updatedAt @map("updated_at")
-  translateText   TranslateText @relation(fields: [translateTextId], references: [id])
-  user            User          @relation(fields: [userId], references: [id])
+  translateText   TranslateText @relation(fields: [translateTextId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([translateTextId, userId])
   @@map("votes")
