@@ -1,21 +1,20 @@
 import { prisma } from "~/utils/prisma";
 import { sanitizeUser } from "~/utils/sanitizeUser";
-import type { PageListItem, sanitizedUserWithPages } from "../types";
 
 export async function fetchSanitizedUserWithPages(
 	userName: string,
 	isOwnProfile: boolean,
-): Promise<sanitizedUserWithPages | null> {
+) {
 	const user = await prisma.user.findUnique({
 		where: { userName },
 		include: {
 			pages: {
-				select: {
-					id: true,
-					title: true,
-					slug: true,
-					isPublished: true,
-					createdAt: true,
+				include: {
+					sourceTexts: {
+						where: {
+							number: 0,
+						},
+					},
 				},
 				where: {
 					isArchived: false,
@@ -28,8 +27,9 @@ export async function fetchSanitizedUserWithPages(
 
 	if (!user) return null;
 
-	const pages: PageListItem[] = user.pages.map((page) => ({
+	const pages = user.pages.map((page) => ({
 		...page,
+		title: page.sourceTexts.filter((item) => item.number === 0)[0].text,
 	}));
 	return {
 		...sanitizeUser(user),

@@ -75,7 +75,7 @@ export function EditHeader({
 			return <Loader2 className="w-4 h-4 animate-spin" />;
 		}
 		if (!hasUnsavedChanges) {
-			return <Check className="w-4 h-4" />;
+			return <Check className="w-4 h-4" data-testid="save-button-check" />;
 		}
 		return (
 			<>
@@ -114,6 +114,7 @@ export function EditHeader({
 						size="sm"
 						className="rounded-full md:absolute md:left-1/2 md:transform md:-translate-x-1/2"
 						disabled={isSubmitting || !hasUnsavedChanges}
+						data-testid="save-button"
 					>
 						{renderButtonIcon()}
 					</Button>
@@ -135,7 +136,11 @@ export function EditHeader({
 					<div className="justify-self-end flex items-center">
 						<Popover>
 							<PopoverTrigger asChild>
-								<Button variant="ghost" className="mr-2 text-gray-500">
+								<Button
+									variant="ghost"
+									className="mr-2 text-gray-500"
+									data-testid="tags-button"
+								>
 									<Hash className="w-5 h-5 mr-2 text-gray-500" />
 									{selectedTags.length}
 								</Button>
@@ -157,6 +162,7 @@ export function EditHeader({
 										);
 									}}
 									className="bg-transparent text-gray-900 text-sm  w-full p-2 focus:outline-none"
+									data-testid="tags-select"
 								/>
 								<p className="text-xs text-gray-500">max 5 tags</p>
 								{tagsMeta.allErrors && (
@@ -177,7 +183,12 @@ export function EditHeader({
 					</div>
 					<DropdownMenu modal={false}>
 						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" className="ml-auto" type="button">
+							<Button
+								variant="ghost"
+								className="ml-auto"
+								type="button"
+								data-testid="change-publish-button"
+							>
 								{isPublished ? (
 									<Globe className="w-5 h-5  mr-2" />
 								) : (
@@ -196,7 +207,7 @@ export function EditHeader({
 								<span className="text-gray-500">Set to Private</span>
 							</DropdownMenuItem>
 							<DropdownMenuItem onSelect={() => handlePublishToggle(true)}>
-								<Globe className="mr-2 h-4 w-4" />
+								<Globe className="mr-2 h-4 w-4" data-testid="public-button" />
 								<span>Set to Public</span>
 							</DropdownMenuItem>
 						</DropdownMenuContent>

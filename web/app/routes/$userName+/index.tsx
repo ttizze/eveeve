@@ -59,6 +59,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		isOwner,
 	);
 	if (!sanitizedUserWithPages) throw new Response("Not Found", { status: 404 });
+
 	const pageCreatedAt = new Date(
 		sanitizedUserWithPages.createdAt,
 	).toLocaleDateString();

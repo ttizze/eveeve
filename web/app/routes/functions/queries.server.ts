@@ -14,11 +14,22 @@ export async function fetchAllPublishedPages() {
 		where: { isPublished: true, isArchived: false },
 		select: {
 			id: true,
-			title: true,
 			slug: true,
 			createdAt: true,
 			updatedAt: true,
 			user: { select: { userName: true } },
+			sourceTexts: {
+				where: {
+					number: 0,
+				},
+				select: {
+					number: true,
+					text: true,
+					translateTexts: {
+						select: { id: true, text: true },
+					},
+				},
+			},
 		},
 	});
 }

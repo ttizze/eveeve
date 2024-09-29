@@ -22,6 +22,11 @@ export function Editor({ initialContent, setHasUnsavedChanges }: EditorProps) {
 			pageContentControl.change(editor.getHTML());
 			setHasUnsavedChanges(true);
 		},
+		editorProps: {
+			attributes: {
+				"data-testid": "tiptap-editor",
+			},
+		},
 	});
 
 	return (

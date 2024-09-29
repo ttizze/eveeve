@@ -28,20 +28,20 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 		return [{ title: "Page Not Found" }];
 	}
 
-	const { pageWithTranslations, title } = data;
+	const { pageWithTranslations, sourceTitleWithBestTranslationTitle } = data;
 
 	const description = stripHtmlTags(pageWithTranslations.content).slice(0, 200);
 	const imageUrl = pageWithTranslations.user.icon;
 
 	return [
-		{ title: title },
+		{ title: sourceTitleWithBestTranslationTitle },
 		{ name: "description", content: description },
 		{ property: "og:type", content: "article" },
-		{ property: "og:title", content: title },
+		{ property: "og:title", content: sourceTitleWithBestTranslationTitle },
 		{ property: "og:description", content: description },
 		{ property: "og:image", content: imageUrl },
 		{ name: "twitter:card", content: "summary" },
-		{ name: "twitter:title", content: title },
+		{ name: "twitter:title", content: sourceTitleWithBestTranslationTitle },
 		{ name: "twitter:description", content: description },
 		{ name: "twitter:image", content: imageUrl },
 	];
@@ -77,17 +77,9 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		throw new Response("Page not found", { status: 404 });
 	}
 	const sourceTitleWithTranslations =
-		pageWithTranslations.sourceTextWithTranslations
-			.filter((item) => item.sourceText?.number === 0)
-			.sort((a, b) => {
-				if (a.sourceText && b.sourceText) {
-					return (
-						new Date(b.sourceText.createdAt).getTime() -
-						new Date(a.sourceText.createdAt).getTime()
-					);
-				}
-				return 0;
-			})[0];
+		pageWithTranslations.sourceTextWithTranslations.filter(
+			(item) => item.sourceText?.number === 0,
+		)[0];
 	const bestTranslationTitle = getBestTranslation(
 		sourceTitleWithTranslations.translationsWithVotes,
 	);
@@ -96,7 +88,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		nonSanitizedUser?.id ?? 0,
 		targetLanguage,
 	);
-	const title = bestTranslationTitle
+	const sourceTitleWithBestTranslationTitle = bestTranslationTitle
 		? `${sourceTitleWithTranslations.sourceText.text} - ${bestTranslationTitle.translateText.text}`
 		: sourceTitleWithTranslations.sourceText.text;
 	const likeCount = await fetchLikeCount(pageWithTranslations.page.id);
@@ -111,7 +103,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		hasGeminiApiKey,
 		userAITranslationInfo,
 		sourceTitleWithTranslations,
-		title,
+		sourceTitleWithBestTranslationTitle,
 		likeCount,
 		isLikedByUser,
 	});
@@ -196,7 +188,7 @@ export default function Page() {
 		hasGeminiApiKey,
 		userAITranslationInfo,
 		sourceTitleWithTranslations,
-		title,
+		sourceTitleWithBestTranslationTitle,
 		targetLanguage,
 		likeCount,
 		isLikedByUser,
@@ -235,7 +227,10 @@ export default function Page() {
 						likeCount={likeCount}
 						slug={pageWithTranslations.page.slug}
 					/>
-					<ShareDialog url={shareUrl} title={title} />
+					<ShareDialog
+						url={shareUrl}
+						title={sourceTitleWithBestTranslationTitle}
+					/>
 				</div>
 			</article>
 		</div>

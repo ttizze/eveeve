@@ -36,7 +36,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	if (!data) {
 		return [{ title: "Edit Page" }];
 	}
-	return [{ title: `Edit ${data.page?.title}` }];
+	return [{ title: `Edit ${data.title}` }];
 };
 
 export const editPageSchema = z.object({
@@ -71,9 +71,12 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 	}
 
 	const page = await getPageBySlug(slug);
+	const title = page?.sourceTexts.find(
+		(sourceText) => sourceText.number === 0,
+	)?.text;
 	const allTags = await getAllTags();
 
-	return typedjson({ currentUser, page, allTags });
+	return typedjson({ currentUser, page, allTags, title });
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
@@ -108,7 +111,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	);
 
 	const sourceLanguage = await getPageSourceLanguage(numberedContent, title);
-	//createOrUpdateSourceTextsでpageIdを使用するため､ここで一旦pageを作成する
+	//翻訳との結びつきを維持するため、sourceTextIdを付与したpage.contentを保存し、sourceTextのnumberが変わってもsourceTextIdで紐付けられるようにしている。
+	//そのため、sourceTextIdを付与したpage.contentを保存しなければならないが、createOrUpdateSourceTextsでpageIdを使用するため､ここで一旦pageを作成する
 	const page = await createOrUpdatePage(
 		currentUser.id,
 		slug,
@@ -140,7 +144,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function EditPage() {
-	const { currentUser, page, allTags } = useTypedLoaderData<typeof loader>();
+	const { currentUser, page, allTags, title } =
+		useTypedLoaderData<typeof loader>();
 	const fetcher = useFetcher<typeof action>();
 	const [form, fields] = useForm({
 		onValidate({ formData }) {
@@ -151,7 +156,7 @@ export default function EditPage() {
 		constraint: getZodConstraint(editPageSchema),
 		shouldValidate: "onInput",
 		defaultValue: {
-			title: page?.title,
+			title: title,
 			pageContent: page?.content,
 			isPublished: page?.isPublished.toString(),
 			tags: page?.tagPages.map((tagPage) => tagPage.tag.name) || [],
@@ -185,12 +190,13 @@ export default function EditPage() {
 							<h1 className="text-4xl font-bold !mb-0 h-auto">
 								<TextareaAutosize
 									{...getTextareaProps(fields.title)}
-									defaultValue={page?.title}
+									defaultValue={title}
 									placeholder="input title..."
 									className="w-full outline-none bg-transparent resize-none overflow-hidden"
 									minRows={1}
 									maxRows={10}
 									onChange={(e) => setHasUnsavedChanges(true)}
+									data-testid="title-input"
 								/>
 							</h1>
 							{fields.title.errors?.map((error) => (

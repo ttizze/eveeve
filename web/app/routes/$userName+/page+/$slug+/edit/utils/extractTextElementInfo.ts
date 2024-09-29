@@ -4,7 +4,7 @@ import type { TextElementInfo } from "../types";
 export async function extractTextElementInfo(
 	content: string,
 	title: string,
-	titleSourceTextId: number | null,
+	titleSourceTextId: number | undefined,
 ): Promise<Array<TextElementInfo>> {
 	const doc = new JSDOM(content);
 
@@ -27,11 +27,9 @@ export async function extractTextElementInfo(
 		const dataSourceTextId = element.getAttribute("data-source-text-id");
 		if (dataNumber !== null) {
 			textElements.push({
-				number: Number.parseInt(dataNumber, 10),
+				number: Number(dataNumber),
 				text: element.textContent?.trim() || "",
-				sourceTextId: dataSourceTextId
-					? Number.parseInt(dataSourceTextId, 10)
-					: null,
+				sourceTextId: dataSourceTextId ? Number(dataSourceTextId) : undefined,
 			});
 		}
 	}

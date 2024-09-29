@@ -14,7 +14,6 @@ export async function createOrUpdatePage(
 			slug,
 		},
 		update: {
-			title,
 			content,
 			isPublished,
 			sourceLanguage,
@@ -22,7 +21,6 @@ export async function createOrUpdatePage(
 		create: {
 			userId,
 			slug,
-			title,
 			content,
 			isPublished,
 			sourceLanguage,
@@ -36,37 +34,42 @@ export async function createOrUpdateSourceTexts(
 	textElements: TextElementInfo[],
 	pageId: number,
 ): Promise<Array<{ number: number; sourceTextId: number }>> {
-	return await prisma.$transaction(async (tx) => {
-		const results = await Promise.all(
-			textElements.map(async (element) => {
-				if (element.sourceTextId) {
-					const existingSourceText = await tx.sourceText.findUnique({
-						where: { id: element.sourceTextId, pageId },
-					});
-					if (existingSourceText) {
-						const sourceText = await tx.sourceText.update({
-							where: { id: element.sourceTextId },
-							data: {
-								number: element.number,
-								text: element.text,
-							},
-						});
-						return { number: element.number, sourceTextId: sourceText.id };
-					}
-				}
-				const sourceText = await tx.sourceText.create({
-					data: {
+	try {
+		return await prisma.$transaction(async (tx) => {
+			// numberの重複を避けるため、一旦既存のsourceTextのnumberを-1倍にする
+			await tx.sourceText.updateMany({
+				where: { pageId },
+				data: { number: { multiply: -1 } },
+			});
+
+			const upsertPromises = textElements.map((element) =>
+				tx.sourceText.upsert({
+					where: { id: element.sourceTextId ?? 0 },
+					update: {
+						number: element.number,
+						text: element.text,
+					},
+					create: {
 						pageId,
 						number: element.number,
 						text: element.text,
 					},
-				});
-				return { number: element.number, sourceTextId: sourceText.id };
-			}),
-		);
-		return results;
-	});
+				}),
+			);
+
+			const updatedOrCreatedSourceTexts = await Promise.all(upsertPromises);
+
+			return updatedOrCreatedSourceTexts.map((st) => ({
+				number: st.number,
+				sourceTextId: st.id,
+			}));
+		});
+	} catch (error) {
+		console.error("Error in createOrUpdateSourceTexts:", error);
+		throw error;
+	}
 }
+
 export async function upsertTags(tags: string[], pageId: number) {
 	const upsertPromises = tags.map(async (tagName) => {
 		const upsertedTag = await prisma.tag.upsert({

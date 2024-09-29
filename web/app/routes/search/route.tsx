@@ -84,11 +84,6 @@ export default function Search() {
 											className="block p-2 text-inherit no-underline"
 										>
 											<h3 className="font-bold">{result.title}</h3>
-											{result.pageTranslationInfo.map((info) => (
-												<p key={info.id} className="text-sm ">
-													{info.translationTitle}
-												</p>
-											))}
 										</Link>
 									</li>
 								))}

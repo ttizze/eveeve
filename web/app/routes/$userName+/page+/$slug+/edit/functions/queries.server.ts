@@ -4,6 +4,11 @@ export async function getPageBySlug(slug: string) {
 	return await prisma.page.findUnique({
 		where: { slug },
 		include: {
+			sourceTexts: {
+				where: {
+					number: 0,
+				},
+			},
 			tagPages: {
 				include: {
 					tag: true,
@@ -24,14 +29,11 @@ export async function getTitleSourceTextId(slug: string) {
 				select: {
 					id: true,
 				},
-				orderBy: {
-					createdAt: "desc",
-				},
 				take: 1,
 			},
 		},
 	});
-	return titleSourceText?.sourceTexts[0]?.id || null;
+	return titleSourceText?.sourceTexts[0]?.id;
 }
 
 export async function getAllTags() {
