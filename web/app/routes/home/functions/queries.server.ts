@@ -62,7 +62,7 @@ export async function fetchPaginatedPublicPages(
 			title: page.sourceTexts.filter((item) => item.number === 0)[0].text,
 		};
 	});
-	
+
 	return {
 		pages: pagesWithTitle,
 		totalPages: Math.ceil(totalCount / pageSize),

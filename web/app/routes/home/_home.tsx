@@ -34,13 +34,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		9,
 		currentUser?.id,
 	);
-	
+
 	return json({ pages, totalPages, currentPage, currentUser });
 }
 
 export default function Home() {
-	const { pages, totalPages, currentPage } =
-		useLoaderData<typeof loader>();
+	const { pages, totalPages, currentPage } = useLoaderData<typeof loader>();
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const handlePageChange = (newPage: number) => {

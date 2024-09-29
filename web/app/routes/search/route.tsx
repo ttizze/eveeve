@@ -83,9 +83,7 @@ export default function Search() {
 											to={`/${result.user.userName}/page/${encodeURIComponent(result.slug)}`}
 											className="block p-2 text-inherit no-underline"
 										>
-											<h3 className="font-bold">
-												{result.title}
-											</h3>
+											<h3 className="font-bold">{result.title}</h3>
 										</Link>
 									</li>
 								))}
