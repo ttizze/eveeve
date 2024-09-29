@@ -10,7 +10,7 @@
 		"typecheck": "tsc --noEmit",
 		"check": "bunx @biomejs/biome check --write .",
 		"seed": "prisma db seed",
-		"test": "vitest"
+		"test": "DATABASE_URL=postgresql://postgres:password@localhost:5433/postgres?schema=public bunx prisma migrate dev && bunx prisma migrate deploy && vitest"
 	},
 	"prisma": {
 		"seed": "tsx prisma/seed.ts"
