@@ -22,8 +22,14 @@ export async function fetchPageWithSourceTexts(pageId: number) {
 	});
 
 	if (!pageWithSourceTexts) return null;
+	const title = pageWithSourceTexts.sourceTexts.filter(
+		(item) => item.number === 0,
+	)[0].text;
 
-	return pageWithSourceTexts;
+	return {
+		...pageWithSourceTexts,
+		title,
+	};
 }
 
 export async function fetchPageWithTranslations(

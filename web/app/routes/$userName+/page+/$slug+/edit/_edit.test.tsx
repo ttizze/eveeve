@@ -152,7 +152,7 @@ describe("EditPage", () => {
 		await waitFor(async () => {
 			const updatedPage = await prisma.page.findFirst({
 				where: { slug: "test-page" },
-				include: { sourceTexts: true },
+				include: { sourceTexts: { orderBy: { number: "asc" } } },
 			});
 			console.log(updatedPage?.sourceTexts);
 			expect(updatedPage).not.toBeNull();

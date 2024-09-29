@@ -166,9 +166,7 @@ export async function action({ request }: ActionFunctionArgs) {
 				userId: nonSanitizedUser.id,
 				pageId: pageWithSourceTexts.id,
 				targetLanguage,
-				title: pageWithSourceTexts.sourceTexts.filter(
-					(item) => item.number === 0,
-				)[0].text,
+				title: pageWithSourceTexts.title,
 				numberedContent: pageWithSourceTexts.content,
 				numberedElements: pageWithSourceTexts.sourceTexts,
 			});

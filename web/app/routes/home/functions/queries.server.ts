@@ -56,9 +56,15 @@ export async function fetchPaginatedPublicPages(
 			},
 		}),
 	]);
-
+	const pagesWithTitle = pages.map((page) => {
+		return {
+			...page,
+			title: page.sourceTexts.filter((item) => item.number === 0)[0].text,
+		};
+	});
+	
 	return {
-		pages,
+		pages: pagesWithTitle,
 		totalPages: Math.ceil(totalCount / pageSize),
 		currentPage: page,
 	};

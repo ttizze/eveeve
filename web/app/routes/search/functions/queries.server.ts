@@ -1,7 +1,7 @@
 import { prisma } from "~/utils/prisma";
 
 export async function searchTitle(query: string) {
-	return prisma.page.findMany({
+	const pages = await prisma.page.findMany({
 		where: {
 			AND: [
 				{
@@ -14,6 +14,12 @@ export async function searchTitle(query: string) {
 							sourceTexts: {
 								some: {
 									text: { contains: query, mode: "insensitive" },
+								},
+							},
+						},
+						{
+							sourceTexts: {
+								some: {
 									translateTexts: {
 										some: {
 											text: { contains: query, mode: "insensitive" },
@@ -36,6 +42,9 @@ export async function searchTitle(query: string) {
 				select: { userName: true },
 			},
 			sourceTexts: {
+				where: {
+					number: 0,
+				},
 				select: {
 					id: true,
 					text: true,
@@ -47,4 +56,11 @@ export async function searchTitle(query: string) {
 			},
 		},
 	});
+	const pagesWithTitle = pages.map((page) => {
+		return {
+			...page,
+			title: page.sourceTexts.filter((item) => item.number === 0)[0].text,
+		};
+	});
+	return pagesWithTitle;
 }

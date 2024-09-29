@@ -27,18 +27,19 @@ export const meta: MetaFunction = () => {
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
-	const page = Number.parseInt(url.searchParams.get("page") || "1", 10);
+	const page = Number(url.searchParams.get("page") || "1");
 	const currentUser = await authenticator.isAuthenticated(request);
 	const { pages, totalPages, currentPage } = await fetchPaginatedPublicPages(
 		page,
 		9,
 		currentUser?.id,
 	);
+	
 	return json({ pages, totalPages, currentPage, currentUser });
 }
 
 export default function Home() {
-	const { pages, totalPages, currentPage, currentUser } =
+	const { pages, totalPages, currentPage } =
 		useLoaderData<typeof loader>();
 	const [searchParams, setSearchParams] = useSearchParams();
 
@@ -64,7 +65,7 @@ export default function Home() {
 								className="block"
 							>
 								<CardTitle className="flex items-center pr-3 break-all overflow-wrap-anywhere">
-									{page.sourceTexts.filter((item) => item.number === 0)[0].text}
+									{page.title}
 								</CardTitle>
 								<CardDescription>
 									{new Date(page.createdAt).toLocaleDateString()}

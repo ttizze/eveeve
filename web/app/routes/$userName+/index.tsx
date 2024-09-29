@@ -59,6 +59,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		isOwner,
 	);
 	if (!sanitizedUserWithPages) throw new Response("Not Found", { status: 404 });
+
 	const pageCreatedAt = new Date(
 		sanitizedUserWithPages.createdAt,
 	).toLocaleDateString();
@@ -215,7 +216,7 @@ export default function UserPage() {
 							<CardHeader>
 								<CardTitle className="flex items-center pr-3 break-all overflow-wrap-anywhere">
 									{page.isPublished ? "" : <Lock className="h-4 w-4 mr-2" />}
-									{page.sourceTexts.filter((item) => item.number === 0)[0].text}
+									{page.title}
 								</CardTitle>
 								<CardDescription>{pageCreatedAt}</CardDescription>
 							</CardHeader>

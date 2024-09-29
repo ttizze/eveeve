@@ -84,11 +84,7 @@ export default function Search() {
 											className="block p-2 text-inherit no-underline"
 										>
 											<h3 className="font-bold">
-												{
-													result.sourceTexts.filter(
-														(item) => item.number === 0,
-													)[0].text
-												}
+												{result.title}
 											</h3>
 										</Link>
 									</li>
