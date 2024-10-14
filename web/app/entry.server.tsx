@@ -79,10 +79,7 @@ async function handleBotRequest(
 		let currentResponseStatusCode = responseStatusCode;
 		const { pipe, abort } = renderToPipeableStream(
 			<I18nextProvider i18n={instance}>
-				<RemixServer
-					context={remixContext}
-					url={request.url}
-				/>
+				<RemixServer context={remixContext} url={request.url} />
 			</I18nextProvider>,
 			{
 				onAllReady() {
@@ -142,10 +139,7 @@ async function handleBrowserRequest(
 		let currentResponseStatusCode = responseStatusCode;
 		const { pipe, abort } = renderToPipeableStream(
 			<I18nextProvider i18n={instance}>
-				<RemixServer
-					context={remixContext}
-					url={request.url}
-				/>
+				<RemixServer context={remixContext} url={request.url} />
 			</I18nextProvider>,
 			{
 				onShellReady() {

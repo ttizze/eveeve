@@ -1,5 +1,6 @@
 import type { LinksFunction } from "@remix-run/node";
 import type { LoaderFunctionArgs } from "@remix-run/node";
+import { data } from "@remix-run/node";
 import {
 	Links,
 	Meta,
@@ -22,7 +23,6 @@ import { Footer } from "~/routes/resources+/footer";
 import { Header } from "~/routes/resources+/header";
 import tailwind from "~/tailwind.css?url";
 import { authenticator } from "~/utils/auth.server";
-import { data } from "@remix-run/node";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const isDevelopment = process.env.NODE_ENV === "development";
@@ -32,15 +32,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		: (process.env.GOOGLE_ANALYTICS_ID ?? "");
 	const currentUser = await authenticator.isAuthenticated(request);
 	const locale = (await i18nServer.getLocale(request)) || "en";
-	return data({
-		isDevelopment,
-		currentUser,
-		locale,
-		gaTrackingId,
-	},
+	return data(
+		{
+			isDevelopment,
+			currentUser,
+			locale,
+			gaTrackingId,
+		},
 		{
 			headers: { "Set-Cookie": await localeCookie.serialize(locale) },
-		}
+		},
 	);
 }
 
