@@ -9,9 +9,9 @@ import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link, useNavigation } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { ArrowLeft, ArrowUpFromLine, Check, Key, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -22,7 +22,6 @@ import { sanitizeUser } from "~/utils/sanitizeUser";
 import { commitSession, getSession } from "~/utils/session.server";
 import { updateUser } from "./functions/mutations.server";
 import { getUserByUserName } from "./functions/queries.server";
-
 export const meta: MetaFunction = () => {
 	return [{ title: "Edit Profile" }];
 };
@@ -47,7 +46,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 	if (!updatedUser) {
 		throw new Response("Not Found", { status: 404 });
 	}
-	return typedjson({ currentUser: updatedUser });
+	return { currentUser: updatedUser };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -73,7 +72,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function EditProfile() {
-	const { currentUser } = useTypedLoaderData<typeof loader>();
+	const { currentUser } = useLoaderData<typeof loader>();
 	const [isGeminiApiKeyDialogOpen, setIsGeminiApiKeyDialogOpen] =
 		useState(false);
 	const navigation = useNavigation();

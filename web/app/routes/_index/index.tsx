@@ -2,17 +2,16 @@ import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Form } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { LogIn } from "lucide-react";
 import { useState } from "react";
 import { FaDiscord, FaGithub, FaGoogle } from "react-icons/fa";
-import { useTypedLoaderData } from "remix-typedjson";
 import { Button } from "~/components/ui/button";
 import i18nServer from "~/i18n.server";
 import { authenticator } from "~/utils/auth.server";
 import { AddAndVoteTranslations } from "../$userName+/page+/$slug+/components/sourceTextAndTranslationSection/AddAndVoteTranslations";
 import { SourceTextAndTranslationSection } from "../$userName+/page+/$slug+/components/sourceTextAndTranslationSection/SourceTextAndTranslationSection";
 import { fetchPageWithTranslations } from "../$userName+/page+/$slug+/functions/queries.server";
-
 export const meta: MetaFunction = () => {
 	return [
 		{ title: "EveEve" },
@@ -68,7 +67,7 @@ export default function Index() {
 		heroText,
 		sourceLanguage,
 		targetLanguage,
-	} = useTypedLoaderData<typeof loader>();
+	} = useLoaderData<typeof loader>();
 	const [selectedSourceTextId, setSelectedSourceTextId] = useState<
 		number | null
 	>(null);

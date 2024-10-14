@@ -1,7 +1,7 @@
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useRevalidator } from "@remix-run/react";
-import { typedjson, useTypedLoaderData } from "remix-typedjson";
+import { useLoaderData } from "@remix-run/react";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import i18nServer from "~/i18n.server";
 import { createOrUpdateSourceTexts } from "~/routes/$userName+/page+/$slug+/edit/functions/mutations.server";
@@ -28,11 +28,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const hasGeminiApiKey = !!nonSanitizedUser?.geminiApiKey;
 	const targetLanguage = await i18nServer.getLocale(request);
 
-	return typedjson({
+	return {
 		currentUser,
 		targetLanguage,
 		hasGeminiApiKey,
-	});
+	};
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -184,7 +184,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function TranslatePage() {
-	const { hasGeminiApiKey } = useTypedLoaderData<typeof loader>();
+	const { hasGeminiApiKey } = useLoaderData<typeof loader>();
 	const revalidator = useRevalidator();
 
 	return (

@@ -23,8 +23,7 @@ export const handleError = Sentry.wrapHandleErrorWithSentry(
 	},
 );
 
-const ABORT_DELAY = 5_000;
-
+export const streamTimeout = 5000;
 function setSecurityHeaders(headers: Headers) {
 	headers.set(
 		"Strict-Transport-Security",
@@ -80,11 +79,7 @@ async function handleBotRequest(
 		let currentResponseStatusCode = responseStatusCode;
 		const { pipe, abort } = renderToPipeableStream(
 			<I18nextProvider i18n={instance}>
-				<RemixServer
-					context={remixContext}
-					url={request.url}
-					abortDelay={ABORT_DELAY}
-				/>
+				<RemixServer context={remixContext} url={request.url} />
 			</I18nextProvider>,
 			{
 				onAllReady() {
@@ -119,7 +114,7 @@ async function handleBotRequest(
 			},
 		);
 
-		setTimeout(abort, ABORT_DELAY);
+		setTimeout(abort, streamTimeout + 1000);
 	});
 }
 
@@ -144,11 +139,7 @@ async function handleBrowserRequest(
 		let currentResponseStatusCode = responseStatusCode;
 		const { pipe, abort } = renderToPipeableStream(
 			<I18nextProvider i18n={instance}>
-				<RemixServer
-					context={remixContext}
-					url={request.url}
-					abortDelay={ABORT_DELAY}
-				/>
+				<RemixServer context={remixContext} url={request.url} />
 			</I18nextProvider>,
 			{
 				onShellReady() {
@@ -182,6 +173,6 @@ async function handleBrowserRequest(
 			},
 		);
 
-		setTimeout(abort, ABORT_DELAY);
+		setTimeout(abort, streamTimeout + 1000);
 	});
 }

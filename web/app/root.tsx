@@ -1,5 +1,6 @@
 import type { LinksFunction } from "@remix-run/node";
 import type { LoaderFunctionArgs } from "@remix-run/node";
+import { data } from "@remix-run/node";
 import {
 	Links,
 	Meta,
@@ -14,8 +15,6 @@ import { useLoaderData, useRouteLoaderData } from "@remix-run/react";
 import { captureRemixErrorBoundaryError, withSentry } from "@sentry/remix";
 import { useEffect } from "react";
 import { useChangeLanguage } from "remix-i18next/react";
-import { typedjson } from "remix-typedjson";
-import { useTypedLoaderData } from "remix-typedjson";
 import { useHydrated } from "remix-utils/use-hydrated";
 import { ThemeProvider } from "~/components/theme-provider";
 import * as gtag from "~/gtags.client";
@@ -33,9 +32,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		: (process.env.GOOGLE_ANALYTICS_ID ?? "");
 	const currentUser = await authenticator.isAuthenticated(request);
 	const locale = (await i18nServer.getLocale(request)) || "en";
-	return typedjson(
-		{ isDevelopment, currentUser, locale, gaTrackingId },
-		{ headers: { "Set-Cookie": await localeCookie.serialize(locale) } },
+	return data(
+		{
+			isDevelopment,
+			currentUser,
+			locale,
+			gaTrackingId,
+		},
+		{
+			headers: { "Set-Cookie": await localeCookie.serialize(locale) },
+		},
 	);
 }
 
@@ -48,7 +54,8 @@ export const links: LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
-	const { locale, gaTrackingId } = useRouteLoaderData<typeof loader>("root");
+	const data = useRouteLoaderData<typeof loader>("root");
+	const { gaTrackingId, locale } = data ?? {};
 	const location = useLocation();
 	useEffect(() => {
 		if (gaTrackingId?.length) {
@@ -126,7 +133,7 @@ function CommonLayout({
 	children,
 	isSpecialLayout = true,
 }: { children: React.ReactNode; isSpecialLayout: boolean }) {
-	const { currentUser } = useTypedLoaderData<typeof loader>();
+	const { currentUser } = useLoaderData<typeof loader>();
 
 	if (isSpecialLayout) {
 		return <>{children}</>;
@@ -146,7 +153,8 @@ function CommonLayout({
 }
 
 export function ErrorBoundary() {
-	const isDevelopment = useRouteLoaderData<typeof loader>("root").isDevelopment;
+	const data = useRouteLoaderData<typeof loader>("root");
+	const isDevelopment = data?.isDevelopment;
 	const error = useRouteError();
 	const isHydrated = useHydrated();
 	captureRemixErrorBoundaryError(error);
