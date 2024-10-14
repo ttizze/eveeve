@@ -6,7 +6,6 @@ import { useActionData, useNavigation } from "@remix-run/react";
 import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
-import { typedjson } from "remix-typedjson";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -20,9 +19,10 @@ export const meta: MetaFunction = () => {
 const schema = z.object({
 	query: z.string().min(1, "Search query is required"),
 });
+
 export async function loader({ request }: LoaderFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request);
-	return typedjson({ currentUser });
+	return { currentUser };
 }
 
 export async function action({ request }: ActionFunctionArgs) {

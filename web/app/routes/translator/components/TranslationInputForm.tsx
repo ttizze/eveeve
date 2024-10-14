@@ -1,9 +1,8 @@
 import { getFormProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
-import { Form, useNavigation } from "@remix-run/react";
+import { Form, useActionData, useNavigation } from "@remix-run/react";
 import { Languages } from "lucide-react";
 import { useState } from "react";
-import { useTypedActionData } from "remix-typedjson";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
@@ -14,7 +13,7 @@ import { translationInputSchema } from "../types";
 export function TranslationInputForm() {
 	const navigation = useNavigation();
 	const [selectedModel, setSelectedModel] = useState("gemini-1.5-flash");
-	const actionData = useTypedActionData<typeof action>();
+	const actionData = useActionData<typeof action>();
 	const [inputType, setInputType] = useState<"url" | "file">("url");
 
 	const [form, fields] = useForm({

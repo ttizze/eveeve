@@ -8,9 +8,9 @@ import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
-import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { z } from "zod";
 import { authenticator } from "~/utils/auth.server";
 import { EditFooter } from "./components/EditFooter";
@@ -76,7 +76,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 	)?.text;
 	const allTags = await getAllTags();
 
-	return typedjson({ currentUser, page, allTags, title });
+	return { currentUser, page, allTags, title };
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
@@ -144,8 +144,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function EditPage() {
-	const { currentUser, page, allTags, title } =
-		useTypedLoaderData<typeof loader>();
+	const { currentUser, page, allTags, title } = useLoaderData<typeof loader>();
 	const fetcher = useFetcher<typeof action>();
 	const [form, fields] = useForm({
 		onValidate({ formData }) {

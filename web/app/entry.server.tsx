@@ -23,8 +23,7 @@ export const handleError = Sentry.wrapHandleErrorWithSentry(
 	},
 );
 
-const ABORT_DELAY = 5_000;
-
+export const streamTimeout = 5000;
 function setSecurityHeaders(headers: Headers) {
 	headers.set(
 		"Strict-Transport-Security",
@@ -83,7 +82,6 @@ async function handleBotRequest(
 				<RemixServer
 					context={remixContext}
 					url={request.url}
-					abortDelay={ABORT_DELAY}
 				/>
 			</I18nextProvider>,
 			{
@@ -119,7 +117,7 @@ async function handleBotRequest(
 			},
 		);
 
-		setTimeout(abort, ABORT_DELAY);
+		setTimeout(abort, streamTimeout + 1000);
 	});
 }
 
@@ -147,7 +145,6 @@ async function handleBrowserRequest(
 				<RemixServer
 					context={remixContext}
 					url={request.url}
-					abortDelay={ABORT_DELAY}
 				/>
 			</I18nextProvider>,
 			{
@@ -182,6 +179,6 @@ async function handleBrowserRequest(
 			},
 		);
 
-		setTimeout(abort, ABORT_DELAY);
+		setTimeout(abort, streamTimeout + 1000);
 	});
 }

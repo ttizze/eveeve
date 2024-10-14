@@ -3,7 +3,7 @@ import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
-import { typedjson, useTypedLoaderData } from "remix-typedjson";
+import { useLoaderData } from "@remix-run/react";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import i18nServer from "~/i18n.server";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
@@ -30,7 +30,10 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 
 	const { pageWithTranslations, sourceTitleWithBestTranslationTitle } = data;
 
-	const description = stripHtmlTags(pageWithTranslations.content).slice(0, 200);
+	const description = stripHtmlTags(pageWithTranslations.page.content).slice(
+		0,
+		200,
+	);
 	const imageUrl = pageWithTranslations.user.icon;
 
 	return [
@@ -96,7 +99,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		pageWithTranslations.page.id,
 		currentUser?.id ?? 0,
 	);
-	return typedjson({
+	return {
 		targetLanguage,
 		pageWithTranslations,
 		currentUser,
@@ -106,7 +109,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		sourceTitleWithBestTranslationTitle,
 		likeCount,
 		isLikedByUser,
-	});
+	};
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -192,7 +195,7 @@ export default function Page() {
 		targetLanguage,
 		likeCount,
 		isLikedByUser,
-	} = useTypedLoaderData<typeof loader>();
+	} = useLoaderData<typeof loader>();
 	const actionData = useActionData<typeof action>();
 	const [form, fields] = useForm({
 		lastResult: actionData?.lastResult,
