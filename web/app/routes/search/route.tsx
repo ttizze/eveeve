@@ -67,6 +67,9 @@ export default function Search() {
 							{isSearching ? "Searching..." : "Search"}
 						</Button>
 					</div>
+					{fields.query.errors && (
+						<p className="text-red-500 mt-2">{fields.query.errors}</p>
+					)}
 				</Form>
 				{actionData?.searchResults && (
 					<div className=" shadow-lg rounded-md z-10  ">
