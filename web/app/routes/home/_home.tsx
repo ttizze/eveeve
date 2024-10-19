@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { data } from "@remix-run/node";
 import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
 import { CalendarPlus } from "lucide-react";
@@ -18,14 +18,17 @@ import {
 	PaginationNext,
 	PaginationPrevious,
 } from "~/components/ui/pagination";
+import i18nServer from "~/i18n.server";
 import { LikeButton } from "~/routes/resources+/like-button";
 import { authenticator } from "~/utils/auth.server";
 import { fetchPaginatedPublicPages } from "./functions/queries.server";
+
 export const meta: MetaFunction = () => {
 	return [{ title: "Home - Latest Pages" }];
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
+	const locale = await i18nServer.getLocale(request);
 	const url = new URL(request.url);
 	const page = Number(url.searchParams.get("page") || "1");
 	const currentUser = await authenticator.isAuthenticated(request);
@@ -34,8 +37,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		9,
 		currentUser?.id,
 	);
+	const pagesLocale = pages.map((page) => {
+		return {
+			...page,
+			createdAt: new Date(page.createdAt).toLocaleDateString(locale),
+		};
+	});
 
-	return json({ pages, totalPages, currentPage, currentUser });
+	return data({ pages: pagesLocale, totalPages, currentPage, currentUser });
 }
 
 export default function Home() {
@@ -66,9 +75,7 @@ export default function Home() {
 								<CardTitle className="flex items-center pr-3 break-all overflow-wrap-anywhere">
 									{page.title}
 								</CardTitle>
-								<CardDescription>
-									{new Date(page.createdAt).toLocaleDateString()}
-								</CardDescription>
+								<CardDescription>{page.createdAt}</CardDescription>
 							</Link>
 						</CardHeader>
 						<CardContent>

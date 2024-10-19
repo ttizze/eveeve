@@ -32,10 +32,6 @@ export function ContentWithTranslations({
 	targetLanguage,
 }: ContentWithTranslationsProps) {
 	const isHydrated = useHydrated();
-	const localCreatedAt = isHydrated
-		? pageWithTranslations.page.createdAt.toLocaleString()
-		: pageWithTranslations.page.createdAt.toISOString();
-
 	const [selectedSourceTextId, setSelectedSourceTextId] = useState<
 		number | null
 	>(null);
@@ -89,7 +85,9 @@ export function ContentWithTranslations({
 						<span className="text-sm">
 							{pageWithTranslations.user.displayName}
 						</span>
-						<span className="text-xs text-gray-500">{localCreatedAt}</span>
+						<span className="text-xs text-gray-500">
+							{pageWithTranslations.page.createdAt}
+						</span>
 					</div>
 				</Link>
 				{pageWithTranslations.user.userName === currentUserName &&

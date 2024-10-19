@@ -8,11 +8,15 @@ import {
 } from "~/components/ui/select";
 
 const geminiModels = [
-	{ name: "gemini-1.5-flash", description: "fast", value: "gemini-1.5-flash" },
 	{
-		name: "gemini-1.5-pro",
+		name: "gemini-1.5-flash-002",
+		description: "fast",
+		value: "gemini-1.5-flash-002",
+	},
+	{
+		name: "gemini-1.5-pro-002",
 		description: "high quality",
-		value: "gemini-1.5-pro",
+		value: "gemini-1.5-pro-002",
 	},
 ];
 

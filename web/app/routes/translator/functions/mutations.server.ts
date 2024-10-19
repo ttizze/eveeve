@@ -23,29 +23,3 @@ export async function createUserAITranslationInfo(
 		throw error;
 	}
 }
-
-export async function getOrCreatePage(
-	userId: number,
-	slug: string,
-	title: string,
-	content: string,
-) {
-	const page = await prisma.page.upsert({
-		where: {
-			slug,
-		},
-		update: {
-			title,
-			content,
-		},
-		create: {
-			userId,
-			slug,
-			title,
-			content,
-		},
-	});
-
-	console.log(`Page upserted: ${page.title}`);
-	return page;
-}
