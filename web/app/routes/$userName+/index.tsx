@@ -31,6 +31,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import i18nServer from "~/i18n.server";
 import { authenticator } from "~/utils/auth.server";
 import {
 	archivePage,
@@ -49,6 +50,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 };
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
+	const locale = await i18nServer.getLocale(request);
 	const { userName } = params;
 	if (!userName) throw new Error("Username is required");
 	const currentUser = await authenticator.isAuthenticated(request);
@@ -59,12 +61,14 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		isOwner,
 	);
 	if (!sanitizedUserWithPages) throw new Response("Not Found", { status: 404 });
-
-	const pageCreatedAt = new Date(
-		sanitizedUserWithPages.createdAt,
-	).toLocaleDateString();
-
-	return { sanitizedUserWithPages, isOwner, pageCreatedAt };
+	const sanitizedUserWithPagesLocalized = {
+		...sanitizedUserWithPages,
+		pages: sanitizedUserWithPages.pages.map((page) => ({
+			...page,
+			createdAt: new Date(page.createdAt).toLocaleDateString(locale),
+		})),
+	};
+	return { sanitizedUserWithPages: sanitizedUserWithPagesLocalized, isOwner };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -97,8 +101,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function UserPage() {
 	const navigate = useNavigate();
-	const { sanitizedUserWithPages, isOwner, pageCreatedAt } =
-		useLoaderData<typeof loader>();
+	const { sanitizedUserWithPages, isOwner } = useLoaderData<typeof loader>();
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [pageToDelete, setPageToDelete] = useState<number | null>(null);
 
@@ -218,7 +221,7 @@ export default function UserPage() {
 									{page.isPublished ? "" : <Lock className="h-4 w-4 mr-2" />}
 									{page.title}
 								</CardTitle>
-								<CardDescription>{pageCreatedAt}</CardDescription>
+								<CardDescription>{page.createdAt}</CardDescription>
 							</CardHeader>
 						</Link>
 					</Card>

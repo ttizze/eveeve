@@ -9,7 +9,11 @@ export async function fetchSanitizedUserWithPages(
 		where: { userName },
 		include: {
 			pages: {
-				include: {
+				select: {
+					id: true,
+					slug: true,
+					isPublished: true,
+					createdAt: true,
 					sourceTexts: {
 						where: {
 							number: 0,

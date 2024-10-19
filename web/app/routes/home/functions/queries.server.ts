@@ -17,7 +17,10 @@ export async function fetchPaginatedPublicPages(
 			},
 			skip,
 			take: pageSize,
-			include: {
+			select: {
+				id: true,
+				slug: true,
+				createdAt: true,
 				user: {
 					select: {
 						userName: true,

@@ -35,15 +35,6 @@ export function TranslationInputForm() {
 				encType="multipart/form-data"
 				className="space-y-4"
 			>
-				<div className="flex space-x-2 mb-2">
-					<Button
-						type="button"
-						onClick={() => setInputType("file")}
-						variant={inputType === "file" ? "default" : "outline"}
-					>
-						File
-					</Button>
-				</div>
 				<div className="flex space-x-1">
 					<div className="flex-col flex-grow w-full">
 						<input

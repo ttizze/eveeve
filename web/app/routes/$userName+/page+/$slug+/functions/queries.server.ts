@@ -68,7 +68,10 @@ export async function fetchPageWithTranslations(
 	if (!page) return null;
 
 	return {
-		page: page,
+		page: {
+			...page,
+			createdAt: page.createdAt.toLocaleString(targetLanguage),
+		},
 		user: sanitizeUser(page.user),
 		tagPages: page.tagPages,
 		sourceTextWithTranslations: page.sourceTexts.map((sourceText) => {
