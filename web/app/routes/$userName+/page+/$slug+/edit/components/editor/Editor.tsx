@@ -25,6 +25,7 @@ export function Editor({ initialContent, setHasUnsavedChanges }: EditorProps) {
 		editorProps: {
 			attributes: {
 				"data-testid": "tiptap-editor",
+				class: "focus:outline-none",
 			},
 		},
 	});
