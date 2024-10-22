@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import type { MultiValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import type { z } from "zod";
+import { ModeToggle } from "~/components/ModeToggle";
 import { Button } from "~/components/ui/button";
 import {
 	DropdownMenu,
@@ -30,8 +31,6 @@ import {
 } from "~/components/ui/popover";
 import type { SanitizedUser } from "~/types";
 import type { editPageSchema } from "../_edit";
-import { ModeToggle } from "~/components/ModeToggle";
-
 
 interface EditHeaderProps {
 	currentUser: SanitizedUser | null;
@@ -136,7 +135,7 @@ export function EditHeader({
 					))}
 				</div>
 				<div className="flex items-center">
-				<ModeToggle />					
+					<ModeToggle />
 					<div className="justify-self-end flex items-center">
 						<Popover>
 							<PopoverTrigger asChild>
