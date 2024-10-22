@@ -30,6 +30,9 @@ import {
 } from "~/components/ui/popover";
 import type { SanitizedUser } from "~/types";
 import type { editPageSchema } from "../_edit";
+import { ModeToggle } from "~/components/ModeToggle";
+
+
 interface EditHeaderProps {
 	currentUser: SanitizedUser | null;
 	pageSlug: string | undefined;
@@ -133,6 +136,7 @@ export function EditHeader({
 					))}
 				</div>
 				<div className="flex items-center">
+				<ModeToggle />					
 					<div className="justify-self-end flex items-center">
 						<Popover>
 							<PopoverTrigger asChild>
