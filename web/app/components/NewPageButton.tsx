@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Button } from "~/components/ui/button";
 
 const generateSlug = (length = 8): string => {
-	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	const charset =
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	let slug = "";
 	while (slug.length < length) {
 		const byte = crypto.getRandomValues(new Uint8Array(1))[0];
