@@ -13,7 +13,6 @@ import { useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import { z } from "zod";
 import { authenticator } from "~/utils/auth.server";
-import { EditFooter } from "./components/EditFooter";
 import { EditHeader } from "./components/EditHeader";
 import { Editor } from "./components/editor/Editor";
 import {
@@ -219,7 +218,6 @@ export default function EditPage() {
 					</div>
 				</fetcher.Form>
 			</FormProvider>
-			<EditFooter />
 		</div>
 	);
 }

@@ -2,6 +2,19 @@ import { useNavigate } from "@remix-run/react";
 import { Loader2, PlusCircle } from "lucide-react";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
+
+const generateSlug = (length = 8): string => {
+	const charset =
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	let slug = "";
+	while (slug.length < length) {
+		const byte = crypto.getRandomValues(new Uint8Array(1))[0];
+		if (byte < 248) {
+			slug += charset[byte % 62];
+		}
+	}
+	return slug;
+};
 interface NewPageButtonProps {
 	userName: string;
 }
@@ -11,7 +24,7 @@ export function NewPageButton({ userName }: NewPageButtonProps) {
 	const [isLoading, setIsLoading] = useState(false);
 	const handleNewPage = () => {
 		setIsLoading(true);
-		const newSlug = crypto.randomUUID();
+		const newSlug = generateSlug();
 		navigate(`/${userName}/page/${newSlug}/edit`);
 	};
 
