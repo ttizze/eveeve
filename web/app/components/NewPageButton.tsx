@@ -3,15 +3,17 @@ import { Loader2, PlusCircle } from "lucide-react";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 
-const generateSlug = (length = 8): string =>
-	Array.from(crypto.getRandomValues(new Uint8Array(length)))
-		.map(
-			(byte) =>
-				"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"[
-					byte % 62
-				],
-		)
-		.join("");
+const generateSlug = (length = 8): string => {
+	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	let slug = "";
+	while (slug.length < length) {
+		const byte = crypto.getRandomValues(new Uint8Array(1))[0];
+		if (byte < 248) {
+			slug += charset[byte % 62];
+		}
+	}
+	return slug;
+};
 interface NewPageButtonProps {
 	userName: string;
 }
