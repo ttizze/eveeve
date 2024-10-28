@@ -183,7 +183,7 @@ export default function EditPage() {
 						allTags={allTags}
 					/>
 
-					<div className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg mt-2 md:mt-20 mx-auto px-2">
+					<div className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg mt-2 md:mt-20 mx-auto px-2 prose-headings:text-gray-500 prose-headings:dark:text-gray-400 text-gray-500 dark:text-gray-400">
 						<div className="mt-10 h-auto">
 							<h1 className="text-4xl font-bold !mb-0 h-auto">
 								<TextareaAutosize
