@@ -31,7 +31,7 @@ export function TranslationSection({
 
 	return (
 		<span className="group relative block rounded-md  pl-4 hover:bg-gray-300 dark:hover:bg-gray-700 ">
-			<span className="notranslate  inline-block pl-4 pr-5 py-2">
+			<span className="notranslate inline-block pl-4 pr-5 py-2 text-gray-700 dark:text-gray-200">
 				{sanitizedAndParsedText}
 				<ToggleButton
 					className="group-hover:text-gray-800 dark:group-hover:text-gray-300 "
