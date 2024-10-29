@@ -58,6 +58,15 @@ export async function createOrUpdateSourceTexts(
 			);
 
 			const updatedOrCreatedSourceTexts = await Promise.all(upsertPromises);
+			const upsertedIds = updatedOrCreatedSourceTexts.map((st) => st.id);
+
+			// 作成または更新したsourceText以外を削除
+			await tx.sourceText.deleteMany({
+				where: {
+					pageId,
+					id: { notIn: upsertedIds },
+				},
+			});
 
 			return updatedOrCreatedSourceTexts.map((st) => ({
 				number: st.number,

@@ -5,10 +5,10 @@ import { EditorFloatingMenu } from "./EditorFloatingMenu";
 import { configureEditor } from "./editorConfig";
 interface EditorProps {
 	initialContent: string;
-	setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
+	onContentChange: () => void;
 }
 
-export function Editor({ initialContent, setHasUnsavedChanges }: EditorProps) {
+export function Editor({ initialContent, onContentChange }: EditorProps) {
 	const pageContentControl = useInputControl({
 		name: "pageContent",
 		formId: "edit-page",
@@ -20,7 +20,7 @@ export function Editor({ initialContent, setHasUnsavedChanges }: EditorProps) {
 		},
 		onUpdate: async ({ editor }) => {
 			pageContentControl.change(editor.getHTML());
-			setHasUnsavedChanges(true);
+			onContentChange();
 		},
 		editorProps: {
 			attributes: {

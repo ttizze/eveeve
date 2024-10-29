@@ -30,6 +30,8 @@ import { addSourceTextIdToContent } from "./utils/addSourceTextIdToContent";
 import { extractTextElementInfo } from "./utils/extractTextElementInfo";
 import { getPageSourceLanguage } from "./utils/getPageSourceLanguage";
 import { removeSourceTextIdDuplicatesAndEmptyElements } from "./utils/removeSourceTextIdDuplicates";
+import { useCallback, useEffect } from "react";
+import { useDebouncedCallback } from "use-debounce";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	if (!data) {
@@ -162,6 +164,29 @@ export default function EditPage() {
 	});
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
+	const handleAutoSave = useCallback(() => {
+		const formData = new FormData();
+		formData.set("title", fields.title.value as string);
+		formData.set("pageContent", fields.pageContent.value as string);
+		formData.set("isPublished", fields.isPublished.value as string);
+		if (fetcher.state !== "submitting") {
+			fetcher.submit(formData, { method: "post" });
+		}
+	}, [fetcher, fields]);
+
+	const debouncedAutoSave = useDebouncedCallback(handleAutoSave, 1000);
+
+	const handleContentChange = useCallback(() => {
+		setHasUnsavedChanges(true);
+		debouncedAutoSave();
+	}, [debouncedAutoSave]);
+
+	useEffect(() => {
+		if (fetcher.state === "loading") {
+			setHasUnsavedChanges(false);
+		}
+	}, [fetcher.state]);
+
 	return (
 		<div>
 			<FormProvider context={form.context}>
@@ -193,7 +218,7 @@ export default function EditPage() {
 									className="w-full outline-none bg-transparent resize-none overflow-hidden"
 									minRows={1}
 									maxRows={10}
-									onChange={(e) => setHasUnsavedChanges(true)}
+									onChange={(e) => handleContentChange()}
 									data-testid="title-input"
 								/>
 							</h1>
@@ -207,7 +232,7 @@ export default function EditPage() {
 						<div className="mt-12">
 							<Editor
 								initialContent={page?.content || ""}
-								setHasUnsavedChanges={setHasUnsavedChanges}
+								onContentChange={handleContentChange}
 							/>
 							{fields.pageContent.errors?.map((error) => (
 								<p className="text-sm text-red-500" key={error}>
