@@ -10,7 +10,9 @@ import { useFetcher } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
 import { useLoaderData } from "@remix-run/react";
 import { useState } from "react";
+import { useCallback, useEffect } from "react";
 import TextareaAutosize from "react-textarea-autosize";
+import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
 import { authenticator } from "~/utils/auth.server";
 import { EditHeader } from "./components/EditHeader";
@@ -162,6 +164,35 @@ export default function EditPage() {
 	});
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
+	const handleAutoSave = useCallback(() => {
+		const formData = new FormData();
+		formData.set("title", fields.title.value as string);
+		formData.set("pageContent", fields.pageContent.value as string);
+		formData.set("isPublished", fields.isPublished.value as string);
+		const tags = fields.tags.value as string[];
+		if (Array.isArray(tags)) {
+			for (const tag of tags) {
+				formData.append("tags[]", tag);
+			}
+		}
+		if (fetcher.state !== "submitting") {
+			fetcher.submit(formData, { method: "post" });
+		}
+	}, [fetcher, fields]);
+
+	const debouncedAutoSave = useDebouncedCallback(handleAutoSave, 1000);
+
+	const handleContentChange = useCallback(() => {
+		setHasUnsavedChanges(true);
+		debouncedAutoSave();
+	}, [debouncedAutoSave]);
+
+	useEffect(() => {
+		if (fetcher.state === "loading") {
+			setHasUnsavedChanges(false);
+		}
+	}, [fetcher.state]);
+
 	return (
 		<div>
 			<FormProvider context={form.context}>
@@ -183,7 +214,7 @@ export default function EditPage() {
 						allTags={allTags}
 					/>
 
-					<div className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg mt-2 md:mt-20 mx-auto px-2">
+					<div className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg mt-2 md:mt-20 mx-auto px-2 prose-headings:text-gray-500 prose-headings:dark:text-gray-400 text-gray-500 dark:text-gray-400">
 						<div className="mt-10 h-auto">
 							<h1 className="text-4xl font-bold !mb-0 h-auto">
 								<TextareaAutosize
@@ -193,7 +224,7 @@ export default function EditPage() {
 									className="w-full outline-none bg-transparent resize-none overflow-hidden"
 									minRows={1}
 									maxRows={10}
-									onChange={(e) => setHasUnsavedChanges(true)}
+									onChange={(e) => handleContentChange()}
 									data-testid="title-input"
 								/>
 							</h1>
@@ -207,7 +238,7 @@ export default function EditPage() {
 						<div className="mt-12">
 							<Editor
 								initialContent={page?.content || ""}
-								setHasUnsavedChanges={setHasUnsavedChanges}
+								onContentChange={handleContentChange}
 							/>
 							{fields.pageContent.errors?.map((error) => (
 								<p className="text-sm text-red-500" key={error}>
