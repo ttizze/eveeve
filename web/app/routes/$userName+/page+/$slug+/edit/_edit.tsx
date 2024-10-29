@@ -169,6 +169,12 @@ export default function EditPage() {
 		formData.set("title", fields.title.value as string);
 		formData.set("pageContent", fields.pageContent.value as string);
 		formData.set("isPublished", fields.isPublished.value as string);
+		const tags = fields.tags.value as string[];
+		if (Array.isArray(tags)) {
+			for (const tag of tags) {
+				formData.append("tags[]", tag);
+			}
+		}
 		if (fetcher.state !== "submitting") {
 			fetcher.submit(formData, { method: "post" });
 		}
