@@ -9,10 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js 20
-      
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-    - run: npm ci
-    - run: npm run typecheck
+    - name: Install Bun
+      run: |
+        curl -fsSL https://bun.sh/install | bash
+        export BUN_INSTALL="$HOME/.bun"
+        export PATH="$BUN_INSTALL/bin:$PATH"
+    - name: Install dependencies
+      working-directory: ./web
+      run: bun install
+    - name: Run typecheck
+      working-directory: ./web
+      run: bun run typecheck
