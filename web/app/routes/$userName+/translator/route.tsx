@@ -5,14 +5,14 @@ import { useLoaderData } from "@remix-run/react";
 import { marked } from "marked";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import i18nServer from "~/i18n.server";
-import { createOrUpdateSourceTexts } from "~/routes/$userName+/page+/$slug+/edit/functions/mutations.server";
-import { createOrUpdatePage } from "~/routes/$userName+/page+/$slug+/edit/functions/mutations.server";
-import { getTitleSourceTextId } from "~/routes/$userName+/page+/$slug+/edit/functions/queries.server";
-import { addNumbersToContent } from "~/routes/$userName+/page+/$slug+/edit/utils/addNumbersToContent";
-import { addSourceTextIdToContent } from "~/routes/$userName+/page+/$slug+/edit/utils/addSourceTextIdToContent";
-import { extractArticle } from "~/routes/$userName+/page+/$slug+/edit/utils/extractArticle";
-import { extractTextElementInfo } from "~/routes/$userName+/page+/$slug+/edit/utils/extractTextElementInfo";
-import { getPageSourceLanguage } from "~/routes/$userName+/page+/$slug+/edit/utils/getPageSourceLanguage";
+import { createOrUpdateSourceTexts } from "../page+/$slug+/edit/functions/mutations.server";
+import { createOrUpdatePage } from "../page+/$slug+/edit/functions/mutations.server";
+import { getTitleSourceTextId } from "../page+/$slug+/edit/functions/queries.server";
+import { addNumbersToContent } from "../page+/$slug+/edit/utils/addNumbersToContent";
+import { addSourceTextIdToContent } from "../page+/$slug+/edit/utils/addSourceTextIdToContent";
+import { extractArticle } from "../page+/$slug+/edit/utils/extractArticle";
+import { extractTextElementInfo } from "../page+/$slug+/edit/utils/extractTextElementInfo";
+import { getPageSourceLanguage } from "../page+/$slug+/edit/utils/getPageSourceLanguage";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
 import { authenticator } from "~/utils/auth.server";
 import { TranslationInputForm } from "./components/TranslationInputForm";
@@ -21,6 +21,7 @@ import { translationInputSchema } from "./types";
 import { generateMarkdownFromDirectory } from "./utils/generate-markdown";
 import { generateSlug } from "./utils/generate-slug.server";
 import { processUploadedFolder } from "./utils/process-uploaded-folder";
+
 export async function loader({ request }: LoaderFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/fail",
