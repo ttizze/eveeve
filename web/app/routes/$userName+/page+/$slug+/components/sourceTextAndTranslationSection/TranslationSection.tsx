@@ -30,15 +30,18 @@ export function TranslationSection({
 	);
 
 	return (
-		<span className="group relative block rounded-md  pl-4 hover:bg-gray-300 dark:hover:bg-gray-700 ">
-			<span className="notranslate inline-block pl-4 pr-5 py-2 text-gray-700 dark:text-gray-200">
+		<span
+			className="group relative block rounded-md  hover:bg-gray-300 dark:hover:bg-gray-700 "
+			onMouseUp={(e) => {
+				// テキストが選択されている場合は何もしない
+				if (window.getSelection()?.toString()) return;
+				// 右クリックの場合は何もしない
+				if (e.button === 2) return;
+				onOpenAddAndVoteTranslations(sourceText.id);
+			}}
+		>
+			<span className="notranslate inline-block  py-2 text-gray-700 dark:text-gray-200">
 				{sanitizedAndParsedText}
-				<ToggleButton
-					className="group-hover:text-gray-800 dark:group-hover:text-gray-300 "
-					onClick={() => {
-						onOpenAddAndVoteTranslations(sourceText.id);
-					}}
-				/>
 			</span>
 		</span>
 	);
