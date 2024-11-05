@@ -31,7 +31,7 @@ export function TranslationSection({
 
 	return (
 		<span
-			className="group relative block rounded-md  hover:bg-gray-300 dark:hover:bg-gray-700 "
+			className="group relative block rounded-md"
 			onMouseUp={(e) => {
 				// テキストが選択されている場合は何もしない
 				if (window.getSelection()?.toString()) return;
