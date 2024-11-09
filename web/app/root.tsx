@@ -142,8 +142,8 @@ function CommonLayout({
 	return (
 		<>
 			<Header currentUser={currentUser} />
-			<div className="flex flex-col min-h-screen">
-				<main className="flex-grow mb-10 mt-3 md:mt-5">
+			<div className="flex flex-col ">
+				<main className="mb-5 mt-3 md:mt-5">
 					<div className="mx-auto px-2 md:container">{children}</div>
 				</main>
 				<Footer currentUser={currentUser} />
