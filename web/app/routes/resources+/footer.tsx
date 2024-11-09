@@ -1,13 +1,11 @@
 import { Link } from "@remix-run/react";
-import { FaGithub, FaDiscord } from "react-icons/fa";
+import { FaDiscord, FaGithub } from "react-icons/fa";
 import type { SanitizedUser } from "~/types";
 interface FooterProps {
 	currentUser: SanitizedUser | null;
 }
 
-
 export function Footer({ currentUser }: FooterProps) {
-
 	return (
 		<footer className="">
 			<div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">

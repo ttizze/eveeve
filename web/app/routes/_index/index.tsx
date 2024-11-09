@@ -5,7 +5,7 @@ import { Form } from "@remix-run/react";
 import { useLoaderData } from "@remix-run/react";
 import { LogIn } from "lucide-react";
 import { useState } from "react";
-import { FaDiscord, FaGithub, FaGoogle } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa";
 import { Button } from "~/components/ui/button";
 import i18nServer from "~/i18n.server";
 import { authenticator } from "~/utils/auth.server";
@@ -124,8 +124,6 @@ export default function Index() {
 							</Button>
 						</Form>
 					</div>
-
-
 				</div>
 				{selectedSourceTextWithTranslations && (
 					<AddAndVoteTranslations

@@ -29,7 +29,12 @@ export function NewPageButton({ userName }: NewPageButtonProps) {
 	};
 
 	return (
-		<Button onClick={handleNewPage} variant="ghost" disabled={isLoading} className="gap-2">
+		<Button
+			onClick={handleNewPage}
+			variant="ghost"
+			disabled={isLoading}
+			className="gap-2"
+		>
 			{isLoading ? (
 				<Loader2 className="h-4 w-4 animate-spin" />
 			) : (

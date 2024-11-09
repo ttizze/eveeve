@@ -4,12 +4,17 @@ import { redirect } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
 import { HomeIcon, LogOutIcon, Search } from "lucide-react";
+import { ModeToggle } from "~/components/ModeToggle";
 import { NewPageButton } from "~/components/NewPageButton";
 import { Button } from "~/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 import type { SanitizedUser } from "~/types";
 import { authenticator } from "~/utils/auth.server";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "~/components/ui/dropdown-menu";
-import { ModeToggle } from "~/components/ModeToggle";
 interface HeaderProps {
 	currentUser: SanitizedUser | null;
 }
@@ -96,10 +101,7 @@ export function Header({ currentUser }: HeaderProps) {
 							</DropdownMenu>
 						</>
 					) : (
-						<Form
-							method="post"
-							action="/resources/header"
-						>
+						<Form method="post" action="/resources/header">
 							<Button
 								type="submit"
 								name="intent"

@@ -13,8 +13,12 @@ export function ModeToggle() {
 
 	return (
 		<Button variant="ghost" onClick={toggleTheme} className="relative gap-2">
-			<Sun className={`w-4 h-4 transition-all ${isDark ?  "rotate-0 scale-100 ":"hidden" }`} />
-			<Moon className={`w-4 h-4 transition-all ${isDark ? "hidden" :"rotate-0 scale-100 text-gray-800" }`} />
+			<Sun
+				className={`w-4 h-4 transition-all ${isDark ? "rotate-0 scale-100 " : "hidden"}`}
+			/>
+			<Moon
+				className={`w-4 h-4 transition-all ${isDark ? "hidden" : "rotate-0 scale-100 text-gray-800"}`}
+			/>
 			<span>{isDark ? "Light Theme" : "Dark Theme"}</span>
 		</Button>
 	);
