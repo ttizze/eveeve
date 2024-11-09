@@ -47,7 +47,7 @@ export function Header({ currentUser }: HeaderProps) {
 				<Link to="/home">
 					<h1 className="text-2xl font-bold">EveEve</h1>
 				</Link>
-				<div className="grid grid-cols-2 gap-6 items-center">
+				<div className="grid grid-cols-2 gap-6 items-center mr-2">
 					<Link
 						to="/search"
 						className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white justify-self-center"
