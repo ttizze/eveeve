@@ -1,5 +1,5 @@
 import { useNavigate } from "@remix-run/react";
-import { Loader2, PlusCircle } from "lucide-react";
+import { Loader2, PencilIcon } from "lucide-react";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 
@@ -29,11 +29,19 @@ export function NewPageButton({ userName }: NewPageButtonProps) {
 	};
 
 	return (
-		<Button onClick={handleNewPage} variant="ghost" disabled={isLoading}>
+		<Button
+			onClick={handleNewPage}
+			variant="ghost"
+			disabled={isLoading}
+			className="gap-2"
+		>
 			{isLoading ? (
-				<Loader2 className="h-6 w-6 animate-spin" />
+				<Loader2 className="h-4 w-4 animate-spin" />
 			) : (
-				<PlusCircle className="h-6 w-6" />
+				<>
+					<PencilIcon className="h-4 w-4" />
+					<span>Write</span>
+				</>
 			)}
 		</Button>
 	);

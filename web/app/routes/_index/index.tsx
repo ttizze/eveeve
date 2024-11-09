@@ -5,7 +5,7 @@ import { Form } from "@remix-run/react";
 import { useLoaderData } from "@remix-run/react";
 import { LogIn } from "lucide-react";
 import { useState } from "react";
-import { FaDiscord, FaGithub, FaGoogle } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa";
 import { Button } from "~/components/ui/button";
 import i18nServer from "~/i18n.server";
 import { authenticator } from "~/utils/auth.server";
@@ -123,25 +123,6 @@ export default function Index() {
 								<LogIn />
 							</Button>
 						</Form>
-					</div>
-
-					<div className="flex justify-center gap-6">
-						<a
-							href="https://github.com/ttizze/eveeve"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="transition-colors"
-						>
-							<FaGithub size={24} />
-						</a>
-						<a
-							href="https://discord.gg/2JfhZdu9zW"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="transition-colors"
-						>
-							<FaDiscord size={24} />
-						</a>
 					</div>
 				</div>
 				{selectedSourceTextWithTranslations && (
