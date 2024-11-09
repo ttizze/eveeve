@@ -7,7 +7,7 @@ interface FooterProps {
 
 export function Footer({ currentUser }: FooterProps) {
 	return (
-		<footer className="">
+		<footer className="fixed bottom-0 w-full">
 			<div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-center items-center text-sm text-gray-600 dark:text-gray-300 gap-4">
 					<Link
