@@ -114,11 +114,7 @@ function App() {
 		location.pathname === "/welcome";
 
 	return (
-		<ThemeProvider
-			attribute="class"
-			defaultTheme="system"
-			enableSystem
-		>
+		<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 			<CommonLayout isSpecialLayout={isSpecialLayout}>
 				<Outlet />
 			</CommonLayout>
