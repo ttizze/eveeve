@@ -1,7 +1,6 @@
 import { useNavigate } from "@remix-run/react";
 import { Loader2, PencilIcon } from "lucide-react";
 import { useState } from "react";
-import { Button } from "~/components/ui/button";
 
 const generateSlug = (length = 8): string => {
 	const charset =
@@ -29,20 +28,20 @@ export function NewPageButton({ userName }: NewPageButtonProps) {
 	};
 
 	return (
-		<Button
+		<button
+			type="button"
 			onClick={handleNewPage}
-			variant="ghost"
 			disabled={isLoading}
-			className="gap-2  justify-start w-full text-left px-4 py-2"
+			className="w-full  gap-2 flex cursor-pointer items-center  px-6 py-4 text-sm hover:bg-accent hover:text-accent-foreground"
 		>
 			{isLoading ? (
 				<Loader2 className="h-4 w-4 animate-spin" />
 			) : (
 				<>
 					<PencilIcon className="h-4 w-4" />
-					<span>Write</span>
+					Write
 				</>
 			)}
-		</Button>
+		</button>
 	);
 }

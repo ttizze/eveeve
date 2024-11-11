@@ -4,8 +4,6 @@ import { redirect } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
 import { HomeIcon, LogOutIcon, Search } from "lucide-react";
-import { ModeToggle } from "~/components/ModeToggle";
-import { NewPageButton } from "~/components/NewPageButton";
 import { Button } from "~/components/ui/button";
 import {
 	DropdownMenu,
@@ -15,6 +13,8 @@ import {
 } from "~/components/ui/dropdown-menu";
 import type { SanitizedUser } from "~/types";
 import { authenticator } from "~/utils/auth.server";
+import { ModeToggle } from "../../components/ModeToggle";
+import { NewPageButton } from "./components/NewPageButton";
 interface HeaderProps {
 	currentUser: SanitizedUser | null;
 }
@@ -64,14 +64,14 @@ export function Header({ currentUser }: HeaderProps) {
 										className="w-6 h-6 rounded-full"
 									/>
 								</DropdownMenuTrigger>
-								<DropdownMenuContent>
+								<DropdownMenuContent className="m-2 p-0 rounded-xl min-w-40">
 									<DropdownMenuItem asChild>
 										<NewPageButton userName={currentUser.userName} />
 									</DropdownMenuItem>
 									<DropdownMenuItem asChild>
 										<Link
 											to={`/${currentUser.userName}`}
-											className="flex items-center gap-2 justify-start w-full text-left px-4 py-2 cursor-pointer"
+											className="w-full rounded-none flex items-center gap-2 justify-start  text-left px-6 py-4 cursor-pointer hover:bg-accent hover:text-accent-foreground"
 										>
 											<HomeIcon className="w-4 h-4" />
 											Home
@@ -86,16 +86,15 @@ export function Header({ currentUser }: HeaderProps) {
 											action="/resources/header"
 											className="w-full !p-0"
 										>
-											<Button
+											<button
 												type="submit"
 												name="intent"
 												value="logout"
-												variant="ghost"
-												className="gap-2 justify-start w-full text-left px-4 py-2 text-red-500"
+												className="w-full gap-2 flex cursor-pointer items-center  px-6 py-4 text-sm hover:bg-accent hover:text-accent-foreground text-red-500"
 											>
 												<LogOutIcon className="w-4 h-4" />
 												Log out
-											</Button>
+											</button>
 										</Form>
 									</DropdownMenuItem>
 								</DropdownMenuContent>
