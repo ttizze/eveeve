@@ -72,7 +72,7 @@ export function Header({ currentUser }: HeaderProps) {
 										<Link
 											to={`/${currentUser.userName}`}
 											className="flex items-center gap-2 justify-start w-full text-left px-4 py-2 cursor-pointer"
-											>
+										>
 											<HomeIcon className="w-4 h-4" />
 											Home
 										</Link>
@@ -81,7 +81,11 @@ export function Header({ currentUser }: HeaderProps) {
 										<ModeToggle />
 									</DropdownMenuItem>
 									<DropdownMenuItem asChild>
-										<Form method="post" action="/resources/header" className="w-full !p-0">
+										<Form
+											method="post"
+											action="/resources/header"
+											className="w-full !p-0"
+										>
 											<Button
 												type="submit"
 												name="intent"
@@ -98,7 +102,11 @@ export function Header({ currentUser }: HeaderProps) {
 							</DropdownMenu>
 						</>
 					) : (
-						<Form method="post" action="/resources/header" className="w-full  !p-0">
+						<Form
+							method="post"
+							action="/resources/header"
+							className="w-full  !p-0"
+						>
 							<Button
 								type="submit"
 								name="intent"
