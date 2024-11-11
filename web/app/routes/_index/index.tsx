@@ -87,7 +87,7 @@ export default function Index() {
 
 	return (
 		<div className="flex flex-col justify-between">
-			<main className="container mx-auto px-4 py-10 flex flex-col items-center justify-center">
+			<main className="prose dark:prose-invert sm:prose lg:prose-lg mx-auto px-2 py-10 flex flex-col items-center justify-center">
 				<div className="max-w-4xl w-full">
 					<h1 className="text-7xl font-bold mb-20 text-center">
 						<SourceTextAndTranslationSection
