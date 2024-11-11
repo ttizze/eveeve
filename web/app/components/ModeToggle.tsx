@@ -15,13 +15,13 @@ export function ModeToggle() {
 		<Button
 			variant="ghost"
 			onClick={toggleTheme}
-			className="gap-2 justify-start w-full text-left px-4 py-2"
-		>
+      className="gap-2 justify-start w-full text-left px-4 py-2"
+    >
 			<Sun
-				className={`w-4 h-4 transition-all ${isDark ? "rotate-0 scale-100 " : "hidden"}`}
+				className={`w-4 h-4  ${isDark ? "rotate-0 scale-100 " : "hidden"}`}
 			/>
 			<Moon
-				className={`w-4 h-4 transition-all ${isDark ? "hidden" : "rotate-0 scale-100 text-gray-800"}`}
+				className={`w-4 h-4 ${isDark ? "hidden" : "rotate-0 scale-100 text-gray-800"}`}
 			/>
 			<span>{isDark ? "Light Theme" : "Dark Theme"}</span>
 		</Button>

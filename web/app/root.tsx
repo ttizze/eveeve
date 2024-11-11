@@ -73,7 +73,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 				<Meta />
 				<Links />
 			</head>
-			<body className="flex flex-col min-h-screen">
+			<body className="flex flex-col min-h-screen transition-colors duration-300">
 				{!gaTrackingId ? null : (
 					<>
 						<script
@@ -118,7 +118,6 @@ function App() {
 			attribute="class"
 			defaultTheme="system"
 			enableSystem
-			disableTransitionOnChange
 		>
 			<CommonLayout isSpecialLayout={isSpecialLayout}>
 				<Outlet />
