@@ -12,7 +12,11 @@ export function ModeToggle() {
 	}
 
 	return (
-		<Button variant="ghost" onClick={toggleTheme} className="relative gap-2">
+		<Button
+			variant="ghost"
+			onClick={toggleTheme}
+			className="gap-2 justify-start w-full text-left px-4 py-2"
+		>
 			<Sun
 				className={`w-4 h-4 transition-all ${isDark ? "rotate-0 scale-100 " : "hidden"}`}
 			/>

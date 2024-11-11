@@ -33,7 +33,7 @@ export function NewPageButton({ userName }: NewPageButtonProps) {
 			onClick={handleNewPage}
 			variant="ghost"
 			disabled={isLoading}
-			className="gap-2"
+			className="gap-2  justify-start w-full text-left px-4 py-2"
 		>
 			{isLoading ? (
 				<Loader2 className="h-4 w-4 animate-spin" />
