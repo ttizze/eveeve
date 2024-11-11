@@ -65,32 +65,33 @@ export function Header({ currentUser }: HeaderProps) {
 									/>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent>
-									<DropdownMenuItem>
+									<DropdownMenuItem asChild>
 										<NewPageButton userName={currentUser.userName} />
 									</DropdownMenuItem>
-									<DropdownMenuItem>
-										<Button variant="ghost" className="">
-											<Link
-												prefetch="render"
-												to={`/${currentUser.userName}`}
-												className=" flex items-center gap-2"
-											>
-												<HomeIcon className="w-4 h-4" />
-												Home
-											</Link>
-										</Button>
+									<DropdownMenuItem asChild>
+										<Link
+											to={`/${currentUser.userName}`}
+											className="flex items-center gap-2 justify-start w-full text-left px-4 py-2 cursor-pointer"
+										>
+											<HomeIcon className="w-4 h-4" />
+											Home
+										</Link>
 									</DropdownMenuItem>
-									<DropdownMenuItem>
+									<DropdownMenuItem asChild>
 										<ModeToggle />
 									</DropdownMenuItem>
-									<DropdownMenuItem>
-										<Form method="post" action="/resources/header">
+									<DropdownMenuItem asChild>
+										<Form
+											method="post"
+											action="/resources/header"
+											className="w-full !p-0"
+										>
 											<Button
 												type="submit"
 												name="intent"
 												value="logout"
 												variant="ghost"
-												className="gap-2 text-red-500"
+												className="gap-2 justify-start w-full text-left px-4 py-2 text-red-500"
 											>
 												<LogOutIcon className="w-4 h-4" />
 												Log out
@@ -101,12 +102,17 @@ export function Header({ currentUser }: HeaderProps) {
 							</DropdownMenu>
 						</>
 					) : (
-						<Form method="post" action="/resources/header">
+						<Form
+							method="post"
+							action="/resources/header"
+							className="w-full  !p-0"
+						>
 							<Button
 								type="submit"
 								name="intent"
 								value="SignInWithGoogle"
 								variant="ghost"
+								className="gap-2  justify-start w-full text-left px-4 py-2"
 							>
 								Start
 							</Button>

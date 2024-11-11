@@ -73,7 +73,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 				<Meta />
 				<Links />
 			</head>
-			<body>
+			<body className="flex flex-col min-h-screen">
 				{!gaTrackingId ? null : (
 					<>
 						<script
@@ -142,12 +142,10 @@ function CommonLayout({
 	return (
 		<>
 			<Header currentUser={currentUser} />
-			<div className="flex flex-col ">
-				<main className="mb-5 mt-3 md:mt-5">
-					<div className="mx-auto px-2 md:container">{children}</div>
-				</main>
-				<Footer currentUser={currentUser} />
-			</div>
+			<main className="mb-5 mt-3 md:mt-5 flex-grow">
+				<div className="mx-auto px-2 md:container">{children}</div>
+			</main>
+			<Footer />
 		</>
 	);
 }
