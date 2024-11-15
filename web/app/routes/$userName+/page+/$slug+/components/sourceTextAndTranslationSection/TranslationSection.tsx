@@ -1,4 +1,3 @@
-import { MoreVertical } from "lucide-react";
 import { Languages, Plus } from "lucide-react";
 import { useHydrated } from "remix-utils/use-hydrated";
 import type { SourceTextWithTranslations } from "../../types";
@@ -30,43 +29,16 @@ export function TranslationSection({
 	);
 
 	return (
-		<span
-			className="group relative block rounded-md"
-			onMouseUp={(e) => {
-				// テキストが選択されている場合は何もしない
-				if (window.getSelection()?.toString()) return;
-				// 右クリックの場合は何もしない
-				if (e.button === 2) return;
-				onOpenAddAndVoteTranslations(sourceText.id);
-			}}
-		>
-			<span className="notranslate inline-block  py-2 text-gray-700 dark:text-gray-200">
+		<span className="group relative block rounded-md">
+			<span
+				className="notranslate inline-block  py-2 text-gray-700 dark:text-gray-200"
+				onMouseUp={(e) => {
+					if (window.getSelection()?.toString()) return;
+					if (e.button === 2) return;
+					onOpenAddAndVoteTranslations(sourceText.id);
+				}}>
 				{sanitizedAndParsedText}
 			</span>
 		</span>
-	);
-}
-
-function ToggleButton({
-	className,
-	onClick,
-}: {
-	className?: string;
-	onClick: () => void;
-}) {
-	const label = "Show translation options";
-
-	return (
-		<button
-			type="button"
-			className={"absolute top-2 right-0 md:right-1"}
-			onClick={onClick}
-			aria-label={label}
-			title={label}
-		>
-			<MoreVertical
-				className={`w-5 h-5 text-gray-500 rounded-md ${className}`}
-			/>
-		</button>
 	);
 }

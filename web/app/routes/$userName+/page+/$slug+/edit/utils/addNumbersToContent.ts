@@ -11,7 +11,7 @@ export function shouldProcessElement(element: Element): boolean {
 	const isNotAlreadyTranslated =
 		htmlElement.getAttribute("data-translated") !== "true";
 	const isNotTooltip = !htmlElement.classList.contains(
-		"eveeve-source-text-tooltip",
+		"source-text-tooltip",
 	);
 	const isNotExcludedTag = ![
 		"script",
