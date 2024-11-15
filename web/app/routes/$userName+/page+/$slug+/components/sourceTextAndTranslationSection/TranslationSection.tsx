@@ -36,7 +36,8 @@ export function TranslationSection({
 					if (window.getSelection()?.toString()) return;
 					if (e.button === 2) return;
 					onOpenAddAndVoteTranslations(sourceText.id);
-				}}>
+				}}
+			>
 				{sanitizedAndParsedText}
 			</span>
 		</span>
