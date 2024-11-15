@@ -10,9 +10,7 @@ export function shouldProcessElement(element: Element): boolean {
 	const isNotEditable = !htmlElement.isContentEditable;
 	const isNotAlreadyTranslated =
 		htmlElement.getAttribute("data-translated") !== "true";
-	const isNotTooltip = !htmlElement.classList.contains(
-		"eveeve-source-text-tooltip",
-	);
+	const isNotTooltip = !htmlElement.classList.contains("source-text-tooltip");
 	const isNotExcludedTag = ![
 		"script",
 		"style",
