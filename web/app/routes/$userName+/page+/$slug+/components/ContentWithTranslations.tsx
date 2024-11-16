@@ -21,6 +21,8 @@ interface ContentWithTranslationsProps {
 	hasGeminiApiKey: boolean;
 	userAITranslationInfo: UserAITranslationInfo | null;
 	targetLanguage: string;
+	showOriginal: boolean;
+	showTranslation: boolean;
 }
 
 export function ContentWithTranslations({
@@ -30,6 +32,8 @@ export function ContentWithTranslations({
 	hasGeminiApiKey,
 	userAITranslationInfo,
 	targetLanguage,
+	showOriginal = true,
+	showTranslation = true,
 }: ContentWithTranslationsProps) {
 	const isHydrated = useHydrated();
 	const [selectedSourceTextId, setSelectedSourceTextId] = useState<
@@ -62,6 +66,8 @@ export function ContentWithTranslations({
 						sourceLanguage={pageWithTranslations.page.sourceLanguage}
 						targetLanguage={targetLanguage}
 						onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
+						showOriginal={true}
+						showTranslation={true}
 					/>
 				)}
 			</h1>
@@ -115,6 +121,8 @@ export function ContentWithTranslations({
 						targetLanguage={targetLanguage}
 						currentUserName={currentUserName}
 						onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
+						showOriginal={showOriginal}
+						showTranslation={showTranslation}
 					/>
 					{selectedSourceTextWithTranslations && (
 						<AddAndVoteTranslations

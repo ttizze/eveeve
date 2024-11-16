@@ -4,14 +4,14 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
 import { useLoaderData } from "@remix-run/react";
+import { useState } from "react";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import i18nServer from "~/i18n.server";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
-import { LikeButton } from "~/routes/resources+/like-button";
 import { authenticator } from "~/utils/auth.server";
 import { stripHtmlTags } from "../../utils/stripHtmlTags";
 import { ContentWithTranslations } from "./components/ContentWithTranslations";
-import { ShareDialog } from "./components/ShareDialog";
+import { FloatingControls } from "./components/FloatingControls";
 import { createUserAITranslationInfo } from "./functions/mutations.server";
 import {
 	fetchIsLikedByUser,
@@ -201,10 +201,12 @@ export default function Page() {
 		lastResult: actionData?.lastResult,
 	});
 
+	const [showOriginal, setShowOriginal] = useState(true);
+	const [showTranslation, setShowTranslation] = useState(true);
 	const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 
 	return (
-		<div className=" w-full max-w-3xl  mx-auto">
+		<div className="w-full max-w-3xl mx-auto">
 			<article className="w-full prose dark:prose-invert prose-a:underline prose-a:decoration-dotted sm:prose lg:prose-lg mx-auto mb-20">
 				<ContentWithTranslations
 					pageWithTranslations={pageWithTranslations}
@@ -213,6 +215,8 @@ export default function Page() {
 					hasGeminiApiKey={hasGeminiApiKey}
 					userAITranslationInfo={userAITranslationInfo}
 					targetLanguage={targetLanguage}
+					showOriginal={showOriginal}
+					showTranslation={showTranslation}
 				/>
 				<div className="flex flex-wrap gap-2">
 					{pageWithTranslations.tagPages.map((tagPage) => (
@@ -224,18 +228,18 @@ export default function Page() {
 						</div>
 					))}
 				</div>
-				<div className="flex justify-between items-center mt-8 mx-4">
-					<LikeButton
-						liked={isLikedByUser}
-						likeCount={likeCount}
-						slug={pageWithTranslations.page.slug}
-					/>
-					<ShareDialog
-						url={shareUrl}
-						title={sourceTitleWithBestTranslationTitle}
-					/>
-				</div>
 			</article>
+			<FloatingControls
+				showOriginal={showOriginal}
+				showTranslation={showTranslation}
+				onToggleOriginal={() => setShowOriginal(!showOriginal)}
+				onToggleTranslation={() => setShowTranslation(!showTranslation)}
+				liked={isLikedByUser}
+				likeCount={likeCount}
+				slug={pageWithTranslations.page.slug}
+				shareUrl={shareUrl}
+				shareTitle={sourceTitleWithBestTranslationTitle}
+			/>
 		</div>
 	);
 }
