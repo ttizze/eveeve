@@ -24,6 +24,4 @@ dist-ssr
 *.sw?
 
 .env
-.env
-bun.lockb
 test-results
