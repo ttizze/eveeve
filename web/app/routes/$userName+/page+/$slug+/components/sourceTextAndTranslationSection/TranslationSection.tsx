@@ -29,17 +29,15 @@ export function TranslationSection({
 	);
 
 	return (
-		<span
-			className="group relative block rounded-md"
-			onMouseUp={(e) => {
-				// テキストが選択されている場合は何もしない
-				if (window.getSelection()?.toString()) return;
-				// 右クリックの場合は何もしない
-				if (e.button === 2) return;
-				onOpenAddAndVoteTranslations(sourceText.id);
-			}}
-		>
-			<span className="notranslate inline-block  py-2 text-gray-700 dark:text-gray-200">
+		<span className="group relative block rounded-md">
+			<span
+				className="notranslate inline-block  py-2 text-gray-700 dark:text-gray-200"
+				onMouseUp={(e) => {
+					if (window.getSelection()?.toString()) return;
+					if (e.button === 2) return;
+					onOpenAddAndVoteTranslations(sourceText.id);
+				}}
+			>
 				{sanitizedAndParsedText}
 			</span>
 		</span>
