@@ -3,6 +3,16 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
+interface SeedText {
+	text: string;
+	number: number;
+	pageId: number;
+	translations: {
+		text: string;
+		targetLanguage: string;
+	}[];
+}
+
 async function seed() {
 	await addRequiredData();
 
@@ -12,6 +22,63 @@ async function seed() {
 }
 
 async function addRequiredData() {
+	const { evame, evameEnPage, evameJaPage } = await createUserAndPages();
+
+	const seedTexts: SeedText[] = [
+		{
+			text: "Write to the World",
+			number: 0,
+			pageId: evameEnPage.id,
+			translations: [
+				{
+					text: "世界に向けて書く",
+					targetLanguage: "ja",
+				},
+			],
+		},
+		{
+			text: "Evame is an innovative open-source platform that enables everyone to read articles in their native language, regardless of the original language. Through user-contributed content and collaborative translations, we break down language barriers, fostering global understanding and knowledge sharing.",
+			number: 1,
+			pageId: evameEnPage.id,
+			translations: [
+				{
+					text: "Evameは、誰もが母国語で文章を読めるようにする革新的なオープンソースプラットフォームです。ユーザーによる投稿と翻訳を通じて、言語の障壁を取り除き、世界中の理解と知識の共有を促進します。",
+					targetLanguage: "ja",
+				},
+			],
+		},
+		{
+			text: "世界に向けて書く",
+			number: 0,
+			pageId: evameJaPage.id,
+			translations: [
+				{
+					text: "Write to the World",
+					targetLanguage: "en",
+				},
+			],
+		},
+		{
+			text: "Evameは、誰もが母国語で文章を読めるようにする革新的なオープンソースプラットフォームです。ユーザーによる投稿と翻訳を通じて、言語の障壁を取り除き、世界中の理解と知識の共有を促進します。",
+			number: 1,
+			pageId: evameJaPage.id,
+			translations: [
+				{
+					text: "Evame is an innovative open-source platform that enables everyone to read articles in their native language, regardless of the original language. Through user-contributed content and collaborative translations, we break down language barriers, fostering global understanding and knowledge sharing.",
+					targetLanguage: "en",
+				},
+			],
+		},
+	];
+
+	await Promise.all(
+		seedTexts.map((text) => upsertSourceTextWithTranslations(text, evame.id)),
+	);
+
+	console.log("Required data added successfully");
+}
+
+async function createUserAndPages() {
 	const evame = await prisma.user.upsert({
 		where: { userName: "evame" },
 		update: {},
@@ -23,79 +90,67 @@ async function addRequiredData() {
 		},
 	});
 
-	const evamePage = await prisma.page.upsert({
-		where: { slug: "evame" },
-		update: {},
-		create: {
-			slug: "evame",
-			sourceLanguage: "en",
-			content: "test",
-			isPublished: true,
-			userId: evame.id,
-		},
-	});
+	const [evameEnPage, evameJaPage] = await Promise.all([
+		prisma.page.upsert({
+			where: { slug: "evame" },
+			update: {},
+			create: {
+				slug: "evame",
+				sourceLanguage: "en",
+				content: "test",
+				isPublished: true,
+				userId: evame.id,
+			},
+		}),
+		prisma.page.upsert({
+			where: { slug: "evame-ja" },
+			update: {},
+			create: {
+				slug: "evame-ja",
+				sourceLanguage: "ja",
+				content: "test",
+				isPublished: true,
+				userId: evame.id,
+			},
+		}),
+	]);
 
-	const evameJapanese = await prisma.page.upsert({
-		where: { slug: "evame-ja" },
-		update: {},
-		create: {
-			slug: "evame-ja",
-			sourceLanguage: "ja",
-			content: "test",
-			isPublished: true,
-			userId: evame.id,
-		},
-	});
+	return { evame, evameEnPage, evameJaPage };
+}
 
-	const sourceTexts = [
-		{
-			text: "Write to the World",
-			number: 0,
-			pageId: evamePage.id,
-		},
-		{
-			text: "Evame is an innovative open-source platform that enables everyone to read articles in their native language, regardless of the original language. Through user-contributed content and collaborative translations, we break down language barriers, fostering global understanding and knowledge sharing.",
-			number: 1,
-			pageId: evamePage.id,
-		},
-		{
-			text: "世界に向けて書く",
-			number: 0,
-			pageId: evameJapanese.id,
-		},
-		{
-			text: "Evameは、誰もが自分の母国語で文章を読めるようにする革新的なオープンソースプラットフォームです。ユーザーによる投稿と翻訳を通じて、言語の障壁を取り除き、世界中の理解と知識の共有を促進します。",
-			number: 1,
-			pageId: evameJapanese.id,
-		},
-	];
-	for (const sourceText of sourceTexts) {
-		const existingSourceText = await prisma.sourceText.findFirst({
-			where: {
+async function upsertSourceTextWithTranslations(
+	sourceText: SeedText,
+	userId: number,
+) {
+	const upsertedSourceText = await prisma.sourceText.upsert({
+		where: {
+			pageId_number: {
 				pageId: sourceText.pageId,
 				number: sourceText.number,
 			},
-			orderBy: {
-				createdAt: "desc",
-			},
-		});
+		},
+		update: {},
+		create: {
+			text: sourceText.text,
+			number: sourceText.number,
+			pageId: sourceText.pageId,
+		},
+	});
 
-		if (existingSourceText) {
-			await prisma.sourceText.update({
-				where: { id: existingSourceText.id },
+	await Promise.all(
+		sourceText.translations.map((translation) =>
+			prisma.translateText.create({
 				data: {
-					text: sourceText.text,
+					text: translation.text,
+					sourceTextId: upsertedSourceText.id,
+					userId,
+					targetLanguage: translation.targetLanguage,
 				},
-			});
-		} else {
-			await prisma.sourceText.create({
-				data: sourceText,
-			});
-		}
-	}
-
-	console.log("Required data added successfully");
+			}),
+		),
+	);
 }
+
 async function addDevelopmentData() {
 	const email = "dev@example.com";
 

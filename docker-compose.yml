@@ -54,8 +54,8 @@ services:
     entrypoint: >
       /bin/sh -c "
       mc alias set myminio http://minio:9000 minioadmin minioadmin;
-      mc mb myminio/eveeve;
-      mc anonymous set public myminio/eveeve;
+      mc mb myminio/evame;
+      mc anonymous set public myminio/evame;
       "
 
 volumes:
