@@ -1,7 +1,8 @@
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { forwardRef } from "react";
 
-export function ModeToggle() {
+export const ModeToggle = forwardRef<HTMLButtonElement>((props, ref) => {
 	const { theme, setTheme } = useTheme();
 	const isDark = theme === "dark";
 
@@ -11,9 +12,10 @@ export function ModeToggle() {
 
 	return (
 		<button
+			ref={ref}
 			type="button"
 			onClick={toggleTheme}
-			className="w-full  gap-2 flex cursor-pointer items-center px-6 py-4 text-sm hover:bg-accent hover:text-accent-foreground"
+			className="w-full gap-2 flex cursor-pointer items-center px-6 py-4 text-sm hover:bg-accent hover:text-accent-foreground"
 		>
 			<Sun
 				className={`w-4 h-4  ${isDark ? "rotate-0 scale-100 " : "hidden"}`}
@@ -24,4 +26,6 @@ export function ModeToggle() {
 			<span>{isDark ? "Light Theme" : "Dark Theme"}</span>
 		</button>
 	);
-}
+});
+
+ModeToggle.displayName = "ModeToggle";
