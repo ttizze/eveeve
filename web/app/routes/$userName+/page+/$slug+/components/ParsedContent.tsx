@@ -13,6 +13,8 @@ interface ParsedContentProps {
 	targetLanguage: string;
 	currentUserName: string | undefined;
 	onOpenAddAndVoteTranslations: (sourceTextId: number) => void;
+	showOriginal: boolean;
+	showTranslation: boolean;
 }
 
 export const MemoizedParsedContent = memo(ParsedContent);
@@ -23,6 +25,8 @@ export function ParsedContent({
 	targetLanguage,
 	currentUserName,
 	onOpenAddAndVoteTranslations,
+	showOriginal = true,
+	showTranslation = true,
 }: ParsedContentProps) {
 	const sanitizedContent = DOMPurify.sanitize(
 		pageWithTranslations.page.content,
@@ -61,6 +65,8 @@ export function ParsedContent({
 							sourceLanguage={sourceLanguage}
 							targetLanguage={targetLanguage}
 							onOpenAddAndVoteTranslations={onOpenAddAndVoteTranslations}
+							showOriginal={showOriginal}
+							showTranslation={showTranslation}
 						/>
 					</DynamicTag>
 				);
