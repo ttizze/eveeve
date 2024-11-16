@@ -102,13 +102,13 @@ export default function Welcome() {
 			<Card className="w-[350px] mx-auto">
 				<CardHeader>
 					<CardTitle className="flex items-center justify-center">
-						Welcome to eveeve
+						Welcome to Evame
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
 					<Form method="post" {...getFormProps(form)}>
 						<div className="mb-4 flex items-center">
-							<p className="mr-2">eveeve.org/</p>
+							<p className="mr-2">Evame</p>
 							<Input
 								{...getInputProps(userName, { type: "text" })}
 								placeholder="example"

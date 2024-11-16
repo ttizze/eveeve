@@ -8,7 +8,7 @@ export default function PrivacyPolicyPage() {
 
 				<section className="mb-8">
 					<p className="mb-4">
-						This Privacy Policy describes how EveEve ("we", "our", or "us")
+						This Privacy Policy describes how Evame ("we", "our", or "us")
 						collects, uses, and shares your personal information when you use
 						our service.
 					</p>

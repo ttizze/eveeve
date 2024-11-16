@@ -14,11 +14,11 @@ import { SourceTextAndTranslationSection } from "../$userName+/page+/$slug+/comp
 import { fetchPageWithTranslations } from "../$userName+/page+/$slug+/functions/queries.server";
 export const meta: MetaFunction = () => {
 	return [
-		{ title: "EveEve" },
+		{ title: "Evame" },
 		{
 			name: "description",
 			content:
-				"EveEve is an open-source platform for collaborative article translation and sharing.",
+				"Evame is an open-source platform for collaborative article translation and sharing.",
 		},
 	];
 };

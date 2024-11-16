@@ -9,7 +9,7 @@ export default function TermsPage() {
 				<section className="mb-8">
 					<p className="mb-4">
 						Please read the following Terms of Service carefully before using
-						EveEve (hereinafter referred to as "the Service"). By using the
+						Evame (hereinafter referred to as "the Service"). By using the
 						Service, you are deemed to have agreed to these terms.
 					</p>
 				</section>

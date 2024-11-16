@@ -1,16 +1,12 @@
-![EveEve](./web/public/title-logo-dark.png)
+![Evame](./web/public/title-logo-dark.png)
 
-# EveEve
+# Evame
 
 ## 概要
 
-EveEve（Everyone Translate Everything）は、ユーザの投稿したテクストに対訳､脚注､解説を付け、美しいレイアウトで提供し､知識と文化の交流を促進することを目指すオープンソースプロジェクトです。
+Evameは、ユーザの投稿したテクストに対訳､脚注､解説を付け、美しいレイアウトで提供し､知識と文化の交流を促進することを目指すオープンソースプロジェクトです。
 
 このプロジェクトの目的は、世界中の人々に、物語と知識への扉を開くことです。
-
-## プロジェクト名の由来
-
-「EveEve」は "Everyone Translate Everything" の略です。この名前は、世界中の人々が協力して、あらゆるテクストを翻訳し、知識を共有するというプロジェクトの理念を体現しています。
 
 ## 現在の機能
 
