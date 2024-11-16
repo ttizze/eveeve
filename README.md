@@ -1,18 +1,14 @@
-![EveEve](./web/public/title-logo-dark.png)
+![Evame](./web/public/title-logo-dark.png)
 
-# EveEve
+# Evame
 
 [日本語版はこちら](README.ja.md)
 
 ## Overview
 
-EveEve (Everyone Translate Everything) is an open-source project aimed at facilitating knowledge and cultural exchange by providing translations, footnotes, and explanations for user-submitted texts in a beautiful layout.
+Evame is an open-source project aimed at facilitating knowledge and cultural exchange by providing translations, footnotes, and explanations for user-submitted texts in a beautiful layout.
 
 The goal of this project is to open doors to stories and knowledge for people around the world.
-
-## Project Name Origin
-
-"EveEve" stands for "Everyone Translate Everything". This name embodies the project's philosophy of people worldwide collaborating to translate all kinds of texts and share knowledge.
 
 ## Current Features
 
@@ -82,7 +78,7 @@ The goal of this project is to open doors to stories and knowledge for people ar
    bun run dev
    ```
 
-8. Access EveEve at `http://localhost:5173` in your browser.
+8. Access Evame at `http://localhost:5173` in your browser.
 
 9. For local development, authentication is simplified:
    - Visit `http://localhost:5173/auth/login` and log in with dev@example.com and devpassword.
