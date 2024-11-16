@@ -12,38 +12,38 @@ async function seed() {
 }
 
 async function addRequiredData() {
-	const eveeve = await prisma.user.upsert({
-		where: { userName: "eveeve" },
+	const evame = await prisma.user.upsert({
+		where: { userName: "evame" },
 		update: {},
 		create: {
-			userName: "eveeve",
-			displayName: "eveeve",
-			email: "eveeve@example.com",
+			userName: "evame",
+			displayName: "evame",
+			email: "evame@example.com",
 			icon: " ",
 		},
 	});
 
-	const evePage = await prisma.page.upsert({
-		where: { slug: "eveeve" },
+	const evamePage = await prisma.page.upsert({
+		where: { slug: "evame" },
 		update: {},
 		create: {
-			slug: "eveeve",
+			slug: "evame",
 			sourceLanguage: "en",
 			content: "test",
 			isPublished: true,
-			userId: eveeve.id,
+			userId: evame.id,
 		},
 	});
 
-	const eveeveJapanese = await prisma.page.upsert({
-		where: { slug: "eveeve-ja" },
+	const evameJapanese = await prisma.page.upsert({
+		where: { slug: "evame-ja" },
 		update: {},
 		create: {
-			slug: "eveeve-ja",
+			slug: "evame-ja",
 			sourceLanguage: "ja",
 			content: "test",
 			isPublished: true,
-			userId: eveeve.id,
+			userId: evame.id,
 		},
 	});
 
@@ -51,22 +51,22 @@ async function addRequiredData() {
 		{
 			text: "Write to the World",
 			number: 0,
-			pageId: evePage.id,
+			pageId: evamePage.id,
 		},
 		{
 			text: "Evame is an innovative open-source platform that enables everyone to read articles in their native language, regardless of the original language. Through user-contributed content and collaborative translations, we break down language barriers, fostering global understanding and knowledge sharing.",
 			number: 1,
-			pageId: evePage.id,
+			pageId: evamePage.id,
 		},
 		{
 			text: "世界に向けて書く",
 			number: 0,
-			pageId: eveeveJapanese.id,
+			pageId: evameJapanese.id,
 		},
 		{
 			text: "Evameは、誰もが自分の母国語で文章を読めるようにする革新的なオープンソースプラットフォームです。ユーザーによる投稿と翻訳を通じて、言語の障壁を取り除き、世界中の理解と知識の共有を促進します。",
 			number: 1,
-			pageId: eveeveJapanese.id,
+			pageId: evameJapanese.id,
 		},
 	];
 	for (const sourceText of sourceTexts) {
