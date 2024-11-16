@@ -5,6 +5,7 @@ import { Link } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
 import { useNavigate } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
+import { useSearchParams } from "@remix-run/react";
 import Linkify from "linkify-react";
 import { Lock, MoreVertical, Settings } from "lucide-react";
 import { BookOpen, Trash } from "lucide-react";
@@ -31,6 +32,14 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import {
+	Pagination,
+	PaginationContent,
+	PaginationItem,
+	PaginationLink,
+	PaginationNext,
+	PaginationPrevious,
+} from "~/components/ui/pagination";
 import i18nServer from "~/i18n.server";
 import { authenticator } from "~/utils/auth.server";
 import {
@@ -53,14 +62,22 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 	const locale = await i18nServer.getLocale(request);
 	const { userName } = params;
 	if (!userName) throw new Error("Username is required");
+
+	const url = new URL(request.url);
+	const page = Number(url.searchParams.get("page") || "1");
+	const pageSize = 9;
+
 	const currentUser = await authenticator.isAuthenticated(request);
 	const isOwner = currentUser?.userName === userName;
 
 	const sanitizedUserWithPages = await fetchSanitizedUserWithPages(
 		userName,
 		isOwner,
+		page,
+		pageSize,
 	);
 	if (!sanitizedUserWithPages) throw new Response("Not Found", { status: 404 });
+
 	const sanitizedUserWithPagesLocalized = {
 		...sanitizedUserWithPages,
 		pages: sanitizedUserWithPages.pages.map((page) => ({
@@ -68,7 +85,12 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 			createdAt: new Date(page.createdAt).toLocaleDateString(locale),
 		})),
 	};
-	return { sanitizedUserWithPages: sanitizedUserWithPagesLocalized, isOwner };
+	return {
+		sanitizedUserWithPages: sanitizedUserWithPagesLocalized,
+		isOwner,
+		totalPages: sanitizedUserWithPages.totalPages,
+		currentPage: sanitizedUserWithPages.currentPage,
+	};
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -101,9 +123,11 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function UserPage() {
 	const navigate = useNavigate();
-	const { sanitizedUserWithPages, isOwner } = useLoaderData<typeof loader>();
+	const { sanitizedUserWithPages, isOwner, totalPages, currentPage } =
+		useLoaderData<typeof loader>();
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [pageToDelete, setPageToDelete] = useState<number | null>(null);
+	const [searchParams, setSearchParams] = useSearchParams();
 
 	const fetcher = useFetcher();
 
@@ -127,6 +151,11 @@ export default function UserPage() {
 		}
 		setDialogOpen(false);
 	};
+
+	const handlePageChange = (newPage: number) => {
+		setSearchParams({ page: newPage.toString() });
+	};
+
 	return (
 		<div className="">
 			<div className="mb-6 rounded-3xl w-full overflow-hidden ">
@@ -226,6 +255,39 @@ export default function UserPage() {
 						</Link>
 					</Card>
 				))}
+			</div>
+
+			<div className="mt-8 flex justify-center">
+				<Pagination>
+					<PaginationContent>
+						{currentPage > 1 && (
+							<PaginationItem>
+								<PaginationPrevious
+									onClick={() => handlePageChange(currentPage - 1)}
+								/>
+							</PaginationItem>
+						)}
+						{Array.from({ length: totalPages }, (_, i) => i + 1).map(
+							(pageNum) => (
+								<PaginationItem key={pageNum}>
+									<PaginationLink
+										onClick={() => handlePageChange(pageNum)}
+										isActive={pageNum === currentPage}
+									>
+										{pageNum}
+									</PaginationLink>
+								</PaginationItem>
+							),
+						)}
+						{currentPage < totalPages && (
+							<PaginationItem>
+								<PaginationNext
+									onClick={() => handlePageChange(currentPage + 1)}
+								/>
+							</PaginationItem>
+						)}
+					</PaginationContent>
+				</Pagination>
 			</div>
 
 			{sanitizedUserWithPages.pages.length === 0 && (
