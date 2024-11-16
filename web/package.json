@@ -105,7 +105,7 @@
 		"@types/react-window": "1.8.8",
 		"autoprefixer": "10.4.20",
 		"minio": "8.0.2",
-		"postcss": "8.4.49",
+		"postcss": "8.4.47",
 		"prisma": "5.22.0",
 		"remix-development-tools": "4.7.6",
 		"remix-flat-routes": "0.6.5",
