@@ -13,6 +13,10 @@ declare module "@remix-run/server-runtime" {
 }
 
 export default defineConfig({
+	//sentryにアップロードするため必要､upload後消されるためセキュリティの問題はない
+	build: {
+		sourcemap: true,
+	},
 	plugins: [
 		remixDevTools(),
 		envOnlyMacros(),
