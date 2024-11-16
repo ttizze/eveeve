@@ -1,5 +1,3 @@
-![Evame](./web/public/title-logo-dark.png)
-
 # Evame
 
 [日本語版はこちら](README.ja.md)
