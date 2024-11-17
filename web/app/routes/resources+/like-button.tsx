@@ -19,26 +19,38 @@ type LikeButtonProps = {
 	liked: boolean;
 	likeCount: number;
 	slug: string;
+	showCount?: boolean;
+	className?: string;
 };
 
-export function LikeButton({ liked, likeCount, slug }: LikeButtonProps) {
+export function LikeButton({
+	liked,
+	likeCount,
+	slug,
+	showCount,
+	className = "",
+}: LikeButtonProps) {
 	const fetcher = useFetcher<typeof action>();
 
 	return (
-		<fetcher.Form method="post" action={"/resources/like-button"}>
-			<input type="hidden" name="slug" value={slug} />
-			<Button
-				type="submit"
-				aria-label="Like"
-				variant="secondary"
-				className={`flex items-center space-x-1 rounded-full ${
-					liked ? "text-red-500" : "text-gray-500"
-				} transition-all duration-200 ease-in-out transform active:scale-110 hover:scale-105`}
-				disabled={fetcher.state === "submitting"}
-			>
-				<Heart className="h-6 w-6" fill={liked ? "currentColor" : "none"} />
-				<span>{likeCount}</span>
-			</Button>
-		</fetcher.Form>
+		<div className="flex items-center gap-2">
+			<fetcher.Form method="post" action={"/resources/like-button"}>
+				<input type="hidden" name="slug" value={slug} />
+				<Button
+					type="submit"
+					aria-label="Like"
+					variant="secondary"
+					size="icon"
+					className={`h-12 w-12 rounded-full shadow-lg ${className}`}
+					disabled={fetcher.state === "submitting"}
+				>
+					<Heart
+						className={`h-5 w-5 ${liked ? "text-red-500" : ""}`}
+						fill={liked ? "currentColor" : "none"}
+					/>
+				</Button>
+			</fetcher.Form>
+			{showCount && <span className="text-muted-foreground">{likeCount}</span>}
+		</div>
 	);
 }
