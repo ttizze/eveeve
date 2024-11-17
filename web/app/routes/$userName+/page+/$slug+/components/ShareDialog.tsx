@@ -28,8 +28,12 @@ export function ShareDialog({ url, title }: ShareDialogProps) {
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen} modal={false}>
 			<DialogTrigger asChild>
-				<Button variant="outline" size="icon">
-					<Share className="h-4 w-4" />
+				<Button
+					variant="secondary"
+					size="icon"
+					className="h-12 w-12 rounded-full shadow-lg"
+				>
+					<Share className="h-5 w-5" />
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-md">

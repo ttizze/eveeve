@@ -35,7 +35,6 @@ export function FloatingControls({
 		const currentScrollY = window.scrollY;
 		const scrollDelta = currentScrollY - lastScrollY;
 
-		// 100px以上の下スクロールの時だけ非表示に
 		if (scrollDelta > 100) {
 			setIsVisible(false);
 		} else if (scrollDelta < 0 || currentScrollY < 100) {
@@ -55,31 +54,34 @@ export function FloatingControls({
 	return (
 		<div
 			className={cn(
-				"fixed bottom-4 right-4 flex gap-2 transition-all duration-300 transform",
+				"fixed bottom-4 right-4 flex gap-3 transition-all duration-300 transform",
 				isVisible ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0",
 			)}
 		>
-			<div className="bg-background/80 backdrop-blur-sm rounded-lg shadow-lg p-2 flex gap-2">
-				<Button
-					variant="ghost"
-					size="icon"
-					onClick={onToggleOriginal}
-					title={showOriginal ? "Hide original text" : "Show original text"}
-				>
-					<FileText className={cn("h-4 w-4", !showOriginal && "opacity-50")} />
-				</Button>
-				<Button
-					variant="ghost"
-					size="icon"
-					onClick={onToggleTranslation}
-					title={showTranslation ? "Hide translation" : "Show translation"}
-				>
-					<Languages
-						className={cn("h-4 w-4", !showTranslation && "opacity-50")}
-					/>
-				</Button>
-				<div className="w-px bg-border" />
+			<Button
+				variant="secondary"
+				size="icon"
+				className="h-12 w-12 rounded-full shadow-lg"
+				onClick={onToggleOriginal}
+				title={showOriginal ? "Hide original text" : "Show original text"}
+			>
+				<FileText className={cn("h-5 w-5", !showOriginal && "opacity-50")} />
+			</Button>
+			<Button
+				variant="secondary"
+				size="icon"
+				className="h-12 w-12 rounded-full shadow-lg"
+				onClick={onToggleTranslation}
+				title={showTranslation ? "Hide translation" : "Show translation"}
+			>
+				<Languages
+					className={cn("h-5 w-5", !showTranslation && "opacity-50")}
+				/>
+			</Button>
+			<div className="h-12 w-12">
 				<LikeButton liked={liked} likeCount={likeCount} slug={slug} />
+			</div>
+			<div className="h-12 w-12">
 				<ShareDialog url={shareUrl} title={shareTitle} />
 			</div>
 		</div>

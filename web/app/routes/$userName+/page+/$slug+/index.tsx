@@ -8,6 +8,7 @@ import { useState } from "react";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import i18nServer from "~/i18n.server";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
+import { LikeButton } from "~/routes/resources+/like-button";
 import { authenticator } from "~/utils/auth.server";
 import { stripHtmlTags } from "../../utils/stripHtmlTags";
 import { ContentWithTranslations } from "./components/ContentWithTranslations";
@@ -228,6 +229,12 @@ export default function Page() {
 						</div>
 					))}
 				</div>
+				<LikeButton
+					liked={isLikedByUser}
+					likeCount={likeCount}
+					slug={pageWithTranslations.page.slug}
+					showCount
+				/>
 			</article>
 			<FloatingControls
 				showOriginal={showOriginal}
