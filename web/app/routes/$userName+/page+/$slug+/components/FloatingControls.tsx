@@ -61,7 +61,11 @@ export function FloatingControls({
 			<Button
 				variant="ghost"
 				size="icon"
-				className="h-12 w-12 rounded-full border bg-background"
+				className={cn(
+					"h-12 w-12 rounded-full border bg-background relative",
+					!showOriginal &&
+						"after:absolute after:w-full after:h-[1px] after:bg-current after:top-1/2 after:left-0 after:origin-center after:-rotate-45",
+				)}
 				onClick={onToggleOriginal}
 				title={showOriginal ? "Hide original text" : "Show original text"}
 			>
@@ -70,7 +74,11 @@ export function FloatingControls({
 			<Button
 				variant="ghost"
 				size="icon"
-				className="h-12 w-12 rounded-full border bg-background"
+				className={cn(
+					"h-12 w-12 rounded-full border bg-background relative",
+					!showTranslation &&
+						"after:absolute after:w-full after:h-[1px] after:bg-current after:top-1/2 after:left-0 after:origin-center after:-rotate-45",
+				)}
 				onClick={onToggleTranslation}
 				title={showTranslation ? "Hide translation" : "Show translation"}
 			>
