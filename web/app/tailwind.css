@@ -96,12 +96,6 @@
 	content: none !important;
 }
 
-.tippy-box[data-theme~="custom-transparent"] {
-	background-color: transparent;
-	border: none;
-	box-shadow: none;
-}
-
-.tippy-box[data-theme~="custom-transparent"] .tippy-content {
-	padding: 0;
+.tippy-box[data-theme="custom-transparent"] {
+	@apply rounded-lg border bg-background shadow-md p-1;
 }
