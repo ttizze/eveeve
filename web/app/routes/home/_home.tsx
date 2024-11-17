@@ -107,6 +107,7 @@ export default function Home() {
 									liked={page.likePages.length > 0}
 									likeCount={page._count.likePages}
 									slug={page.slug}
+									showCount
 								/>
 							</div>
 						</CardContent>

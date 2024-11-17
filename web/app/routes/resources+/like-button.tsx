@@ -39,9 +39,9 @@ export function LikeButton({
 				<Button
 					type="submit"
 					aria-label="Like"
-					variant="secondary"
+					variant="ghost"
 					size="icon"
-					className={`h-12 w-12 rounded-full shadow-lg ${className}`}
+					className={`h-12 w-12 rounded-full border bg-background ${className}`}
 					disabled={fetcher.state === "submitting"}
 				>
 					<Heart

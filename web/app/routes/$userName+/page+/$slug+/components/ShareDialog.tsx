@@ -29,9 +29,9 @@ export function ShareDialog({ url, title }: ShareDialogProps) {
 		<Dialog open={isOpen} onOpenChange={setIsOpen} modal={false}>
 			<DialogTrigger asChild>
 				<Button
-					variant="secondary"
+					variant="ghost"
 					size="icon"
-					className="h-12 w-12 rounded-full shadow-lg"
+					className="h-12 w-12 rounded-full border bg-background"
 				>
 					<Share className="h-5 w-5" />
 				</Button>
