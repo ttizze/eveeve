@@ -1,13 +1,13 @@
 import bcrypt from "bcryptjs";
 import { Authenticator, AuthorizationError } from "remix-auth";
-import { EmailLinkStrategy } from "remix-auth-email-link";
 import { FormStrategy } from "remix-auth-form";
 import { GoogleStrategy } from "remix-auth-google";
-import { sendMagicLink } from "~/routes/auth/login/utils/send-magic-link.server";
+import { EmailLinkStrategy } from "remix-auth-email-link";
 import type { SanitizedUser } from "../types";
 import { prisma } from "./prisma";
 import { sanitizeUser } from "./sanitizeUser";
 import { sessionStorage } from "./session.server";
+import { sendMagicLink } from "~/routes/auth/login/utils/send-magic-link.server";
 
 const SESSION_SECRET = process.env.SESSION_SECRET;
 const MAGIC_LINK_SECRET = process.env.MAGIC_LINK_SECRET;
