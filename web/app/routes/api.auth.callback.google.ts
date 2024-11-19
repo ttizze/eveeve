@@ -11,12 +11,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		const session = await getSession(request.headers.get("Cookie"));
 		session.set("user", user);
 
-		const redirectTo = user.userName.startsWith("new-user-")
-			? "/welcome"
-			: "/home";
-
-		// セッションをコミットしてリダイレクト
-		return redirect(redirectTo, {
+		return redirect("/home", {
 			headers: {
 				"Set-Cookie": await commitSession(session),
 			},

@@ -11,3 +11,9 @@ export async function getUserByUserName(
 	if (!user) return null;
 	return sanitizeUser(user);
 }
+export async function isUserNameTaken(userName: string): Promise<boolean> {
+	const existingUser = await prisma.user.findUnique({
+		where: { userName },
+	});
+	return !!existingUser;
+}

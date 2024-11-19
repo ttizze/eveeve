@@ -86,6 +86,7 @@ async function createUserAndPages() {
 			userName: "evame",
 			displayName: "evame",
 			email: "evame@example.com",
+			provider: "Admin",
 			icon: " ",
 		},
 	});
@@ -98,7 +99,7 @@ async function createUserAndPages() {
 				slug: "evame",
 				sourceLanguage: "en",
 				content: "test",
-				isPublished: true,
+				isPublished: false,
 				userId: evame.id,
 			},
 		}),
@@ -109,7 +110,7 @@ async function createUserAndPages() {
 				slug: "evame-ja",
 				sourceLanguage: "ja",
 				content: "test",
-				isPublished: true,
+				isPublished: false,
 				userId: evame.id,
 			},
 		}),
@@ -162,7 +163,6 @@ async function addDevelopmentData() {
 			userName: "dev",
 			displayName: "Dev User",
 			password: await bcrypt.hash("devpassword", 10),
-			provider: "Credentials",
 			icon: "",
 		},
 	});
