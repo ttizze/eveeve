@@ -11,7 +11,7 @@ import {
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	return generateSitemap(request, routes, {
-		siteUrl: process.env.CLIENT_URL || "https://eveeeve.org",
+		siteUrl: process.env.CLIENT_URL || "https://evame.tech",
 		headers: {
 			"Cache-Control": "public, max-age=3600",
 		},

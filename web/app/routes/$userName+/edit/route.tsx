@@ -25,17 +25,12 @@ import { commitSession, getSession } from "~/utils/session.server";
 import { updateUser } from "./functions/mutations.server";
 import { getUserByUserName, isUserNameTaken } from "./functions/queries.server";
 import reservedUsernames from "./reserved-usernames.json";
+
 export const meta: MetaFunction = () => {
 	return [{ title: "Edit Profile" }];
 };
 
-function getAppRoutes() {
-	return [];
-}
-
-const RESERVED_USERNAMES = [
-	...new Set([...reservedUsernames, ...getAppRoutes()]),
-];
+const RESERVED_USERNAMES = [...new Set([...reservedUsernames])];
 const schema = z.object({
 	displayName: z
 		.string()
