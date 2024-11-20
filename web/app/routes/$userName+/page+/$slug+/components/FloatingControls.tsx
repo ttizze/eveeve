@@ -82,9 +82,7 @@ export function FloatingControls({
 				onClick={onToggleTranslation}
 				title={showTranslation ? "Hide translation" : "Show translation"}
 			>
-				<Languages
-					className={cn("h-5 w-5", showTranslation && "opacity-50")}
-				/>
+				<Languages className={cn("h-5 w-5", showTranslation && "opacity-50")} />
 			</Button>
 			<div className="h-12 w-12">
 				<LikeButton liked={liked} likeCount={likeCount} slug={slug} />
