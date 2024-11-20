@@ -2,16 +2,15 @@ import { getFormProps, getTextareaProps, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { getZodConstraint } from "@conform-to/zod";
 import type { ActionFunctionArgs } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
+import { useFetcher, useNavigate } from "@remix-run/react";
 import { ArrowUpFromLine } from "lucide-react";
-import { useState } from "react";
 import { z } from "zod";
-import { LoginDialog } from "~/components/LoginDialog";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 import i18nServer from "~/i18n.server";
 import { authenticator } from "~/utils/auth.server";
 import { addUserTranslation } from "./functions/mutations.server";
+import { StartButton } from "~/components/StartButton";
 
 const schema = z.object({
 	sourceTextId: z.number(),
@@ -56,7 +55,7 @@ export function AddTranslationForm({
 	currentUserName,
 }: AddTranslationFormProps) {
 	const fetcher = useFetcher<typeof action>();
-	const [showLoginDialog, setShowLoginDialog] = useState(false);
+	const navigate = useNavigate();
 	const [form, fields] = useForm({
 		lastResult: fetcher.data?.lastResult,
 		id: `add-translation-form-${sourceTextId}`,
@@ -71,7 +70,7 @@ export function AddTranslationForm({
 	const handleAction = (e: React.MouseEvent | React.FocusEvent) => {
 		if (!currentUserName) {
 			e.preventDefault();
-			setShowLoginDialog(true);
+			navigate("/auth/login");
 		}
 	};
 
@@ -84,13 +83,19 @@ export function AddTranslationForm({
 			>
 				{form.errors}
 				<input type="hidden" name="sourceTextId" value={sourceTextId} />
-				<Textarea
-					{...getTextareaProps(fields.text)}
-					className="w-full mb-2 h-24 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-					placeholder="Enter your translation..."
-					onFocus={handleAction}
-					onClick={handleAction}
-				/>
+				<div className="relative">
+					<Textarea
+						{...getTextareaProps(fields.text)}
+						className={`w-full mb-2 h-24 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 ${!currentUserName && "bg-muted"}`}
+						placeholder="Enter your translation..."
+						disabled={!currentUserName}
+					/>
+					{!currentUserName && (
+						<StartButton
+							className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+						/>
+					)}
+				</div>
 				<div className="space-x-2 flex justify-end items-center">
 					{fields.text.errors && (
 						<p className="text-red-500 text-sm">{fields.text.errors}</p>
@@ -106,7 +111,7 @@ export function AddTranslationForm({
 					</Button>
 				</div>
 			</fetcher.Form>
-			<LoginDialog isOpen={showLoginDialog} onOpenChange={setShowLoginDialog} />
+
 		</div>
 	);
 }

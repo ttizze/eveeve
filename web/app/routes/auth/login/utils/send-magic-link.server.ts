@@ -5,7 +5,6 @@ import { resendSendEmail } from "~/utils/resend.server";
 export const sendMagicLink: SendEmailFunction<SanitizedUser> = async (
 	options,
 ) => {
-	console.log("Sending magic link", options);
 	const emailHtml = `
 		<div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: sans-serif;">
 			<h1 style="color: #333; text-align: center;">Welcome to Evame</h1>

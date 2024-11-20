@@ -1,17 +1,15 @@
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Form } from "@remix-run/react";
 import { useLoaderData } from "@remix-run/react";
-import { LogIn } from "lucide-react";
 import { useState } from "react";
-import { FaGoogle } from "react-icons/fa";
-import { Button } from "~/components/ui/button";
 import i18nServer from "~/i18n.server";
 import { authenticator } from "~/utils/auth.server";
 import { AddAndVoteTranslations } from "../$userName+/page+/$slug+/components/sourceTextAndTranslationSection/AddAndVoteTranslations";
 import { SourceTextAndTranslationSection } from "../$userName+/page+/$slug+/components/sourceTextAndTranslationSection/SourceTextAndTranslationSection";
 import { fetchPageWithTranslations } from "../$userName+/page+/$slug+/functions/queries.server";
+import { StartButton } from "../../components/StartButton";
+
 export const meta: MetaFunction = () => {
 	return [
 		{ title: "Evame" },
@@ -72,6 +70,7 @@ export default function Index() {
 		number | null
 	>(null);
 
+
 	const handleOpenAddAndVoteTranslations = (sourceTextId: number) => {
 		setSelectedSourceTextId(sourceTextId);
 	};
@@ -97,6 +96,8 @@ export default function Index() {
 							sourceLanguage={sourceLanguage}
 							targetLanguage={targetLanguage}
 							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
+							showOriginal={true}
+							showTranslation={true}
 						/>
 					</h1>
 
@@ -108,21 +109,15 @@ export default function Index() {
 							sourceLanguage={sourceLanguage}
 							targetLanguage={targetLanguage}
 							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
+							showOriginal={true}
+							showTranslation={true}
 						/>
 					</span>
 
 					<div className="mb-12 flex justify-center mt-10">
-						<Form method="POST">
-							<Button
-								type="submit"
-								variant="default"
-								size="lg"
-								className="w-60 h-12"
-							>
-								<FaGoogle className=" mr-2" />
-								<LogIn />
-							</Button>
-						</Form>
+						<StartButton
+							className="w-60 h-12 text-xl"
+						/>
 					</div>
 				</div>
 				{selectedSourceTextWithTranslations && (

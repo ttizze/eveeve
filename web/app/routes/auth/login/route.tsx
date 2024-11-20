@@ -14,6 +14,7 @@ import { Separator } from "~/components/ui/separator";
 import { sessionStorage } from "~/utils/session.server";
 import { authenticator } from "../../../utils/auth.server";
 import { GoogleForm } from "../../resources+/google-form";
+import { CheckCircle } from "lucide-react";
 
 const loginSchema = z.object({
 	email: z.string().email("Please enter a valid email address"),
@@ -42,7 +43,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	switch (intent) {
 		case "magicLink": {
 			await authenticator.authenticate("magicLink", request, {
-				successRedirect: "/auth/login?emailSent=true",
+				successRedirect: "/auth/login",
 				failureRedirect: "/auth/login",
 			});
 			return submission.reply();
@@ -81,7 +82,7 @@ export default function LoginPage() {
 				<CardHeader>
 					<CardTitle>Login to Evame</CardTitle>
 				</CardHeader>
-				<CardContent>
+				<CardContent className="rounded-full">
 					<GoogleForm redirectTo={location.pathname + location.search} />
 					<Separator className="my-4" />
 					<div className="text-center text-sm text-gray-500 my-2">
@@ -91,7 +92,7 @@ export default function LoginPage() {
 						<div className="space-y-4">
 							<div className="space-y-2">
 								<Label htmlFor={email.id}>Email</Label>
-								<Input {...getInputProps(email, { type: "email" })} />
+								<Input {...getInputProps(email, { type: "email" })} className="rounded-lg" />
 								{email.errors && (
 									<p className="text-sm text-red-500">{email.errors}</p>
 								)}
@@ -100,7 +101,7 @@ export default function LoginPage() {
 								type="submit"
 								name="intent"
 								value="magicLink"
-								className="w-full"
+								className="w-full rounded-full"
 								disabled={navigation.state === "submitting"}
 							>
 								Send Email
@@ -110,10 +111,13 @@ export default function LoginPage() {
 							<p className="text-red-500 text-center mt-2">{form.errors}</p>
 						)}
 						{magicLinkSent && (
-							<div className="text-center p-4 space-y-2">
-								<p className="text-green-600">Email sent successfully!</p>
-								<p className="text-sm text-gray-600">
-									Please check your email for the login link
+							<div className="text-center p-4 space-y-3 mt-4">
+								<div className="flex items-center justify-center gap-2 ">
+									<CheckCircle className="h-5 w-5" />
+									<p className="font-medium">Email sent successfully!</p>
+								</div>
+								<p className="text-sm text-slate-600">
+									Please check your email.
 								</p>
 							</div>
 						)}

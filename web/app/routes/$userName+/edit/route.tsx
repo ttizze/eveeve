@@ -121,6 +121,7 @@ export default function EditProfile() {
 	const { currentUser } = useLoaderData<typeof loader>();
 	const lastResult = useActionData<typeof action>();
 	const navigation = useNavigation();
+	const [showUsernameInput, setShowUsernameInput] = useState(false);
 	const [form, fields] = useForm({
 		id: "edit-profile-form",
 		lastResult,
@@ -156,6 +157,10 @@ export default function EditProfile() {
 		}
 	};
 
+	const toggleUsernameInput = () => {
+		setShowUsernameInput(!showUsernameInput);
+	};
+
 	return (
 		<div className="container mx-auto">
 			<Link to={`/${currentUser.userName}`}>
@@ -187,10 +192,38 @@ export default function EditProfile() {
 						<Label>User Name</Label>
 					</div>
 					<div>
-						<Input
-							{...getInputProps(fields.userName, { type: "text" })}
-							className="w-full h-10 px-3 py-2 border rounded-lg  bg-white dark:bg-black/50 focus:outline-none"
-						/>
+						<div className="space-y-2">
+							<div className="flex items-center gap-2">
+								<span className="text-sm">Current URL:</span>
+								<code className="px-2 py-1 bg-gray-200 dark:bg-gray-800 rounded-lg">
+									evame.tech/{currentUser.userName}
+								</code>
+							</div>
+							<div className="space-y-1 text-sm text-amber-500">
+								<p>⚠️ Important: Changing your username will:</p>
+								<ul className="list-disc list-inside pl-4 space-y-1">
+									<li>Update all URLs of your page</li>
+									<li>Break existing links to your page</li>
+									<li>Allow your current username to be claimed by others</li>
+								</ul>
+							</div>
+							<Button
+								type="button"
+								variant="outline"
+								onClick={toggleUsernameInput}
+							>
+								{showUsernameInput ? "Cancel" : "Edit Username"}
+							</Button>
+						</div>
+						{showUsernameInput && (
+							<code className="flex items-center gap-2 px-2 mt-2 py-1 bg-gray-200 dark:bg-gray-800 rounded-lg">
+								evame.tech/
+								<Input
+									{...getInputProps(fields.userName, { type: "text" })}
+									className=" border rounded-lg bg-white dark:bg-black/50 focus:outline-none"
+								/>
+							</code>
+						)}
 						<div
 							id={fields.userName.errorId}
 							className="text-red-500 text-sm mt-1"
