@@ -4,6 +4,7 @@ import { redirect } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
 import { HomeIcon, LogOutIcon, Search } from "lucide-react";
+import { StartButton } from "~/components/StartButton";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -14,7 +15,6 @@ import type { SanitizedUser } from "~/types";
 import { authenticator } from "~/utils/auth.server";
 import { ModeToggle } from "../../components/ModeToggle";
 import { NewPageButton } from "./components/NewPageButton";
-import { StartButton } from "~/components/StartButton";
 
 interface HeaderProps {
 	currentUser: SanitizedUser | null;

@@ -70,7 +70,6 @@ export default function Index() {
 		number | null
 	>(null);
 
-
 	const handleOpenAddAndVoteTranslations = (sourceTextId: number) => {
 		setSelectedSourceTextId(sourceTextId);
 	};
@@ -115,9 +114,7 @@ export default function Index() {
 					</span>
 
 					<div className="mb-12 flex justify-center mt-10">
-						<StartButton
-							className="w-60 h-12 text-xl"
-						/>
+						<StartButton className="w-60 h-12 text-xl" />
 					</div>
 				</div>
 				{selectedSourceTextWithTranslations && (

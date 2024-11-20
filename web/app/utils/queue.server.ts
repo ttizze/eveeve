@@ -32,7 +32,9 @@ export function Queue<Payload extends object>(
 		registeredQueues[name].worker.close();
 	}
 
-	const queue = new BullQueue<Payload, Payload, string>(name, { connection: RedisConfig });
+	const queue = new BullQueue<Payload, Payload, string>(name, {
+		connection: RedisConfig,
+	});
 	const worker = new Worker<Payload>(name, handlers.processor, {
 		connection: RedisConfig,
 	});

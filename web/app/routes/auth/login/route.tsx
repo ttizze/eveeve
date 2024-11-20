@@ -5,6 +5,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { useLocation } from "@remix-run/react";
 import { useNavigation } from "@remix-run/react";
+import { CheckCircle } from "lucide-react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -14,7 +15,6 @@ import { Separator } from "~/components/ui/separator";
 import { sessionStorage } from "~/utils/session.server";
 import { authenticator } from "../../../utils/auth.server";
 import { GoogleForm } from "../../resources+/google-form";
-import { CheckCircle } from "lucide-react";
 
 const loginSchema = z.object({
 	email: z.string().email("Please enter a valid email address"),
@@ -92,7 +92,10 @@ export default function LoginPage() {
 						<div className="space-y-4">
 							<div className="space-y-2">
 								<Label htmlFor={email.id}>Email</Label>
-								<Input {...getInputProps(email, { type: "email" })} className="rounded-lg" />
+								<Input
+									{...getInputProps(email, { type: "email" })}
+									className="rounded-lg"
+								/>
 								{email.errors && (
 									<p className="text-sm text-red-500">{email.errors}</p>
 								)}

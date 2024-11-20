@@ -5,12 +5,12 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { useFetcher, useNavigate } from "@remix-run/react";
 import { ArrowUpFromLine } from "lucide-react";
 import { z } from "zod";
+import { StartButton } from "~/components/StartButton";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 import i18nServer from "~/i18n.server";
 import { authenticator } from "~/utils/auth.server";
 import { addUserTranslation } from "./functions/mutations.server";
-import { StartButton } from "~/components/StartButton";
 
 const schema = z.object({
 	sourceTextId: z.number(),
@@ -91,9 +91,7 @@ export function AddTranslationForm({
 						disabled={!currentUserName}
 					/>
 					{!currentUserName && (
-						<StartButton
-							className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-						/>
+						<StartButton className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
 					)}
 				</div>
 				<div className="space-x-2 flex justify-end items-center">
@@ -111,7 +109,6 @@ export function AddTranslationForm({
 					</Button>
 				</div>
 			</fetcher.Form>
-
 		</div>
 	);
 }
