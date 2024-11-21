@@ -16,7 +16,7 @@ if (!global.__registeredQueues) {
 }
 const registeredQueues = global.__registeredQueues;
 
-export function Queue<Payload>(
+export function Queue<Payload extends object>(
 	name: string,
 	version: number,
 	handlers: {
@@ -25,14 +25,16 @@ export function Queue<Payload>(
 	},
 ): BullQueue<Payload> {
 	if (registeredQueues[name] && registeredQueues[name].version === version) {
-		return registeredQueues[name].queue;
+		return registeredQueues[name].queue as BullQueue<Payload>;
 	}
 
 	if (registeredQueues[name]) {
 		registeredQueues[name].worker.close();
 	}
 
-	const queue = new BullQueue<Payload>(name, { connection: RedisConfig });
+	const queue = new BullQueue<Payload, Payload, string>(name, {
+		connection: RedisConfig,
+	});
 	const worker = new Worker<Payload>(name, handlers.processor, {
 		connection: RedisConfig,
 	});

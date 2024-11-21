@@ -4,7 +4,7 @@ import { redirect } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
 import { HomeIcon, LogOutIcon, Search } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import { StartButton } from "~/components/StartButton";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -15,6 +15,7 @@ import type { SanitizedUser } from "~/types";
 import { authenticator } from "~/utils/auth.server";
 import { ModeToggle } from "../../components/ModeToggle";
 import { NewPageButton } from "./components/NewPageButton";
+
 interface HeaderProps {
 	currentUser: SanitizedUser | null;
 }
@@ -101,21 +102,7 @@ export function Header({ currentUser }: HeaderProps) {
 							</DropdownMenu>
 						</>
 					) : (
-						<Form
-							method="post"
-							action="/resources/header"
-							className="w-full  !p-0"
-						>
-							<Button
-								type="submit"
-								name="intent"
-								value="SignInWithGoogle"
-								variant="ghost"
-								className="gap-2  justify-start w-full text-left px-4 py-2"
-							>
-								Start
-							</Button>
-						</Form>
+						<StartButton />
 					)}
 				</div>
 			</div>

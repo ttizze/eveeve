@@ -7,32 +7,57 @@ import {
 } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { Form, Link, useNavigation } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
-import { useLoaderData } from "@remix-run/react";
-import { ArrowLeft, ArrowUpFromLine, Check, Key, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useActionData, useLoaderData } from "@remix-run/react";
+import { ArrowLeft, ExternalLink, Loader2, SaveIcon } from "lucide-react";
+import { useState } from "react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { validateGeminiApiKey } from "~/features/translate/services/gemini";
 import { uploadImage } from "~/routes/$userName+/utils/uploadImage";
-import { GeminiApiKeyDialog } from "~/routes/resources+/gemini-api-key-dialog";
 import { authenticator } from "~/utils/auth.server";
 import { sanitizeUser } from "~/utils/sanitizeUser";
 import { commitSession, getSession } from "~/utils/session.server";
 import { updateUser } from "./functions/mutations.server";
-import { getUserByUserName } from "./functions/queries.server";
+import { getUserByUserName, isUserNameTaken } from "./functions/queries.server";
+import reservedUsernames from "./reserved-usernames.json";
+
 export const meta: MetaFunction = () => {
 	return [{ title: "Edit Profile" }];
 };
 
+const RESERVED_USERNAMES = [...new Set([...reservedUsernames])];
 const schema = z.object({
 	displayName: z
 		.string()
 		.min(1, "Display name is required")
-		.max(50, "Display name must be 50 characters or less"),
-	profile: z.string().max(200, "Profile must be 200 characters or less"),
+		.max(25, "Too Long. Must be 25 characters or less"),
+	userName: z
+		.string()
+		.min(3, "Too Short. Must be at least 3 characters")
+		.max(25, "Too Long. Must be 25 characters or less")
+		.regex(
+			/^[a-zA-Z][a-zA-Z0-9-]*$/,
+			"Must start with a alphabet and can only contain alphabets, numbers, and hyphens",
+		)
+		.refine(
+			(name) => !RESERVED_USERNAMES.includes(name.toLowerCase()),
+			"This username cannot be used",
+		)
+		.refine(
+			(name) => !/^\d+$/.test(name),
+			"Username cannot consist of only numbers",
+		),
+	profile: z
+		.string()
+		.max(200, "Too Long. Must be 200 characters or less")
+		.optional(),
 	icon: z.string(),
+	geminiApiKey: z.string().optional(),
 });
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
@@ -58,40 +83,54 @@ export async function action({ request }: ActionFunctionArgs) {
 		return submission.reply();
 	}
 
-	const { displayName, profile, icon } = submission.value;
+	const { displayName, userName, profile, icon, geminiApiKey } =
+		submission.value;
 
-	const updatedUser = await updateUser(currentUser.userName, {
+	const isNameTaken = await isUserNameTaken(userName);
+	if (isNameTaken && userName !== currentUser.userName) {
+		return submission.reply({ formErrors: ["This name is already taken."] });
+	}
+
+	if (geminiApiKey && geminiApiKey.trim() !== "") {
+		const { isValid, errorMessage } = await validateGeminiApiKey(geminiApiKey);
+
+		if (!isValid) {
+			return submission.reply({
+				formErrors: [errorMessage || "Gemini API key validation failed"],
+			});
+		}
+	}
+
+	const updatedUser = await updateUser(currentUser.id, {
 		displayName,
+		userName,
 		profile,
 		icon,
+		geminiApiKey,
 	});
 	const session = await getSession(request.headers.get("Cookie"));
 	session.set("user", sanitizeUser(updatedUser));
-	await commitSession(session);
-	return null;
+	const headers = new Headers({
+		"Set-Cookie": await commitSession(session),
+	});
+
+	return redirect(`/${updatedUser.userName}/edit`, { headers });
 }
 
 export default function EditProfile() {
 	const { currentUser } = useLoaderData<typeof loader>();
-	const [isGeminiApiKeyDialogOpen, setIsGeminiApiKeyDialogOpen] =
-		useState(false);
+	const lastResult = useActionData<typeof action>();
 	const navigation = useNavigation();
-	const [showSuccess, setShowSuccess] = useState(false);
-	useEffect(() => {
-		if (navigation.state === "loading") {
-			setShowSuccess(true);
-		} else if (navigation.state === "idle" && showSuccess) {
-			const timer = setTimeout(() => setShowSuccess(false), 500);
-			return () => clearTimeout(timer);
-		}
-	}, [navigation.state, showSuccess]);
+	const [showUsernameInput, setShowUsernameInput] = useState(false);
 	const [form, fields] = useForm({
 		id: "edit-profile-form",
+		lastResult,
 		constraint: getZodConstraint(schema),
 		shouldValidate: "onBlur",
 		shouldRevalidate: "onInput",
 		defaultValue: {
 			displayName: currentUser.displayName,
+			userName: currentUser.userName,
 			profile: currentUser.profile,
 			icon: currentUser.icon,
 		},
@@ -118,90 +157,155 @@ export default function EditProfile() {
 		}
 	};
 
+	const toggleUsernameInput = () => {
+		setShowUsernameInput(!showUsernameInput);
+	};
+
 	return (
 		<div className="container mx-auto">
 			<Link to={`/${currentUser.userName}`}>
 				<ArrowLeft className="w-6 h-6 mb-5" />
 			</Link>
-			<div className="rounded-xl border p-4 shadow-md bg-gray-200 dark:bg-gray-900">
-				<div className="rounded-xl border p-4 shadow-md dark:shadow-gray-700  bg-white dark:bg-gray-800">
-					<Form method="post" {...getFormProps(form)} className="space-y-4">
-						<div>
-							<img
-								src={profileIconUrl}
-								alt="Preview"
-								className="mt-2 w-40 h-40 object-cover rounded-full"
-							/>
-							<Input
-								id={fields.icon.id}
-								type="file"
-								accept="image/*"
-								onChange={handleProfileImageUpload}
-								className="mt-3 bg-white dark:bg-black/50 cursor-pointer"
-							/>
-							<div
-								id={fields.icon.errorId}
-								className="text-red-500 text-sm mt-1"
-							>
-								{fields.icon.errors}
-							</div>
+			<div className="rounded-xl border p-4 ">
+				<Form method="post" {...getFormProps(form)} className="space-y-4">
+					<div>
+						<img
+							src={profileIconUrl}
+							alt="Preview"
+							className="mt-2 w-40 h-40 object-cover rounded-full"
+						/>
+						<div className="mt-3">
+							<Label>Icon</Label>
 						</div>
-						<div>
-							<Input
-								{...getInputProps(fields.displayName, { type: "text" })}
-								className="w-full h-10 px-3 py-2 border rounded-lg  bg-white dark:bg-black/50 focus:outline-none"
-							/>
-							<div
-								id={fields.displayName.errorId}
-								className="text-red-500 text-sm mt-1"
-							>
-								{fields.displayName.errors}
-							</div>
+						<Input
+							id={fields.icon.id}
+							type="file"
+							accept="image/*"
+							onChange={handleProfileImageUpload}
+							className="mt-3 bg-white dark:bg-black/50 cursor-pointer"
+						/>
+						<div id={fields.icon.errorId} className="text-red-500 text-sm mt-1">
+							{fields.icon.errors}
 						</div>
-						<div>
-							<textarea
-								{...getTextareaProps(fields.profile)}
-								className="w-full h-32 px-3 py-2  border rounded-lg  bg-white dark:bg-black/50 focus:outline-none"
-							/>
-							<div
-								id={fields.profile.errorId}
-								className="text-red-500 text-sm mt-1"
-							>
-								{fields.profile.errors}
+					</div>
+					<div>
+						<Label>User Name</Label>
+					</div>
+					<div>
+						<div className="space-y-2">
+							<div className="flex items-center gap-2">
+								<span className="text-sm">Current URL:</span>
+								<code className="px-2 py-1 bg-gray-200 dark:bg-gray-800 rounded-lg">
+									evame.tech/{currentUser.userName}
+								</code>
 							</div>
+							<div className="space-y-1 text-sm text-amber-500">
+								<p>⚠️ Important: Changing your username will:</p>
+								<ul className="list-disc list-inside pl-4 space-y-1">
+									<li>Update all URLs of your page</li>
+									<li>Break existing links to your page</li>
+									<li>Allow your current username to be claimed by others</li>
+								</ul>
+							</div>
+							<Button
+								type="button"
+								variant="outline"
+								onClick={toggleUsernameInput}
+							>
+								{showUsernameInput ? "Cancel" : "Edit Username"}
+							</Button>
 						</div>
-
-						<Button
-							type="submit"
-							className="w-full h-10"
-							disabled={navigation.state === "submitting"}
+						{showUsernameInput && (
+							<code className="flex items-center gap-2 px-2 mt-2 py-1 bg-gray-200 dark:bg-gray-800 rounded-lg">
+								evame.tech/
+								<Input
+									{...getInputProps(fields.userName, { type: "text" })}
+									className=" border rounded-lg bg-white dark:bg-black/50 focus:outline-none"
+								/>
+							</code>
+						)}
+						<div
+							id={fields.userName.errorId}
+							className="text-red-500 text-sm mt-1"
 						>
-							{showSuccess ? (
-								<Check className="w-6 h-6" />
-							) : navigation.state === "submitting" ? (
-								<Loader2 className="w-6 h-6 animate-spin" />
-							) : (
-								<ArrowUpFromLine className="w-6 h-6" />
-							)}
-						</Button>
-					</Form>
-				</div>
-				<div className="mt-10 rounded-xl border p-4 shadow-md dark:shadow-gray-700 bg-white dark:bg-gray-800">
-					<h2 className="text-xl font-bold mb-3 flex items-center gap-2">
-						<Key className="w-5 h-5" />
-						Gemini API Key
-					</h2>
-					<Button
-						className="w-full"
-						onClick={() => setIsGeminiApiKeyDialogOpen(true)}
+							{fields.userName.errors}
+						</div>
+					</div>
+					<div>
+						<Label>Display Name</Label>
+					</div>
+					<div>
+						<Input
+							{...getInputProps(fields.displayName, { type: "text" })}
+							className="w-full h-10 px-3 py-2 border rounded-lg  bg-white dark:bg-black/50 focus:outline-none"
+						/>
+						<div
+							id={fields.displayName.errorId}
+							className="text-red-500 text-sm mt-1"
+						>
+							{fields.displayName.errors}
+						</div>
+					</div>
+					<div>
+						<Label>Profile</Label>
+					</div>
+					<div>
+						<textarea
+							{...getTextareaProps(fields.profile)}
+							className="w-full h-32 px-3 py-2  border rounded-lg  bg-white dark:bg-black/50 focus:outline-none"
+						/>
+						<div
+							id={fields.profile.errorId}
+							className="text-red-500 text-sm mt-1"
+						>
+							{fields.profile.errors}
+						</div>
+					</div>
+					<div className="flex items-center justify-between">
+						<Label>Gemini API Key</Label>
+					</div>
+					<div>
+						<Link
+							to="https://aistudio.google.com/app/apikey"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="flex items-center gap-2 transition-colors underline hover:text-blue-500"
+						>
+							<span className="">Get API Key at Google AI Studio</span>
+							<ExternalLink className="w-4 h-4" />
+						</Link>
+					</div>
+					<div>
+						<Input
+							{...getInputProps(fields.geminiApiKey, { type: "password" })}
+							className="w-full h-10 px-3 py-2 border rounded-lg  bg-white dark:bg-black/50 focus:outline-none"
+						/>
+					</div>
+					<div
+						id={fields.geminiApiKey.errorId}
+						className="text-red-500 text-sm mt-1"
 					>
-						Change Gemini API Key
+						{fields.geminiApiKey.errors}
+					</div>
+
+					<Button
+						type="submit"
+						className="w-full h-10"
+						disabled={navigation.state === "submitting"}
+					>
+						{navigation.state === "submitting" ? (
+							<Loader2 className="w-6 h-6 animate-spin" />
+						) : (
+							<span className="flex items-center gap-2">
+								<SaveIcon className="w-6 h-6" />
+								Save
+							</span>
+						)}
 					</Button>
-					<GeminiApiKeyDialog
-						isOpen={isGeminiApiKeyDialogOpen}
-						onOpenChange={setIsGeminiApiKeyDialogOpen}
-					/>
-				</div>
+					{form.errors && (
+						<p className="text-red-500 text-center mt-2">{form.errors}</p>
+					)}
+				</Form>
 			</div>
 		</div>
 	);

@@ -24,11 +24,11 @@ export function GoogleForm({ redirectTo }: { redirectTo: string }) {
 				type="submit"
 				name="intent"
 				value="SignInWithGoogle"
-				variant="secondary"
-				className="w-full"
+				variant="outline"
+				className="w-full rounded-full h-12 text-md"
 			>
-				<FcGoogle className="mr-2 h-4 w-4" />
-				Sign In with Google
+				<FcGoogle className="mr-2 h-6 w-6" />
+				Google Login
 			</Button>
 		</fetcher.Form>
 	);

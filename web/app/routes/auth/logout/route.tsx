@@ -1,5 +1,4 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
 import {
@@ -9,14 +8,14 @@ import {
 	CardHeader,
 	CardTitle,
 } from "~/components/ui/card";
-import { authenticator } from "../utils/auth.server";
+import { authenticator } from "../../../utils/auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/auth/login",
 	});
 
-	return json({ currentUser });
+	return { currentUser };
 }
 
 export async function action({ request }: ActionFunctionArgs) {

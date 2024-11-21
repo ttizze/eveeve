@@ -2,9 +2,7 @@ import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
 import { memo, useMemo } from "react";
-import { useState } from "react";
 import { z } from "zod";
-import { LoginDialog } from "~/components/LoginDialog";
 import { VoteButton } from "~/routes/$userName+/page+/$slug+/components/sourceTextAndTranslationSection/VoteButton";
 import type { TranslationWithVote } from "~/routes/$userName+/page+/$slug+/types";
 import { authenticator } from "~/utils/auth.server";
@@ -46,7 +44,6 @@ export const VoteButtons = memo(function VoteButtons({
 	currentUserName,
 }: VoteButtonsProps) {
 	const fetcher = useFetcher();
-	const [showLoginDialog, setShowLoginDialog] = useState(false);
 
 	const isVoting = fetcher.state !== "idle";
 
@@ -99,10 +96,6 @@ export const VoteButtons = memo(function VoteButtons({
 	);
 
 	const handleVoteClick = (e: React.MouseEvent, isUpvote: boolean) => {
-		if (!currentUserName) {
-			setShowLoginDialog(true);
-			e.preventDefault();
-		}
 		const formData = new FormData();
 		formData.append(
 			"translateTextId",
@@ -132,7 +125,6 @@ export const VoteButtons = memo(function VoteButtons({
 					onClick={handleVoteClick}
 				/>
 			</div>
-			<LoginDialog isOpen={showLoginDialog} onOpenChange={setShowLoginDialog} />
 		</div>
 	);
 });
