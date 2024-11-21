@@ -23,7 +23,7 @@ import { authenticator } from "~/utils/auth.server";
 import { sanitizeUser } from "~/utils/sanitizeUser";
 import { commitSession, getSession } from "~/utils/session.server";
 import { updateUser } from "./functions/mutations.server";
-import { getUserByUserName, isUserNameTaken } from "./functions/queries.server";
+import { getUserByUserName } from "./functions/queries.server";
 import reservedUsernames from "./reserved-usernames.json";
 
 export const meta: MetaFunction = () => {
@@ -86,11 +86,6 @@ export async function action({ request }: ActionFunctionArgs) {
 	const { displayName, userName, profile, icon, geminiApiKey } =
 		submission.value;
 
-	const isNameTaken = await isUserNameTaken(userName);
-	if (isNameTaken && userName !== currentUser.userName) {
-		return submission.reply({ formErrors: ["This name is already taken."] });
-	}
-
 	if (geminiApiKey && geminiApiKey.trim() !== "") {
 		const { isValid, errorMessage } = await validateGeminiApiKey(geminiApiKey);
 
@@ -100,21 +95,25 @@ export async function action({ request }: ActionFunctionArgs) {
 			});
 		}
 	}
-
-	const updatedUser = await updateUser(currentUser.id, {
-		displayName,
-		userName,
-		profile,
-		icon,
-		geminiApiKey,
-	});
-	const session = await getSession(request.headers.get("Cookie"));
-	session.set("user", sanitizeUser(updatedUser));
-	const headers = new Headers({
-		"Set-Cookie": await commitSession(session),
-	});
-
-	return redirect(`/${updatedUser.userName}/edit`, { headers });
+	try {
+		const updatedUser = await updateUser(currentUser.id, {
+			displayName,
+			userName,
+			profile,
+			icon,
+			geminiApiKey,
+		});
+		const session = await getSession(request.headers.get("Cookie"));
+		session.set("user", sanitizeUser(updatedUser));
+		const headers = new Headers({
+			"Set-Cookie": await commitSession(session),
+		});
+		return redirect(`/${updatedUser.userName}/edit`, { headers });
+	} catch (error) {
+		return submission.reply({
+			formErrors: [error instanceof Error ? error.message : "Unknown error"],
+		});
+	}
 }
 
 export default function EditProfile() {
