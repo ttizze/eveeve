@@ -5,6 +5,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { useLocation } from "@remix-run/react";
 import { useNavigation } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 import { CheckCircle } from "lucide-react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -15,7 +16,6 @@ import { Separator } from "~/components/ui/separator";
 import { sessionStorage } from "~/utils/session.server";
 import { authenticator } from "../../../utils/auth.server";
 import { GoogleForm } from "../../resources+/google-form";
-import { Link } from "@remix-run/react";
 
 const loginSchema = z.object({
 	email: z.string().email("Please enter a valid email address"),
