@@ -10,6 +10,7 @@ import Linkify from "linkify-react";
 import { Lock, MoreVertical, Settings } from "lucide-react";
 import { BookOpen, Trash } from "lucide-react";
 import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
 	Card,
@@ -40,7 +41,6 @@ import {
 	PaginationNext,
 	PaginationPrevious,
 } from "~/components/ui/pagination";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import i18nServer from "~/i18n.server";
 import { authenticator } from "~/utils/auth.server";
 import {
@@ -169,9 +169,7 @@ export default function UserPage() {
 									alt={sanitizedUserWithPages.displayName}
 								/>
 								<AvatarFallback>
-									{sanitizedUserWithPages.displayName
-										.charAt(0)
-										.toUpperCase()}
+									{sanitizedUserWithPages.displayName.charAt(0).toUpperCase()}
 								</AvatarFallback>
 							</Avatar>
 						</Link>

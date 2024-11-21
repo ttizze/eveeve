@@ -11,7 +11,7 @@ import { redirect } from "@remix-run/node";
 import { Form, Link, useNavigation } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
 import { useActionData, useLoaderData } from "@remix-run/react";
-import { ArrowLeft, ExternalLink, Loader2, SaveIcon } from "lucide-react";
+import { ExternalLink, Loader2, SaveIcon } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
