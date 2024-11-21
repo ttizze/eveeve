@@ -1,29 +1,29 @@
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import type { Editor } from "@tiptap/core";
 import { FloatingMenu } from "@tiptap/react";
-import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import {
-	ImageIcon,
-	Type,
+	ChevronDown,
 	Heading2,
 	Heading3,
 	Heading4,
-	ChevronDown,
+	ImageIcon,
+	IndentDecrease,
+	IndentIncrease,
 	List,
 	ListOrdered,
-	IndentIncrease,
-	IndentDecrease,
+	Type,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useRef } from "react";
 import { Button } from "~/components/ui/button";
-import { handleFileUpload } from "./useFileUpload";
-import { cn } from "~/utils/cn";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
 } from "~/components/ui/tooltip";
-import { useRef } from "react";
+import { cn } from "~/utils/cn";
+import { handleFileUpload } from "./useFileUpload";
 
 interface EditorFloatingMenuProps {
 	editor: Editor;
@@ -36,8 +36,10 @@ const editorCommands: Record<string, (editor: Editor) => boolean> = {
 	h4: (editor) => editor.chain().focus().toggleHeading({ level: 4 }).run(),
 	bulletList: (editor) => editor.chain().focus().toggleBulletList().run(),
 	orderedList: (editor) => editor.chain().focus().toggleOrderedList().run(),
-	indentIncrease: (editor) => editor.chain().focus().sinkListItem("listItem").run(),
-	indentDecrease: (editor) => editor.chain().focus().liftListItem("listItem").run(),
+	indentIncrease: (editor) =>
+		editor.chain().focus().sinkListItem("listItem").run(),
+	indentDecrease: (editor) =>
+		editor.chain().focus().liftListItem("listItem").run(),
 };
 
 const headingIcons: Record<string | number, LucideIcon> = {
@@ -104,7 +106,8 @@ export function EditorFloatingMenu({ editor }: EditorFloatingMenuProps) {
 								<DropdownMenuPrimitive.Trigger
 									className={cn(
 										"flex h-9 w-9 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground items-start rounded-md",
-										editor.isActive("heading") && "bg-secondary text-foreground",
+										editor.isActive("heading") &&
+											"bg-secondary text-foreground",
 									)}
 								>
 									<div className="rounded-md flex h-8 w-8 mx-0.5 items-center">
