@@ -5,6 +5,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { useLocation } from "@remix-run/react";
 import { useNavigation } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 import { CheckCircle } from "lucide-react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -80,7 +81,9 @@ export default function LoginPage() {
 		<div className="container mx-auto max-w-md py-8">
 			<Card>
 				<CardHeader>
-					<CardTitle>Login to Evame</CardTitle>
+					<CardTitle className="text-center font-bold text-2xl">
+						Login to Evame
+					</CardTitle>
 				</CardHeader>
 				<CardContent className="rounded-full">
 					<GoogleForm redirectTo={location.pathname + location.search} />
@@ -125,6 +128,16 @@ export default function LoginPage() {
 							</div>
 						)}
 					</Form>
+					<div className="text-center text-sm text-gray-500 my-2">
+						Login means you agree to our{" "}
+						<Link to="/terms" className="underline">
+							Terms of Service
+						</Link>{" "}
+						and{" "}
+						<Link to="/privacy" className="underline">
+							Privacy Policy
+						</Link>
+					</div>
 				</CardContent>
 			</Card>
 		</div>
