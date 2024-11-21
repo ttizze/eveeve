@@ -25,6 +25,7 @@ import { commitSession, getSession } from "~/utils/session.server";
 import { updateUser } from "./functions/mutations.server";
 import { getUserByUserName } from "./functions/queries.server";
 import reservedUsernames from "./reserved-usernames.json";
+import { cn } from "~/utils/cn";
 
 export const meta: MetaFunction = () => {
 	return [{ title: "Edit Profile" }];
@@ -45,7 +46,12 @@ const schema = z.object({
 			"Must start with a alphabet and can only contain alphabets, numbers, and hyphens",
 		)
 		.refine(
-			(name) => !RESERVED_USERNAMES.includes(name.toLowerCase()),
+			(name) => {
+				const isReserved = RESERVED_USERNAMES.some(
+					(reserved) => reserved.toLowerCase() === name.toLowerCase(),
+				);
+				return !isReserved;
+			},
 			"This username cannot be used",
 		)
 		.refine(
@@ -211,15 +217,19 @@ export default function EditProfile() {
 								{showUsernameInput ? "Cancel" : "Edit Username"}
 							</Button>
 						</div>
-						{showUsernameInput && (
-							<code className="flex items-center gap-2 px-2 mt-2 py-1 bg-gray-200 dark:bg-gray-800 rounded-lg">
-								evame.tech/
-								<Input
-									{...getInputProps(fields.userName, { type: "text" })}
-									className=" border rounded-lg bg-white dark:bg-black/50 focus:outline-none"
-								/>
-							</code>
-						)}
+
+						<code
+							className={cn(
+								"flex items-center gap-2 px-2 mt-2 py-1 bg-gray-200 dark:bg-gray-800 rounded-lg",
+								showUsernameInput ? "block" : "hidden",
+							)}
+						>
+							evame.tech/
+							<Input
+								{...getInputProps(fields.userName, { type: "text" })}
+								className=" border rounded-lg bg-white dark:bg-black/50 focus:outline-none"
+							/>
+						</code>
 						<div
 							id={fields.userName.errorId}
 							className="text-red-500 text-sm mt-1"
@@ -298,8 +308,10 @@ export default function EditProfile() {
 							</span>
 						)}
 					</Button>
-					{form.errors && (
-						<p className="text-red-500 text-center mt-2">{form.errors}</p>
+					{form.allErrors && (
+						<p className="text-red-500 text-center mt-2">
+							{Object.values(form.allErrors).join(", ")}
+						</p>
 					)}
 				</Form>
 			</div>
