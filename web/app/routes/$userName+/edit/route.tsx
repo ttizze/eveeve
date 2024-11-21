@@ -11,7 +11,7 @@ import { redirect } from "@remix-run/node";
 import { Form, Link, useNavigation } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
 import { useActionData, useLoaderData } from "@remix-run/react";
-import { ArrowLeft, ExternalLink, Loader2, SaveIcon } from "lucide-react";
+import { ExternalLink, Loader2, SaveIcon } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -162,9 +162,6 @@ export default function EditProfile() {
 
 	return (
 		<div className="container mx-auto">
-			<Link to={`/${currentUser.userName}`}>
-				<ArrowLeft className="w-6 h-6 mb-5" />
-			</Link>
 			<div className="rounded-xl border p-4 ">
 				<Form method="post" {...getFormProps(form)} className="space-y-4">
 					<div>

@@ -138,7 +138,7 @@ function CommonLayout({
 		<>
 			<Header currentUser={currentUser} />
 			<main className="mb-5 mt-3 md:mt-5 flex-grow">
-				<div className="mx-auto px-2 md:container">{children}</div>
+				<div className="mx-auto px-2 max-w-screen-lg">{children}</div>
 			</main>
 			<Footer />
 		</>

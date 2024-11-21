@@ -135,7 +135,7 @@ export function EditHeader({
 					))}
 				</div>
 				<div className="flex items-center">
-					<ModeToggle />
+					<ModeToggle showText={false} />
 					<div className="justify-self-end flex items-center">
 						<Popover>
 							<PopoverTrigger asChild>
