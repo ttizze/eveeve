@@ -15,6 +15,7 @@ import { Separator } from "~/components/ui/separator";
 import { sessionStorage } from "~/utils/session.server";
 import { authenticator } from "../../../utils/auth.server";
 import { GoogleForm } from "../../resources+/google-form";
+import { Link } from "@remix-run/react";
 
 const loginSchema = z.object({
 	email: z.string().email("Please enter a valid email address"),
@@ -80,7 +81,9 @@ export default function LoginPage() {
 		<div className="container mx-auto max-w-md py-8">
 			<Card>
 				<CardHeader>
-					<CardTitle>Login to Evame</CardTitle>
+					<CardTitle className="text-center font-bold text-2xl">
+						Login to Evame
+					</CardTitle>
 				</CardHeader>
 				<CardContent className="rounded-full">
 					<GoogleForm redirectTo={location.pathname + location.search} />
@@ -125,6 +128,16 @@ export default function LoginPage() {
 							</div>
 						)}
 					</Form>
+					<div className="text-center text-sm text-gray-500 my-2">
+						Login means you agree to our{" "}
+						<Link to="/terms" className="underline">
+							Terms of Service
+						</Link>{" "}
+						and{" "}
+						<Link to="/privacy" className="underline">
+							Privacy Policy
+						</Link>
+					</div>
 				</CardContent>
 			</Card>
 		</div>

@@ -107,10 +107,11 @@ export default function Index() {
 							showTranslation={true}
 						/>
 					</span>
-
-					<div className="mb-12 flex justify-center mt-10">
-						<StartButton className="w-60 h-12 text-xl" />
-					</div>
+					{!currentUser && (
+						<div className="mb-12 flex justify-center mt-10">
+							<StartButton className="w-60 h-12 text-xl" />
+						</div>
+					)}
 				</div>
 				{selectedSourceTextWithTranslations && (
 					<AddAndVoteTranslations
