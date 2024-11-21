@@ -51,9 +51,9 @@ export function Header({ currentUser }: HeaderProps) {
 				<div className="grid grid-cols-2 gap-6 items-center mr-2">
 					<Link
 						to="/search"
-						className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white justify-self-center"
+						className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white justify-self-end"
 					>
-						<Search className="w-6 h-6" />
+						<Search className="w-6 h-6 " />
 					</Link>
 					{currentUser ? (
 						<>
