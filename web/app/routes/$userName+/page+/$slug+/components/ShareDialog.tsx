@@ -1,4 +1,5 @@
 import { Share } from "lucide-react";
+import { CopyIcon } from "lucide-react";
 import { useState } from "react";
 import {
 	FacebookIcon,
@@ -8,7 +9,6 @@ import {
 	TwitterShareButton,
 	XIcon,
 } from "react-share";
-import { CopyIcon } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
 	Dialog,
