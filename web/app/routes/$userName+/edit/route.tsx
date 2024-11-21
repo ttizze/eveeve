@@ -20,12 +20,12 @@ import { Label } from "~/components/ui/label";
 import { validateGeminiApiKey } from "~/features/translate/services/gemini";
 import { uploadImage } from "~/routes/$userName+/utils/uploadImage";
 import { authenticator } from "~/utils/auth.server";
+import { cn } from "~/utils/cn";
 import { sanitizeUser } from "~/utils/sanitizeUser";
 import { commitSession, getSession } from "~/utils/session.server";
 import { updateUser } from "./functions/mutations.server";
 import { getUserByUserName } from "./functions/queries.server";
 import reservedUsernames from "./reserved-usernames.json";
-import { cn } from "~/utils/cn";
 
 export const meta: MetaFunction = () => {
 	return [{ title: "Edit Profile" }];
@@ -45,15 +45,12 @@ const schema = z.object({
 			/^[a-zA-Z][a-zA-Z0-9-]*$/,
 			"Must start with a alphabet and can only contain alphabets, numbers, and hyphens",
 		)
-		.refine(
-			(name) => {
-				const isReserved = RESERVED_USERNAMES.some(
-					(reserved) => reserved.toLowerCase() === name.toLowerCase(),
-				);
-				return !isReserved;
-			},
-			"This username cannot be used",
-		)
+		.refine((name) => {
+			const isReserved = RESERVED_USERNAMES.some(
+				(reserved) => reserved.toLowerCase() === name.toLowerCase(),
+			);
+			return !isReserved;
+		}, "This username cannot be used")
 		.refine(
 			(name) => !/^\d+$/.test(name),
 			"Username cannot consist of only numbers",

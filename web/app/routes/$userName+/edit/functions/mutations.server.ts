@@ -1,13 +1,16 @@
 import { prisma } from "~/utils/prisma";
 import { isUserNameTaken } from "./queries.server";
 
-export async function updateUser(userId: number, data: {
-	displayName: string;
-	userName: string;
-	profile: string | undefined;
-	icon: string;
-	geminiApiKey: string | undefined;
-}) {
+export async function updateUser(
+	userId: number,
+	data: {
+		displayName: string;
+		userName: string;
+		profile: string | undefined;
+		icon: string;
+		geminiApiKey: string | undefined;
+	},
+) {
 	return prisma.$transaction(async (tx) => {
 		const currentUser = await tx.user.findUnique({
 			where: { id: userId },
