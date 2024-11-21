@@ -40,6 +40,7 @@ import {
 	PaginationNext,
 	PaginationPrevious,
 } from "~/components/ui/pagination";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import i18nServer from "~/i18n.server";
 import { authenticator } from "~/utils/auth.server";
 import {
@@ -157,30 +158,24 @@ export default function UserPage() {
 	};
 
 	return (
-		<div className="">
+		<div className="container mx-auto">
 			<div className="mb-6 rounded-3xl w-full overflow-hidden ">
 				<div className="grid grid-cols-4 gap-4 p-4">
-					<Link to={`${sanitizedUserWithPages.icon}`}>
-						<div className="col-span-1 flex  justify-start">
-							<div className="aspect-square w-40  md:w-32 lg:w-40 overflow-hidden rounded-full">
-								{sanitizedUserWithPages.icon ? (
-									<img
-										src={sanitizedUserWithPages.icon}
-										alt={sanitizedUserWithPages.displayName}
-										className="w-full h-full object-cover"
-									/>
-								) : (
-									<div className="w-full h-full bg-gray-200 flex items-center justify-center">
-										<span className="text-2xl font-bold text-gray-500">
-											{sanitizedUserWithPages.displayName
-												.charAt(0)
-												.toUpperCase()}
-										</span>
-									</div>
-								)}
-							</div>
-						</div>
-					</Link>
+					<div className="col-span-1 flex  justify-start">
+						<Link to={`${sanitizedUserWithPages.icon}`}>
+							<Avatar className="w-32 h-32">
+								<AvatarImage
+									src={sanitizedUserWithPages.icon}
+									alt={sanitizedUserWithPages.displayName}
+								/>
+								<AvatarFallback>
+									{sanitizedUserWithPages.displayName
+										.charAt(0)
+										.toUpperCase()}
+								</AvatarFallback>
+							</Avatar>
+						</Link>
+					</div>
 					<div className="col-span-3">
 						<CardHeader className="p-0">
 							<CardTitle className="text-2xl font-bold flex justify-between items-center">

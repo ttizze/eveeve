@@ -162,9 +162,6 @@ export default function EditProfile() {
 
 	return (
 		<div className="container mx-auto">
-			<Link to={`/${currentUser.userName}`}>
-				<ArrowLeft className="w-6 h-6 mb-5" />
-			</Link>
 			<div className="rounded-xl border p-4 ">
 				<Form method="post" {...getFormProps(form)} className="space-y-4">
 					<div>
