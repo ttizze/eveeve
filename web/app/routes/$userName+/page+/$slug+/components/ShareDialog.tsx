@@ -1,4 +1,5 @@
 import { Share } from "lucide-react";
+import { CopyIcon } from "lucide-react";
 import { useState } from "react";
 import {
 	FacebookIcon,
@@ -36,11 +37,17 @@ export function ShareDialog({ url, title }: ShareDialogProps) {
 					<Share className="h-5 w-5" />
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-md">
+			<DialogContent className="sm:max-w-md rounded-3xl">
 				<DialogHeader>
 					<DialogTitle>Share</DialogTitle>
 				</DialogHeader>
 				<div className="flex justify-center space-x-4 mt-4">
+					<CopyIcon
+						className="w-4 h-4 ml-2 cursor-pointer"
+						onClick={() => {
+							navigator.clipboard.writeText(url);
+						}}
+					/>
 					<FacebookShareButton url={url}>
 						<FacebookIcon size={32} round />
 					</FacebookShareButton>

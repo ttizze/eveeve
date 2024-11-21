@@ -158,10 +158,10 @@ export default function UserPage() {
 	};
 
 	return (
-		<div className="container mx-auto">
+		<div className="">
 			<div className="mb-6 rounded-3xl w-full overflow-hidden ">
-				<div className="grid grid-cols-4 gap-4 p-4">
-					<div className="col-span-1 flex  justify-start">
+				<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+					<div className=" flex  justify-start">
 						<Link to={`${sanitizedUserWithPages.icon}`}>
 							<Avatar className="w-32 h-32">
 								<AvatarImage
@@ -174,7 +174,7 @@ export default function UserPage() {
 							</Avatar>
 						</Link>
 					</div>
-					<div className="col-span-3">
+					<div className="md:col-span-3">
 						<CardHeader className="p-0">
 							<CardTitle className="text-2xl font-bold flex justify-between items-center">
 								<div>{sanitizedUserWithPages.displayName}</div>
