@@ -1,5 +1,4 @@
-import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { useState } from "react";
@@ -51,10 +50,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		sourceLanguage,
 		targetLanguage,
 	};
-}
-export async function action({ request }: ActionFunctionArgs) {
-	const currentUser = await authenticator.authenticate("google", request);
-	return currentUser ? redirect("/home") : redirect("/auth/login");
 }
 
 export default function Index() {
