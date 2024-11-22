@@ -3,14 +3,14 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
-import { HomeIcon, LogOutIcon, Search, SettingsIcon } from "lucide-react";
+import { LogOutIcon, Search, SettingsIcon } from "lucide-react";
 import { StartButton } from "~/components/StartButton";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-	DropdownMenuSeparator
 } from "~/components/ui/dropdown-menu";
 import type { SanitizedUser } from "~/types";
 import { authenticator } from "~/utils/auth.server";
