@@ -159,7 +159,7 @@ export default function UserPage() {
 
 	return (
 		<div className="">
-			<div className="mb-6 rounded-3xl w-full overflow-hidden ">
+			<div className="mb-6 w-full overflow-hidden ">
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 					<div className=" flex  justify-start">
 						<Link to={`${sanitizedUserWithPages.icon}`}>

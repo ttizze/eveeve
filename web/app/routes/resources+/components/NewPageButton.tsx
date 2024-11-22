@@ -33,7 +33,7 @@ export const NewPageButton = forwardRef<HTMLButtonElement, NewPageButtonProps>(
 				type="button"
 				onClick={handleNewPage}
 				disabled={isLoading}
-				className="w-full  gap-2 flex cursor-pointer items-center  px-6 py-4 text-sm hover:bg-accent hover:text-accent-foreground"
+				className="w-full  gap-2 flex cursor-pointer items-center  px-4 py-3 text-sm hover:bg-accent hover:text-accent-foreground"
 			>
 				{isLoading ? (
 					<Loader2 className="h-4 w-4 animate-spin" />
