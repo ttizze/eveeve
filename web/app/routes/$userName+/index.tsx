@@ -42,6 +42,7 @@ import {
 	PaginationPrevious,
 } from "~/components/ui/pagination";
 import i18nServer from "~/i18n.server";
+import { LikeButton } from "~/routes/resources+/like-button";
 import { authenticator } from "~/utils/auth.server";
 import {
 	archivePage,
@@ -51,7 +52,6 @@ import {
 	fetchPageById,
 	fetchSanitizedUserWithPages,
 } from "./functions/queries.server";
-
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	if (!data) {
 		return [{ title: "Profile" }];
@@ -233,19 +233,28 @@ export default function UserPage() {
 								</DropdownMenuContent>
 							</DropdownMenu>
 						)}
-						<Link
-							to={`/${sanitizedUserWithPages.userName}/page/${page.slug}`}
-							key={page.id}
-							className="h-full"
-						>
-							<CardHeader>
+						<CardHeader>
+							<Link
+								to={`/${sanitizedUserWithPages.userName}/page/${page.slug}`}
+								key={page.id}
+								className="h-full"
+							>
 								<CardTitle className="flex items-center pr-3 break-all overflow-wrap-anywhere">
 									{page.isPublished ? "" : <Lock className="h-4 w-4 mr-2" />}
 									{page.title}
 								</CardTitle>
-								<CardDescription>{page.createdAt}</CardDescription>
-							</CardHeader>
-						</Link>
+							</Link>
+							<CardDescription>{page.createdAt}</CardDescription>
+						</CardHeader>
+						<CardContent className="flex justify-end">
+							<LikeButton
+								liked={page.likePages.length > 0}
+								likeCount={page._count.likePages}
+								slug={page.slug}
+								showCount
+								className=" justify-self-end"
+							/>
+						</CardContent>
 					</Card>
 				))}
 			</div>
