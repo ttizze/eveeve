@@ -42,6 +42,7 @@ import {
 	PaginationPrevious,
 } from "~/components/ui/pagination";
 import i18nServer from "~/i18n.server";
+import { LikeButton } from "~/routes/resources+/like-button";
 import { authenticator } from "~/utils/auth.server";
 import {
 	archivePage,
@@ -51,7 +52,6 @@ import {
 	fetchPageById,
 	fetchSanitizedUserWithPages,
 } from "./functions/queries.server";
-import { LikeButton } from "~/routes/resources+/like-button";
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	if (!data) {
 		return [{ title: "Profile" }];
@@ -255,7 +255,6 @@ export default function UserPage() {
 								className=" justify-self-end"
 							/>
 						</CardContent>
-
 					</Card>
 				))}
 			</div>
