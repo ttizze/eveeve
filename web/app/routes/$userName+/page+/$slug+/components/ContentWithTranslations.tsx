@@ -58,7 +58,6 @@ export function ContentWithTranslations({
 	return (
 		<>
 			<div className="flex items-center justify-between">
-
 				<h1 className="!mb-5">
 					{sourceTitleWithTranslations && (
 						<SourceTextAndTranslationSection
