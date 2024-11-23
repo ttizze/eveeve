@@ -1,17 +1,7 @@
 import type { FieldMetadata } from "@conform-to/react";
 import type { Tag } from "@prisma/client";
-import { Link } from "@remix-run/react";
 import type { FetcherWithComponents } from "@remix-run/react";
-import {
-	ArrowDownToLine,
-	ArrowLeft,
-	ArrowUpFromLine,
-	Check,
-	Globe,
-	Hash,
-	Loader2,
-	Lock,
-} from "lucide-react";
+import { Check, Globe, Hash, Loader2, Lock } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { MultiValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
