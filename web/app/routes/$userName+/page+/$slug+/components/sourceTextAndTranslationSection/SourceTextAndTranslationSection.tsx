@@ -1,6 +1,23 @@
 import { Lock } from "lucide-react";
+import type { ReactNode } from "react";
 import type { SourceTextWithTranslations } from "../../types";
 import { TranslationSection } from "./TranslationSection";
+
+interface SourceTextAndTranslationSectionProps {
+	sourceTextWithTranslations: SourceTextWithTranslations;
+	elements: string | ReactNode | ReactNode[];
+	isPublished?: boolean;
+	sourceLanguage: string;
+	targetLanguage: string;
+	sourceTextClassName?: string;
+	onOpenAddAndVoteTranslations: (sourceTextId: number) => void;
+	showOriginal: boolean;
+	showTranslation: boolean;
+	selectedSourceTextId: number | null;
+	currentUserName: string | undefined;
+	onSelectedRef?: (el: HTMLDivElement | null) => void;
+}
+
 export function SourceTextAndTranslationSection({
 	sourceTextWithTranslations,
 	elements,
@@ -11,17 +28,10 @@ export function SourceTextAndTranslationSection({
 	onOpenAddAndVoteTranslations,
 	showOriginal = true,
 	showTranslation = true,
-}: {
-	sourceTextWithTranslations: SourceTextWithTranslations;
-	elements: string | React.ReactNode | React.ReactNode[];
-	isPublished?: boolean;
-	sourceLanguage: string;
-	targetLanguage: string;
-	sourceTextClassName?: string;
-	onOpenAddAndVoteTranslations: (sourceTextId: number) => void;
-	showOriginal: boolean;
-	showTranslation: boolean;
-}) {
+	selectedSourceTextId,
+	currentUserName,
+	onSelectedRef,
+}: SourceTextAndTranslationSectionProps) {
 	return (
 		<>
 			{showOriginal && (
@@ -43,6 +53,9 @@ export function SourceTextAndTranslationSection({
 						key={`translation-${sourceTextWithTranslations.sourceText.id}`}
 						sourceTextWithTranslations={sourceTextWithTranslations}
 						onOpenAddAndVoteTranslations={onOpenAddAndVoteTranslations}
+						selectedSourceTextId={selectedSourceTextId}
+						currentUserName={currentUserName}
+						onSelectedRef={onSelectedRef}
 					/>
 				)}
 		</>

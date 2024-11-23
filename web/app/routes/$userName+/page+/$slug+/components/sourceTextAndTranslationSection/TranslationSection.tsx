@@ -1,18 +1,27 @@
 import { Languages, Plus } from "lucide-react";
 import { useHydrated } from "remix-utils/use-hydrated";
+import { useRef, useEffect } from "react";
 import type { SourceTextWithTranslations } from "../../types";
 import { sanitizeAndParseText } from "../../utils/sanitize-and-parse-text.client";
 
 interface TranslationSectionProps {
 	sourceTextWithTranslations: SourceTextWithTranslations;
 	onOpenAddAndVoteTranslations: (sourceTextId: number) => void;
+	selectedSourceTextId: number | null;
+	currentUserName: string | undefined;
+	onSelectedRef?: (el: HTMLDivElement | null) => void;
 }
 
 export function TranslationSection({
 	sourceTextWithTranslations,
 	onOpenAddAndVoteTranslations,
+	selectedSourceTextId,
+	currentUserName,
+	onSelectedRef,
 }: TranslationSectionProps) {
 	const isHydrated = useHydrated();
+	const isSelected = selectedSourceTextId === sourceTextWithTranslations.sourceText.id;
+	const contentRef = useRef<HTMLDivElement>(null);
 
 	const { bestTranslationWithVote, sourceText } = sourceTextWithTranslations;
 	const sanitizedAndParsedText = bestTranslationWithVote ? (
@@ -28,10 +37,26 @@ export function TranslationSection({
 		</span>
 	);
 
+	useEffect(() => {
+		if (onSelectedRef) {
+			onSelectedRef(isSelected ? contentRef.current : null);
+		}
+	}, [isSelected, onSelectedRef]);
+
 	return (
-		<span className="group relative block rounded-md">
+		<div
+			ref={contentRef}
+			className={`group relative ${
+				isSelected ? "bg-gray-50 dark:bg-gray-800 rounded-lg" : ""
+			}`}
+			style={{
+				display: "grid",
+				gridTemplateRows: isSelected ? "1fr auto" : "1fr 0fr",
+				transition: "grid-template-rows 0.2s, background-color 0.2s",
+			}}
+		>
 			<span
-				className="notranslate inline-block  py-2 text-gray-700 dark:text-gray-200"
+				className="notranslate inline-block py-2 text-gray-700 dark:text-gray-200"
 				onMouseUp={(e) => {
 					if (window.getSelection()?.toString()) return;
 					if (e.button === 2) return;
@@ -40,6 +65,7 @@ export function TranslationSection({
 			>
 				{sanitizedAndParsedText}
 			</span>
-		</span>
+			<div style={{ overflow: "hidden" }} />
+		</div>
 	);
 }

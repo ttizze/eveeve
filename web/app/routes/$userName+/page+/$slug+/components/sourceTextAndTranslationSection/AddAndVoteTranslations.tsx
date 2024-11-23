@@ -1,12 +1,6 @@
 import { ArrowUpDown, ChevronDown, ChevronUp, Languages } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-} from "~/components/ui/dialog";
 import { AddTranslationForm } from "~/routes/resources+/add-translation-form";
 import { TranslationListItem } from "~/routes/resources+/translation-list-item";
 import type { SourceTextWithTranslations } from "../../types";
@@ -42,60 +36,58 @@ export function AddAndVoteTranslations({
 
 	const toggleShowAll = () => setShowAll((prev) => !prev);
 
+	if (!open) return null;
+
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange} modal={false}>
-			<DialogContent className="w-full  max-h-[90vh]  overflow-y-auto flex flex-col">
-				<DialogHeader>
-					<DialogTitle>
-						<Languages className="text-gray-500 w-4 h-4" />
-					</DialogTitle>
-				</DialogHeader>
-				<p className="text-xl pl-2">{sourceText.text}</p>
-				<div className="mt-4">
-					{bestTranslationWithVote && (
+		<div className="w-full bg-background border rounded-lg p-4">
+			<div className="flex items-center gap-2 mb-4">
+				<Languages className="text-gray-500 w-4 h-4" />
+				<p className="text-xl">{sourceText.text}</p>
+			</div>
+			<div>
+				{bestTranslationWithVote && (
+					<TranslationListItem
+						translation={bestTranslationWithVote}
+						currentUserName={currentUserName}
+						showAuthor
+					/>
+				)}
+				<div>
+					<p className="text-gray-500 flex items-center justify-end mr-2 my-4">
+						<ArrowUpDown size={16} />
+					</p>
+					{displayedTranslations.map((displayedTranslation) => (
 						<TranslationListItem
-							translation={bestTranslationWithVote}
+							key={displayedTranslation.translateText.id}
+							translation={displayedTranslation}
 							currentUserName={currentUserName}
-							showAuthor
 						/>
+					))}
+					{hasMoreTranslations && (
+						<Button
+							variant="link"
+							className="mt-2 w-full text-sm"
+							onClick={toggleShowAll}
+						>
+							{showAll ? (
+								<>
+									<ChevronUp size={16} className="mr-1" />
+								</>
+							) : (
+								<>
+									<ChevronDown size={16} className="mr-1" />
+								</>
+							)}
+						</Button>
 					)}
-					<div>
-						<p className="text-gray-500 flex items-center justify-end mr-2 my-4">
-							<ArrowUpDown size={16} />
-						</p>
-						{displayedTranslations.map((displayedTranslation) => (
-							<TranslationListItem
-								key={displayedTranslation.translateText.id}
-								translation={displayedTranslation}
-								currentUserName={currentUserName}
-							/>
-						))}
-						{hasMoreTranslations && (
-							<Button
-								variant="link"
-								className="mt-2 w-full text-sm"
-								onClick={toggleShowAll}
-							>
-								{showAll ? (
-									<>
-										<ChevronUp size={16} className="mr-1" />
-									</>
-								) : (
-									<>
-										<ChevronDown size={16} className="mr-1" />
-									</>
-								)}
-							</Button>
-						)}
-					</div>
-					<div className="mt-4">
-						<AddTranslationForm
-							sourceTextId={sourceTextWithTranslations.sourceText.id}
-							currentUserName={currentUserName}
-						/>
-					</div>
 				</div>
-			</DialogContent>
-		</Dialog>
+				<div className="mt-4">
+					<AddTranslationForm
+						sourceTextId={sourceTextWithTranslations.sourceText.id}
+						currentUserName={currentUserName}
+					/>
+				</div>
+			</div>
+		</div>
 	);
 }

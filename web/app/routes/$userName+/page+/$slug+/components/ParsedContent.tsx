@@ -7,6 +7,7 @@ import parse, {
 import { memo } from "react";
 import type { PageWithTranslations } from "../types";
 import { SourceTextAndTranslationSection } from "./sourceTextAndTranslationSection/SourceTextAndTranslationSection";
+
 interface ParsedContentProps {
 	pageWithTranslations: PageWithTranslations;
 	sourceLanguage: string;
@@ -15,6 +16,8 @@ interface ParsedContentProps {
 	onOpenAddAndVoteTranslations: (sourceTextId: number) => void;
 	showOriginal: boolean;
 	showTranslation: boolean;
+	selectedSourceTextId: number | null;
+	onSelectedRef?: (el: HTMLDivElement | null) => void;
 }
 
 export const MemoizedParsedContent = memo(ParsedContent);
@@ -27,6 +30,8 @@ export function ParsedContent({
 	onOpenAddAndVoteTranslations,
 	showOriginal = true,
 	showTranslation = true,
+	selectedSourceTextId,
+	onSelectedRef,
 }: ParsedContentProps) {
 	const sanitizedContent = DOMPurify.sanitize(
 		pageWithTranslations.page.content,
@@ -67,6 +72,9 @@ export function ParsedContent({
 							onOpenAddAndVoteTranslations={onOpenAddAndVoteTranslations}
 							showOriginal={showOriginal}
 							showTranslation={showTranslation}
+							selectedSourceTextId={selectedSourceTextId}
+							currentUserName={currentUserName}
+							onSelectedRef={onSelectedRef}
 						/>
 					</DynamicTag>
 				);

@@ -92,6 +92,8 @@ export default function Index() {
 							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 							showOriginal={true}
 							showTranslation={true}
+							selectedSourceTextId={selectedSourceTextId}
+							currentUserName={currentUser?.userName}
 						/>
 					</h1>
 
@@ -105,6 +107,8 @@ export default function Index() {
 							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 							showOriginal={true}
 							showTranslation={true}
+							selectedSourceTextId={selectedSourceTextId}
+							currentUserName={currentUser?.userName}
 						/>
 					</span>
 					{!currentUser && (

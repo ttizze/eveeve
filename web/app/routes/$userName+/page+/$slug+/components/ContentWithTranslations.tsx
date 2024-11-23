@@ -1,9 +1,9 @@
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import { Loader2, SquarePen } from "lucide-react";
-import { useState } from "react";
-import { useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
+import { createPortal } from "react-dom";
 import { Button } from "~/components/ui/button";
 import type {
 	PageWithTranslations,
@@ -39,22 +39,22 @@ export function ContentWithTranslations({
 	const [selectedSourceTextId, setSelectedSourceTextId] = useState<
 		number | null
 	>(null);
+	const [selectedTranslationEl, setSelectedTranslationEl] = useState<HTMLDivElement | null>(null);
 
 	const handleOpenAddAndVoteTranslations = useCallback(
 		(sourceTextId: number) => {
-			setSelectedSourceTextId(sourceTextId);
+			setSelectedSourceTextId(
+				sourceTextId === selectedSourceTextId ? null : sourceTextId
+			);
 		},
-		[],
+		[selectedSourceTextId],
 	);
-
-	const handleCloseAddAndVoteTranslations = useCallback(() => {
-		setSelectedSourceTextId(null);
-	}, []);
 
 	const selectedSourceTextWithTranslations =
 		pageWithTranslations.sourceTextWithTranslations.find(
 			(stw) => stw.sourceText.id === selectedSourceTextId,
 		);
+
 	return (
 		<>
 			<div className="flex items-center justify-between">
@@ -69,6 +69,9 @@ export function ContentWithTranslations({
 							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 							showOriginal={true}
 							showTranslation={true}
+							selectedSourceTextId={selectedSourceTextId}
+							currentUserName={currentUserName}
+							onSelectedRef={setSelectedTranslationEl}
 						/>
 					)}
 				</h1>
@@ -116,30 +119,29 @@ export function ContentWithTranslations({
 					<Loader2 className="w-10 h-10 animate-spin" />
 				</div>
 			) : (
-				<>
-					<MemoizedParsedContent
-						pageWithTranslations={pageWithTranslations}
-						sourceLanguage={pageWithTranslations.page.sourceLanguage}
-						targetLanguage={targetLanguage}
+				<MemoizedParsedContent
+					pageWithTranslations={pageWithTranslations}
+					sourceLanguage={pageWithTranslations.page.sourceLanguage}
+					targetLanguage={targetLanguage}
+					currentUserName={currentUserName}
+					onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
+					showOriginal={showOriginal}
+					showTranslation={showTranslation}
+					selectedSourceTextId={selectedSourceTextId}
+					onSelectedRef={setSelectedTranslationEl}
+				/>
+			)}
+			{selectedSourceTextWithTranslations && selectedTranslationEl && createPortal(
+				<div className="overflow-hidden">
+					<AddAndVoteTranslations
+						key={`add-and-vote-translations-${selectedSourceTextWithTranslations.sourceText.id}`}
+						open={true}
+						onOpenChange={() => handleOpenAddAndVoteTranslations(selectedSourceTextWithTranslations.sourceText.id)}
 						currentUserName={currentUserName}
-						onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
-						showOriginal={showOriginal}
-						showTranslation={showTranslation}
+						sourceTextWithTranslations={selectedSourceTextWithTranslations}
 					/>
-					{selectedSourceTextWithTranslations && (
-						<AddAndVoteTranslations
-							key={`add-and-vote-translations-${selectedSourceTextWithTranslations.sourceText.id}`}
-							open={true}
-							onOpenChange={(open) => {
-								if (!open) {
-									handleCloseAddAndVoteTranslations();
-								}
-							}}
-							currentUserName={currentUserName}
-							sourceTextWithTranslations={selectedSourceTextWithTranslations}
-						/>
-					)}
-				</>
+				</div>,
+				selectedTranslationEl
 			)}
 		</>
 	);
