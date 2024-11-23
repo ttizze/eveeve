@@ -1,6 +1,6 @@
 import { Languages, Plus } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
-import { useRef, useEffect } from "react";
 import type { SourceTextWithTranslations } from "../../types";
 import { sanitizeAndParseText } from "../../utils/sanitize-and-parse-text.client";
 
@@ -20,7 +20,8 @@ export function TranslationSection({
 	onSelectedRef,
 }: TranslationSectionProps) {
 	const isHydrated = useHydrated();
-	const isSelected = selectedSourceTextId === sourceTextWithTranslations.sourceText.id;
+	const isSelected =
+		selectedSourceTextId === sourceTextWithTranslations.sourceText.id;
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	const { bestTranslationWithVote, sourceText } = sourceTextWithTranslations;

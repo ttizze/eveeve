@@ -1,9 +1,9 @@
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import { Loader2, SquarePen } from "lucide-react";
-import { useState, useCallback } from "react";
-import { useHydrated } from "remix-utils/use-hydrated";
+import { useCallback, useState } from "react";
 import { createPortal } from "react-dom";
+import { useHydrated } from "remix-utils/use-hydrated";
 import { Button } from "~/components/ui/button";
 import type {
 	PageWithTranslations,
@@ -39,12 +39,13 @@ export function ContentWithTranslations({
 	const [selectedSourceTextId, setSelectedSourceTextId] = useState<
 		number | null
 	>(null);
-	const [selectedTranslationEl, setSelectedTranslationEl] = useState<HTMLDivElement | null>(null);
+	const [selectedTranslationEl, setSelectedTranslationEl] =
+		useState<HTMLDivElement | null>(null);
 
 	const handleOpenAddAndVoteTranslations = useCallback(
 		(sourceTextId: number) => {
 			setSelectedSourceTextId(
-				sourceTextId === selectedSourceTextId ? null : sourceTextId
+				sourceTextId === selectedSourceTextId ? null : sourceTextId,
 			);
 		},
 		[selectedSourceTextId],
@@ -131,18 +132,24 @@ export function ContentWithTranslations({
 					onSelectedRef={setSelectedTranslationEl}
 				/>
 			)}
-			{selectedSourceTextWithTranslations && selectedTranslationEl && createPortal(
-				<div className="overflow-hidden">
-					<AddAndVoteTranslations
-						key={`add-and-vote-translations-${selectedSourceTextWithTranslations.sourceText.id}`}
-						open={true}
-						onOpenChange={() => handleOpenAddAndVoteTranslations(selectedSourceTextWithTranslations.sourceText.id)}
-						currentUserName={currentUserName}
-						sourceTextWithTranslations={selectedSourceTextWithTranslations}
-					/>
-				</div>,
-				selectedTranslationEl
-			)}
+			{selectedSourceTextWithTranslations &&
+				selectedTranslationEl &&
+				createPortal(
+					<div className="overflow-hidden">
+						<AddAndVoteTranslations
+							key={`add-and-vote-translations-${selectedSourceTextWithTranslations.sourceText.id}`}
+							open={true}
+							onOpenChange={() =>
+								handleOpenAddAndVoteTranslations(
+									selectedSourceTextWithTranslations.sourceText.id,
+								)
+							}
+							currentUserName={currentUserName}
+							sourceTextWithTranslations={selectedSourceTextWithTranslations}
+						/>
+					</div>,
+					selectedTranslationEl,
+				)}
 		</>
 	);
 }
