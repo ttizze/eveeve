@@ -73,46 +73,19 @@ export function EditHeader({
 	}, [fetcher.state, setHasUnsavedChanges]);
 
 	const renderButtonIcon = () => {
-		if (isSubmitting) {
-			return <Loader2 className="w-4 h-4 animate-spin" />;
+		if (hasUnsavedChanges) {
+			return <Loader2 className="w-6 h-6 animate-spin" />;
 		}
-		if (!hasUnsavedChanges) {
-			return <Check className="w-4 h-4" data-testid="save-button-check" />;
-		}
-		return (
-			<>
-				{isPublished ? (
-					<div className="flex justify-center items-center space-x-2 text-sm">
-						<ArrowUpFromLine className="w-4 h-4 mr-2" />
-						Publish
-					</div>
-				) : (
-					<div className="flex justify-center items-center space-x-2 text-sm ">
-						<ArrowDownToLine className="w-4 h-4 mr-2" />
-						Save
-					</div>
-				)}
-			</>
-		);
+		return <Check className="w-6 h-6" data-testid="save-button-check" />;
 	};
 
 	return (
 		<header className="sticky top-0 z-10 p-2 bg-background bg-opacity-50 backdrop-blur-md border-b">
 			<div className="flex items-center justify-between">
 				<div className="flex items-center">
-					<Link
-						to={
-							pageSlug
-								? `/${currentUser?.userName}/page/${pageSlug}`
-								: `/${currentUser?.userName}`
-						}
-						className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white mr-2"
-					>
-						<ArrowLeft className="w-6 h-6 opacity-50" />
-					</Link>
 					<Button
 						type="submit"
-						variant="default"
+						variant="ghost"
 						size="sm"
 						className="rounded-full md:absolute md:left-1/2 md:transform md:-translate-x-1/2"
 						disabled={isSubmitting || !hasUnsavedChanges}
