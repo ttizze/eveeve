@@ -1,24 +1,21 @@
 import type { FieldMetadata } from "@conform-to/react";
 import type { Tag } from "@prisma/client";
 import type { FetcherWithComponents } from "@remix-run/react";
+import { Link } from "@remix-run/react";
+import { Form } from "@remix-run/react";
 import {
-	ArrowDownToLine,
-	ArrowLeft,
-	ArrowUpFromLine,
 	Check,
 	Globe,
 	Hash,
 	Loader2,
 	Lock,
 	LogOutIcon,
-	Search,
 	SettingsIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { MultiValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import type { z } from "zod";
-import { ModeToggle } from "~/components/ModeToggle";
 import { Button } from "~/components/ui/button";
 import {
 	DropdownMenu,
@@ -32,7 +29,6 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "~/components/ui/popover";
-import { Form } from "@remix-run/react";
 import type { SanitizedUser } from "~/types";
 import type { editPageSchema } from "../_edit";
 

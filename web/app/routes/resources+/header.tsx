@@ -58,7 +58,7 @@ export function Header({ currentUser }: HeaderProps) {
 					</Link>
 					{currentUser ? (
 						<>
-					<NewPageButton userName={currentUser.userName} />
+							<NewPageButton userName={currentUser.userName} />
 							<DropdownMenu>
 								<DropdownMenuTrigger>
 									<img
@@ -113,7 +113,6 @@ export function Header({ currentUser }: HeaderProps) {
 									</DropdownMenuItem>
 								</DropdownMenuContent>
 							</DropdownMenu>
-
 						</>
 					) : (
 						<StartButton />
