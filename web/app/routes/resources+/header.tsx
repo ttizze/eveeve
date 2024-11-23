@@ -49,7 +49,7 @@ export function Header({ currentUser }: HeaderProps) {
 				<Link to="/home">
 					<h1 className="text-2xl font-bold">Evame</h1>
 				</Link>
-				<div className="grid grid-cols-2 gap-6 items-center mr-2">
+				<div className="grid grid-cols-3 gap-3 items-center mr-2">
 					<Link
 						to="/search"
 						className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white justify-self-end"
@@ -58,6 +58,7 @@ export function Header({ currentUser }: HeaderProps) {
 					</Link>
 					{currentUser ? (
 						<>
+					<NewPageButton userName={currentUser.userName} />
 							<DropdownMenu>
 								<DropdownMenuTrigger>
 									<img
@@ -81,9 +82,6 @@ export function Header({ currentUser }: HeaderProps) {
 										</Link>
 									</DropdownMenuItem>
 									<DropdownMenuSeparator className="my-0" />
-									<DropdownMenuItem asChild>
-										<NewPageButton userName={currentUser.userName} />
-									</DropdownMenuItem>
 									<DropdownMenuItem asChild>
 										<Link
 											to={`/${currentUser.userName}/settings`}
@@ -115,6 +113,7 @@ export function Header({ currentUser }: HeaderProps) {
 									</DropdownMenuItem>
 								</DropdownMenuContent>
 							</DropdownMenu>
+
 						</>
 					) : (
 						<StartButton />
