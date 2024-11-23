@@ -57,20 +57,34 @@ export function ContentWithTranslations({
 		);
 	return (
 		<>
-			<h1 className="!mb-5">
-				{sourceTitleWithTranslations && (
-					<SourceTextAndTranslationSection
-						sourceTextWithTranslations={sourceTitleWithTranslations}
-						isPublished={pageWithTranslations.page.isPublished}
-						elements={sourceTitleWithTranslations.sourceText.text}
-						sourceLanguage={pageWithTranslations.page.sourceLanguage}
-						targetLanguage={targetLanguage}
-						onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
-						showOriginal={true}
-						showTranslation={true}
-					/>
-				)}
-			</h1>
+			<div className="flex items-center justify-between">
+				<h1 className="!mb-5">
+					{sourceTitleWithTranslations && (
+						<SourceTextAndTranslationSection
+							sourceTextWithTranslations={sourceTitleWithTranslations}
+							isPublished={pageWithTranslations.page.isPublished}
+							elements={sourceTitleWithTranslations.sourceText.text}
+							sourceLanguage={pageWithTranslations.page.sourceLanguage}
+							targetLanguage={targetLanguage}
+							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
+							showOriginal={true}
+							showTranslation={true}
+						/>
+					)}
+				</h1>
+				{pageWithTranslations.user.userName === currentUserName &&
+					currentUserName && (
+						<div className="ml-auto">
+							<Button asChild variant="ghost">
+								<Link
+									to={`/${currentUserName}/page/${pageWithTranslations.page.slug}/edit`}
+								>
+									<SquarePen className="w-5 h-5" />
+								</Link>
+							</Button>
+						</div>
+					)}
+			</div>
 			<TranslateButton
 				pageId={pageWithTranslations.page.id}
 				userAITranslationInfo={userAITranslationInfo}
@@ -96,18 +110,6 @@ export function ContentWithTranslations({
 						</span>
 					</div>
 				</Link>
-				{pageWithTranslations.user.userName === currentUserName &&
-					currentUserName && (
-						<div className="ml-auto">
-							<Button asChild variant="ghost">
-								<Link
-									to={`/${currentUserName}/page/${pageWithTranslations.page.slug}/edit`}
-								>
-									<SquarePen className="w-5 h-5" />
-								</Link>
-							</Button>
-						</div>
-					)}
 			</div>
 			{!isHydrated ? (
 				<div className="w-full h-full flex items-center justify-center">
