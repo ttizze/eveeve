@@ -219,7 +219,7 @@ export default function Page() {
 					showOriginal={showOriginal}
 					showTranslation={showTranslation}
 				/>
-				<div className="flex flex-wrap gap-2">
+				<div className="flex flex-wrap gap-2 pb-4">
 					{pageWithTranslations.tagPages.map((tagPage) => (
 						<div
 							key={tagPage.tag.id}
