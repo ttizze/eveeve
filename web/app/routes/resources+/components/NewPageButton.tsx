@@ -32,7 +32,7 @@ export const NewPageButton = ({ userName }: NewPageButtonProps) => {
 			type="button"
 			onClick={handleNewPage}
 			disabled={isLoading}
-			className="flex cursor-pointer items-center  text-sm"
+			className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white  flex cursor-pointer items-center  text-sm"
 		>
 			{isLoading ? (
 				<Loader2 className="h-6 w-6 animate-spin" />
