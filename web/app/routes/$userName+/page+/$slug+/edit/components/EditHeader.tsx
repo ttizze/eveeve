@@ -6,10 +6,10 @@ import { Form } from "@remix-run/react";
 import {
 	Check,
 	Globe,
-	Hash,
 	Loader2,
 	Lock,
 	LogOutIcon,
+	Settings2,
 	SettingsIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -29,6 +29,8 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "~/components/ui/popover";
+import { Switch } from "~/components/ui/switch";
+import { Badge } from "~/components/ui/badge";
 import type { SanitizedUser } from "~/types";
 import type { editPageSchema } from "../_edit";
 
@@ -42,6 +44,7 @@ interface EditHeaderProps {
 	tagsMeta: FieldMetadata<z.infer<typeof editPageSchema>["tags"]>;
 	initialTags: Tag[];
 	allTags: Tag[];
+	onAutoSave: () => void;
 }
 
 export function EditHeader({
@@ -54,6 +57,7 @@ export function EditHeader({
 	tagsMeta,
 	initialTags,
 	allTags,
+	onAutoSave,
 }: EditHeaderProps) {
 	const isSubmitting = fetcher.state === "submitting";
 	const [isPublished, setIsPublished] = useState(initialIsPublished);
@@ -61,9 +65,20 @@ export function EditHeader({
 		MultiValue<{ value: string; label: string }>
 	>(initialTags.map((tag) => ({ value: tag.name, label: tag.name })));
 
-	const handlePublishToggle = (newPublishState: boolean) => {
-		setIsPublished(newPublishState);
-		setHasUnsavedChanges(true);
+	const handlePublishChange = (checked: boolean) => {
+		const formData = new FormData();
+		const titleInput = document.querySelector<HTMLTextAreaElement>('[data-testid="title-input"]');
+		const editorContent = document.querySelector<HTMLDivElement>('.ProseMirror');
+
+		formData.set("title", titleInput?.value || '');
+		formData.set("pageContent", editorContent?.innerHTML || '');
+		formData.set("isPublished", checked ? "true" : "false");
+		selectedTags.forEach((tag, index) => {
+			formData.set(`${tagsMeta.name}[${index}]`, tag.value);
+		});
+
+		fetcher.submit(formData, { method: "post" });
+		setIsPublished(checked);
 	};
 
 	useEffect(() => {
@@ -74,9 +89,9 @@ export function EditHeader({
 
 	const renderButtonIcon = () => {
 		if (hasUnsavedChanges) {
-			return <Loader2 className="w-6 h-6 animate-spin" />;
+			return <Loader2 className="w-4 h-4 animate-spin" />;
 		}
-		return <Check className="w-6 h-6" data-testid="save-button-check" />;
+		return <Check className="w-4 h-4" data-testid="save-button-check" />;
 	};
 
 	return (
@@ -89,7 +104,7 @@ export function EditHeader({
 						</Link>
 						<Button
 							type="submit"
-							variant="default"
+							variant="ghost"
 							size="sm"
 							className="rounded-full"
 							disabled={isSubmitting || !hasUnsavedChanges}
@@ -112,83 +127,82 @@ export function EditHeader({
 						))}
 					</div>
 					<div className="flex items-center gap-3">
-						<Popover>
-							<PopoverTrigger asChild>
-								<Button
-									variant="ghost"
-									className="text-gray-500"
-									data-testid="tags-button"
-								>
-									<Hash className="w-5 h-5 mr-2 text-gray-500" />
-									{selectedTags.length}
-								</Button>
-							</PopoverTrigger>
-							<PopoverContent className="w-80">
-								<CreatableSelect
-									placeholder="tags"
-									isMulti
-									name={tagsMeta.name}
-									options={allTags.map((tag) => ({
-										value: tag.name,
-										label: tag.name,
-									}))}
-									value={selectedTags}
-									onChange={(value) => {
-										setHasUnsavedChanges(true);
-										setSelectedTags(
-											value as MultiValue<{ value: string; label: string }>,
-										);
-									}}
-									className="bg-transparent text-gray-900 text-sm w-full p-2 focus:outline-none"
-									data-testid="tags-select"
-								/>
-								<p className="text-xs text-gray-500">max 5 tags</p>
-								{tagsMeta.allErrors && (
-									<div>
-										{Object.entries(tagsMeta.allErrors).map(([key, errors]) => (
-											<div key={key}>
-												{errors.map((error) => (
-													<p key={key} className="text-sm text-red-500">
-														{error}
-													</p>
-												))}
-											</div>
-										))}
+						<div className="flex items-center gap-2">
+
+							<Popover>
+								<PopoverTrigger asChild>
+									<Button
+										variant="ghost"
+										size="icon"
+										className="rounded-full"
+										disabled={isSubmitting}
+									>
+										<Settings2 className="w-4 h-4" />
+									</Button>
+								</PopoverTrigger>
+								<PopoverContent className="w-80">
+									<div className="space-y-4">
+										<div>
+											<h3 className="text-sm font-medium mb-3">Tags</h3>
+											<CreatableSelect
+												placeholder="Add tags..."
+												isMulti
+												name={tagsMeta.name}
+												options={allTags.map((tag) => ({
+													value: tag.name,
+													label: tag.name,
+												}))}
+												value={selectedTags}
+												onChange={(value) => {
+													const formData = new FormData();
+													const titleInput = document.querySelector<HTMLTextAreaElement>('[data-testid="title-input"]');
+													const editorContent = document.querySelector<HTMLDivElement>('.ProseMirror');
+
+													formData.set("title", titleInput?.value || '');
+													formData.set("pageContent", editorContent?.innerHTML || '');
+													formData.set("isPublished", isPublished ? "true" : "false");
+													(value as MultiValue<{ value: string; label: string }>).forEach((tag, index) => {
+														formData.set(`${tagsMeta.name}[${index}]`, tag.value);
+													});
+
+													setSelectedTags(value as MultiValue<{ value: string; label: string }>);
+													fetcher.submit(formData, { method: "post" });
+												}}
+												className="bg-transparent text-gray-900 text-sm w-full"
+												data-testid="tags-select"
+											/>
+											<p className="text-xs text-gray-500 mt-2">max 5 tags</p>
+											{tagsMeta.allErrors && (
+												<div className="mt-2">
+													{Object.entries(tagsMeta.allErrors).map(([key, errors]) => (
+														<div key={key}>
+															{errors.map((error) => (
+																<p key={error} className="text-sm text-red-500">
+																	{error}
+																</p>
+															))}
+														</div>
+													))}
+												</div>
+											)}
+										</div>
 									</div>
+								</PopoverContent>
+							</Popover>
+							<div className="flex items-center gap-2 bg-secondary/50 rounded-full px-3 py-1.5">
+								{isPublished ? (
+									<Globe className="w-4 h-4" />
+								) : (
+									<Lock className="w-4 h-4" />
 								)}
-							</PopoverContent>
-						</Popover>
-						<DropdownMenu modal={false}>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant="ghost"
-									className="ml-auto"
-									type="button"
-									data-testid="change-publish-button"
-								>
-									{isPublished ? (
-										<Globe className="w-5 h-5 mr-2" />
-									) : (
-										<Lock className="w-5 h-5 text-gray-500 mr-2" />
-									)}
-									{isPublished ? (
-										"Public"
-									) : (
-										<span className="text-gray-500">Private</span>
-									)}
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
-								<DropdownMenuItem onSelect={() => handlePublishToggle(false)}>
-									<Lock className="mr-2 h-4 w-4" />
-									<span className="text-gray-500">Set to Private</span>
-								</DropdownMenuItem>
-								<DropdownMenuItem onSelect={() => handlePublishToggle(true)}>
-									<Globe className="mr-2 h-4 w-4" data-testid="public-button" />
-									<span>Set to Public</span>
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
+								<Switch
+									checked={isPublished}
+									onCheckedChange={handlePublishChange}
+									disabled={isSubmitting}
+									data-testid="publish-switch"
+								/>
+							</div>
+						</div>
 						<DropdownMenu>
 							<DropdownMenuTrigger>
 								<img

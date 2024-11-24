@@ -21,7 +21,7 @@ export function configureEditor(initialContent: string) {
 				autolink: true,
 			}),
 			Placeholder.configure({
-				placeholder: "input content...",
+				placeholder: "Write to world...",
 			}),
 			Image,
 			FileHandler.configure({

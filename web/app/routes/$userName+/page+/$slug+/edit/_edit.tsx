@@ -169,11 +169,11 @@ export default function EditPage() {
 		formData.set("title", fields.title.value as string);
 		formData.set("pageContent", fields.pageContent.value as string);
 		formData.set("isPublished", fields.isPublished.value as string);
-		const tags = fields.tags.value as string[];
+		const tags = fields.tags.value;
 		if (Array.isArray(tags)) {
-			for (const tag of tags) {
-				formData.append("tags[]", tag);
-			}
+			tags.forEach((tag, index) => {
+				formData.set(`${fields.tags.name}[${index}]`, tag as string);
+			});
 		}
 		if (fetcher.state !== "submitting") {
 			fetcher.submit(formData, { method: "post" });
@@ -212,6 +212,7 @@ export default function EditPage() {
 							})) || []
 						}
 						allTags={allTags}
+						onAutoSave={handleAutoSave}
 					/>
 
 					<div className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg mt-2 md:mt-20 mx-auto px-2 prose-headings:text-gray-700 prose-headings:dark:text-gray-200 text-gray-700 dark:text-gray-200">
@@ -220,7 +221,7 @@ export default function EditPage() {
 								<TextareaAutosize
 									{...getTextareaProps(fields.title)}
 									defaultValue={title}
-									placeholder="input title..."
+									placeholder="Title"
 									className="w-full outline-none bg-transparent resize-none overflow-hidden"
 									minRows={1}
 									maxRows={10}
@@ -234,7 +235,6 @@ export default function EditPage() {
 								</p>
 							))}
 						</div>
-						<hr className="!mt-2 !mb-1" />
 						<div className="mt-12">
 							<Editor
 								initialContent={page?.content || ""}
