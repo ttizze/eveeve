@@ -30,7 +30,6 @@ import {
 	PopoverTrigger,
 } from "~/components/ui/popover";
 import { Switch } from "~/components/ui/switch";
-import { Badge } from "~/components/ui/badge";
 import type { SanitizedUser } from "~/types";
 import type { editPageSchema } from "../_edit";
 
@@ -67,11 +66,14 @@ export function EditHeader({
 
 	const handlePublishChange = (checked: boolean) => {
 		const formData = new FormData();
-		const titleInput = document.querySelector<HTMLTextAreaElement>('[data-testid="title-input"]');
-		const editorContent = document.querySelector<HTMLDivElement>('.ProseMirror');
+		const titleInput = document.querySelector<HTMLTextAreaElement>(
+			'[data-testid="title-input"]',
+		);
+		const editorContent =
+			document.querySelector<HTMLDivElement>(".ProseMirror");
 
-		formData.set("title", titleInput?.value || '');
-		formData.set("pageContent", editorContent?.innerHTML || '');
+		formData.set("title", titleInput?.value || "");
+		formData.set("pageContent", editorContent?.innerHTML || "");
 		formData.set("isPublished", checked ? "true" : "false");
 		selectedTags.forEach((tag, index) => {
 			formData.set(`${tagsMeta.name}[${index}]`, tag.value);
@@ -128,7 +130,6 @@ export function EditHeader({
 					</div>
 					<div className="flex items-center gap-3">
 						<div className="flex items-center gap-2">
-
 							<Popover>
 								<PopoverTrigger asChild>
 									<Button
@@ -155,17 +156,42 @@ export function EditHeader({
 												value={selectedTags}
 												onChange={(value) => {
 													const formData = new FormData();
-													const titleInput = document.querySelector<HTMLTextAreaElement>('[data-testid="title-input"]');
-													const editorContent = document.querySelector<HTMLDivElement>('.ProseMirror');
+													const titleInput =
+														document.querySelector<HTMLTextAreaElement>(
+															'[data-testid="title-input"]',
+														);
+													const editorContent =
+														document.querySelector<HTMLDivElement>(
+															".ProseMirror",
+														);
 
-													formData.set("title", titleInput?.value || '');
-													formData.set("pageContent", editorContent?.innerHTML || '');
-													formData.set("isPublished", isPublished ? "true" : "false");
-													(value as MultiValue<{ value: string; label: string }>).forEach((tag, index) => {
-														formData.set(`${tagsMeta.name}[${index}]`, tag.value);
+													formData.set("title", titleInput?.value || "");
+													formData.set(
+														"pageContent",
+														editorContent?.innerHTML || "",
+													);
+													formData.set(
+														"isPublished",
+														isPublished ? "true" : "false",
+													);
+													(
+														value as MultiValue<{
+															value: string;
+															label: string;
+														}>
+													).forEach((tag, index) => {
+														formData.set(
+															`${tagsMeta.name}[${index}]`,
+															tag.value,
+														);
 													});
 
-													setSelectedTags(value as MultiValue<{ value: string; label: string }>);
+													setSelectedTags(
+														value as MultiValue<{
+															value: string;
+															label: string;
+														}>,
+													);
 													fetcher.submit(formData, { method: "post" });
 												}}
 												className="bg-transparent text-gray-900 text-sm w-full"
@@ -174,15 +200,20 @@ export function EditHeader({
 											<p className="text-xs text-gray-500 mt-2">max 5 tags</p>
 											{tagsMeta.allErrors && (
 												<div className="mt-2">
-													{Object.entries(tagsMeta.allErrors).map(([key, errors]) => (
-														<div key={key}>
-															{errors.map((error) => (
-																<p key={error} className="text-sm text-red-500">
-																	{error}
-																</p>
-															))}
-														</div>
-													))}
+													{Object.entries(tagsMeta.allErrors).map(
+														([key, errors]) => (
+															<div key={key}>
+																{errors.map((error) => (
+																	<p
+																		key={error}
+																		className="text-sm text-red-500"
+																	>
+																		{error}
+																	</p>
+																))}
+															</div>
+														),
+													)}
 												</div>
 											)}
 										</div>
