@@ -1,4 +1,4 @@
-import { Text, Languages } from "lucide-react";
+import { Languages, Text } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { LikeButton } from "~/routes/resources+/like-button";

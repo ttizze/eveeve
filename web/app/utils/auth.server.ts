@@ -22,7 +22,7 @@ if (!MAGIC_LINK_SECRET) {
 const authenticator = new Authenticator<SanitizedUser>(sessionStorage);
 
 function generateTemporaryUserName() {
-  return `new-${crypto.randomUUID().slice(0, 10)}-${new Date().toISOString().slice(0, 10)}`;
+	return `new-${crypto.randomUUID().slice(0, 10)}-${new Date().toISOString().slice(0, 10)}`;
 }
 
 const formStrategy = new FormStrategy(async ({ form }) => {
