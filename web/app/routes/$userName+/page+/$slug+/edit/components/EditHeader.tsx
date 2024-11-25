@@ -32,7 +32,7 @@ import {
 import { Switch } from "~/components/ui/switch";
 import type { SanitizedUser } from "~/types";
 import type { editPageSchema } from "../_edit";
-
+import { ModeToggle } from "~/components/ModeToggle";
 interface EditHeaderProps {
 	currentUser: SanitizedUser;
 	pageSlug: string | undefined;
@@ -266,6 +266,9 @@ export function EditHeader({
 										Settings
 									</Link>
 								</DropdownMenuItem>
+								<DropdownMenuItem asChild>
+										<ModeToggle />
+									</DropdownMenuItem>
 								<DropdownMenuItem asChild>
 									<Form
 										method="post"
