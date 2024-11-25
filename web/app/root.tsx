@@ -109,9 +109,9 @@ function App() {
 	const { locale } = useLoaderData<typeof loader>();
 	useChangeLanguage(locale);
 	const location = useLocation();
-	const isSpecialLayout =
-		/^\/\w+\/page\/[\w-]+\/edit$/.test(location.pathname) ||
-		location.pathname === "/welcome";
+	const isSpecialLayout = /^\/[\w-]+\/page\/[\w-]+\/edit$/.test(
+		location.pathname,
+	);
 
 	return (
 		<ThemeProvider attribute="class" defaultTheme="system" enableSystem>

@@ -1,4 +1,4 @@
-import { json } from "@remix-run/node";
+import { data } from "@remix-run/node";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Link } from "@remix-run/react";
@@ -39,7 +39,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		return redirect("/auth/login");
 	}
 
-	return json({ error: "Invalid intent" }, { status: 400 });
+	return data({ error: "Invalid intent" }, { status: 400 });
 }
 
 export function Header({ currentUser }: HeaderProps) {
@@ -49,7 +49,9 @@ export function Header({ currentUser }: HeaderProps) {
 				<Link to="/home">
 					<h1 className="text-2xl font-bold">Evame</h1>
 				</Link>
-				<div className="grid grid-cols-3 gap-3 items-center mr-2">
+				<div
+					className={`grid ${currentUser ? "grid-cols-3" : "grid-cols-2"} gap-3 items-center mr-2`}
+				>
 					<Link
 						to="/search"
 						className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white justify-self-end"
