@@ -1,5 +1,6 @@
 import { Extension } from "@tiptap/core";
 
+//sourceTextIdを付与したpage.contentを保存するために使用する
 export const CustomDataAttribute = Extension.create({
 	name: "customDataAttribute",
 	addGlobalAttributes() {

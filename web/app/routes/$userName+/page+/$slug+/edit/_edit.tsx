@@ -17,6 +17,7 @@ import { z } from "zod";
 import { authenticator } from "~/utils/auth.server";
 import { EditHeader } from "./components/EditHeader";
 import { Editor } from "./components/editor/Editor";
+import type { Editor as TiptapEditor } from "@tiptap/react";
 import {
 	createOrUpdatePage,
 	createOrUpdateSourceTexts,
@@ -112,8 +113,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	);
 
 	const sourceLanguage = await getPageSourceLanguage(numberedContent, title);
-	//翻訳との結びつきを維持するため、sourceTextIdを付与したpage.contentを保存し、sourceTextのnumberが変わってもsourceTextIdで紐付けられるようにしている。
-	//そのため、sourceTextIdを付与したpage.contentを保存しなければならないが、createOrUpdateSourceTextsでpageIdを使用するため､ここで一旦pageを作成する
+	//編集でsourceTextのnumberが変わってもtranslateTextとsourceTextを紐付けられるよう、sourceTextIdを付与したpage.contentを保存する必要がある。
+	//createOrUpdateSourceTextsでpageIdを使用するため､ここで一旦pageを保存し､後にsourceTextIdを付与したpage.contentを再度保存する。
 	const page = await createOrUpdatePage(
 		currentUser.id,
 		slug,
@@ -147,6 +148,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function EditPage() {
 	const { currentUser, page, allTags, title } = useLoaderData<typeof loader>();
 	const fetcher = useFetcher<typeof action>();
+	const [editorInstance, setEditorInstance] = useState<TiptapEditor | null>(null);
+
 	const [form, fields] = useForm({
 		onValidate({ formData }) {
 			return parseWithZod(formData, { schema: editPageSchema });
@@ -193,6 +196,16 @@ export default function EditPage() {
 		}
 	}, [fetcher.state]);
 
+	const handleTitleKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			if (editorInstance) {
+				editorInstance.commands.focus();
+				editorInstance.commands.setHardBreak();
+			}
+		}
+	};
+
 	return (
 		<div>
 			<FormProvider context={form.context}>
@@ -226,6 +239,7 @@ export default function EditPage() {
 									maxRows={10}
 									onChange={(e) => handleContentChange()}
 									data-testid="title-input"
+									onKeyDown={handleTitleKeyDown}
 								/>
 							</h1>
 							{fields.title.errors?.map((error) => (
@@ -238,6 +252,7 @@ export default function EditPage() {
 							<Editor
 								initialContent={page?.content || ""}
 								onContentChange={handleContentChange}
+								setEditor={setEditorInstance}
 							/>
 							{fields.pageContent.errors?.map((error) => (
 								<p className="text-sm text-red-500" key={error}>
