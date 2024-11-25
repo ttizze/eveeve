@@ -49,7 +49,12 @@ export function TranslateButton({
 									{navigation.state === "submitting" ? (
 										<LoadingSpinner />
 									) : (
-										<Languages className="w-4 h-4" />
+										<>
+											<Languages className="w-4 h-4" />
+											<span className="ml-1 hidden md:block">
+												Translate
+											</span>
+										</>
 									)}
 								</Button>
 							) : (
