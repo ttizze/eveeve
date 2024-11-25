@@ -35,7 +35,12 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 		0,
 		200,
 	);
-	const imageUrl = pageWithTranslations.user.icon;
+	const firstImageMatch = pageWithTranslations.page.content.match(
+		/<img[^>]+src="([^">]+)"/,
+	);
+	const imageUrl = firstImageMatch
+		? firstImageMatch[1]
+		: pageWithTranslations.user.icon;
 
 	return [
 		{ title: sourceTitleWithBestTranslationTitle },
@@ -44,7 +49,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 		{ property: "og:title", content: sourceTitleWithBestTranslationTitle },
 		{ property: "og:description", content: description },
 		{ property: "og:image", content: imageUrl },
-		{ name: "twitter:card", content: "summary" },
+		{ name: "twitter:card", content: "summary_large_image" },
 		{ name: "twitter:title", content: sourceTitleWithBestTranslationTitle },
 		{ name: "twitter:description", content: description },
 		{ name: "twitter:image", content: imageUrl },
