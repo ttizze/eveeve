@@ -10,7 +10,11 @@ interface EditorProps {
 	setEditor?: (editor: ReturnType<typeof useEditor>) => void;
 }
 
-export function Editor({ initialContent, onContentChange, setEditor }: EditorProps) {
+export function Editor({
+	initialContent,
+	onContentChange,
+	setEditor,
+}: EditorProps) {
 	const pageContentControl = useInputControl({
 		name: "pageContent",
 		formId: "edit-page",

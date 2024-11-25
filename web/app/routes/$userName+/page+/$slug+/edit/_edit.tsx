@@ -9,6 +9,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
 import { useLoaderData } from "@remix-run/react";
+import type { Editor as TiptapEditor } from "@tiptap/react";
 import { useState } from "react";
 import { useCallback, useEffect } from "react";
 import TextareaAutosize from "react-textarea-autosize";
@@ -17,7 +18,6 @@ import { z } from "zod";
 import { authenticator } from "~/utils/auth.server";
 import { EditHeader } from "./components/EditHeader";
 import { Editor } from "./components/editor/Editor";
-import type { Editor as TiptapEditor } from "@tiptap/react";
 import {
 	createOrUpdatePage,
 	createOrUpdateSourceTexts,
@@ -148,7 +148,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function EditPage() {
 	const { currentUser, page, allTags, title } = useLoaderData<typeof loader>();
 	const fetcher = useFetcher<typeof action>();
-	const [editorInstance, setEditorInstance] = useState<TiptapEditor | null>(null);
+	const [editorInstance, setEditorInstance] = useState<TiptapEditor | null>(
+		null,
+	);
 
 	const [form, fields] = useForm({
 		onValidate({ formData }) {
@@ -197,7 +199,7 @@ export default function EditPage() {
 	}, [fetcher.state]);
 
 	const handleTitleKeyDown = (e: React.KeyboardEvent) => {
-		if (e.key === 'Enter') {
+		if (e.key === "Enter") {
 			e.preventDefault();
 			if (editorInstance) {
 				editorInstance.commands.focus();
