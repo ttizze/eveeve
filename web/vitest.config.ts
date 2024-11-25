@@ -1,6 +1,6 @@
 import * as path from "node:path";
+import dotenv from "dotenv";
 import * as VitestConfig from "vitest/config";
-import dotenv from 'dotenv';
 
 export default VitestConfig.defineConfig({
 	test: {
