@@ -38,7 +38,7 @@ export default defineConfig({
 		tsconfigPaths(),
 		sentryVitePlugin({
 			org: "reimei",
-			project: "eveeve",
+			project: "evame",
 			url: "https://sentry.io/",
 			sourcemaps: {
 				filesToDeleteAfterUpload: "true",
