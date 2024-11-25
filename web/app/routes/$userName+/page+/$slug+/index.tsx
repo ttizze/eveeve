@@ -35,11 +35,12 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 		0,
 		200,
 	);
-	const firstImageMatch = pageWithTranslations.page.content.match(/<img[^>]+src="([^">]+)"/);
-	const imageUrl = firstImageMatch 
-		? firstImageMatch[1] 
+	const firstImageMatch = pageWithTranslations.page.content.match(
+		/<img[^>]+src="([^">]+)"/,
+	);
+	const imageUrl = firstImageMatch
+		? firstImageMatch[1]
 		: pageWithTranslations.user.icon;
-
 
 	return [
 		{ title: sourceTitleWithBestTranslationTitle },
