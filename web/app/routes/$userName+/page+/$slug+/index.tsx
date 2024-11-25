@@ -219,16 +219,6 @@ export default function Page() {
 					showOriginal={showOriginal}
 					showTranslation={showTranslation}
 				/>
-				<div className="flex flex-wrap gap-2 pb-4">
-					{pageWithTranslations.tagPages.map((tagPage) => (
-						<div
-							key={tagPage.tag.id}
-							className="text-sm text-muted-foreground rounded-md px-2 py-1 bg-muted"
-						>
-							{tagPage.tag.name}
-						</div>
-					))}
-				</div>
 				<LikeButton
 					liked={isLikedByUser}
 					likeCount={likeCount}
