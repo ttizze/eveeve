@@ -51,9 +51,7 @@ export function TranslateButton({
 									) : (
 										<>
 											<Languages className="w-4 h-4" />
-											<span className="ml-1 hidden md:block">
-												Translate
-											</span>
+											<span className="ml-1 hidden md:block">Translate</span>
 										</>
 									)}
 								</Button>
