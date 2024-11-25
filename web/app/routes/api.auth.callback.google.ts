@@ -18,6 +18,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		});
 	} catch (error) {
 		console.error("Google authentication error:", error);
-		return new Response("Authentication failed", { status: 500 });
+		throw error;
 	}
 }
