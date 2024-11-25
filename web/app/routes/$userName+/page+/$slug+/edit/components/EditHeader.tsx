@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import type { MultiValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import type { z } from "zod";
+import { ModeToggle } from "~/components/ModeToggle";
 import { Button } from "~/components/ui/button";
 import {
 	DropdownMenu,
@@ -32,7 +33,6 @@ import {
 import { Switch } from "~/components/ui/switch";
 import type { SanitizedUser } from "~/types";
 import type { editPageSchema } from "../_edit";
-
 interface EditHeaderProps {
 	currentUser: SanitizedUser;
 	pageSlug: string | undefined;
@@ -265,6 +265,9 @@ export function EditHeader({
 										<SettingsIcon className="w-4 h-4" />
 										Settings
 									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem asChild>
+									<ModeToggle />
 								</DropdownMenuItem>
 								<DropdownMenuItem asChild>
 									<Form
