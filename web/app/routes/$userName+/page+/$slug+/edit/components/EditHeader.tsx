@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import type { MultiValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import type { z } from "zod";
+import { ModeToggle } from "~/components/ModeToggle";
 import { Button } from "~/components/ui/button";
 import {
 	DropdownMenu,
@@ -32,7 +33,6 @@ import {
 import { Switch } from "~/components/ui/switch";
 import type { SanitizedUser } from "~/types";
 import type { editPageSchema } from "../_edit";
-import { ModeToggle } from "~/components/ModeToggle";
 interface EditHeaderProps {
 	currentUser: SanitizedUser;
 	pageSlug: string | undefined;
@@ -267,8 +267,8 @@ export function EditHeader({
 									</Link>
 								</DropdownMenuItem>
 								<DropdownMenuItem asChild>
-										<ModeToggle />
-									</DropdownMenuItem>
+									<ModeToggle />
+								</DropdownMenuItem>
 								<DropdownMenuItem asChild>
 									<Form
 										method="post"
