@@ -2,7 +2,6 @@ import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { BubbleMenu, type Editor as TiptapEditor } from "@tiptap/react";
 import {
 	Bold,
-	Brackets,
 	ChevronDown,
 	Code,
 	Heading2,
@@ -78,15 +77,9 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
 			isActive: () => editor.isActive("blockquote"),
 		},
 		{
-			value: "code",
-			label: "Code",
-			icon: Code,
-			isActive: () => editor.isActive("code"),
-		},
-		{
 			value: "codeBlock",
 			label: "Code Block",
-			icon: Brackets,
+			icon: Code,
 			isActive: () => editor.isActive("codeBlock"),
 		},
 		{
