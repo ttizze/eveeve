@@ -30,9 +30,9 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "~/components/ui/popover";
-import { Switch } from "~/components/ui/switch";
 import type { SanitizedUser } from "~/types";
 import type { editPageSchema } from "../_edit";
+
 interface EditHeaderProps {
 	currentUser: SanitizedUser;
 	pageSlug: string | undefined;
@@ -64,7 +64,7 @@ export function EditHeader({
 		MultiValue<{ value: string; label: string }>
 	>(initialTags.map((tag) => ({ value: tag.name, label: tag.name })));
 
-	const handlePublishChange = (checked: boolean) => {
+	const handlePublishChange = (newPublishState: boolean) => {
 		const formData = new FormData();
 		const titleInput = document.querySelector<HTMLTextAreaElement>(
 			'[data-testid="title-input"]',
@@ -74,13 +74,13 @@ export function EditHeader({
 
 		formData.set("title", titleInput?.value || "");
 		formData.set("pageContent", editorContent?.innerHTML || "");
-		formData.set("isPublished", checked ? "true" : "false");
+		formData.set("isPublished", newPublishState ? "true" : "false");
 		selectedTags.forEach((tag, index) => {
 			formData.set(`${tagsMeta.name}[${index}]`, tag.value);
 		});
 
 		fetcher.submit(formData, { method: "post" });
-		setIsPublished(checked);
+		setIsPublished(newPublishState);
 	};
 
 	useEffect(() => {
@@ -98,7 +98,7 @@ export function EditHeader({
 
 	return (
 		<header className="z-10">
-			<div className="max-w-7xl mx-auto py-2 md:py-4 px-2 md:px-6 lg:px-8">
+			<div className="max-w-7xl mx-auto py-2.5 md:py-4 px-4 md:px-6 lg:px-8">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-4">
 						<Link to="/home" className="text-2xl font-bold">
@@ -108,7 +108,7 @@ export function EditHeader({
 							type="submit"
 							variant="ghost"
 							size="sm"
-							className="rounded-full"
+							className="rounded-full hover:bg-secondary/80"
 							disabled={isSubmitting || !hasUnsavedChanges}
 							data-testid="save-button"
 						>
@@ -128,14 +128,14 @@ export function EditHeader({
 							/>
 						))}
 					</div>
-					<div className="flex items-center gap-3">
-						<div className="flex items-center gap-2">
+					<div className="flex items-center gap-4">
+						<div className="flex items-center gap-3">
 							<Popover>
 								<PopoverTrigger asChild>
 									<Button
 										variant="ghost"
 										size="icon"
-										className="rounded-full"
+										className="rounded-full hover:bg-secondary/80"
 										disabled={isSubmitting}
 									>
 										<Settings2 className="w-4 h-4" />
@@ -220,19 +220,45 @@ export function EditHeader({
 									</div>
 								</PopoverContent>
 							</Popover>
-							<div className="flex items-center gap-2 bg-secondary/50 rounded-full px-3 py-1.5">
-								{isPublished ? (
-									<Globe className="w-4 h-4" />
-								) : (
-									<Lock className="w-4 h-4" />
-								)}
-								<Switch
-									checked={isPublished}
-									onCheckedChange={handlePublishChange}
-									disabled={isSubmitting}
-									data-testid="publish-switch"
-								/>
-							</div>
+							<Popover>
+								<PopoverTrigger asChild>
+									<Button
+										variant={isPublished ? "default" : "secondary"}
+										size="sm"
+										className="rounded-full flex items-center gap-2 px-4 py-2 transition-colors duration-400"
+										disabled={isSubmitting}
+									>
+										{isPublished ? (
+											<Globe className="w-4 h-4" />
+										) : (
+											<Lock className="w-4 h-4" />
+										)}
+										<span>{isPublished ? "Public" : "Private"}</span>
+									</Button>
+								</PopoverTrigger>
+								<PopoverContent className="w-32 rounded-xl p-1" align="end">
+									<div className="space-y-1 p-1">
+										<button
+											type="button"
+											className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors duration-200 hover:bg-secondary/80 disabled:opacity-50 disabled:pointer-events-none"
+											onClick={() => handlePublishChange(true)}
+											disabled={isPublished}
+										>
+											<Globe className="w-4 h-4" />
+											<span>Public</span>
+										</button>
+										<button
+											type="button"
+											className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors duration-200 hover:bg-secondary/80 disabled:opacity-50 disabled:pointer-events-none"
+											onClick={() => handlePublishChange(false)}
+											disabled={!isPublished}
+										>
+											<Lock className="w-4 h-4" />
+											<span>Private</span>
+										</button>
+									</div>
+								</PopoverContent>
+							</Popover>
 						</div>
 						<DropdownMenu>
 							<DropdownMenuTrigger>

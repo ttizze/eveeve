@@ -21,7 +21,10 @@ if (!MAGIC_LINK_SECRET) {
 
 const authenticator = new Authenticator<SanitizedUser>(sessionStorage);
 
-const temporaryUserName = `new-${crypto.randomUUID().slice(0, 10)}-${new Date().toISOString().slice(0, 10)}`;
+function generateTemporaryUserName() {
+	return `new-${crypto.randomUUID().slice(0, 10)}-${new Date().toISOString().slice(0, 10)}`;
+}
+
 const formStrategy = new FormStrategy(async ({ form }) => {
 	const email = form.get("email");
 	const password = form.get("password");
@@ -69,7 +72,7 @@ const googleStrategy = new GoogleStrategy<SanitizedUser>(
 		const newUser = await prisma.user.create({
 			data: {
 				email: profile.emails[0].value || "",
-				userName: temporaryUserName,
+				userName: generateTemporaryUserName(),
 				displayName: profile.displayName || "New User",
 				icon: profile.photos[0].value || "",
 				provider: "Google",
@@ -100,7 +103,7 @@ const magicLinkStrategy = new EmailLinkStrategy(
 			data: {
 				email: String(email),
 				icon: `${process.env.CLIENT_URL}/avatar.png`,
-				userName: temporaryUserName,
+				userName: generateTemporaryUserName(),
 				displayName: String(email).split("@")[0],
 				provider: "MagicLink",
 			},

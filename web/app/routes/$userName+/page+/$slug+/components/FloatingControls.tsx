@@ -1,4 +1,4 @@
-import { FileText, Languages } from "lucide-react";
+import { Languages, Text } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { LikeButton } from "~/routes/resources+/like-button";
@@ -62,22 +62,20 @@ export function FloatingControls({
 				variant="ghost"
 				size="icon"
 				className={cn(
-					"h-12 w-12 rounded-full border bg-background relative",
-					showOriginal &&
-						"after:absolute after:w-full after:h-[1px] after:bg-current after:top-1/2 after:left-0 after:origin-center after:-rotate-45",
+					"h-12 w-12 rounded-full border bg-background relative after:absolute after:w-full after:h-[1px] after:bg-current after:top-1/2 after:left-0 after:origin-center after:-rotate-45",
+					showOriginal && "after:opacity-50",
 				)}
 				onClick={onToggleOriginal}
 				title={showOriginal ? "Hide original text" : "Show original text"}
 			>
-				<FileText className={cn("h-5 w-5", showOriginal && "opacity-50")} />
+				<Text className={cn("h-5 w-5", showOriginal && "opacity-50")} />
 			</Button>
 			<Button
 				variant="ghost"
 				size="icon"
 				className={cn(
-					"h-12 w-12 rounded-full border bg-background relative",
-					showTranslation &&
-						"after:absolute after:w-full after:h-[1px] after:bg-current after:top-1/2 after:left-0 after:origin-center after:-rotate-45",
+					"h-12 w-12 rounded-full border bg-background relative after:absolute after:w-full after:h-[1px] after:bg-current after:top-1/2 after:left-0 after:origin-center after:-rotate-45",
+					showTranslation && "after:opacity-50",
 				)}
 				onClick={onToggleTranslation}
 				title={showTranslation ? "Hide translation" : "Show translation"}

@@ -35,7 +35,12 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 		0,
 		200,
 	);
-	const imageUrl = pageWithTranslations.user.icon;
+	const firstImageMatch = pageWithTranslations.page.content.match(
+		/<img[^>]+src="([^">]+)"/,
+	);
+	const imageUrl = firstImageMatch
+		? firstImageMatch[1]
+		: pageWithTranslations.user.icon;
 
 	return [
 		{ title: sourceTitleWithBestTranslationTitle },
@@ -44,7 +49,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 		{ property: "og:title", content: sourceTitleWithBestTranslationTitle },
 		{ property: "og:description", content: description },
 		{ property: "og:image", content: imageUrl },
-		{ name: "twitter:card", content: "summary" },
+		{ name: "twitter:card", content: "summary_large_image" },
 		{ name: "twitter:title", content: sourceTitleWithBestTranslationTitle },
 		{ name: "twitter:description", content: description },
 		{ name: "twitter:image", content: imageUrl },
@@ -219,16 +224,6 @@ export default function Page() {
 					showOriginal={showOriginal}
 					showTranslation={showTranslation}
 				/>
-				<div className="flex flex-wrap gap-2 pb-4">
-					{pageWithTranslations.tagPages.map((tagPage) => (
-						<div
-							key={tagPage.tag.id}
-							className="text-sm text-muted-foreground rounded-md px-2 py-1 bg-muted"
-						>
-							{tagPage.tag.name}
-						</div>
-					))}
-				</div>
 				<LikeButton
 					liked={isLikedByUser}
 					likeCount={likeCount}

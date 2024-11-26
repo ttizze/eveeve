@@ -117,6 +117,16 @@ export function ContentWithTranslations({
 				</div>
 			) : (
 				<>
+					<div className="flex flex-wrap gap-2 py-4">
+						{pageWithTranslations.tagPages.map((tagPage) => (
+							<div
+								key={tagPage.tag.id}
+								className="text-sm text-muted-foreground rounded-md px-2 py-1 bg-muted"
+							>
+								{tagPage.tag.name}
+							</div>
+						))}
+					</div>
 					<MemoizedParsedContent
 						pageWithTranslations={pageWithTranslations}
 						sourceLanguage={pageWithTranslations.page.sourceLanguage}
