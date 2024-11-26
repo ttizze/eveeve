@@ -86,8 +86,8 @@ export function EditorFloatingMenu({ editor }: EditorFloatingMenuProps) {
 				<div className="floating-menu">
 					<div ref={containerRef}>
 						<DropdownMenuPrimitive.Root modal={false}>
-							<DropdownMenuPrimitive.Trigger className="flex h-8 w-8 items-center justify-center rounded-full border bg-background text-muted-foreground hover:bg-secondary hover:text-foreground">
-								<Plus className="h-4 w-4" />
+							<DropdownMenuPrimitive.Trigger className="flex h-10 w-10 items-center justify-center rounded-full border bg-background text-muted-foreground hover:bg-secondary hover:text-foreground">
+								<Plus className="h-5 w-5" />
 							</DropdownMenuPrimitive.Trigger>
 							<DropdownMenuPrimitive.Portal container={containerRef.current}>
 								<DropdownMenuPrimitive.Content
