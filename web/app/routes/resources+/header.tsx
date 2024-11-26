@@ -1,14 +1,15 @@
-import { json } from "@remix-run/node";
+import { data } from "@remix-run/node";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
-import { HomeIcon, LogOutIcon, Search } from "lucide-react";
+import { LogOutIcon, Search, SettingsIcon } from "lucide-react";
 import { StartButton } from "~/components/StartButton";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import type { SanitizedUser } from "~/types";
@@ -38,7 +39,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		return redirect("/auth/login");
 	}
 
-	return json({ error: "Invalid intent" }, { status: 400 });
+	return data({ error: "Invalid intent" }, { status: 400 });
 }
 
 export function Header({ currentUser }: HeaderProps) {
@@ -48,15 +49,18 @@ export function Header({ currentUser }: HeaderProps) {
 				<Link to="/home">
 					<h1 className="text-2xl font-bold">Evame</h1>
 				</Link>
-				<div className="grid grid-cols-2 gap-6 items-center mr-2">
+				<div
+					className={`grid ${currentUser ? "grid-cols-3" : "grid-cols-2"} gap-3 items-center mr-2`}
+				>
 					<Link
 						to="/search"
-						className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white justify-self-center"
+						className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white justify-self-end"
 					>
-						<Search className="w-6 h-6" />
+						<Search className="w-6 h-6 " />
 					</Link>
 					{currentUser ? (
 						<>
+							<NewPageButton userName={currentUser.userName} />
 							<DropdownMenu>
 								<DropdownMenuTrigger>
 									<img
@@ -67,15 +71,26 @@ export function Header({ currentUser }: HeaderProps) {
 								</DropdownMenuTrigger>
 								<DropdownMenuContent className="m-2 p-0 rounded-xl min-w-40">
 									<DropdownMenuItem asChild>
-										<NewPageButton userName={currentUser.userName} />
-									</DropdownMenuItem>
-									<DropdownMenuItem asChild>
 										<Link
 											to={`/${currentUser.userName}`}
-											className="w-full rounded-none flex items-center gap-2 justify-start  text-left px-6 py-4 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+											className="w-full rounded-none  px-4 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
 										>
-											<HomeIcon className="w-4 h-4" />
-											Home
+											<div className="flex flex-col items-start">
+												{currentUser.displayName}
+												<span className="text-xs text-gray-500">
+													@{currentUser.userName}
+												</span>
+											</div>
+										</Link>
+									</DropdownMenuItem>
+									<DropdownMenuSeparator className="my-0" />
+									<DropdownMenuItem asChild>
+										<Link
+											to={`/${currentUser.userName}/settings`}
+											className="w-full rounded-none flex items-center gap-2 justify-start  text-left px-4 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+										>
+											<SettingsIcon className="w-4 h-4" />
+											Settings
 										</Link>
 									</DropdownMenuItem>
 									<DropdownMenuItem asChild>
@@ -91,7 +106,7 @@ export function Header({ currentUser }: HeaderProps) {
 												type="submit"
 												name="intent"
 												value="logout"
-												className="w-full gap-2 flex cursor-pointer items-center  px-6 py-4 text-sm hover:bg-accent hover:text-accent-foreground text-red-500"
+												className="w-full gap-2 flex cursor-pointer items-center  px-4 py-3 text-sm hover:bg-accent hover:text-accent-foreground text-red-500"
 											>
 												<LogOutIcon className="w-4 h-4" />
 												Log out

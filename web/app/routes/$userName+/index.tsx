@@ -42,6 +42,7 @@ import {
 	PaginationPrevious,
 } from "~/components/ui/pagination";
 import i18nServer from "~/i18n.server";
+import { LikeButton } from "~/routes/resources+/like-button";
 import { authenticator } from "~/utils/auth.server";
 import {
 	archivePage,
@@ -158,10 +159,10 @@ export default function UserPage() {
 	};
 
 	return (
-		<div className="container mx-auto">
-			<div className="mb-6 rounded-3xl w-full overflow-hidden ">
-				<div className="grid grid-cols-4 gap-4 p-4">
-					<div className="col-span-1 flex  justify-start">
+		<div className="">
+			<div className="mb-6 w-full overflow-hidden ">
+				<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+					<div className=" flex  justify-start">
 						<Link to={`${sanitizedUserWithPages.icon}`}>
 							<Avatar className="w-32 h-32">
 								<AvatarImage
@@ -174,7 +175,7 @@ export default function UserPage() {
 							</Avatar>
 						</Link>
 					</div>
-					<div className="col-span-3">
+					<div className="md:col-span-3">
 						<CardHeader className="p-0">
 							<CardTitle className="text-2xl font-bold flex justify-between items-center">
 								<div>{sanitizedUserWithPages.displayName}</div>
@@ -233,19 +234,28 @@ export default function UserPage() {
 								</DropdownMenuContent>
 							</DropdownMenu>
 						)}
-						<Link
-							to={`/${sanitizedUserWithPages.userName}/page/${page.slug}`}
-							key={page.id}
-							className="h-full"
-						>
-							<CardHeader>
+						<CardHeader>
+							<Link
+								to={`/${sanitizedUserWithPages.userName}/page/${page.slug}`}
+								key={page.id}
+								className="h-full"
+							>
 								<CardTitle className="flex items-center pr-3 break-all overflow-wrap-anywhere">
 									{page.isPublished ? "" : <Lock className="h-4 w-4 mr-2" />}
 									{page.title}
 								</CardTitle>
-								<CardDescription>{page.createdAt}</CardDescription>
-							</CardHeader>
-						</Link>
+							</Link>
+							<CardDescription>{page.createdAt}</CardDescription>
+						</CardHeader>
+						<CardContent className="flex justify-end">
+							<LikeButton
+								liked={page.likePages.length > 0}
+								likeCount={page._count.likePages}
+								slug={page.slug}
+								showCount
+								className=" justify-self-end"
+							/>
+						</CardContent>
 					</Card>
 				))}
 			</div>

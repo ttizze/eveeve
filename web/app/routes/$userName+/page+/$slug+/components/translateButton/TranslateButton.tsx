@@ -5,11 +5,11 @@ import { Languages } from "lucide-react";
 import { useState } from "react";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Button } from "~/components/ui/button";
-import { AIModelSelector } from "~/features/translate/components/AIModelSelector";
+import { GeminiApiKeyDialog } from "~/routes/resources+/gemini-api-key-dialog";
 import TargetLanguageSelector from "./TargetLanguageSelector";
+import { TranslateSettingsButton } from "./TranslateSettingsButton";
 import { UserAITranslationStatus } from "./UserAITranslationStatus";
 
-import { GeminiApiKeyDialog } from "~/routes/resources+/gemini-api-key-dialog";
 type TranslateButtonProps = {
 	pageId: number;
 	userAITranslationInfo: UserAITranslationInfo | null;
@@ -29,16 +29,11 @@ export function TranslateButton({
 
 	return (
 		<>
-			<div className="mb-5  rounded-xl px-4 py-4 bg-gray-100 dark:bg-gray-900 shadow-md dark:shadow-gray-800">
+			<div className="mb-5">
 				<div className="flex flex-col space-y-2">
-					<div className="flex items-center space-x-1 h-10">
+					<div className="flex items-center space-x-1">
 						<TargetLanguageSelector targetLanguage={targetLanguage} />
-						<AIModelSelector
-							onModelSelect={setSelectedModel}
-							className="bg-background"
-						/>
-					</div>
-					<div className="h-full">
+						<TranslateSettingsButton onModelSelect={setSelectedModel} />
 						<Form method="post" className="h-full">
 							<input type="hidden" name="pageId" value={pageId} />
 							<input type="hidden" name="aiModel" value={selectedModel} />
@@ -47,22 +42,21 @@ export function TranslateButton({
 									type="submit"
 									name="intent"
 									value="translate"
-									className="w-full h-full"
+									size="default"
+									variant="default"
 									disabled={navigation.state === "submitting"}
 								>
 									{navigation.state === "submitting" ? (
 										<LoadingSpinner />
 									) : (
-										<div className="flex items-center justify-center w-full">
-											<Languages className="w-5 h-5" />
-										</div>
+										<>
+											<Languages className="w-4 h-4" />
+											<span className="ml-1 hidden md:block">Translate</span>
+										</>
 									)}
 								</Button>
 							) : (
-								<Button
-									onClick={() => setIsDialogOpen(true)}
-									className="w-full h-full"
-								>
+								<Button onClick={() => setIsDialogOpen(true)} size="default">
 									<div className="flex items-center justify-center w-full">
 										<Languages className="w-5 h-5" />
 									</div>

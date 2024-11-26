@@ -8,6 +8,10 @@ export async function fetchSanitizedUserWithPages(
 	pageSize = 9,
 ) {
 	const skip = (page - 1) * pageSize;
+	const userID = await prisma.user.findUnique({
+		where: { userName },
+		select: { id: true },
+	});
 	const [user, totalCount] = await Promise.all([
 		prisma.user.findUnique({
 			where: { userName },
@@ -18,6 +22,19 @@ export async function fetchSanitizedUserWithPages(
 						slug: true,
 						isPublished: true,
 						createdAt: true,
+						likePages: {
+							where: {
+								userId: userID?.id,
+							},
+							select: {
+								userId: true,
+							},
+						},
+						_count: {
+							select: {
+								likePages: true,
+							},
+						},
 						sourceTexts: {
 							where: {
 								number: 0,

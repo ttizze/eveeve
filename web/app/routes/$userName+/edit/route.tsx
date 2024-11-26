@@ -20,6 +20,7 @@ import { Label } from "~/components/ui/label";
 import { validateGeminiApiKey } from "~/features/translate/services/gemini";
 import { uploadImage } from "~/routes/$userName+/utils/uploadImage";
 import { authenticator } from "~/utils/auth.server";
+import { cn } from "~/utils/cn";
 import { sanitizeUser } from "~/utils/sanitizeUser";
 import { commitSession, getSession } from "~/utils/session.server";
 import { updateUser } from "./functions/mutations.server";
@@ -44,10 +45,12 @@ const schema = z.object({
 			/^[a-zA-Z][a-zA-Z0-9-]*$/,
 			"Must start with a alphabet and can only contain alphabets, numbers, and hyphens",
 		)
-		.refine(
-			(name) => !RESERVED_USERNAMES.includes(name.toLowerCase()),
-			"This username cannot be used",
-		)
+		.refine((name) => {
+			const isReserved = RESERVED_USERNAMES.some(
+				(reserved) => reserved.toLowerCase() === name.toLowerCase(),
+			);
+			return !isReserved;
+		}, "This username cannot be used")
 		.refine(
 			(name) => !/^\d+$/.test(name),
 			"Username cannot consist of only numbers",
@@ -211,15 +214,19 @@ export default function EditProfile() {
 								{showUsernameInput ? "Cancel" : "Edit Username"}
 							</Button>
 						</div>
-						{showUsernameInput && (
-							<code className="flex items-center gap-2 px-2 mt-2 py-1 bg-gray-200 dark:bg-gray-800 rounded-lg">
-								evame.tech/
-								<Input
-									{...getInputProps(fields.userName, { type: "text" })}
-									className=" border rounded-lg bg-white dark:bg-black/50 focus:outline-none"
-								/>
-							</code>
-						)}
+
+						<code
+							className={cn(
+								"flex items-center gap-2 px-2 mt-2 py-1 bg-gray-200 dark:bg-gray-800 rounded-lg",
+								showUsernameInput ? "block" : "hidden",
+							)}
+						>
+							evame.tech/
+							<Input
+								{...getInputProps(fields.userName, { type: "text" })}
+								className=" border rounded-lg bg-white dark:bg-black/50 focus:outline-none"
+							/>
+						</code>
 						<div
 							id={fields.userName.errorId}
 							className="text-red-500 text-sm mt-1"
@@ -298,8 +305,10 @@ export default function EditProfile() {
 							</span>
 						)}
 					</Button>
-					{form.errors && (
-						<p className="text-red-500 text-center mt-2">{form.errors}</p>
+					{form.allErrors && (
+						<p className="text-red-500 text-center mt-2">
+							{Object.values(form.allErrors).join(", ")}
+						</p>
 					)}
 				</Form>
 			</div>
