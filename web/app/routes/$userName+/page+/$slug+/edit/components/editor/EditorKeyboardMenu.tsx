@@ -4,14 +4,16 @@ import {
 	Heading2,
 	Heading3,
 	Heading4,
+	ImageIcon,
 	IndentDecrease,
 	IndentIncrease,
 	List,
 	ListOrdered,
-	Quote,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "~/utils/cn";
+import { handleFileUpload } from "./useFileUpload";
+
 interface EditorKeyboardMenuProps {
 	editor: TiptapEditor;
 }
@@ -38,22 +40,15 @@ export function EditorKeyboardMenu({ editor }: EditorKeyboardMenuProps) {
 				h2: editor.isActive("heading", { level: 2 }),
 				h3: editor.isActive("heading", { level: 3 }),
 				h4: editor.isActive("heading", { level: 4 }),
-				bold: editor.isActive("bold"),
-				italic: editor.isActive("italic"),
-				strike: editor.isActive("strike"),
 				code: editor.isActive("code"),
 				bulletList: editor.isActive("bulletList"),
 				orderedList: editor.isActive("orderedList"),
-				blockquote: editor.isActive("blockquote"),
-				// インデントはエディターの状態に基づかない
 				indent: false,
 				outdent: false,
 			});
 		};
 
-		// 初期状態を設定
 		updateHandler();
-		// エディターの変更を監視
 		editor.on("update", updateHandler);
 		return () => {
 			editor.off("update", updateHandler);
@@ -92,12 +87,6 @@ export function EditorKeyboardMenu({ editor }: EditorKeyboardMenuProps) {
 			isActive: () => editor.isActive("heading", { level: 4 }),
 		},
 		{
-			value: "blockquote",
-			label: "Blockquote",
-			icon: Quote,
-			isActive: () => editor.isActive("blockquote"),
-		},
-		{
 			value: "code",
 			label: "Code",
 			icon: Code,
@@ -118,31 +107,56 @@ export function EditorKeyboardMenu({ editor }: EditorKeyboardMenuProps) {
 	];
 
 	return (
-		<footer className="sticky bottom-0 w-full h-[48px] md:hidden bg-background border-t border-border">
-			{items.map(({ value, icon: Icon, isActive, label }) => (
+		<>
+			<footer className="sticky bottom-0 w-full h-[48px] md:hidden bg-background border-t border-border">
+				{items.map(({ value, icon: Icon, isActive, label }) => (
+					<button
+						key={value}
+						type="button"
+						onClick={(e) => {
+							e.preventDefault();
+							editorCommands[value](editor);
+							setActiveStates((prev) => ({
+								...prev,
+								[value]: !prev[value],
+							}));
+						}}
+						onMouseDown={(e) => e.preventDefault()}
+						className={cn(
+							"rounded-md inline-flex h-[48px] px-2 items-center justify-center text-sm text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 touch-manipulation",
+							"active:bg-secondary active:text-foreground",
+							(isActive() || activeStates[value]) &&
+								"bg-secondary text-foreground",
+						)}
+						title={label}
+					>
+						<Icon className="h-6 w-6" />
+					</button>
+				))}
 				<button
-					key={value}
 					type="button"
-					onClick={(e) => {
-						e.preventDefault();
-						editorCommands[value](editor);
-						setActiveStates((prev) => ({
-							...prev,
-							[value]: !prev[value],
-						}));
-					}}
-					onMouseDown={(e) => e.preventDefault()}
+					onClick={() =>
+						document.getElementById("keyboardImageUpload")?.click()
+					}
 					className={cn(
-						"rounded-md inline-flex h-[48px]  px-2 items-center justify-center text-sm text-muted-foreground transition-colors  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 touch-manipulation",
+						"rounded-md inline-flex h-[48px] px-1 items-center justify-center text-sm text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 touch-manipulation",
 						"active:bg-secondary active:text-foreground",
-						(isActive() || activeStates[value]) &&
-							"bg-secondary text-foreground",
 					)}
-					title={label}
+					title="Insert Image"
 				>
-					<Icon className="h-6 w-6 " />
+					<ImageIcon className="h-6 w-6" />
 				</button>
-			))}
-		</footer>
+			</footer>
+			<input
+				id="keyboardImageUpload"
+				type="file"
+				accept="image/*"
+				onChange={(e) => {
+					const file = e.target.files?.[0];
+					if (file) handleFileUpload(file, editor);
+				}}
+				style={{ display: "none" }}
+			/>
+		</>
 	);
 }
