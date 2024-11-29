@@ -5,6 +5,7 @@ import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
 import { LogOutIcon, Search, SettingsIcon } from "lucide-react";
 import { StartButton } from "~/components/StartButton";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -16,7 +17,6 @@ import type { SanitizedUser } from "~/types";
 import { authenticator } from "~/utils/auth.server";
 import { ModeToggle } from "../../components/ModeToggle";
 import { NewPageButton } from "./components/NewPageButton";
-
 interface HeaderProps {
 	currentUser: SanitizedUser | null;
 }
@@ -68,11 +68,15 @@ export function Header({ currentUser }: HeaderProps) {
 							<NewPageButton userName={currentUser.userName} />
 							<DropdownMenu>
 								<DropdownMenuTrigger>
-									<img
-										src={currentUser.icon}
-										alt={currentUser.displayName}
-										className="w-6 h-6 rounded-full"
-									/>
+									<Avatar className="w-6 h-6">
+										<AvatarImage
+											src={currentUser.icon}
+											alt={currentUser.displayName}
+										/>
+										<AvatarFallback>
+											{currentUser.displayName.charAt(0).toUpperCase()}
+										</AvatarFallback>
+									</Avatar>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent className="m-2 p-0 rounded-xl min-w-40">
 									<DropdownMenuItem asChild>

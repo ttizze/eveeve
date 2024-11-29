@@ -4,6 +4,7 @@ import { Loader2, SquarePen } from "lucide-react";
 import { useState } from "react";
 import { useCallback } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import type {
 	PageWithTranslations,
@@ -92,21 +93,25 @@ export function ContentWithTranslations({
 						key={tagPage.tag.id}
 						className="text-sm text-muted-foreground rounded-full px-3 py-1 bg-muted"
 					>
-						{tagPage.tag.name}
+						# {tagPage.tag.name}
 					</div>
 				))}
 			</div>
 
-			<div className="flex items-center">
+			<div className="flex items-center not-prose">
 				<Link
 					to={`/${pageWithTranslations.user.userName}`}
-					className=" flex items-center mr-2 !no-underline hover:text-gray-700"
+					className="flex items-center mr-2 !no-underline hover:text-gray-700"
 				>
-					<img
-						src={pageWithTranslations.user.icon}
-						alt="Icon"
-						className="w-14 h-14 rounded-full object-cover mr-3 !my-0"
-					/>
+					<Avatar className="w-12 h-12 flex-shrink-0 mr-3 ">
+						<AvatarImage
+							src={pageWithTranslations.user.icon}
+							alt={pageWithTranslations.user.displayName}
+						/>
+						<AvatarFallback>
+							{pageWithTranslations.user.displayName.charAt(0).toUpperCase()}
+						</AvatarFallback>
+					</Avatar>
 					<div className="flex flex-col">
 						<span className="text-sm">
 							{pageWithTranslations.user.displayName}
