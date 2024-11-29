@@ -29,7 +29,7 @@ export function TranslateButton({
 
 	return (
 		<>
-			<div className="mb-5">
+			<div className="py-2">
 				<div className="flex flex-col space-y-2">
 					<div className="flex items-center space-x-1">
 						<TargetLanguageSelector targetLanguage={targetLanguage} />

@@ -58,7 +58,7 @@ export function ContentWithTranslations({
 	return (
 		<>
 			<div className="flex items-center justify-between">
-				<h1 className="!mb-5">
+				<h1 className="!mb-0">
 					{sourceTitleWithTranslations && (
 						<SourceTextAndTranslationSection
 							sourceTextWithTranslations={sourceTitleWithTranslations}
@@ -67,11 +67,12 @@ export function ContentWithTranslations({
 							sourceLanguage={pageWithTranslations.page.sourceLanguage}
 							targetLanguage={targetLanguage}
 							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
-							showOriginal={true}
-							showTranslation={true}
+							showOriginal={showOriginal}
+							showTranslation={showTranslation}
 						/>
 					)}
 				</h1>
+
 				{pageWithTranslations.user.userName === currentUserName &&
 					currentUserName && (
 						<div className="ml-auto">
@@ -84,6 +85,16 @@ export function ContentWithTranslations({
 							</Button>
 						</div>
 					)}
+			</div>
+			<div className="flex flex-wrap gap-2 py-2">
+				{pageWithTranslations.tagPages.map((tagPage) => (
+					<div
+						key={tagPage.tag.id}
+						className="text-sm text-muted-foreground rounded-full px-3 py-1 bg-muted"
+					>
+						{tagPage.tag.name}
+					</div>
+				))}
 			</div>
 			<TranslateButton
 				pageId={pageWithTranslations.page.id}
@@ -117,16 +128,6 @@ export function ContentWithTranslations({
 				</div>
 			) : (
 				<>
-					<div className="flex flex-wrap gap-2 py-4">
-						{pageWithTranslations.tagPages.map((tagPage) => (
-							<div
-								key={tagPage.tag.id}
-								className="text-sm text-muted-foreground rounded-md px-2 py-1 bg-muted"
-							>
-								{tagPage.tag.name}
-							</div>
-						))}
-					</div>
 					<MemoizedParsedContent
 						pageWithTranslations={pageWithTranslations}
 						sourceLanguage={pageWithTranslations.page.sourceLanguage}
