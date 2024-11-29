@@ -86,7 +86,7 @@ export function ContentWithTranslations({
 						</div>
 					)}
 			</div>
-			<div className="flex flex-wrap gap-2 py-2">
+			<div className="flex flex-wrap gap-2 pt-2 pb-3">
 				{pageWithTranslations.tagPages.map((tagPage) => (
 					<div
 						key={tagPage.tag.id}
@@ -96,12 +96,7 @@ export function ContentWithTranslations({
 					</div>
 				))}
 			</div>
-			<TranslateButton
-				pageId={pageWithTranslations.page.id}
-				userAITranslationInfo={userAITranslationInfo}
-				hasGeminiApiKey={hasGeminiApiKey}
-				targetLanguage={targetLanguage}
-			/>
+
 			<div className="flex items-center">
 				<Link
 					to={`/${pageWithTranslations.user.userName}`}
@@ -110,7 +105,7 @@ export function ContentWithTranslations({
 					<img
 						src={pageWithTranslations.user.icon}
 						alt="Icon"
-						className="w-14 h-14 rounded-full object-cover mx-3 !my-0"
+						className="w-14 h-14 rounded-full object-cover mr-3 !my-0"
 					/>
 					<div className="flex flex-col">
 						<span className="text-sm">
@@ -122,6 +117,12 @@ export function ContentWithTranslations({
 					</div>
 				</Link>
 			</div>
+			<TranslateButton
+				pageId={pageWithTranslations.page.id}
+				userAITranslationInfo={userAITranslationInfo}
+				hasGeminiApiKey={hasGeminiApiKey}
+				targetLanguage={targetLanguage}
+			/>
 			{!isHydrated ? (
 				<div className="w-full h-full flex items-center justify-center">
 					<Loader2 className="w-10 h-10 animate-spin" />
