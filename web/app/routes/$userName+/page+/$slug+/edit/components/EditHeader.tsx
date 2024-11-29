@@ -101,8 +101,13 @@ export function EditHeader({
 			<div className="max-w-7xl mx-auto py-2.5 md:py-4 px-4 md:px-6 lg:px-8">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-4">
-						<Link to="/home" className="text-2xl font-bold">
-							Evame
+						<Link to="/home">
+							<img
+								src="/logo.svg"
+								alt="Evame"
+								className="h-8 w-auto  dark:invert"
+								aria-label="Evame Logo"
+							/>
 						</Link>
 						<Button
 							type="submit"
