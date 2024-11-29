@@ -27,7 +27,8 @@ export function SourceTextAndTranslationSection({
 			{showOriginal && (
 				<span
 					className={`inline-block ${
-						sourceTextWithTranslations.translationsWithVotes.length === 0
+						sourceTextWithTranslations.translationsWithVotes.length === 0 ||
+						!showTranslation
 							? "text-gray-700 dark:text-gray-200"
 							: "text-gray-300 dark:text-gray-600"
 					} ${sourceTextClassName}`}
