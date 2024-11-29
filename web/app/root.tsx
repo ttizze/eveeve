@@ -57,6 +57,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 	const data = useRouteLoaderData<typeof loader>("root");
 	const { gaTrackingId, locale } = data ?? {};
 	const location = useLocation();
+	const isEditorPage = /^\/[\w-]+\/page\/[\w-]+\/edit$/.test(location.pathname);
+
 	useEffect(() => {
 		if (gaTrackingId?.length) {
 			gtag.pageview(location.pathname, gaTrackingId);
@@ -68,12 +70,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
 				<meta charSet="utf-8" />
 				<meta
 					name="viewport"
-					content="width=device-width, initial-scale=1, maximum-scale=1"
+					content="width=device-width, initial-scale=1, interactive-widget=resizes-content, maximum-scale=1"
 				/>
 				<Meta />
 				<Links />
 			</head>
-			<body className="flex flex-col min-h-screen transition-colors duration-300">
+			<body
+				className={`flex flex-col min-h-svh transition-colors duration-300 ${isEditorPage ? "overflow-hidden " : null}`}
+			>
 				{!gaTrackingId ? null : (
 					<>
 						<script
