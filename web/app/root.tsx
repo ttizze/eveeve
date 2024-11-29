@@ -73,6 +73,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 					content="width=device-width, initial-scale=1, interactive-widget=resizes-content, maximum-scale=1"
 				/>
 				<Meta />
+				<link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
+				<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 				<Links />
 			</head>
 			<body

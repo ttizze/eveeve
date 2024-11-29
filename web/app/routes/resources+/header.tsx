@@ -47,7 +47,12 @@ export function Header({ currentUser }: HeaderProps) {
 		<header className="z-10 ">
 			<div className="max-w-7xl mx-auto py-2 md:py-4 px-2 md:px-6 lg:px-8 flex justify-between items-center">
 				<Link to="/home">
-					<h1 className="text-2xl font-bold">Evame</h1>
+				<img
+            src="/logo.svg"
+            alt="Evame"
+            className="h-8 w-auto  dark:invert"
+            aria-label="Evame Logo"
+          />
 				</Link>
 				<div
 					className={`grid ${currentUser ? "grid-cols-3" : "grid-cols-2"} gap-3 items-center mr-2`}
