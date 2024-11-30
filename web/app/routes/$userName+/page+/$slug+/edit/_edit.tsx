@@ -17,6 +17,7 @@ import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
 import { authenticator } from "~/utils/auth.server";
 import { EditHeader } from "./components/EditHeader";
+import { TagInput } from "./components/TagInput";
 import { Editor } from "./components/editor/Editor";
 import { EditorKeyboardMenu } from "./components/editor/EditorKeyboardMenu";
 import {
@@ -104,7 +105,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	const { title, pageContent, isPublished, tags } = submission.value;
 	const isPublishedBool = isPublished === "true";
 	const titleSourceTextId = await getTitleSourceTextId(slug);
-	//tiptapが既存の要素を引き継いで重複したsourceTextIdを追加してしまうため、重複を削除
 	const numberedContent = await removeSourceTextIdDuplicatesAndEmptyElements(
 		addNumbersToContent(pageContent),
 	);
@@ -115,8 +115,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	);
 
 	const sourceLanguage = await getPageSourceLanguage(numberedContent, title);
-	//翻訳との結びつきを維持するため、sourceTextIdを付与したpage.contentを保存し、sourceTextのnumberが変わってもsourceTextIdで紐付けられるようにしている。
-	//そのため、sourceTextIdを付与したpage.contentを保存しなければならないが、createOrUpdateSourceTextsでpageIdを使用するため､ここで一旦pageを作成する
 	const page = await createOrUpdatePage(
 		currentUser.id,
 		slug,
@@ -219,18 +217,10 @@ export default function EditPage() {
 						fetcher={fetcher}
 						hasUnsavedChanges={hasUnsavedChanges}
 						setHasUnsavedChanges={setHasUnsavedChanges}
-						tagsMeta={fields.tags}
-						initialTags={
-							page?.tagPages.map((tagPage) => ({
-								id: tagPage.tagId,
-								name: tagPage.tag.name,
-							})) || []
-						}
-						allTags={allTags}
 						onAutoSave={handleAutoSave}
 					/>
 					<div
-						className=" w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg 
+						className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg 
 						md:mt-20 mx-auto px-2 prose-headings:text-gray-700 prose-headings:dark:text-gray-200 text-gray-700 dark:text-gray-200"
 						style={{
 							minHeight: isKeyboardVisible
@@ -256,6 +246,20 @@ export default function EditPage() {
 									{error}
 								</p>
 							))}
+							<TagInput
+								tagsMeta={fields.tags}
+								initialTags={
+									page?.tagPages.map((tagPage) => ({
+										id: tagPage.tagId,
+										name: tagPage.tag.name,
+									})) || []
+								}
+								allTags={allTags}
+								onTagsChange={(tags) => {
+									setHasUnsavedChanges(true);
+									debouncedAutoSave();
+								}}
+							/>
 						</div>
 						<Editor
 							initialContent={page?.content || ""}
