@@ -28,22 +28,18 @@ import type { SanitizedUser } from "~/types";
 
 interface EditHeaderProps {
 	currentUser: SanitizedUser;
-	pageSlug: string | undefined;
 	initialIsPublished: boolean | undefined;
 	fetcher: FetcherWithComponents<unknown>;
 	hasUnsavedChanges: boolean;
 	setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
-	onAutoSave: () => void;
 }
 
 export function EditHeader({
 	currentUser,
-	pageSlug,
 	initialIsPublished,
 	fetcher,
 	hasUnsavedChanges,
 	setHasUnsavedChanges,
-	onAutoSave,
 }: EditHeaderProps) {
 	const isSubmitting = fetcher.state === "submitting";
 	const [isPublished, setIsPublished] = useState(initialIsPublished);

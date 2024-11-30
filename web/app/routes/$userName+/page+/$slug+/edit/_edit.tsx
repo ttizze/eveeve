@@ -153,7 +153,9 @@ export default function EditPage() {
 	const [editorInstance, setEditorInstance] = useState<TiptapEditor | null>(
 		null,
 	);
-
+	const [currentTags, setCurrentTags] = useState<string[]>(
+		page?.tagPages.map((tagPage) => tagPage.tag.name) || []
+	);
 	const [form, fields] = useForm({
 		onValidate({ formData }) {
 			return parseWithZod(formData, { schema: editPageSchema });
@@ -176,16 +178,13 @@ export default function EditPage() {
 		formData.set("title", fields.title.value as string);
 		formData.set("pageContent", fields.pageContent.value as string);
 		formData.set("isPublished", fields.isPublished.value as string);
-		const tags = fields.tags.value;
-		if (Array.isArray(tags)) {
-			tags.forEach((tag, index) => {
-				formData.set(`${fields.tags.name}[${index}]`, tag as string);
-			});
-		}
+		currentTags.forEach((tag, index) => {
+			formData.set(`${fields.tags.name}[${index}]`, tag);
+		});
 		if (fetcher.state !== "submitting") {
 			fetcher.submit(formData, { method: "post" });
 		}
-	}, [fetcher, fields]);
+	}, [fetcher, fields, currentTags]);
 
 	const debouncedAutoSave = useDebouncedCallback(handleAutoSave, 1000);
 
@@ -212,12 +211,10 @@ export default function EditPage() {
 				<fetcher.Form method="post" {...getFormProps(form)}>
 					<EditHeader
 						currentUser={currentUser}
-						pageSlug={page?.slug}
 						initialIsPublished={page?.isPublished}
 						fetcher={fetcher}
 						hasUnsavedChanges={hasUnsavedChanges}
 						setHasUnsavedChanges={setHasUnsavedChanges}
-						onAutoSave={handleAutoSave}
 					/>
 					<div
 						className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg 
@@ -256,6 +253,7 @@ export default function EditPage() {
 								}
 								allTags={allTags}
 								onTagsChange={(tags) => {
+									setCurrentTags(tags);
 									setHasUnsavedChanges(true);
 									debouncedAutoSave();
 								}}

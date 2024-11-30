@@ -34,7 +34,6 @@ export function TagInput({
 
 	const handleRemoveTag = (tagToRemove: string) => {
 		const updatedTags = tags.filter((tag) => tag !== tagToRemove);
-		console.log();
 		setTags(updatedTags);
 		onTagsChange(updatedTags);
 	};
