@@ -154,7 +154,7 @@ export default function EditPage() {
 		null,
 	);
 	const [currentTags, setCurrentTags] = useState<string[]>(
-		page?.tagPages.map((tagPage) => tagPage.tag.name) || []
+		page?.tagPages.map((tagPage) => tagPage.tag.name) || [],
 	);
 	const [form, fields] = useForm({
 		onValidate({ formData }) {
