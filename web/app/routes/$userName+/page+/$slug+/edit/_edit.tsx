@@ -156,6 +156,10 @@ export default function EditPage() {
 	const [currentTags, setCurrentTags] = useState<string[]>(
 		page?.tagPages.map((tagPage) => tagPage.tag.name) || [],
 	);
+	const [currentIsPublished, setCurrentIsPublished] = useState(
+		page?.isPublished,
+	);
+
 	const [form, fields] = useForm({
 		onValidate({ formData }) {
 			return parseWithZod(formData, { schema: editPageSchema });
@@ -177,14 +181,14 @@ export default function EditPage() {
 		const formData = new FormData();
 		formData.set("title", fields.title.value as string);
 		formData.set("pageContent", fields.pageContent.value as string);
-		formData.set("isPublished", fields.isPublished.value as string);
+		formData.set("isPublished", currentIsPublished?.toString() || "false");
 		currentTags.forEach((tag, index) => {
 			formData.set(`${fields.tags.name}[${index}]`, tag);
 		});
 		if (fetcher.state !== "submitting") {
 			fetcher.submit(formData, { method: "post" });
 		}
-	}, [fetcher, fields, currentTags]);
+	}, [fetcher, fields, currentTags, currentIsPublished]);
 
 	const debouncedAutoSave = useDebouncedCallback(handleAutoSave, 1000);
 
@@ -214,7 +218,10 @@ export default function EditPage() {
 						initialIsPublished={page?.isPublished}
 						fetcher={fetcher}
 						hasUnsavedChanges={hasUnsavedChanges}
-						setHasUnsavedChanges={setHasUnsavedChanges}
+						onPublishChange={(isPublished) => {
+							setCurrentIsPublished(isPublished);
+							handleContentChange();
+						}}
 					/>
 					<div
 						className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg 
@@ -254,8 +261,7 @@ export default function EditPage() {
 								allTags={allTags}
 								onTagsChange={(tags) => {
 									setCurrentTags(tags);
-									setHasUnsavedChanges(true);
-									debouncedAutoSave();
+									handleContentChange();
 								}}
 							/>
 						</div>

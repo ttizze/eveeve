@@ -9,7 +9,7 @@ import {
 	LogOutIcon,
 	SettingsIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ModeToggle } from "~/components/ModeToggle";
 import { Button } from "~/components/ui/button";
 import {
@@ -31,7 +31,7 @@ interface EditHeaderProps {
 	initialIsPublished: boolean | undefined;
 	fetcher: FetcherWithComponents<unknown>;
 	hasUnsavedChanges: boolean;
-	setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
+	onPublishChange: (isPublished: boolean) => void;
 }
 
 export function EditHeader({
@@ -39,32 +39,15 @@ export function EditHeader({
 	initialIsPublished,
 	fetcher,
 	hasUnsavedChanges,
-	setHasUnsavedChanges,
+	onPublishChange,
 }: EditHeaderProps) {
 	const isSubmitting = fetcher.state === "submitting";
 	const [isPublished, setIsPublished] = useState(initialIsPublished);
 
 	const handlePublishChange = (newPublishState: boolean) => {
-		const formData = new FormData();
-		const titleInput = document.querySelector<HTMLTextAreaElement>(
-			'[data-testid="title-input"]',
-		);
-		const editorContent =
-			document.querySelector<HTMLDivElement>(".ProseMirror");
-
-		formData.set("title", titleInput?.value || "");
-		formData.set("pageContent", editorContent?.innerHTML || "");
-		formData.set("isPublished", newPublishState ? "true" : "false");
-
-		fetcher.submit(formData, { method: "post" });
 		setIsPublished(newPublishState);
+		onPublishChange(newPublishState);
 	};
-
-	useEffect(() => {
-		if (fetcher.state === "loading") {
-			setHasUnsavedChanges(false);
-		}
-	}, [fetcher.state, setHasUnsavedChanges]);
 
 	const renderButtonIcon = () => {
 		if (hasUnsavedChanges) {
@@ -75,8 +58,8 @@ export function EditHeader({
 
 	return (
 		<header className="z-10  w-full ">
-			<div className="max-w-7xl mx-auto py-2.5 md:py-4 px-4 md:px-6 lg:px-8">
-				<div className="flex items-center justify-between">
+			<div className="max-w-7xl mx-auto py-2 md:py-4 px-2 md:px-6 lg:px-8 flex justify-between items-center">
+				<div className="flex items-center w-full justify-between">
 					<div className="flex items-center gap-4">
 						<Link to="/home">
 							<img
