@@ -1,5 +1,3 @@
-import type { FieldMetadata } from "@conform-to/react";
-import type { Tag } from "@prisma/client";
 import type { FetcherWithComponents } from "@remix-run/react";
 import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
@@ -9,13 +7,9 @@ import {
 	Loader2,
 	Lock,
 	LogOutIcon,
-	Settings2,
 	SettingsIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import type { MultiValue } from "react-select";
-import CreatableSelect from "react-select/creatable";
-import type { z } from "zod";
+import { useState } from "react";
 import { ModeToggle } from "~/components/ModeToggle";
 import { Button } from "~/components/ui/button";
 import {
@@ -31,63 +25,29 @@ import {
 	PopoverTrigger,
 } from "~/components/ui/popover";
 import type { SanitizedUser } from "~/types";
-import type { editPageSchema } from "../_edit";
 
 interface EditHeaderProps {
 	currentUser: SanitizedUser;
-	pageSlug: string | undefined;
 	initialIsPublished: boolean | undefined;
 	fetcher: FetcherWithComponents<unknown>;
 	hasUnsavedChanges: boolean;
-	setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
-	tagsMeta: FieldMetadata<z.infer<typeof editPageSchema>["tags"]>;
-	initialTags: Tag[];
-	allTags: Tag[];
-	onAutoSave: () => void;
+	onPublishChange: (isPublished: boolean) => void;
 }
 
 export function EditHeader({
 	currentUser,
-	pageSlug,
 	initialIsPublished,
 	fetcher,
 	hasUnsavedChanges,
-	setHasUnsavedChanges,
-	tagsMeta,
-	initialTags,
-	allTags,
-	onAutoSave,
+	onPublishChange,
 }: EditHeaderProps) {
 	const isSubmitting = fetcher.state === "submitting";
 	const [isPublished, setIsPublished] = useState(initialIsPublished);
-	const [selectedTags, setSelectedTags] = useState<
-		MultiValue<{ value: string; label: string }>
-	>(initialTags.map((tag) => ({ value: tag.name, label: tag.name })));
 
 	const handlePublishChange = (newPublishState: boolean) => {
-		const formData = new FormData();
-		const titleInput = document.querySelector<HTMLTextAreaElement>(
-			'[data-testid="title-input"]',
-		);
-		const editorContent =
-			document.querySelector<HTMLDivElement>(".ProseMirror");
-
-		formData.set("title", titleInput?.value || "");
-		formData.set("pageContent", editorContent?.innerHTML || "");
-		formData.set("isPublished", newPublishState ? "true" : "false");
-		selectedTags.forEach((tag, index) => {
-			formData.set(`${tagsMeta.name}[${index}]`, tag.value);
-		});
-
-		fetcher.submit(formData, { method: "post" });
 		setIsPublished(newPublishState);
+		onPublishChange(newPublishState);
 	};
-
-	useEffect(() => {
-		if (fetcher.state === "loading") {
-			setHasUnsavedChanges(false);
-		}
-	}, [fetcher.state, setHasUnsavedChanges]);
 
 	const renderButtonIcon = () => {
 		if (hasUnsavedChanges) {
@@ -97,15 +57,15 @@ export function EditHeader({
 	};
 
 	return (
-		<header className="z-10">
-			<div className="max-w-7xl mx-auto py-2.5 md:py-4 px-4 md:px-6 lg:px-8">
-				<div className="flex items-center justify-between">
+		<header className="z-10  w-full ">
+			<div className="max-w-7xl mx-auto py-2 md:py-4 px-2 md:px-6 lg:px-8 flex justify-between items-center">
+				<div className="flex items-center w-full justify-between">
 					<div className="flex items-center gap-4">
 						<Link to="/home">
 							<img
 								src="/logo.svg"
 								alt="Evame"
-								className="h-8 w-auto  dark:invert"
+								className="h-8 w-auto dark:invert"
 								aria-label="Evame Logo"
 							/>
 						</Link>
@@ -124,107 +84,9 @@ export function EditHeader({
 							name="isPublished"
 							value={isPublished ? "true" : "false"}
 						/>
-						{selectedTags.map((tag, index) => (
-							<input
-								key={tag.value}
-								type="hidden"
-								name={`${tagsMeta.name}[${index}]`}
-								value={tag.value}
-							/>
-						))}
 					</div>
 					<div className="flex items-center gap-4">
 						<div className="flex items-center gap-3">
-							<Popover>
-								<PopoverTrigger asChild>
-									<Button
-										variant="ghost"
-										size="icon"
-										className="rounded-full hover:bg-secondary/80"
-										disabled={isSubmitting}
-									>
-										<Settings2 className="w-4 h-4" />
-									</Button>
-								</PopoverTrigger>
-								<PopoverContent className="w-80">
-									<div className="space-y-4">
-										<div>
-											<h3 className="text-sm font-medium mb-3">Tags</h3>
-											<CreatableSelect
-												placeholder="Add tags..."
-												isMulti
-												name={tagsMeta.name}
-												options={allTags.map((tag) => ({
-													value: tag.name,
-													label: tag.name,
-												}))}
-												value={selectedTags}
-												onChange={(value) => {
-													const formData = new FormData();
-													const titleInput =
-														document.querySelector<HTMLTextAreaElement>(
-															'[data-testid="title-input"]',
-														);
-													const editorContent =
-														document.querySelector<HTMLDivElement>(
-															".ProseMirror",
-														);
-
-													formData.set("title", titleInput?.value || "");
-													formData.set(
-														"pageContent",
-														editorContent?.innerHTML || "",
-													);
-													formData.set(
-														"isPublished",
-														isPublished ? "true" : "false",
-													);
-													(
-														value as MultiValue<{
-															value: string;
-															label: string;
-														}>
-													).forEach((tag, index) => {
-														formData.set(
-															`${tagsMeta.name}[${index}]`,
-															tag.value,
-														);
-													});
-
-													setSelectedTags(
-														value as MultiValue<{
-															value: string;
-															label: string;
-														}>,
-													);
-													fetcher.submit(formData, { method: "post" });
-												}}
-												className="bg-transparent text-gray-900 text-sm w-full"
-												data-testid="tags-select"
-											/>
-											<p className="text-xs text-gray-500 mt-2">max 5 tags</p>
-											{tagsMeta.allErrors && (
-												<div className="mt-2">
-													{Object.entries(tagsMeta.allErrors).map(
-														([key, errors]) => (
-															<div key={key}>
-																{errors.map((error) => (
-																	<p
-																		key={error}
-																		className="text-sm text-red-500"
-																	>
-																		{error}
-																	</p>
-																))}
-															</div>
-														),
-													)}
-												</div>
-											)}
-										</div>
-									</div>
-								</PopoverContent>
-							</Popover>
 							<Popover>
 								<PopoverTrigger asChild>
 									<Button
