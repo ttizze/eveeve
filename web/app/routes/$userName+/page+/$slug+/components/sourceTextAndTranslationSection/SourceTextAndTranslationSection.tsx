@@ -51,7 +51,9 @@ export function SourceTextAndTranslationSection({
 						sourceTextWithTranslations={sourceTextWithTranslations}
 						onOpenAddAndVoteTranslations={onOpenAddAndVoteTranslations}
 						floatingRefs={floatingRefs}
-						isSelected={sourceTextWithTranslations.sourceText.id === selectedSourceTextId}
+						isSelected={
+							sourceTextWithTranslations.sourceText.id === selectedSourceTextId
+						}
 					/>
 				)}
 		</>
