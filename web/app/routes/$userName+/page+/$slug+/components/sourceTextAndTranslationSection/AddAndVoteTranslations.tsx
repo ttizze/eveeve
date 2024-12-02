@@ -1,3 +1,4 @@
+import type { UseFloatingReturn } from "@floating-ui/react";
 import { ArrowUpDown, ChevronDown, ChevronUp, Languages } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
@@ -18,11 +19,15 @@ export function AddAndVoteTranslations({
 	sourceTextWithTranslations,
 	open,
 	onOpenChange,
+	floatingRefs,
+	floatingStyles,
 }: {
 	currentUserName: string | undefined;
 	sourceTextWithTranslations: SourceTextWithTranslations;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	floatingRefs: UseFloatingReturn["refs"];
+	floatingStyles: UseFloatingReturn["floatingStyles"];
 }) {
 	const [showAll, setShowAll] = useState(false);
 	const { bestTranslationWithVote, translationsWithVotes, sourceText } =
@@ -44,7 +49,15 @@ export function AddAndVoteTranslations({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange} modal={false}>
-			<DialogContent className="w-full  max-h-[90vh]  overflow-y-auto flex flex-col">
+			<DialogContent
+				className="w-full  max-h-[90vh]  overflow-y-auto flex flex-col"
+				ref={floatingRefs.setFloating}
+				style={{
+					...floatingStyles,
+					animation: 'none',
+					transition: 'none'
+				}}
+			>
 				<DialogHeader>
 					<DialogTitle>
 						<Languages className="text-gray-500 w-4 h-4" />

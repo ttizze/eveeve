@@ -1,6 +1,8 @@
+import type { UseFloatingReturn } from "@floating-ui/react";
 import { Lock } from "lucide-react";
 import type { SourceTextWithTranslations } from "../../types";
 import { TranslationSection } from "./TranslationSection";
+
 export function SourceTextAndTranslationSection({
 	sourceTextWithTranslations,
 	elements,
@@ -11,6 +13,8 @@ export function SourceTextAndTranslationSection({
 	onOpenAddAndVoteTranslations,
 	showOriginal = true,
 	showTranslation = true,
+	floatingRefs,
+	selectedSourceTextId,
 }: {
 	sourceTextWithTranslations: SourceTextWithTranslations;
 	elements: string | React.ReactNode | React.ReactNode[];
@@ -21,6 +25,8 @@ export function SourceTextAndTranslationSection({
 	onOpenAddAndVoteTranslations: (sourceTextId: number) => void;
 	showOriginal: boolean;
 	showTranslation: boolean;
+	floatingRefs: UseFloatingReturn["refs"];
+	selectedSourceTextId: number | null;
 }) {
 	return (
 		<>
@@ -44,6 +50,8 @@ export function SourceTextAndTranslationSection({
 						key={`translation-${sourceTextWithTranslations.sourceText.id}`}
 						sourceTextWithTranslations={sourceTextWithTranslations}
 						onOpenAddAndVoteTranslations={onOpenAddAndVoteTranslations}
+						floatingRefs={floatingRefs}
+						isSelected={sourceTextWithTranslations.sourceText.id === selectedSourceTextId}
 					/>
 				)}
 		</>

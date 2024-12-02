@@ -1,3 +1,4 @@
+import { useFloating } from "@floating-ui/react";
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import { Hash, Loader2, SquarePen } from "lucide-react";
@@ -37,6 +38,7 @@ export function ContentWithTranslations({
 	showTranslation = true,
 }: ContentWithTranslationsProps) {
 	const isHydrated = useHydrated();
+	const { refs: floatingRefs, floatingStyles } = useFloating();
 	const [selectedSourceTextId, setSelectedSourceTextId] = useState<
 		number | null
 	>(null);
@@ -70,6 +72,8 @@ export function ContentWithTranslations({
 							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 							showOriginal={showOriginal}
 							showTranslation={showTranslation}
+							floatingRefs={floatingRefs}
+							selectedSourceTextId={selectedSourceTextId}
 						/>
 					)}
 				</h1>
@@ -145,6 +149,8 @@ export function ContentWithTranslations({
 						onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 						showOriginal={showOriginal}
 						showTranslation={showTranslation}
+						floatingRefs={floatingRefs}
+						selectedSourceTextId={selectedSourceTextId}
 					/>
 					{selectedSourceTextWithTranslations && (
 						<AddAndVoteTranslations
@@ -157,6 +163,8 @@ export function ContentWithTranslations({
 							}}
 							currentUserName={currentUserName}
 							sourceTextWithTranslations={selectedSourceTextWithTranslations}
+							floatingRefs={floatingRefs}
+							floatingStyles={floatingStyles}
 						/>
 					)}
 				</>
