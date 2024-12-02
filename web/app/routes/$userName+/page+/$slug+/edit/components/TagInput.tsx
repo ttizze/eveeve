@@ -39,13 +39,12 @@ export function TagInput({
 	};
 
 	return (
-		<div className="flex flex-wrap items-center gap-2 mb-2">
+		<div className="flex flex-wrap items-center gap-2 pt-2 pb-3">
 			{tags.map((tag) => (
 				<div
 					key={tag}
 					className="flex items-center gap-1 px-3 h-[32px] bg-primary rounded-full text-sm text-primary-foreground"
 				>
-					<span>{tag}</span>
 					<button
 						type="button"
 						onClick={() => handleRemoveTag(tag)}
@@ -53,6 +52,7 @@ export function TagInput({
 					>
 						<X className="w-3 h-3" />
 					</button>
+					<span>{tag}</span>
 				</div>
 			))}
 			{tags.length < 5 && (
@@ -84,12 +84,13 @@ export function TagInput({
 					classNames={{
 						control: (state) =>
 							cn(
-								"border border-border px-4 w-28  rounded-full  bg-transparent cursor-pointer text-sm",
+								"border border-border px-4 w-30  rounded-full  bg-transparent cursor-pointer text-sm",
 							),
-						valueContainer: () => "w-full  h-[32px]",
-						input: () => "m-0 p-0  ",
+						valueContainer: () => "w-full",
+						placeholder: () => " text-center flex items-center h-[32px]",
+						input: () => "m-0 p-0   h-[32px]",
 						menu: () =>
-							"bg-popover border border-border rounded-lg mt-2 w-50 rounded-sm min-w-60 ",
+							"bg-popover border border-border rounded-lg mt-2 w-50 rounded-sm min-w-60",
 						option: (state) =>
 							cn(
 								"px-4 py-2 cursor-pointer w-40",
