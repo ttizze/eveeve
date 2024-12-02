@@ -10,6 +10,7 @@ import {
 import { AddTranslationForm } from "~/routes/resources+/add-translation-form";
 import { TranslationListItem } from "~/routes/resources+/translation-list-item";
 import type { SourceTextWithTranslations } from "../../types";
+import type { CSSProperties } from "react";
 
 const INITIAL_DISPLAY_COUNT = 3;
 
@@ -18,11 +19,13 @@ export function AddAndVoteTranslations({
 	sourceTextWithTranslations,
 	open,
 	onOpenChange,
+	clickPosition,
 }: {
 	currentUserName: string | undefined;
 	sourceTextWithTranslations: SourceTextWithTranslations;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	clickPosition?: { x: number; y: number };
 }) {
 	const [showAll, setShowAll] = useState(false);
 	const { bestTranslationWithVote, translationsWithVotes, sourceText } =
@@ -42,9 +45,18 @@ export function AddAndVoteTranslations({
 
 	const toggleShowAll = () => setShowAll((prev) => !prev);
 
+	const dialogStyle: CSSProperties | undefined = clickPosition
+		? {
+			top: `${clickPosition.y}px`,
+		}
+		: undefined;
+
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange} modal={false}>
-			<DialogContent className="w-full  max-h-[90vh]  overflow-y-auto flex flex-col">
+			<DialogContent
+				className="w-full max-h-[90vh] overflow-y-auto flex flex-col"
+				style={dialogStyle}
+			>
 				<DialogHeader>
 					<DialogTitle>
 						<Languages className="text-gray-500 w-4 h-4" />

@@ -40,9 +40,21 @@ export function ContentWithTranslations({
 	const [selectedSourceTextId, setSelectedSourceTextId] = useState<
 		number | null
 	>(null);
+	const [clickPosition, setClickPosition] = useState<{
+		x: number;
+		y: number;
+	} | null>(null);
 
 	const handleOpenAddAndVoteTranslations = useCallback(
 		(sourceTextId: number) => {
+			const target = document.activeElement;
+			if (target instanceof HTMLElement) {
+				const rect = target.getBoundingClientRect();
+				setClickPosition({
+					x: 10,
+					y: 10,
+				});
+			}
 			setSelectedSourceTextId(sourceTextId);
 		},
 		[],
@@ -50,12 +62,14 @@ export function ContentWithTranslations({
 
 	const handleCloseAddAndVoteTranslations = useCallback(() => {
 		setSelectedSourceTextId(null);
+		setClickPosition(null);
 	}, []);
 
 	const selectedSourceTextWithTranslations =
 		pageWithTranslations.sourceTextWithTranslations.find(
 			(stw) => stw.sourceText.id === selectedSourceTextId,
 		);
+
 	return (
 		<>
 			<div className="flex items-center justify-between">
@@ -157,6 +171,7 @@ export function ContentWithTranslations({
 							}}
 							currentUserName={currentUserName}
 							sourceTextWithTranslations={selectedSourceTextWithTranslations}
+							clickPosition={clickPosition || undefined}
 						/>
 					)}
 				</>
