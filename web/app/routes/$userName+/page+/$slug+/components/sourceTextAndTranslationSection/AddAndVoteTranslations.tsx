@@ -1,5 +1,6 @@
 import { ArrowUpDown, ChevronDown, ChevronUp, Languages } from "lucide-react";
 import { useMemo, useState } from "react";
+import type { CSSProperties } from "react";
 import { Button } from "~/components/ui/button";
 import {
 	Dialog,
@@ -10,7 +11,6 @@ import {
 import { AddTranslationForm } from "~/routes/resources+/add-translation-form";
 import { TranslationListItem } from "~/routes/resources+/translation-list-item";
 import type { SourceTextWithTranslations } from "../../types";
-import type { CSSProperties } from "react";
 
 const INITIAL_DISPLAY_COUNT = 3;
 
@@ -47,8 +47,8 @@ export function AddAndVoteTranslations({
 
 	const dialogStyle: CSSProperties | undefined = clickPosition
 		? {
-			top: `${clickPosition.y}px`,
-		}
+				top: `${clickPosition.y}px`,
+			}
 		: undefined;
 
 	return (
