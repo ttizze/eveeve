@@ -52,6 +52,7 @@ import {
 	fetchPageById,
 	fetchSanitizedUserWithPages,
 } from "./functions/queries.server";
+
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	if (!data) {
 		return [{ title: "Profile" }];

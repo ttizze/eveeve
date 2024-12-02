@@ -26,7 +26,6 @@ export function ParsedContent({
 	pageWithTranslations,
 	sourceLanguage,
 	targetLanguage,
-	currentUserName,
 	onOpenAddAndVoteTranslations,
 	showOriginal = true,
 	showTranslation = true,

@@ -1,9 +1,10 @@
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
-import { Loader2, SquarePen } from "lucide-react";
+import { Hash, Loader2, SquarePen } from "lucide-react";
 import { useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 import { useHydrated } from "remix-utils/use-hydrated";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import type {
 	PageWithTranslations,
@@ -59,7 +60,7 @@ export function ContentWithTranslations({
 	return (
 		<>
 			<div className="flex items-center justify-between">
-				<h1 className="!mb-5">
+				<h1 className="!mb-0">
 					{sourceTitleWithTranslations && (
 						<SourceTextAndTranslationSection
 							sourceTextWithTranslations={sourceTitleWithTranslations}
@@ -68,14 +69,15 @@ export function ContentWithTranslations({
 							sourceLanguage={pageWithTranslations.page.sourceLanguage}
 							targetLanguage={targetLanguage}
 							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
-							showOriginal={true}
-							showTranslation={true}
+							showOriginal={showOriginal}
+							showTranslation={showTranslation}
 							selectedSourceTextId={selectedSourceTextId}
 							currentUserName={currentUserName}
 							onSelectedRef={setSelectedTranslationEl}
 						/>
 					)}
 				</h1>
+
 				{pageWithTranslations.user.userName === currentUserName &&
 					currentUserName && (
 						<div className="ml-auto">
@@ -89,22 +91,34 @@ export function ContentWithTranslations({
 						</div>
 					)}
 			</div>
-			<TranslateButton
-				pageId={pageWithTranslations.page.id}
-				userAITranslationInfo={userAITranslationInfo}
-				hasGeminiApiKey={hasGeminiApiKey}
-				targetLanguage={targetLanguage}
-			/>
-			<div className="flex items-center">
+			<div className="flex flex-wrap gap-2 pt-2 pb-3">
+				{pageWithTranslations.tagPages.map((tagPage) => (
+					<div
+						key={tagPage.tag.id}
+						className="flex items-center gap-1 px-3 h-[32px] bg-primary rounded-full text-sm text-primary-foreground"
+					>
+						<button type="button" className="hover:text-destructive ml-1">
+							<Hash className="w-3 h-3" />
+						</button>
+						<span>{tagPage.tag.name}</span>
+					</div>
+				))}
+			</div>
+
+			<div className="flex items-center not-prose">
 				<Link
 					to={`/${pageWithTranslations.user.userName}`}
-					className=" flex items-center mr-2 !no-underline hover:text-gray-700"
+					className="flex items-center mr-2 !no-underline hover:text-gray-700"
 				>
-					<img
-						src={pageWithTranslations.user.icon}
-						alt="Icon"
-						className="w-14 h-14 rounded-full object-cover mx-3 !my-0"
-					/>
+					<Avatar className="w-12 h-12 flex-shrink-0 mr-3 ">
+						<AvatarImage
+							src={pageWithTranslations.user.icon}
+							alt={pageWithTranslations.user.displayName}
+						/>
+						<AvatarFallback>
+							{pageWithTranslations.user.displayName.charAt(0).toUpperCase()}
+						</AvatarFallback>
+					</Avatar>
 					<div className="flex flex-col">
 						<span className="text-sm">
 							{pageWithTranslations.user.displayName}
@@ -115,6 +129,12 @@ export function ContentWithTranslations({
 					</div>
 				</Link>
 			</div>
+			<TranslateButton
+				pageId={pageWithTranslations.page.id}
+				userAITranslationInfo={userAITranslationInfo}
+				hasGeminiApiKey={hasGeminiApiKey}
+				targetLanguage={targetLanguage}
+			/>
 			{!isHydrated ? (
 				<div className="w-full h-full flex items-center justify-center">
 					<Loader2 className="w-10 h-10 animate-spin" />

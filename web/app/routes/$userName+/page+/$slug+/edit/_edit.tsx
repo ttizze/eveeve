@@ -9,6 +9,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
 import { useLoaderData } from "@remix-run/react";
+import type { Editor as TiptapEditor } from "@tiptap/react";
 import { useState } from "react";
 import { useCallback, useEffect } from "react";
 import TextareaAutosize from "react-textarea-autosize";
@@ -16,7 +17,9 @@ import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
 import { authenticator } from "~/utils/auth.server";
 import { EditHeader } from "./components/EditHeader";
+import { TagInput } from "./components/TagInput";
 import { Editor } from "./components/editor/Editor";
+import { EditorKeyboardMenu } from "./components/editor/EditorKeyboardMenu";
 import {
 	createOrUpdatePage,
 	createOrUpdateSourceTexts,
@@ -27,6 +30,7 @@ import {
 	getPageBySlug,
 	getTitleSourceTextId,
 } from "./functions/queries.server";
+import { useKeyboardVisible } from "./hooks/useKeyboardVisible";
 import { addNumbersToContent } from "./utils/addNumbersToContent";
 import { addSourceTextIdToContent } from "./utils/addSourceTextIdToContent";
 import { extractTextElementInfo } from "./utils/extractTextElementInfo";
@@ -101,7 +105,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	const { title, pageContent, isPublished, tags } = submission.value;
 	const isPublishedBool = isPublished === "true";
 	const titleSourceTextId = await getTitleSourceTextId(slug);
-	//tiptapが既存の要素を引き継いで重複したsourceTextIdを追加してしまうため、重複を削除
 	const numberedContent = await removeSourceTextIdDuplicatesAndEmptyElements(
 		addNumbersToContent(pageContent),
 	);
@@ -112,8 +115,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	);
 
 	const sourceLanguage = await getPageSourceLanguage(numberedContent, title);
-	//翻訳との結びつきを維持するため、sourceTextIdを付与したpage.contentを保存し、sourceTextのnumberが変わってもsourceTextIdで紐付けられるようにしている。
-	//そのため、sourceTextIdを付与したpage.contentを保存しなければならないが、createOrUpdateSourceTextsでpageIdを使用するため､ここで一旦pageを作成する
 	const page = await createOrUpdatePage(
 		currentUser.id,
 		slug,
@@ -147,6 +148,18 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function EditPage() {
 	const { currentUser, page, allTags, title } = useLoaderData<typeof loader>();
 	const fetcher = useFetcher<typeof action>();
+	const isKeyboardVisible = useKeyboardVisible();
+
+	const [editorInstance, setEditorInstance] = useState<TiptapEditor | null>(
+		null,
+	);
+	const [currentTags, setCurrentTags] = useState<string[]>(
+		page?.tagPages.map((tagPage) => tagPage.tag.name) || [],
+	);
+	const [currentIsPublished, setCurrentIsPublished] = useState(
+		page?.isPublished,
+	);
+
 	const [form, fields] = useForm({
 		onValidate({ formData }) {
 			return parseWithZod(formData, { schema: editPageSchema });
@@ -168,17 +181,14 @@ export default function EditPage() {
 		const formData = new FormData();
 		formData.set("title", fields.title.value as string);
 		formData.set("pageContent", fields.pageContent.value as string);
-		formData.set("isPublished", fields.isPublished.value as string);
-		const tags = fields.tags.value;
-		if (Array.isArray(tags)) {
-			tags.forEach((tag, index) => {
-				formData.set(`${fields.tags.name}[${index}]`, tag as string);
-			});
-		}
+		formData.set("isPublished", currentIsPublished?.toString() || "false");
+		currentTags.forEach((tag, index) => {
+			formData.set(`${fields.tags.name}[${index}]`, tag);
+		});
 		if (fetcher.state !== "submitting") {
 			fetcher.submit(formData, { method: "post" });
 		}
-	}, [fetcher, fields]);
+	}, [fetcher, fields, currentTags, currentIsPublished]);
 
 	const debouncedAutoSave = useDebouncedCallback(handleAutoSave, 1000);
 
@@ -194,29 +204,36 @@ export default function EditPage() {
 	}, [fetcher.state]);
 
 	return (
-		<div>
+		<div
+			className={`overflow-y-scroll overflow-x-hidden flex flex-col ${isKeyboardVisible ? "overscroll-y-contain" : null}`}
+			style={{
+				height: "calc(100 * var(--svh, 1svh))",
+			}}
+			id="root"
+		>
 			<FormProvider context={form.context}>
-				<fetcher.Form method="post" {...getFormProps(form)} className="pb-20">
+				<fetcher.Form method="post" {...getFormProps(form)}>
 					<EditHeader
 						currentUser={currentUser}
-						pageSlug={page?.slug}
 						initialIsPublished={page?.isPublished}
 						fetcher={fetcher}
 						hasUnsavedChanges={hasUnsavedChanges}
-						setHasUnsavedChanges={setHasUnsavedChanges}
-						tagsMeta={fields.tags}
-						initialTags={
-							page?.tagPages.map((tagPage) => ({
-								id: tagPage.tagId,
-								name: tagPage.tag.name,
-							})) || []
-						}
-						allTags={allTags}
-						onAutoSave={handleAutoSave}
+						onPublishChange={(isPublished) => {
+							setCurrentIsPublished(isPublished);
+							handleContentChange();
+						}}
 					/>
-					<div className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg mt-2 md:mt-20 mx-auto px-2 prose-headings:text-gray-700 prose-headings:dark:text-gray-200 text-gray-700 dark:text-gray-200">
-						<div className="mt-10 h-auto">
-							<h1 className="text-4xl font-bold !mb-0 h-auto">
+					<main
+						className="w-full max-w-3xl prose dark:prose-invert prose-sm sm:prose lg:prose-lg 
+						mx-auto px-2  prose-headings:text-gray-700 prose-headings:dark:text-gray-200 text-gray-700 dark:text-gray-200 mb-5 mt-3 md:mt-5 flex-grow tracking-wider"
+						style={{
+							minHeight: isKeyboardVisible
+								? "calc(100 * var(--svh, 1svh) - 47px)"
+								: "calc(100 * var(--svh, 1svh) - 48px)",
+						}}
+					>
+						<div className="">
+							<h1 className="!m-0 ">
 								<TextareaAutosize
 									{...getTextareaProps(fields.title)}
 									defaultValue={title}
@@ -233,19 +250,33 @@ export default function EditPage() {
 									{error}
 								</p>
 							))}
-						</div>
-						<div className="mt-12">
-							<Editor
-								initialContent={page?.content || ""}
-								onContentChange={handleContentChange}
+							<TagInput
+								tagsMeta={fields.tags}
+								initialTags={
+									page?.tagPages.map((tagPage) => ({
+										id: tagPage.tagId,
+										name: tagPage.tag.name,
+									})) || []
+								}
+								allTags={allTags}
+								onTagsChange={(tags) => {
+									setCurrentTags(tags);
+									handleContentChange();
+								}}
 							/>
-							{fields.pageContent.errors?.map((error) => (
-								<p className="text-sm text-red-500" key={error}>
-									{error}
-								</p>
-							))}
 						</div>
-					</div>
+						<Editor
+							initialContent={page?.content || ""}
+							onContentChange={handleContentChange}
+							onEditorCreate={setEditorInstance}
+						/>
+						{fields.pageContent.errors?.map((error) => (
+							<p className="text-sm text-red-500" key={error}>
+								{error}
+							</p>
+						))}
+					</main>
+					{editorInstance && <EditorKeyboardMenu editor={editorInstance} />}
 				</fetcher.Form>
 			</FormProvider>
 		</div>

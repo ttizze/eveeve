@@ -29,7 +29,7 @@ export function TranslateButton({
 
 	return (
 		<>
-			<div className="mb-5">
+			<div className="pt-3">
 				<div className="flex flex-col space-y-2">
 					<div className="flex items-center space-x-1">
 						<TargetLanguageSelector targetLanguage={targetLanguage} />
@@ -49,7 +49,10 @@ export function TranslateButton({
 									{navigation.state === "submitting" ? (
 										<LoadingSpinner />
 									) : (
-										<Languages className="w-4 h-4" />
+										<>
+											<Languages className="w-4 h-4" />
+											<span className="ml-1 hidden md:block">Translate</span>
+										</>
 									)}
 								</Button>
 							) : (
