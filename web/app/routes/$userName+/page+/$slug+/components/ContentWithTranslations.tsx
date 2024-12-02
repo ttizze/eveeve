@@ -1,6 +1,6 @@
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
-import { Loader2, SquarePen } from "lucide-react";
+import { Hash, Loader2, SquarePen } from "lucide-react";
 import { useState } from "react";
 import { useCallback } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
@@ -91,9 +91,12 @@ export function ContentWithTranslations({
 				{pageWithTranslations.tagPages.map((tagPage) => (
 					<div
 						key={tagPage.tag.id}
-						className="text-sm text-muted-foreground rounded-full px-3 py-1 bg-muted"
+						className="flex items-center gap-1 px-3 h-[32px] bg-primary rounded-full text-sm text-primary-foreground"
 					>
-						# {tagPage.tag.name}
+						<button type="button" className="hover:text-destructive ml-1">
+							<Hash className="w-3 h-3" />
+						</button>
+						<span>{tagPage.tag.name}</span>
 					</div>
 				))}
 			</div>
