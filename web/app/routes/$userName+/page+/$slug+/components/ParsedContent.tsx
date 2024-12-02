@@ -72,7 +72,6 @@ export function ParsedContent({
 							showOriginal={showOriginal}
 							showTranslation={showTranslation}
 							selectedSourceTextId={selectedSourceTextId}
-							currentUserName={currentUserName}
 							onSelectedRef={onSelectedRef}
 						/>
 					</DynamicTag>

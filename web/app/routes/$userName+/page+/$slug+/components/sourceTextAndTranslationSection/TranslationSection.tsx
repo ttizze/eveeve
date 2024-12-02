@@ -8,7 +8,6 @@ interface TranslationSectionProps {
 	sourceTextWithTranslations: SourceTextWithTranslations;
 	onOpenAddAndVoteTranslations: (sourceTextId: number) => void;
 	selectedSourceTextId: number | null;
-	currentUserName: string | undefined;
 	onSelectedRef?: (el: HTMLDivElement | null) => void;
 }
 
@@ -16,7 +15,6 @@ export function TranslationSection({
 	sourceTextWithTranslations,
 	onOpenAddAndVoteTranslations,
 	selectedSourceTextId,
-	currentUserName,
 	onSelectedRef,
 }: TranslationSectionProps) {
 	const isHydrated = useHydrated();

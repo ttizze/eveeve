@@ -14,7 +14,6 @@ interface SourceTextAndTranslationSectionProps {
 	showOriginal: boolean;
 	showTranslation: boolean;
 	selectedSourceTextId: number | null;
-	currentUserName: string | undefined;
 	onSelectedRef?: (el: HTMLDivElement | null) => void;
 }
 
@@ -29,7 +28,6 @@ export function SourceTextAndTranslationSection({
 	showOriginal = true,
 	showTranslation = true,
 	selectedSourceTextId,
-	currentUserName,
 	onSelectedRef,
 }: SourceTextAndTranslationSectionProps) {
 	return (
@@ -55,7 +53,6 @@ export function SourceTextAndTranslationSection({
 						sourceTextWithTranslations={sourceTextWithTranslations}
 						onOpenAddAndVoteTranslations={onOpenAddAndVoteTranslations}
 						selectedSourceTextId={selectedSourceTextId}
-						currentUserName={currentUserName}
 						onSelectedRef={onSelectedRef}
 					/>
 				)}

@@ -72,7 +72,6 @@ export function ContentWithTranslations({
 							showOriginal={showOriginal}
 							showTranslation={showTranslation}
 							selectedSourceTextId={selectedSourceTextId}
-							currentUserName={currentUserName}
 							onSelectedRef={setSelectedTranslationEl}
 						/>
 					)}
