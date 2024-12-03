@@ -1,6 +1,6 @@
+import { FcGoogle } from "react-icons/fc";
 import type { ActionFunctionArgs } from "react-router";
 import { useFetcher } from "react-router";
-import { FcGoogle } from "react-icons/fc";
 import { Button } from "~/components/ui/button";
 import { authenticator } from "~/utils/auth.server";
 

@@ -1,6 +1,9 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { json } from "react-router";
-import { unstable_createMemoryUploadHandler, unstable_parseMultipartFormData } from "react-router";
+import {
+	unstable_createMemoryUploadHandler,
+	unstable_parseMultipartFormData,
+} from "react-router";
 import type { ActionFunctionArgs } from "react-router";
 
 export async function action({ request }: ActionFunctionArgs) {

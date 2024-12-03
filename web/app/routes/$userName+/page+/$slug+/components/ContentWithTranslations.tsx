@@ -1,9 +1,9 @@
 import { arrow, offset, shift, useFloating } from "@floating-ui/react";
 import type { UserAITranslationInfo } from "@prisma/client";
-import { Link } from "react-router";
 import { Hash, Loader2, SquarePen } from "lucide-react";
 import { useRef, useState } from "react";
 import { useCallback } from "react";
+import { Link } from "react-router";
 import { useHydrated } from "remix-utils/use-hydrated";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";

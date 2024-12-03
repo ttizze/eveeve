@@ -8,13 +8,13 @@ import * as Sentry from "@sentry/remix";
 
 import { HydratedRouter } from "react-router/dom";
 
-import { useLocation, useMatches } from "react-router";
 import i18next from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import Backend from "i18next-http-backend";
 import { StrictMode, startTransition, useEffect } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { I18nextProvider, initReactI18next } from "react-i18next";
+import { useLocation, useMatches } from "react-router";
 import { getInitialNamespaces } from "remix-i18next/client";
 import * as i18n from "~/utils/i18n";
 

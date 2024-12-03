@@ -1,6 +1,6 @@
+import DOMPurify from "isomorphic-dompurify";
 import type { LoaderFunctionArgs } from "react-router";
 import { json } from "react-router";
-import DOMPurify from "isomorphic-dompurify";
 import type { PreviewData } from "./types";
 
 function extractMetaContent(html: string, property: string): string {

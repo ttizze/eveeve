@@ -1,19 +1,19 @@
+import { captureRemixErrorBoundaryError, withSentry } from "@sentry/remix";
+import { useEffect } from "react";
 import type { LinksFunction } from "react-router";
 import type { LoaderFunctionArgs } from "react-router";
 import { data } from "react-router";
 import {
-    Links,
-    Meta,
-    Outlet,
-    Scripts,
-    ScrollRestoration,
-    isRouteErrorResponse,
-    useRouteError,
+	Links,
+	Meta,
+	Outlet,
+	Scripts,
+	ScrollRestoration,
+	isRouteErrorResponse,
+	useRouteError,
 } from "react-router";
 import { useLocation } from "react-router";
 import { useLoaderData, useRouteLoaderData } from "react-router";
-import { captureRemixErrorBoundaryError, withSentry } from "@sentry/remix";
-import { useEffect } from "react";
 import { useChangeLanguage } from "remix-i18next/react";
 import { useHydrated } from "remix-utils/use-hydrated";
 import { ThemeProvider } from "~/components/theme-provider";

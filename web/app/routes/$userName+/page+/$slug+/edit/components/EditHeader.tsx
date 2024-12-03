@@ -1,6 +1,3 @@
-import type { FetcherWithComponents } from "react-router";
-import { Link } from "react-router";
-import { Form } from "react-router";
 import {
 	Check,
 	Globe,
@@ -10,6 +7,9 @@ import {
 	SettingsIcon,
 } from "lucide-react";
 import { useState } from "react";
+import type { FetcherWithComponents } from "react-router";
+import { Link } from "react-router";
+import { Form } from "react-router";
 import { ModeToggle } from "~/components/ModeToggle";
 import { Button } from "~/components/ui/button";
 import {

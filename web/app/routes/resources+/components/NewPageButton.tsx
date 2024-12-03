@@ -1,6 +1,6 @@
-import { useNavigate } from "react-router";
 import { Loader2, PencilIcon } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 const generateSlug = (length = 8): string => {
 	const charset =

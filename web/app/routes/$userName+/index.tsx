@@ -1,3 +1,7 @@
+import Linkify from "linkify-react";
+import { Lock, MoreVertical, Settings } from "lucide-react";
+import { BookOpen, Trash } from "lucide-react";
+import { useState } from "react";
 import type { LoaderFunctionArgs } from "react-router";
 import type { ActionFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
@@ -6,10 +10,6 @@ import { useFetcher } from "react-router";
 import { useNavigate } from "react-router";
 import type { MetaFunction } from "react-router";
 import { useSearchParams } from "react-router";
-import Linkify from "linkify-react";
-import { Lock, MoreVertical, Settings } from "lucide-react";
-import { BookOpen, Trash } from "lucide-react";
-import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {

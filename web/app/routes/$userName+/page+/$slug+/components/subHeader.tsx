@@ -1,6 +1,6 @@
-import { Link } from "react-router";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 
 // スクロール制御用のカスタムフック
 function useScroll(threshold = 10) {

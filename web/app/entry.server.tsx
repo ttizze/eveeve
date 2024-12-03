@@ -7,13 +7,13 @@ import * as Sentry from "@sentry/remix";
 
 import { PassThrough } from "node:stream";
 
-import type { AppLoadContext, EntryContext } from "react-router";
 import { createReadableStreamFromReadable } from "@react-router/node";
-import { ServerRouter } from "react-router";
 import { createInstance } from "i18next";
 import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 import { I18nextProvider, initReactI18next } from "react-i18next";
+import type { AppLoadContext, EntryContext } from "react-router";
+import { ServerRouter } from "react-router";
 import i18nServer from "./i18n.server";
 import * as i18n from "./utils/i18n";
 

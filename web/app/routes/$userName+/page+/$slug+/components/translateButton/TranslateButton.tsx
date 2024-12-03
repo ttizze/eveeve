@@ -1,8 +1,8 @@
 import type { UserAITranslationInfo } from "@prisma/client";
-import { Form } from "react-router";
-import { useNavigation } from "react-router";
 import { Languages } from "lucide-react";
 import { useState } from "react";
+import { Form } from "react-router";
+import { useNavigation } from "react-router";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Button } from "~/components/ui/button";
 import { GeminiApiKeyDialog } from "~/routes/resources+/gemini-api-key-dialog";

@@ -1,5 +1,5 @@
-import { createRoutesStub } from "react-router";
 import { render, screen, waitFor } from "@testing-library/react";
+import { createRoutesStub } from "react-router";
 import { expect, test, vi } from "vitest";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";

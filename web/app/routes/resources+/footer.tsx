@@ -1,5 +1,5 @@
-import { Link } from "react-router";
 import { FaDiscord, FaGithub } from "react-icons/fa";
+import { Link } from "react-router";
 
 export function Footer() {
 	return (
