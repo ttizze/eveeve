@@ -2,7 +2,7 @@ import { data } from "@remix-run/node";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
-import { EllipsisVertical  } from "lucide-react";
+import { EllipsisVertical } from "lucide-react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
@@ -77,15 +77,15 @@ export function TranslationListItem({
 				)}
 			</div>
 			<div className="flex items-center justify-end">
-				<Link to={`/${translation.user.userName}`} className="!no-underline mr-2">
+				<Link
+					to={`/${translation.user.userName}`}
+					className="!no-underline mr-2"
+				>
 					<p className="text-sm text-gray-500 text-right flex justify-end items-center  ">
-						by:{" "}
-						{translation.user.displayName}
+						by: {translation.user.displayName}
 					</p>
 				</Link>
-				<VoteButtons
-					translationWithVote={translation}
-				/>
+				<VoteButtons translationWithVote={translation} />
 			</div>
 		</div>
 	);
