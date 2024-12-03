@@ -1,4 +1,5 @@
-import { ArrowUpDown, ChevronDown, ChevronUp, Languages } from "lucide-react";
+import type { UseFloatingReturn } from "@floating-ui/react";
+import { ChevronDown, ChevronUp, Languages } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import {
@@ -18,11 +19,15 @@ export function AddAndVoteTranslations({
 	sourceTextWithTranslations,
 	open,
 	onOpenChange,
+	floatingRefs,
+	floatingStyles,
 }: {
 	currentUserName: string | undefined;
 	sourceTextWithTranslations: SourceTextWithTranslations;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	floatingRefs: UseFloatingReturn["refs"];
+	floatingStyles: UseFloatingReturn["floatingStyles"];
 }) {
 	const [showAll, setShowAll] = useState(false);
 	const { bestTranslationWithVote, translationsWithVotes, sourceText } =
@@ -44,25 +49,26 @@ export function AddAndVoteTranslations({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange} modal={false}>
-			<DialogContent className="w-full  max-h-[90vh]  overflow-y-auto flex flex-col">
+			<DialogContent
+				className="relative p-4 bg-background border border-gray-500 rounded-xl !max-w-2xl
+											before:content-[''] before:absolute before:top-0 before:left-1/2 before:-translate-y-[11px] before:-translate-x-[10px] before:w-[20px] before:h-[10px]
+											before:bg-gray-500 before:[clip-path:polygon(50%_0,100%_100%,0_100%)]
+											after:content-[''] after:absolute after:top-0 after:left-1/2 after:-translate-y-[9px] after:-translate-x-[10px] after:w-[20px] after:h-[10px]
+											after:bg-background after:[clip-path:polygon(50%_0,100%_100%,0_100%)]"
+				ref={floatingRefs.setFloating}
+				style={{
+					...floatingStyles,
+					animation: "none",
+					transition: "none",
+				}}
+			>
 				<DialogHeader>
-					<DialogTitle>
-						<Languages className="text-gray-500 w-4 h-4" />
+					<DialogTitle className="flex items-center text-gray-500 text-md">
+						<Languages className=" w-4 h-4 mr-1" /> Other translations:
 					</DialogTitle>
 				</DialogHeader>
-				<p className="text-xl pl-2">{sourceText.text}</p>
-				<div className="mt-4">
-					{bestTranslationWithVote && (
-						<TranslationListItem
-							translation={bestTranslationWithVote}
-							currentUserName={currentUserName}
-							showAuthor
-						/>
-					)}
+				<div className="">
 					<div>
-						<p className="text-gray-500 flex items-center justify-end mr-2 my-4">
-							<ArrowUpDown size={16} />
-						</p>
 						{displayedTranslations.map((displayedTranslation) => (
 							<TranslationListItem
 								key={displayedTranslation.translateText.id}
@@ -88,7 +94,7 @@ export function AddAndVoteTranslations({
 							</Button>
 						)}
 					</div>
-					<div className="mt-4">
+					<div className="">
 						<AddTranslationForm
 							sourceTextId={sourceTextWithTranslations.sourceText.id}
 							currentUserName={currentUserName}

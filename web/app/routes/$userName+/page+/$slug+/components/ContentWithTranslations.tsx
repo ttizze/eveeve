@@ -1,7 +1,8 @@
+import { arrow, offset, shift, useFloating } from "@floating-ui/react";
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import { Hash, Loader2, SquarePen } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useCallback } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -37,6 +38,18 @@ export function ContentWithTranslations({
 	showTranslation = true,
 }: ContentWithTranslationsProps) {
 	const isHydrated = useHydrated();
+	const arrowRef = useRef(null);
+	const ARROW_HEIGHT = 10;
+	const GAP = -2;
+	const { refs: floatingRefs, floatingStyles } = useFloating({
+		middleware: [
+			shift(),
+			offset(ARROW_HEIGHT + GAP),
+			arrow({
+				element: arrowRef,
+			}),
+		],
+	});
 	const [selectedSourceTextId, setSelectedSourceTextId] = useState<
 		number | null
 	>(null);
@@ -47,7 +60,6 @@ export function ContentWithTranslations({
 		},
 		[],
 	);
-
 	const handleCloseAddAndVoteTranslations = useCallback(() => {
 		setSelectedSourceTextId(null);
 	}, []);
@@ -58,8 +70,8 @@ export function ContentWithTranslations({
 		);
 	return (
 		<>
-			<div className="flex items-center justify-between">
-				<h1 className="!mb-0">
+			<div className="flex items-center">
+				<h1 className="!mb-0 flex-1">
 					{sourceTitleWithTranslations && (
 						<SourceTextAndTranslationSection
 							sourceTextWithTranslations={sourceTitleWithTranslations}
@@ -70,6 +82,8 @@ export function ContentWithTranslations({
 							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 							showOriginal={showOriginal}
 							showTranslation={showTranslation}
+							floatingRefs={floatingRefs}
+							selectedSourceTextId={selectedSourceTextId}
 						/>
 					)}
 				</h1>
@@ -145,6 +159,8 @@ export function ContentWithTranslations({
 						onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 						showOriginal={showOriginal}
 						showTranslation={showTranslation}
+						floatingRefs={floatingRefs}
+						selectedSourceTextId={selectedSourceTextId}
 					/>
 					{selectedSourceTextWithTranslations && (
 						<AddAndVoteTranslations
@@ -157,6 +173,8 @@ export function ContentWithTranslations({
 							}}
 							currentUserName={currentUserName}
 							sourceTextWithTranslations={selectedSourceTextWithTranslations}
+							floatingRefs={floatingRefs}
+							floatingStyles={floatingStyles}
 						/>
 					)}
 				</>
