@@ -1,8 +1,8 @@
-import { useFloating ,arrow,offset} from "@floating-ui/react";
+import { arrow, offset, useFloating } from "@floating-ui/react";
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import { Hash, Loader2, SquarePen } from "lucide-react";
-import { useState ,useRef} from "react";
+import { useRef, useState } from "react";
 import { useCallback } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -41,7 +41,11 @@ export function ContentWithTranslations({
 	const arrowRef = useRef(null);
 	const ARROW_HEIGHT = 10;
 	const GAP = -2;
-	const { refs: floatingRefs, floatingStyles, context } = useFloating({
+	const {
+		refs: floatingRefs,
+		floatingStyles,
+		context,
+	} = useFloating({
 		middleware: [
 			offset(ARROW_HEIGHT + GAP),
 			arrow({
@@ -62,7 +66,6 @@ export function ContentWithTranslations({
 	const handleCloseAddAndVoteTranslations = useCallback(() => {
 		setSelectedSourceTextId(null);
 	}, []);
-
 
 	const selectedSourceTextWithTranslations =
 		pageWithTranslations.sourceTextWithTranslations.find(

@@ -58,11 +58,10 @@ export function AddAndVoteTranslations({
 				ref={floatingRefs.setFloating}
 				style={{
 					...floatingStyles,
-					animation: 'none',
-					transition: 'none'
+					animation: "none",
+					transition: "none",
 				}}
 			>
-
 				<DialogHeader>
 					<DialogTitle>
 						<Languages className="text-gray-500 w-4 h-4" />
