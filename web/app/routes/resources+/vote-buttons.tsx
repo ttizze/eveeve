@@ -81,12 +81,12 @@ export const VoteButtons = memo(function VoteButtons({
 		() => ({
 			upVote: cn(
 				"mr-2 h-4 w-4 transition-all duration-300",
-				optimisticVote?.isUpvote === true && "text-white-500",
+				optimisticVote?.isUpvote === true && "[&>path]:fill-primary",
 				isVoting && "animate-bounce",
 			),
 			downVote: cn(
 				"mr-2 h-4 w-4 transition-all duration-300",
-				optimisticVote?.isUpvote === false && "text-red-500",
+				optimisticVote?.isUpvote === false && "[&>path]:fill-primary",
 				isVoting && "animate-bounce",
 			),
 		}),

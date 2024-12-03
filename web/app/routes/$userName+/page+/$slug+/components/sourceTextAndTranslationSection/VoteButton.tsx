@@ -26,7 +26,7 @@ export const VoteButton = memo(function VoteButton({
 			disabled={isDisabled}
 			onClick={(e) => onClick(e, isUpvote)}
 		>
-			<Icon className={iconClass} fill="white" strokeWidth={0} />
+			<Icon className={iconClass} />
 			{isUpvote && point}
 		</Button>
 	);

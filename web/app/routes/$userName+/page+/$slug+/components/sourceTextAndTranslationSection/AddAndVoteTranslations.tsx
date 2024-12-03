@@ -50,10 +50,10 @@ export function AddAndVoteTranslations({
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange} modal={false}>
 			<DialogContent
-				className="relative p-4 bg-background border-2 border-gray-500 rounded-lg !max-w-2xl
+				className="relative p-4 bg-background border border-gray-500 rounded-xl !max-w-2xl
 											before:content-[''] before:absolute before:top-0 before:left-1/2 before:-translate-y-[11px] before:-translate-x-[10px] before:w-[20px] before:h-[10px]
 											before:bg-gray-500 before:[clip-path:polygon(50%_0,100%_100%,0_100%)]
-											after:content-[''] after:absolute after:top-0 after:left-1/2 after:-translate-y-[8px] after:-translate-x-[10px] after:w-[20px] after:h-[10px]
+											after:content-[''] after:absolute after:top-0 after:left-1/2 after:-translate-y-[9px] after:-translate-x-[10px] after:w-[20px] after:h-[10px]
 											after:bg-background after:[clip-path:polygon(50%_0,100%_100%,0_100%)]"
 				ref={floatingRefs.setFloating}
 				style={{
@@ -63,7 +63,7 @@ export function AddAndVoteTranslations({
 				}}
 			>
 				<DialogHeader>
-					<DialogTitle className="flex items-center text-gray-500">
+					<DialogTitle className="flex items-center text-gray-500 text-md">
 						<Languages className=" w-4 h-4 mr-1" /> Other translations:
 					</DialogTitle>
 				</DialogHeader>
