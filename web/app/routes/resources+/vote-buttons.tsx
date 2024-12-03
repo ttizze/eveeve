@@ -36,12 +36,10 @@ export async function action({ request }: ActionFunctionArgs) {
 
 interface VoteButtonsProps {
 	translationWithVote: TranslationWithVote;
-	currentUserName: string | undefined;
 }
 
 export const VoteButtons = memo(function VoteButtons({
 	translationWithVote,
-	currentUserName,
 }: VoteButtonsProps) {
 	const fetcher = useFetcher();
 
@@ -83,7 +81,7 @@ export const VoteButtons = memo(function VoteButtons({
 		() => ({
 			upVote: cn(
 				"mr-2 h-4 w-4 transition-all duration-300",
-				optimisticVote?.isUpvote === true && "text-blue-500",
+				optimisticVote?.isUpvote === true && "text-white-500",
 				isVoting && "animate-bounce",
 			),
 			downVote: cn(
@@ -109,7 +107,7 @@ export const VoteButtons = memo(function VoteButtons({
 	};
 
 	return (
-		<div className="flex justify-end items-center mt-2">
+		<div className="flex justify-end items-center">
 			<div className="space-x-2 flex">
 				<VoteButton
 					isUpvote={true}

@@ -1,4 +1,4 @@
-import { arrow, offset, useFloating } from "@floating-ui/react";
+import { arrow, offset, useFloating ,   shift } from "@floating-ui/react";
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import { Hash, Loader2, SquarePen } from "lucide-react";
@@ -44,9 +44,9 @@ export function ContentWithTranslations({
 	const {
 		refs: floatingRefs,
 		floatingStyles,
-		context,
 	} = useFloating({
 		middleware: [
+			shift(),
 			offset(ARROW_HEIGHT + GAP),
 			arrow({
 				element: arrowRef,
