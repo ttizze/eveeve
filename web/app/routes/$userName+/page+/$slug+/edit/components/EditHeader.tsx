@@ -1,6 +1,6 @@
-import type { FetcherWithComponents } from "@remix-run/react";
-import { Link } from "@remix-run/react";
-import { Form } from "@remix-run/react";
+import type { FetcherWithComponents } from "react-router";
+import { Link } from "react-router";
+import { Form } from "react-router";
 import {
 	Check,
 	Globe,

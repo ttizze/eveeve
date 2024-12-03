@@ -1,5 +1,5 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
+import { json } from "react-router";
 import DOMPurify from "isomorphic-dompurify";
 import type { PreviewData } from "./types";
 

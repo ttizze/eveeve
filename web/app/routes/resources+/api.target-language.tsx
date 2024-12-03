@@ -1,5 +1,5 @@
-import { json } from "@remix-run/node";
-import type { ActionFunction } from "@remix-run/node";
+import { json } from "react-router";
+import type { ActionFunction } from "react-router";
 
 import { localeCookie } from "~/i18n.server";
 

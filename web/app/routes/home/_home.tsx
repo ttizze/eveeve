@@ -1,7 +1,7 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { data } from "@remix-run/node";
-import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
-import type { MetaFunction } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "react-router";
+import { data } from "react-router";
+import { Link, useLoaderData, useSearchParams } from "react-router";
+import type { MetaFunction } from "react-router";
 import { CalendarPlus } from "lucide-react";
 import {
 	Card,

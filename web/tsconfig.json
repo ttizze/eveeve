@@ -5,16 +5,18 @@
 		"**/.server/**/*.ts",
 		"**/.server/**/*.tsx",
 		"**/.client/**/*.ts",
-		"**/.client/**/*.tsx"
+		"**/.client/**/*.tsx",
+		".react-router/types/**/*"
 	],
 	"compilerOptions": {
 		"lib": ["DOM", "DOM.Iterable", "ES2022"],
 		"types": [
-			"@remix-run/node",
+			"@react-router/node",
 			"vite/client",
 			"vitest/globals",
 			"vitest-environment-vprisma"
 		],
+		"rootDirs": [".", "./.react-router/types"],
 		"isolatedModules": true,
 		"esModuleInterop": true,
 		"jsx": "react-jsx",

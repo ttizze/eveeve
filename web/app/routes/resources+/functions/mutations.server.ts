@@ -1,4 +1,4 @@
-import { json } from "@remix-run/node";
+import { json } from "react-router";
 import { prisma } from "~/utils/prisma";
 export const updateGeminiApiKey = async (
 	userId: number,

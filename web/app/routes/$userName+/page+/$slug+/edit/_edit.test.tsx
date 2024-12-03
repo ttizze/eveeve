@@ -1,4 +1,4 @@
-import { createRemixStub } from "@remix-run/testing";
+import { createRoutesStub } from "react-router";
 import { render, screen, waitFor } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
 import "@testing-library/jest-dom";
@@ -106,7 +106,7 @@ describe("EditPage", () => {
 			userName: "testuser",
 		});
 
-		const RemixStub = createRemixStub([
+		const RemixStub = createRoutesStub([
 			{
 				path: "/:userName/page/:slug/edit",
 				Component: EditPage,
@@ -129,7 +129,7 @@ describe("EditPage", () => {
 			userName: "testuser",
 		});
 
-		const RemixStub = createRemixStub([
+		const RemixStub = createRoutesStub([
 			{
 				path: "/:userName/page/:slug/edit",
 				Component: EditPage,

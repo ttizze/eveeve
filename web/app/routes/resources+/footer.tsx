@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import { FaDiscord, FaGithub } from "react-icons/fa";
 
 export function Footer() {

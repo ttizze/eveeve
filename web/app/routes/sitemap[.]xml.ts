@@ -1,8 +1,8 @@
 // @ts-ignore
-import { routes } from "virtual:remix/server-build";
+import { routes } from "virtual:react-router/server-build";
 import { generateSitemap } from "@nasa-gcn/remix-seo";
 import type { SEOHandle } from "@nasa-gcn/remix-seo";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
 import { serverOnly$ } from "vite-env-only/macros";
 import {
 	fetchAllPublishedPages,

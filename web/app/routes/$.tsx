@@ -1,4 +1,4 @@
-import { type LoaderFunctionArgs, json } from "@remix-run/node";
+import { type LoaderFunctionArgs, json } from "react-router";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	// ルートローダーを実行したい場合はここで行います

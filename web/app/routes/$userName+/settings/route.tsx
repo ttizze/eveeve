@@ -1,7 +1,7 @@
 import { parseWithZod } from "@conform-to/zod";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { useRevalidator } from "@remix-run/react";
-import { useLoaderData } from "@remix-run/react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { useRevalidator } from "react-router";
+import { useLoaderData } from "react-router";
 import { marked } from "marked";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import i18nServer from "~/i18n.server";

@@ -1,4 +1,4 @@
-import { createRemixStub } from "@remix-run/testing";
+import { createRoutesStub } from "react-router";
 import { render, screen, waitFor } from "@testing-library/react";
 import { expect, test } from "vitest";
 import "@testing-library/jest-dom";
@@ -70,7 +70,7 @@ describe("UserProfile", () => {
 			id: 1,
 			userName: "testuser",
 		});
-		const RemixStub = createRemixStub([
+		const RemixStub = createRoutesStub([
 			{
 				path: "/:userName",
 				Component: UserProfile,
@@ -100,7 +100,7 @@ describe("UserProfile", () => {
 	test("loader returns correct data and menu is not displayed for unauthenticated visitor", async () => {
 		// @ts-ignore
 		vi.mocked(authenticator.isAuthenticated).mockResolvedValue(null);
-		const RemixStub = createRemixStub([
+		const RemixStub = createRoutesStub([
 			{
 				path: "/:userName",
 				Component: UserProfile,
@@ -127,7 +127,7 @@ describe("UserProfile", () => {
 			id: 1,
 			userName: "testuser",
 		});
-		const RemixStub = createRemixStub([
+		const RemixStub = createRoutesStub([
 			{
 				path: "/:userName",
 				Component: UserProfile,
@@ -157,7 +157,7 @@ describe("UserProfile", () => {
 			id: 1,
 			userName: "testuser",
 		});
-		const RemixStub = createRemixStub([
+		const RemixStub = createRoutesStub([
 			{
 				path: "/:userName",
 				Component: UserProfile,

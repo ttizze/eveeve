@@ -1,6 +1,6 @@
 import type { UserAITranslationInfo } from "@prisma/client";
-import { Form } from "@remix-run/react";
-import { useNavigation } from "@remix-run/react";
+import { Form } from "react-router";
+import { useNavigation } from "react-router";
 import { Languages } from "lucide-react";
 import { useState } from "react";
 import { LoadingSpinner } from "~/components/LoadingSpinner";

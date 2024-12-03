@@ -1,11 +1,14 @@
 import * as Sentry from "@sentry/remix";
+
 /**
  * By default, Remix will handle hydrating your app on the client for you.
  * You are free to delete this file if you'd like to, but if you ever want it revealed again, you can run `npx remix reveal` ✨
  * For more information, see https://remix.run/file-conventions/entry.client
  */
 
-import { RemixBrowser, useLocation, useMatches } from "@remix-run/react";
+import { HydratedRouter } from "react-router/dom";
+
+import { useLocation, useMatches } from "react-router";
 import i18next from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import Backend from "i18next-http-backend";
@@ -58,7 +61,7 @@ async function main() {
 			document,
 			<I18nextProvider i18n={i18next}>
 				<StrictMode>
-					<RemixBrowser />
+					<HydratedRouter />
 				</StrictMode>
 			</I18nextProvider>,
 		);

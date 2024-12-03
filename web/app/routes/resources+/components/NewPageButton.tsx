@@ -1,4 +1,4 @@
-import { useNavigate } from "@remix-run/react";
+import { useNavigate } from "react-router";
 import { Loader2, PencilIcon } from "lucide-react";
 import { useState } from "react";
 

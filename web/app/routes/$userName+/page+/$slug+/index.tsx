@@ -1,9 +1,9 @@
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { useActionData } from "@remix-run/react";
-import type { MetaFunction } from "@remix-run/react";
-import { useLoaderData } from "@remix-run/react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { useActionData } from "react-router";
+import type { MetaFunction } from "react-router";
+import { useLoaderData } from "react-router";
 import { useState } from "react";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import i18nServer from "~/i18n.server";

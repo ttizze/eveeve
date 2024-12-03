@@ -1,6 +1,6 @@
 import { arrow, offset, shift, useFloating } from "@floating-ui/react";
 import type { UserAITranslationInfo } from "@prisma/client";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import { Hash, Loader2, SquarePen } from "lucide-react";
 import { useRef, useState } from "react";
 import { useCallback } from "react";

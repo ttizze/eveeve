@@ -1,5 +1,5 @@
 import type { UserAITranslationInfo } from "@prisma/client";
-import { useRevalidator } from "@remix-run/react";
+import { useRevalidator } from "react-router";
 import { useEffect } from "react";
 import { Progress } from "~/components/ui/progress";
 import { cn } from "~/utils/cn";

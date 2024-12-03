@@ -7,9 +7,9 @@ import * as Sentry from "@sentry/remix";
 
 import { PassThrough } from "node:stream";
 
-import type { AppLoadContext, EntryContext } from "@remix-run/node";
-import { createReadableStreamFromReadable } from "@remix-run/node";
-import { RemixServer } from "@remix-run/react";
+import type { AppLoadContext, EntryContext } from "react-router";
+import { createReadableStreamFromReadable } from "@react-router/node";
+import { ServerRouter } from "react-router";
 import { createInstance } from "i18next";
 import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
@@ -37,7 +37,7 @@ export default async function handleRequest(
 	request: Request,
 	responseStatusCode: number,
 	responseHeaders: Headers,
-	remixContext: EntryContext,
+	reactRouterContext: EntryContext,
 	// This is ignored so we can keep it in the template for visibility.  Feel
 	// free to delete this parameter in your app if you're not using it!
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -48,13 +48,13 @@ export default async function handleRequest(
 				request,
 				responseStatusCode,
 				responseHeaders,
-				remixContext,
+				reactRouterContext,
 			)
 		: handleBrowserRequest(
 				request,
 				responseStatusCode,
 				responseHeaders,
-				remixContext,
+				reactRouterContext,
 			);
 }
 
@@ -62,11 +62,11 @@ async function handleBotRequest(
 	request: Request,
 	responseStatusCode: number,
 	responseHeaders: Headers,
-	remixContext: EntryContext,
+	reactRouterContext: EntryContext,
 ) {
 	const instance = createInstance();
 	const lng = await i18nServer.getLocale(request);
-	const ns = i18nServer.getRouteNamespaces(remixContext);
+	const ns = i18nServer.getRouteNamespaces(reactRouterContext);
 
 	await instance.use(initReactI18next).init({
 		...i18n,
@@ -79,7 +79,7 @@ async function handleBotRequest(
 		let currentResponseStatusCode = responseStatusCode;
 		const { pipe, abort } = renderToPipeableStream(
 			<I18nextProvider i18n={instance}>
-				<RemixServer context={remixContext} url={request.url} />
+				<ServerRouter context={reactRouterContext} url={request.url} />
 			</I18nextProvider>,
 			{
 				onAllReady() {
@@ -122,11 +122,11 @@ async function handleBrowserRequest(
 	request: Request,
 	responseStatusCode: number,
 	responseHeaders: Headers,
-	remixContext: EntryContext,
+	reactRouterContext: EntryContext,
 ) {
 	const instance = createInstance();
 	const lng = await i18nServer.getLocale(request);
-	const ns = i18nServer.getRouteNamespaces(remixContext);
+	const ns = i18nServer.getRouteNamespaces(reactRouterContext);
 
 	await instance.use(initReactI18next).init({
 		...i18n,
@@ -139,7 +139,7 @@ async function handleBrowserRequest(
 		let currentResponseStatusCode = responseStatusCode;
 		const { pipe, abort } = renderToPipeableStream(
 			<I18nextProvider i18n={instance}>
-				<RemixServer context={remixContext} url={request.url} />
+				<ServerRouter context={reactRouterContext} url={request.url} />
 			</I18nextProvider>,
 			{
 				onShellReady() {

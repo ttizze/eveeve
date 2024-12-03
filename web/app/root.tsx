@@ -1,17 +1,17 @@
-import type { LinksFunction } from "@remix-run/node";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { data } from "@remix-run/node";
+import type { LinksFunction } from "react-router";
+import type { LoaderFunctionArgs } from "react-router";
+import { data } from "react-router";
 import {
-	Links,
-	Meta,
-	Outlet,
-	Scripts,
-	ScrollRestoration,
-	isRouteErrorResponse,
-	useRouteError,
-} from "@remix-run/react";
-import { useLocation } from "@remix-run/react";
-import { useLoaderData, useRouteLoaderData } from "@remix-run/react";
+    Links,
+    Meta,
+    Outlet,
+    Scripts,
+    ScrollRestoration,
+    isRouteErrorResponse,
+    useRouteError,
+} from "react-router";
+import { useLocation } from "react-router";
+import { useLoaderData, useRouteLoaderData } from "react-router";
 import { captureRemixErrorBoundaryError, withSentry } from "@sentry/remix";
 import { useEffect } from "react";
 import { useChangeLanguage } from "remix-i18next/react";

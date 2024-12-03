@@ -1,5 +1,5 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
+import type { ActionFunctionArgs } from "react-router";
+import { useFetcher } from "react-router";
 import { Heart } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { authenticator } from "~/utils/auth.server";
