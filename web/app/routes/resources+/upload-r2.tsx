@@ -1,27 +1,7 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { json } from "react-router";
-import {
-	unstable_createMemoryUploadHandler,
-	unstable_parseMultipartFormData,
-} from "react-router";
+import { type FileUpload, parseFormData } from "@mjackson/form-data-parser";
 import type { ActionFunctionArgs } from "react-router";
-
-export async function action({ request }: ActionFunctionArgs) {
-	const uploadHandler = unstable_createMemoryUploadHandler({
-		maxPartSize: 1024 * 1024 * 10,
-	});
-	const formData = await unstable_parseMultipartFormData(
-		request,
-		uploadHandler,
-	);
-	const file = formData.get("file") as File;
-	if (!file) {
-		return json({ error: "file not found" }, { status: 400 });
-	}
-
-	const url = await uploadToR2(file);
-	return json({ url });
-}
+import { R2FileStorage } from "~/utils/file-storage";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -50,6 +30,28 @@ const s3Client = new S3Client(
 				forcePathStyle: true,
 			},
 );
+
+const fileStorage = new R2FileStorage(s3Client, R2_BUCKET_NAME);
+
+export async function action({ request }: ActionFunctionArgs) {
+	const uploadHandler = async (fileUpload: FileUpload) => {
+		if (fileUpload.fieldName === "file") {
+			const key = `uploads/${Date.now()}-${fileUpload.name}`;
+
+			return await fileStorage.set(key, fileUpload);
+		}
+	};
+	const formData = await parseFormData(request, uploadHandler, {
+		maxFileSize: 1024 * 1024 * 3,
+	});
+	const file = formData.get("file") as File;
+	if (!file) {
+		return Response.json({ error: "file not found" }, { status: 400 });
+	}
+
+	const url = await uploadToR2(file);
+	return Response.json({ url });
+}
 
 export async function uploadToR2(file: File): Promise<string> {
 	const key = `uploads/${Date.now()}-${file.name}`;

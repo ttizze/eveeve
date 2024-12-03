@@ -1,4 +1,3 @@
-import { json } from "react-router";
 import { prisma } from "~/utils/prisma";
 export const updateGeminiApiKey = async (
 	userId: number,
@@ -19,10 +18,10 @@ export const deleteOwnTranslation = async (
 		select: { user: true },
 	});
 	if (!translation) {
-		return json({ error: "Translation not found" }, { status: 404 });
+		return Response.json({ error: "Translation not found" }, { status: 404 });
 	}
 	if (translation.user.userName !== currentUserName) {
-		return json({ error: "Unauthorized" }, { status: 403 });
+		return Response.json({ error: "Unauthorized" }, { status: 403 });
 	}
 	await prisma.translateText.update({
 		where: { id: translationId },
@@ -51,7 +50,7 @@ export async function addUserTranslation(
 		});
 	}
 
-	return json({ success: true });
+	return Response.json({ success: true });
 }
 
 export async function handleVote(
@@ -94,7 +93,7 @@ export async function handleVote(
 		}
 	});
 
-	return json({ success: true });
+	return Response.json({ success: true });
 }
 
 export async function toggleLike(userId: number, slug: string) {

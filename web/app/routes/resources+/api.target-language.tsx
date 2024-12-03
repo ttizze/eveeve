@@ -1,4 +1,3 @@
-import { json } from "react-router";
 import type { ActionFunction } from "react-router";
 
 import { localeCookie } from "~/i18n.server";
@@ -10,7 +9,7 @@ export const action: ActionFunction = async ({ request }) => {
 	if (typeof targetLanguage === "string") {
 		const serializedCookie = await localeCookie.serialize(targetLanguage);
 
-		return json(
+		return Response.json(
 			{ success: true },
 			{
 				headers: {
@@ -20,5 +19,5 @@ export const action: ActionFunction = async ({ request }) => {
 		);
 	}
 
-	return json({ success: false }, { status: 400 });
+	return Response.json({ success: false }, { status: 400 });
 };

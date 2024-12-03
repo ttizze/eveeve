@@ -1,6 +1,5 @@
 import DOMPurify from "isomorphic-dompurify";
 import type { LoaderFunctionArgs } from "react-router";
-import { json } from "react-router";
 import type { PreviewData } from "./types";
 
 function extractMetaContent(html: string, property: string): string {
@@ -25,7 +24,7 @@ function extractFavicon(html: string, baseUrl: string): string {
 export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url).searchParams.get("url");
 	if (!url) {
-		return json({ error: "URL is required" }, { status: 400 });
+		return Response.json({ error: "URL is required" }, { status: 400 });
 	}
 
 	try {
@@ -60,9 +59,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			image,
 			domain,
 		};
-		return json(previewData);
+		return Response.json(previewData);
 	} catch (error) {
 		console.error("Error fetching link preview:", error);
-		return json({ error: "Failed to fetch link preview" }, { status: 500 });
+		return Response.json(
+			{ error: "Failed to fetch link preview" },
+			{ status: 500 },
+		);
 	}
 }

@@ -9,6 +9,7 @@ import { SourceTextAndTranslationSection } from "../$userName+/page+/$slug+/comp
 import { fetchPageWithTranslations } from "../$userName+/page+/$slug+/functions/queries.server";
 import { StartButton } from "../../components/StartButton";
 
+
 export const meta: MetaFunction = () => {
 	return [
 		{ title: "Evame" },
