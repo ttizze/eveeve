@@ -58,10 +58,10 @@ export function TranslationListItem({
 	};
 
 	return (
-		<div className="pl-2 mt-1  ">
+		<div className="pl-4 mt-1  ">
 			<div className="flex items-start justify-between">
 				<div className="flex">
-					<span className="flex-shrink-0 w-4">・</span>
+					<span className="flex-shrink-0 w-5 text-2xl">•</span>
 					<span>{sanitizeAndParseText(translation.translateText.text)}</span>
 				</div>
 				{isOwner && (
