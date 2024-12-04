@@ -1,6 +1,5 @@
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { useRevalidator } from "@remix-run/react";
 import { useLoaderData } from "@remix-run/react";
 import { marked } from "marked";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
@@ -15,12 +14,15 @@ import { addSourceTextIdToContent } from "../page+/$slug+/edit/utils/addSourceTe
 import { extractArticle } from "../page+/$slug+/edit/utils/extractArticle";
 import { extractTextElementInfo } from "../page+/$slug+/edit/utils/extractTextElementInfo";
 import { getPageSourceLanguage } from "../page+/$slug+/edit/utils/getPageSourceLanguage";
-import { TranslationInputForm } from "./components/TranslationInputForm";
 import { createUserAITranslationInfo } from "./functions/mutations.server";
 import { translationInputSchema } from "./types";
 import { generateMarkdownFromDirectory } from "./utils/generate-markdown";
 import { generateSlug } from "./utils/generate-slug.server";
 import { processUploadedFolder } from "./utils/process-uploaded-folder";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { PageManagementTab } from "./components/PageManagementTab";
+import { FolderUploadTab } from "./components/FolderUploadTab";
+import { GitHubIntegrationTab } from "./components/GitHubIntegrationTab";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
@@ -226,19 +228,34 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function TranslatePage() {
 	const { hasGeminiApiKey } = useLoaderData<typeof loader>();
-	const revalidator = useRevalidator();
 
 	return (
-		<div>
-			<div className="container mx-auto max-w-2xl min-h-50 py-10">
-				<div className="pb-4">
+		<div className="container mx-auto max-w-4xl py-10">
+			<Tabs defaultValue="page-management" className="w-full">
+				<TabsList className="grid w-full grid-cols-3">
+					<TabsTrigger value="page-management">Page Management</TabsTrigger>
+					<TabsTrigger value="folder-upload">Folder Upload</TabsTrigger>
+					<TabsTrigger value="github-integration">GitHub Integration</TabsTrigger>
+				</TabsList>
+				
+				<TabsContent value="page-management">
+					<PageManagementTab />
+				</TabsContent>
+				
+				<TabsContent value="folder-upload">
 					{hasGeminiApiKey ? (
-						<TranslationInputForm />
+						<FolderUploadTab />
 					) : (
-						"Gemini API key is not set"
+						<div className="p-4 text-center text-red-500">
+							Gemini API key is not set
+						</div>
 					)}
-				</div>
-			</div>
+				</TabsContent>
+				
+				<TabsContent value="github-integration">
+					<GitHubIntegrationTab />
+				</TabsContent>
+			</Tabs>
 		</div>
 	);
 }
