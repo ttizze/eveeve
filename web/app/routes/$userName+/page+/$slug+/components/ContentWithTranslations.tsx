@@ -1,9 +1,8 @@
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
-import { Hash, Loader2, SquarePen } from "lucide-react";
+import { Hash, Loader2 } from "lucide-react";
 import { useHydrated } from "remix-utils/use-hydrated";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { Button } from "~/components/ui/button";
 import type {
 	PageWithTranslations,
 	SourceTextWithTranslations,
@@ -37,33 +36,20 @@ export function ContentWithTranslations({
 
 	return (
 		<>
-			<div className="flex items-center">
-				<h1 className="!mb-0 flex-1">
-					{sourceTitleWithTranslations && (
-						<SourceTextAndTranslationSection
-							sourceTextWithTranslations={sourceTitleWithTranslations}
-							isPublished={pageWithTranslations.page.isPublished}
-							elements={sourceTitleWithTranslations.sourceText.text}
-							showOriginal={showOriginal}
-							showTranslation={showTranslation}
-							currentUserName={currentUserName}
-						/>
-					)}
-				</h1>
-
-				{pageWithTranslations.user.userName === currentUserName &&
-					currentUserName && (
-						<div className="ml-auto">
-							<Button asChild variant="ghost">
-								<Link
-									to={`/${currentUserName}/page/${pageWithTranslations.page.slug}/edit`}
-								>
-									<SquarePen className="w-5 h-5" />
-								</Link>
-							</Button>
-						</div>
-					)}
-			</div>
+			<h1 className="!mb-0 ">
+				{sourceTitleWithTranslations && (
+					<SourceTextAndTranslationSection
+						sourceTextWithTranslations={sourceTitleWithTranslations}
+						isPublished={pageWithTranslations.page.isPublished}
+						elements={sourceTitleWithTranslations.sourceText.text}
+						showOriginal={showOriginal}
+						showTranslation={showTranslation}
+						currentUserName={currentUserName}
+						isOwner={pageWithTranslations.user.userName === currentUserName}
+						slug={pageWithTranslations.page.slug}
+					/>
+				)}
+			</h1>
 			<div className="flex flex-wrap gap-2 pt-2 pb-3">
 				{pageWithTranslations.tagPages.map((tagPage) => (
 					<div
