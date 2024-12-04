@@ -2,6 +2,7 @@ import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { marked } from "marked";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import i18nServer from "~/i18n.server";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
@@ -14,15 +15,14 @@ import { addSourceTextIdToContent } from "../page+/$slug+/edit/utils/addSourceTe
 import { extractArticle } from "../page+/$slug+/edit/utils/extractArticle";
 import { extractTextElementInfo } from "../page+/$slug+/edit/utils/extractTextElementInfo";
 import { getPageSourceLanguage } from "../page+/$slug+/edit/utils/getPageSourceLanguage";
+import { FolderUploadTab } from "./components/FolderUploadTab";
+import { GitHubIntegrationTab } from "./components/GitHubIntegrationTab";
+import { PageManagementTab } from "./components/PageManagementTab";
 import { createUserAITranslationInfo } from "./functions/mutations.server";
 import { translationInputSchema } from "./types";
 import { generateMarkdownFromDirectory } from "./utils/generate-markdown";
 import { generateSlug } from "./utils/generate-slug.server";
 import { processUploadedFolder } from "./utils/process-uploaded-folder";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { PageManagementTab } from "./components/PageManagementTab";
-import { FolderUploadTab } from "./components/FolderUploadTab";
-import { GitHubIntegrationTab } from "./components/GitHubIntegrationTab";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
@@ -235,13 +235,15 @@ export default function TranslatePage() {
 				<TabsList className="grid w-full grid-cols-3">
 					<TabsTrigger value="page-management">Page Management</TabsTrigger>
 					<TabsTrigger value="folder-upload">Folder Upload</TabsTrigger>
-					<TabsTrigger value="github-integration">GitHub Integration</TabsTrigger>
+					<TabsTrigger value="github-integration">
+						GitHub Integration
+					</TabsTrigger>
 				</TabsList>
-				
+
 				<TabsContent value="page-management">
 					<PageManagementTab />
 				</TabsContent>
-				
+
 				<TabsContent value="folder-upload">
 					{hasGeminiApiKey ? (
 						<FolderUploadTab />
@@ -251,7 +253,7 @@ export default function TranslatePage() {
 						</div>
 					)}
 				</TabsContent>
-				
+
 				<TabsContent value="github-integration">
 					<GitHubIntegrationTab />
 				</TabsContent>
