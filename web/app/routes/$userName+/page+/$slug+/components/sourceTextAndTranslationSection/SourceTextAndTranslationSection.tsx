@@ -38,12 +38,12 @@ export function SourceTextAndTranslationSection({
 				</span>
 			)}
 			{showTranslation && (
-					<TranslationSection
-						key={`translation-${sourceTextWithTranslations.sourceText.id}`}
-						sourceTextWithTranslations={sourceTextWithTranslations}
-						currentUserName={currentUserName}
-					/>
-				)}
+				<TranslationSection
+					key={`translation-${sourceTextWithTranslations.sourceText.id}`}
+					sourceTextWithTranslations={sourceTextWithTranslations}
+					currentUserName={currentUserName}
+				/>
+			)}
 		</>
 	);
 }

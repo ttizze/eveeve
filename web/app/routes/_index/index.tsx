@@ -1,10 +1,8 @@
 import type { MetaFunction } from "@remix-run/node";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { useState } from "react";
 import i18nServer from "~/i18n.server";
 import { authenticator } from "~/utils/auth.server";
-import { AddAndVoteTranslations } from "../$userName+/page+/$slug+/components/sourceTextAndTranslationSection/AddAndVoteTranslations";
 import { SourceTextAndTranslationSection } from "../$userName+/page+/$slug+/components/sourceTextAndTranslationSection/SourceTextAndTranslationSection";
 import { fetchPageWithTranslations } from "../$userName+/page+/$slug+/functions/queries.server";
 import { StartButton } from "../../components/StartButton";
@@ -53,15 +51,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Index() {
-	const {
-		currentUser,
-		heroTitle,
-		heroText,
-		sourceLanguage,
-		targetLanguage,
-	} = useLoaderData<typeof loader>();
-
-
+	const { currentUser, heroTitle, heroText, sourceLanguage, targetLanguage } =
+		useLoaderData<typeof loader>();
 
 	return (
 		<div className="flex flex-col justify-between">

@@ -35,8 +35,6 @@ export function ContentWithTranslations({
 }: ContentWithTranslationsProps) {
 	const isHydrated = useHydrated();
 
-
-
 	return (
 		<>
 			<div className="flex items-center">

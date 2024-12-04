@@ -1,11 +1,11 @@
 import { Link } from "@remix-run/react";
 import { Languages, Plus } from "lucide-react";
+import { useState } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
 import { VoteButtons } from "~/routes/resources+/vote-buttons";
 import type { SourceTextWithTranslations } from "../../types";
 import { sanitizeAndParseText } from "../../utils/sanitize-and-parse-text.client";
 import { AddAndVoteTranslations } from "./AddAndVoteTranslations";
-import { useState } from "react";
 
 interface TranslationSectionProps {
 	sourceTextWithTranslations: SourceTextWithTranslations;
@@ -17,7 +17,7 @@ export function TranslationSection({
 	currentUserName,
 }: TranslationSectionProps) {
 	const isHydrated = useHydrated();
-  const [isSelected, setIsSelected] = useState(false);
+	const [isSelected, setIsSelected] = useState(false);
 
 	const { bestTranslationWithVote } = sourceTextWithTranslations;
 	if (!bestTranslationWithVote)
@@ -32,38 +32,36 @@ export function TranslationSection({
 		: bestTranslationWithVote.translateText.text;
 
 	return (
-		<div
-			className={"group relative"}
-		>
+		<div className={"group relative"}>
 			<span
 				className="notranslate inline-block py-2 text-gray-700 dark:text-gray-200"
 				onMouseUp={(e) => {
 					if (window.getSelection()?.toString()) return;
 					if (e.button === 2) return;
-					setIsSelected(prev => !prev);
+					setIsSelected((prev) => !prev);
 				}}
 			>
 				{sanitizedAndParsedText}
 			</span>
 			{isSelected && (
-        <>
-				<div className="flex items-center justify-end">
-					<Link
-						to={`/${bestTranslationWithVote?.user.userName}`}
-						className="!no-underline mr-2"
-					>
-						<p className="text-sm text-gray-500 text-right flex justify-end items-center">
-							by: {bestTranslationWithVote?.user.displayName}
-						</p>
-					</Link>
-					<VoteButtons translationWithVote={bestTranslationWithVote} />
-				</div>
-				<AddAndVoteTranslations
-					currentUserName={currentUserName}
-					sourceTextWithTranslations={sourceTextWithTranslations}
-					open={isSelected}
-				/>
-			</>
+				<>
+					<div className="flex items-center justify-end">
+						<Link
+							to={`/${bestTranslationWithVote?.user.userName}`}
+							className="!no-underline mr-2"
+						>
+							<p className="text-sm text-gray-500 text-right flex justify-end items-center">
+								by: {bestTranslationWithVote?.user.displayName}
+							</p>
+						</Link>
+						<VoteButtons translationWithVote={bestTranslationWithVote} />
+					</div>
+					<AddAndVoteTranslations
+						currentUserName={currentUserName}
+						sourceTextWithTranslations={sourceTextWithTranslations}
+						open={isSelected}
+					/>
+				</>
 			)}
 		</div>
 	);
