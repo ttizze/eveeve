@@ -1,3 +1,4 @@
+import { arrow, offset, shift, useFloating } from "@floating-ui/react";
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import { Hash, Loader2, SquarePen } from "lucide-react";
@@ -37,6 +38,7 @@ export function ContentWithTranslations({
 	showTranslation = true,
 }: ContentWithTranslationsProps) {
 	const isHydrated = useHydrated();
+
 	const [selectedSourceTextId, setSelectedSourceTextId] = useState<
 		number | null
 	>(null);
@@ -59,8 +61,8 @@ export function ContentWithTranslations({
 
 	return (
 		<>
-			<div className="flex items-center justify-between">
-				<h1 className="!mb-0">
+			<div className="flex items-center">
+				<h1 className="!mb-0 flex-1">
 					{sourceTitleWithTranslations && (
 						<SourceTextAndTranslationSection
 							sourceTextWithTranslations={sourceTitleWithTranslations}
@@ -94,7 +96,7 @@ export function ContentWithTranslations({
 				{pageWithTranslations.tagPages.map((tagPage) => (
 					<div
 						key={tagPage.tag.id}
-						className="flex items-center gap-1 px-3 h-[32px] bg-primary rounded-full text-sm text-primary-foreground"
+						className="flex items-center gap-1 px-3 h-[32px] bg-secondary rounded-full text-sm text-secondary-foreground"
 					>
 						<button type="button" className="hover:text-destructive ml-1">
 							<Hash className="w-3 h-3" />
@@ -164,7 +166,7 @@ export function ContentWithTranslations({
 								)
 							}
 							currentUserName={currentUserName}
-							sourceTextWithTranslations={selectedSourceTextWithTranslations}
+							sourceTextWithTranslations={selectedSourceTextWithTranslations}				
 						/>
 					</div>,
 					selectedTranslationEl,

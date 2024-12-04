@@ -1,4 +1,5 @@
-import { ArrowUpDown, ChevronDown, ChevronUp, Languages } from "lucide-react";
+import type { UseFloatingReturn } from "@floating-ui/react";
+import { ChevronDown, ChevronUp, Languages } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { AddTranslationForm } from "~/routes/resources+/add-translation-form";
@@ -11,12 +12,13 @@ export function AddAndVoteTranslations({
 	currentUserName,
 	sourceTextWithTranslations,
 	open,
-	onOpenChange,
 }: {
 	currentUserName: string | undefined;
 	sourceTextWithTranslations: SourceTextWithTranslations;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	floatingRefs: UseFloatingReturn["refs"];
+	floatingStyles: UseFloatingReturn["floatingStyles"];
 }) {
 	const [showAll, setShowAll] = useState(false);
 	const { bestTranslationWithVote, translationsWithVotes, sourceText } =
@@ -49,13 +51,9 @@ export function AddAndVoteTranslations({
 					<TranslationListItem
 						translation={bestTranslationWithVote}
 						currentUserName={currentUserName}
-						showAuthor
 					/>
 				)}
 				<div>
-					<p className="text-gray-500 flex items-center justify-end mr-2 my-4">
-						<ArrowUpDown size={16} />
-					</p>
 					{displayedTranslations.map((displayedTranslation) => (
 						<TranslationListItem
 							key={displayedTranslation.translateText.id}

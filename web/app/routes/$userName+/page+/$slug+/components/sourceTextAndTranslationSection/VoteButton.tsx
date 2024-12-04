@@ -18,7 +18,7 @@ export const VoteButton = memo(function VoteButton({
 	const Icon = isUpvote ? ThumbsUp : ThumbsDown;
 	return (
 		<Button
-			variant="outline"
+			variant="ghost"
 			size="sm"
 			type="button"
 			name="isUpvote"

@@ -1,3 +1,4 @@
+import type { UseFloatingReturn } from "@floating-ui/react";
 import DOMPurify from "dompurify";
 import parse, {
 	type HTMLReactParserOptions,

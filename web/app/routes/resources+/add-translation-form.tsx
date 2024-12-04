@@ -4,10 +4,10 @@ import { getZodConstraint } from "@conform-to/zod";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { useFetcher, useNavigate } from "@remix-run/react";
 import { ArrowUpFromLine } from "lucide-react";
+import TextareaAutosize from "react-textarea-autosize";
 import { z } from "zod";
 import { StartButton } from "~/components/StartButton";
 import { Button } from "~/components/ui/button";
-import { Textarea } from "~/components/ui/textarea";
 import i18nServer from "~/i18n.server";
 import { authenticator } from "~/utils/auth.server";
 import { addUserTranslation } from "./functions/mutations.server";
@@ -67,13 +67,6 @@ export function AddTranslationForm({
 		},
 	});
 
-	const handleAction = (e: React.MouseEvent | React.FocusEvent) => {
-		if (!currentUserName) {
-			e.preventDefault();
-			navigate("/auth/login");
-		}
-	};
-
 	return (
 		<div className="mt-4">
 			<fetcher.Form
@@ -84,11 +77,12 @@ export function AddTranslationForm({
 				{form.errors}
 				<input type="hidden" name="sourceTextId" value={sourceTextId} />
 				<div className="relative">
-					<Textarea
+					<TextareaAutosize
 						{...getTextareaProps(fields.text)}
-						className={`w-full mb-2 h-24 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 ${!currentUserName && "bg-muted"}`}
-						placeholder="Enter your translation..."
+						className={`w-full mb-2 rounded-xl p-2 border border-gray-500 bg-background resize-none overflow-hidden ${!currentUserName && "bg-muted"}`}
+						placeholder="Or enter your translation..."
 						disabled={!currentUserName}
+						minRows={3}
 					/>
 					{!currentUserName && (
 						<StartButton className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
@@ -102,10 +96,15 @@ export function AddTranslationForm({
 						type="submit"
 						name="intent"
 						value="add"
-						className=""
-						disabled={fetcher.state !== "idle" || !currentUserName}
+						className="rounded-xl"
+						disabled={
+							fetcher.state !== "idle" ||
+							!currentUserName ||
+							!fields.text?.value?.trim()
+						}
 					>
 						<ArrowUpFromLine className="h-4 w-4" />
+						Submit
 					</Button>
 				</div>
 			</fetcher.Form>

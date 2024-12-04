@@ -1,3 +1,4 @@
+import type { UseFloatingReturn } from "@floating-ui/react";
 import { Lock } from "lucide-react";
 import type { ReactNode } from "react";
 import type { SourceTextWithTranslations } from "../../types";
