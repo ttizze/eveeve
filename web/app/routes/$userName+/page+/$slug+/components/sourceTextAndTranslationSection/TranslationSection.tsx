@@ -1,10 +1,10 @@
+import { Link } from "@remix-run/react";
 import { Languages, Plus } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
+import { VoteButtons } from "~/routes/resources+/vote-buttons";
 import type { SourceTextWithTranslations } from "../../types";
 import { sanitizeAndParseText } from "../../utils/sanitize-and-parse-text.client";
-import { Link } from "@remix-run/react";
-import { VoteButtons } from "~/routes/resources+/vote-buttons";
 
 interface TranslationSectionProps {
 	sourceTextWithTranslations: SourceTextWithTranslations;
@@ -32,11 +32,9 @@ export function TranslationSection({
 				<Languages size={24} />
 			</span>
 		);
-	const sanitizedAndParsedText = isHydrated ? (
-		sanitizeAndParseText(bestTranslationWithVote.translateText.text)
-	) : (
-		bestTranslationWithVote.translateText.text
-	);
+	const sanitizedAndParsedText = isHydrated
+		? sanitizeAndParseText(bestTranslationWithVote.translateText.text)
+		: bestTranslationWithVote.translateText.text;
 
 	useEffect(() => {
 		if (onSelectedRef) {
@@ -63,7 +61,7 @@ export function TranslationSection({
 			>
 				{sanitizedAndParsedText}
 			</span>
-			{isSelected &&
+			{isSelected && (
 				<div className="flex items-center justify-end">
 					<Link
 						to={`/${bestTranslationWithVote?.user.userName}`}
@@ -75,7 +73,7 @@ export function TranslationSection({
 					</Link>
 					<VoteButtons translationWithVote={bestTranslationWithVote} />
 				</div>
-			}
+			)}
 		</div>
 	);
 }
