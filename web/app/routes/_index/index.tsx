@@ -1,3 +1,4 @@
+import { useFloating } from "@floating-ui/react";
 import type { MetaFunction } from "@remix-run/node";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
@@ -61,6 +62,7 @@ export default function Index() {
 		sourceLanguage,
 		targetLanguage,
 	} = useLoaderData<typeof loader>();
+	const { refs: floatingRefs, floatingStyles } = useFloating();
 	const [selectedSourceTextId, setSelectedSourceTextId] = useState<
 		number | null
 	>(null);
@@ -92,6 +94,7 @@ export default function Index() {
 							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 							showOriginal={true}
 							showTranslation={true}
+							selectedSourceTextId={selectedSourceTextId}
 						/>
 					</h1>
 
@@ -105,6 +108,7 @@ export default function Index() {
 							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 							showOriginal={true}
 							showTranslation={true}
+							selectedSourceTextId={selectedSourceTextId}
 						/>
 					</span>
 					{!currentUser && (
@@ -124,6 +128,8 @@ export default function Index() {
 						}}
 						currentUserName={currentUser?.userName}
 						sourceTextWithTranslations={selectedSourceTextWithTranslations}
+						floatingRefs={floatingRefs}
+						floatingStyles={floatingStyles}
 					/>
 				)}
 			</main>
