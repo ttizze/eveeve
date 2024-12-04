@@ -67,7 +67,7 @@ export function AddTranslationForm({
 	});
 
 	return (
-		<div className="mt-4">
+		<div className="mt-4 px-4">
 			<fetcher.Form
 				method="post"
 				{...getFormProps(form)}
@@ -78,7 +78,7 @@ export function AddTranslationForm({
 				<div className="relative">
 					<TextareaAutosize
 						{...getTextareaProps(fields.text)}
-						className={`w-full mb-2 rounded-xl p-2 border border-gray-500 bg-background resize-none overflow-hidden ${!currentUserName && "bg-muted"}`}
+						className={`w-full mb-2 rounded-xl p-2 !text-base border border-gray-500 bg-background resize-none overflow-hidden ${!currentUserName && "bg-muted"}`}
 						placeholder="Or enter your translation..."
 						disabled={!currentUserName}
 						minRows={3}

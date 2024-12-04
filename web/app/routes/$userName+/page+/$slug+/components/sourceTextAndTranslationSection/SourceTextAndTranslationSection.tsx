@@ -7,28 +7,20 @@ interface SourceTextAndTranslationSectionProps {
 	sourceTextWithTranslations: SourceTextWithTranslations;
 	elements: string | ReactNode | ReactNode[];
 	isPublished?: boolean;
-	sourceLanguage: string;
-	targetLanguage: string;
 	sourceTextClassName?: string;
-	onOpenAddAndVoteTranslations: (sourceTextId: number) => void;
 	showOriginal: boolean;
 	showTranslation: boolean;
-	selectedSourceTextId: number | null;
-	onSelectedRef?: (el: HTMLDivElement | null) => void;
+	currentUserName: string | undefined;
 }
 
 export function SourceTextAndTranslationSection({
 	sourceTextWithTranslations,
 	elements,
 	isPublished,
-	sourceLanguage,
-	targetLanguage,
 	sourceTextClassName,
-	onOpenAddAndVoteTranslations,
 	showOriginal = true,
 	showTranslation = true,
-	selectedSourceTextId,
-	onSelectedRef,
+	currentUserName,
 }: SourceTextAndTranslationSectionProps) {
 	return (
 		<>
@@ -45,15 +37,11 @@ export function SourceTextAndTranslationSection({
 					{elements}
 				</span>
 			)}
-			{showTranslation &&
-				sourceLanguage !== targetLanguage &&
-				sourceTextWithTranslations.translationsWithVotes.length > 0 && (
+			{showTranslation && (
 					<TranslationSection
 						key={`translation-${sourceTextWithTranslations.sourceText.id}`}
 						sourceTextWithTranslations={sourceTextWithTranslations}
-						onOpenAddAndVoteTranslations={onOpenAddAndVoteTranslations}
-						selectedSourceTextId={selectedSourceTextId}
-						onSelectedRef={onSelectedRef}
+						currentUserName={currentUserName}
 					/>
 				)}
 		</>

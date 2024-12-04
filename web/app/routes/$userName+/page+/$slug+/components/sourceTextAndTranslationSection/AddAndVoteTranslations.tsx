@@ -15,10 +15,9 @@ export function AddAndVoteTranslations({
 	currentUserName: string | undefined;
 	sourceTextWithTranslations: SourceTextWithTranslations;
 	open: boolean;
-	onOpenChange: (open: boolean) => void;
 }) {
 	const [showAll, setShowAll] = useState(false);
-	const { bestTranslationWithVote, translationsWithVotes, sourceText } =
+	const { bestTranslationWithVote, translationsWithVotes } =
 		sourceTextWithTranslations;
 	const alternativeTranslationsWithVotes = translationsWithVotes.filter(
 		(t) => t.translateText.id !== bestTranslationWithVote?.translateText.id,
@@ -39,8 +38,8 @@ export function AddAndVoteTranslations({
 
 	return (
 		<div className="w-full bg-background ">
-			<div className="flex items-center text-gray-500 text-sm">
-				<Languages className="w-4 h-4 mr-1" /> Other translations:
+			<div className="flex items-center justify-end text-gray-500 text-sm">
+				<Languages className="w-4 h-4 mr-1" /> Other translations
 			</div>
 			<div>
 				<div>

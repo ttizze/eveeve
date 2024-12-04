@@ -1,4 +1,3 @@
-import { useFloating } from "@floating-ui/react";
 import type { MetaFunction } from "@remix-run/node";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
@@ -56,29 +55,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function Index() {
 	const {
 		currentUser,
-		topPageWithTranslations,
 		heroTitle,
 		heroText,
 		sourceLanguage,
 		targetLanguage,
 	} = useLoaderData<typeof loader>();
-	const { refs: floatingRefs, floatingStyles } = useFloating();
-	const [selectedSourceTextId, setSelectedSourceTextId] = useState<
-		number | null
-	>(null);
 
-	const handleOpenAddAndVoteTranslations = (sourceTextId: number) => {
-		setSelectedSourceTextId(sourceTextId);
-	};
 
-	const handleCloseAddAndVoteTranslations = () => {
-		setSelectedSourceTextId(null);
-	};
-
-	const selectedSourceTextWithTranslations =
-		topPageWithTranslations.sourceTextWithTranslations.find(
-			(stw) => stw.sourceText.id === selectedSourceTextId,
-		);
 
 	return (
 		<div className="flex flex-col justify-between">
@@ -91,11 +74,9 @@ export default function Index() {
 							elements={heroTitle.sourceText.text}
 							sourceLanguage={sourceLanguage}
 							targetLanguage={targetLanguage}
-							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
+							currentUserName={currentUser?.userName}
 							showOriginal={true}
 							showTranslation={true}
-							floatingRefs={floatingRefs}
-							selectedSourceTextId={selectedSourceTextId}
 						/>
 					</h1>
 
@@ -106,11 +87,9 @@ export default function Index() {
 							elements={heroText.sourceText.text}
 							sourceLanguage={sourceLanguage}
 							targetLanguage={targetLanguage}
-							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 							showOriginal={true}
 							showTranslation={true}
-							floatingRefs={floatingRefs}
-							selectedSourceTextId={selectedSourceTextId}
+							currentUserName={currentUser?.userName}
 						/>
 					</span>
 					{!currentUser && (
@@ -119,21 +98,6 @@ export default function Index() {
 						</div>
 					)}
 				</div>
-				{selectedSourceTextWithTranslations && (
-					<AddAndVoteTranslations
-						key={`add-and-vote-translations-${selectedSourceTextWithTranslations.sourceText.id}`}
-						open={true}
-						onOpenChange={(open) => {
-							if (!open) {
-								handleCloseAddAndVoteTranslations();
-							}
-						}}
-						currentUserName={currentUser?.userName}
-						sourceTextWithTranslations={selectedSourceTextWithTranslations}
-						floatingRefs={floatingRefs}
-						floatingStyles={floatingStyles}
-					/>
-				)}
 			</main>
 		</div>
 	);

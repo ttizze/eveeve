@@ -1,8 +1,6 @@
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import { Hash, Loader2, SquarePen } from "lucide-react";
-import { useCallback, useState } from "react";
-import { createPortal } from "react-dom";
 import { useHydrated } from "remix-utils/use-hydrated";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -11,7 +9,6 @@ import type {
 	SourceTextWithTranslations,
 } from "../types";
 import { MemoizedParsedContent } from "./ParsedContent";
-import { AddAndVoteTranslations } from "./sourceTextAndTranslationSection/AddAndVoteTranslations";
 import { SourceTextAndTranslationSection } from "./sourceTextAndTranslationSection/SourceTextAndTranslationSection";
 import { TranslateButton } from "./translateButton/TranslateButton";
 
@@ -38,25 +35,7 @@ export function ContentWithTranslations({
 }: ContentWithTranslationsProps) {
 	const isHydrated = useHydrated();
 
-	const [selectedSourceTextId, setSelectedSourceTextId] = useState<
-		number | null
-	>(null);
-	const [selectedTranslationEl, setSelectedTranslationEl] =
-		useState<HTMLDivElement | null>(null);
 
-	const handleOpenAddAndVoteTranslations = useCallback(
-		(sourceTextId: number) => {
-			setSelectedSourceTextId(
-				sourceTextId === selectedSourceTextId ? null : sourceTextId,
-			);
-		},
-		[selectedSourceTextId],
-	);
-
-	const selectedSourceTextWithTranslations =
-		pageWithTranslations.sourceTextWithTranslations.find(
-			(stw) => stw.sourceText.id === selectedSourceTextId,
-		);
 
 	return (
 		<>
@@ -67,13 +46,9 @@ export function ContentWithTranslations({
 							sourceTextWithTranslations={sourceTitleWithTranslations}
 							isPublished={pageWithTranslations.page.isPublished}
 							elements={sourceTitleWithTranslations.sourceText.text}
-							sourceLanguage={pageWithTranslations.page.sourceLanguage}
-							targetLanguage={targetLanguage}
-							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 							showOriginal={showOriginal}
 							showTranslation={showTranslation}
-							selectedSourceTextId={selectedSourceTextId}
-							onSelectedRef={setSelectedTranslationEl}
+							currentUserName={currentUserName}
 						/>
 					)}
 				</h1>
@@ -145,31 +120,10 @@ export function ContentWithTranslations({
 					sourceLanguage={pageWithTranslations.page.sourceLanguage}
 					targetLanguage={targetLanguage}
 					currentUserName={currentUserName}
-					onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 					showOriginal={showOriginal}
 					showTranslation={showTranslation}
-					selectedSourceTextId={selectedSourceTextId}
-					onSelectedRef={setSelectedTranslationEl}
 				/>
 			)}
-			{selectedSourceTextWithTranslations &&
-				selectedTranslationEl &&
-				createPortal(
-					<div className="overflow-hidden">
-						<AddAndVoteTranslations
-							key={`add-and-vote-translations-${selectedSourceTextWithTranslations.sourceText.id}`}
-							open={true}
-							onOpenChange={() =>
-								handleOpenAddAndVoteTranslations(
-									selectedSourceTextWithTranslations.sourceText.id,
-								)
-							}
-							currentUserName={currentUserName}
-							sourceTextWithTranslations={selectedSourceTextWithTranslations}
-						/>
-					</div>,
-					selectedTranslationEl,
-				)}
 		</>
 	);
 }
