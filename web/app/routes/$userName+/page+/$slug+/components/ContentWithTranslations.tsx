@@ -1,9 +1,8 @@
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
-import { Hash, Loader2, SquarePen } from "lucide-react";
+import { Hash, Loader2 } from "lucide-react";
 import { useHydrated } from "remix-utils/use-hydrated";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { Button } from "~/components/ui/button";
 import type {
 	PageWithTranslations,
 	SourceTextWithTranslations,

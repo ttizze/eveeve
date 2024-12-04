@@ -1,10 +1,10 @@
+import { Link } from "@remix-run/react";
 import { Lock } from "lucide-react";
+import { SquarePen } from "lucide-react";
 import type { ReactNode } from "react";
+import { Button } from "~/components/ui/button";
 import type { SourceTextWithTranslations } from "../../types";
 import { TranslationSection } from "./TranslationSection";
-import { Button } from "~/components/ui/button";
-import { Link } from "@remix-run/react";
-import { SquarePen } from "lucide-react";
 interface SourceTextAndTranslationSectionProps {
 	sourceTextWithTranslations: SourceTextWithTranslations;
 	elements: string | ReactNode | ReactNode[];
@@ -33,11 +33,12 @@ export function SourceTextAndTranslationSection({
 			{showOriginal && (
 				<div className="flex items-center">
 					<span
-						className={`inline-block ${sourceTextWithTranslations.translationsWithVotes.length === 0 ||
+						className={`inline-block ${
+							sourceTextWithTranslations.translationsWithVotes.length === 0 ||
 							!showTranslation
-							? "text-gray-700 dark:text-gray-200"
-							: "text-gray-300 dark:text-gray-600"
-							} ${sourceTextClassName}`}
+								? "text-gray-700 dark:text-gray-200"
+								: "text-gray-300 dark:text-gray-600"
+						} ${sourceTextClassName}`}
 					>
 						{isPublished === false && <Lock className="h-6 w-6 mr-1 inline" />}
 						{elements}
