@@ -105,7 +105,7 @@ export function ContentWithTranslations({
 				{pageWithTranslations.tagPages.map((tagPage) => (
 					<div
 						key={tagPage.tag.id}
-						className="flex items-center gap-1 px-3 h-[32px] bg-primary rounded-full text-sm text-primary-foreground"
+						className="flex items-center gap-1 px-3 h-[32px] bg-secondary rounded-full text-sm text-secondary-foreground"
 					>
 						<button type="button" className="hover:text-destructive ml-1">
 							<Hash className="w-3 h-3" />
