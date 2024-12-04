@@ -1,3 +1,4 @@
+import { useFloating } from "@floating-ui/react";
 import type { MetaFunction } from "@remix-run/node";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
@@ -8,7 +9,6 @@ import { AddAndVoteTranslations } from "../$userName+/page+/$slug+/components/so
 import { SourceTextAndTranslationSection } from "../$userName+/page+/$slug+/components/sourceTextAndTranslationSection/SourceTextAndTranslationSection";
 import { fetchPageWithTranslations } from "../$userName+/page+/$slug+/functions/queries.server";
 import { StartButton } from "../../components/StartButton";
-import { useFloating } from "@floating-ui/react";
 
 export const meta: MetaFunction = () => {
 	return [
@@ -22,7 +22,6 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-
 	const currentUser = await authenticator.isAuthenticated(request);
 	const targetLanguage = await i18nServer.getLocale(request);
 	const pageName = targetLanguage === "en" ? "evame-ja" : "evame";
