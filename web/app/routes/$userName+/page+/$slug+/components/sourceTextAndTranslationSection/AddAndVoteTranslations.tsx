@@ -17,8 +17,6 @@ export function AddAndVoteTranslations({
 	sourceTextWithTranslations: SourceTextWithTranslations;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	floatingRefs: UseFloatingReturn["refs"];
-	floatingStyles: UseFloatingReturn["floatingStyles"];
 }) {
 	const [showAll, setShowAll] = useState(false);
 	const { bestTranslationWithVote, translationsWithVotes, sourceText } =

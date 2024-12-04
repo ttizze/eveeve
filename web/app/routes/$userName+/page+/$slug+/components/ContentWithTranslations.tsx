@@ -1,4 +1,3 @@
-import { arrow, offset, shift, useFloating } from "@floating-ui/react";
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import { Hash, Loader2, SquarePen } from "lucide-react";
@@ -166,7 +165,7 @@ export function ContentWithTranslations({
 								)
 							}
 							currentUserName={currentUserName}
-							sourceTextWithTranslations={selectedSourceTextWithTranslations}				
+							sourceTextWithTranslations={selectedSourceTextWithTranslations}
 						/>
 					</div>,
 					selectedTranslationEl,

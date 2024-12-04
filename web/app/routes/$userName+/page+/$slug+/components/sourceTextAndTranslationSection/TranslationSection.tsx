@@ -1,4 +1,3 @@
-import type { UseFloatingReturn } from "@floating-ui/react";
 import { Languages, Plus } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
