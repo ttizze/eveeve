@@ -1,4 +1,3 @@
-import type { UseFloatingReturn } from "@floating-ui/react";
 import { ChevronDown, ChevronUp, Languages } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
