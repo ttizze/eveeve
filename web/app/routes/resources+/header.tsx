@@ -50,7 +50,7 @@ export function Header({ currentUser }: HeaderProps) {
 					<img
 						src="/logo.svg"
 						alt="Evame"
-						className="h-8 w-auto  dark:invert"
+						className="h-6 w-auto  dark:invert"
 						aria-label="Evame Logo"
 					/>
 				</Link>
