@@ -8,6 +8,7 @@ import { AddAndVoteTranslations } from "../$userName+/page+/$slug+/components/so
 import { SourceTextAndTranslationSection } from "../$userName+/page+/$slug+/components/sourceTextAndTranslationSection/SourceTextAndTranslationSection";
 import { fetchPageWithTranslations } from "../$userName+/page+/$slug+/functions/queries.server";
 import { StartButton } from "../../components/StartButton";
+import { useFloating } from "@floating-ui/react";
 
 export const meta: MetaFunction = () => {
 	return [
@@ -21,6 +22,7 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
+
 	const currentUser = await authenticator.isAuthenticated(request);
 	const targetLanguage = await i18nServer.getLocale(request);
 	const pageName = targetLanguage === "en" ? "evame-ja" : "evame";
@@ -61,6 +63,7 @@ export default function Index() {
 		sourceLanguage,
 		targetLanguage,
 	} = useLoaderData<typeof loader>();
+	const { refs: floatingRefs, floatingStyles } = useFloating();
 	const [selectedSourceTextId, setSelectedSourceTextId] = useState<
 		number | null
 	>(null);
@@ -92,6 +95,7 @@ export default function Index() {
 							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 							showOriginal={true}
 							showTranslation={true}
+							selectedSourceTextId={selectedSourceTextId}
 						/>
 					</h1>
 
@@ -105,6 +109,7 @@ export default function Index() {
 							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 							showOriginal={true}
 							showTranslation={true}
+							selectedSourceTextId={selectedSourceTextId}
 						/>
 					</span>
 					{!currentUser && (
@@ -124,6 +129,8 @@ export default function Index() {
 						}}
 						currentUserName={currentUser?.userName}
 						sourceTextWithTranslations={selectedSourceTextWithTranslations}
+						floatingRefs={floatingRefs}
+						floatingStyles={floatingStyles}
 					/>
 				)}
 			</main>
