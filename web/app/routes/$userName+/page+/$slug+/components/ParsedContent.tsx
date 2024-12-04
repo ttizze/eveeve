@@ -1,4 +1,3 @@
-import type { UseFloatingReturn } from "@floating-ui/react";
 import DOMPurify from "dompurify";
 import parse, {
 	type HTMLReactParserOptions,
@@ -14,11 +13,8 @@ interface ParsedContentProps {
 	sourceLanguage: string;
 	targetLanguage: string;
 	currentUserName: string | undefined;
-	onOpenAddAndVoteTranslations: (sourceTextId: number) => void;
 	showOriginal: boolean;
 	showTranslation: boolean;
-	floatingRefs: UseFloatingReturn["refs"];
-	selectedSourceTextId: number | null;
 }
 
 export const MemoizedParsedContent = memo(ParsedContent);
@@ -27,11 +23,9 @@ export function ParsedContent({
 	pageWithTranslations,
 	sourceLanguage,
 	targetLanguage,
-	onOpenAddAndVoteTranslations,
 	showOriginal = true,
 	showTranslation = true,
-	floatingRefs,
-	selectedSourceTextId,
+	currentUserName,
 }: ParsedContentProps) {
 	const sanitizedContent = DOMPurify.sanitize(
 		pageWithTranslations.page.content,
@@ -67,13 +61,9 @@ export function ParsedContent({
 							key={`translation-${sourceTextId}`}
 							sourceTextWithTranslations={sourceTextWithTranslation}
 							elements={domToReact(domNode.children as DOMNode[], options)}
-							sourceLanguage={sourceLanguage}
-							targetLanguage={targetLanguage}
-							onOpenAddAndVoteTranslations={onOpenAddAndVoteTranslations}
 							showOriginal={showOriginal}
 							showTranslation={showTranslation}
-							floatingRefs={floatingRefs}
-							selectedSourceTextId={selectedSourceTextId}
+							currentUserName={currentUserName}
 						/>
 					</DynamicTag>
 				);

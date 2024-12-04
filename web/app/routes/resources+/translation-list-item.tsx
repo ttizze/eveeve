@@ -58,9 +58,12 @@ export function TranslationListItem({
 	};
 
 	return (
-		<div className="px-3 mt-3 py-2 ">
+		<div className="pl-2 mt-1  ">
 			<div className="flex items-start justify-between">
-				{sanitizeAndParseText(translation.translateText.text)}
+				<div className="flex">
+					<span className="flex-shrink-0 w-4">・</span>
+					<span>{sanitizeAndParseText(translation.translateText.text)}</span>
+				</div>
 				{isOwner && (
 					<div className="">
 						<DropdownMenu modal={false}>

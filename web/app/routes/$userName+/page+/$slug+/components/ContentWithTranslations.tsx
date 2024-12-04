@@ -1,9 +1,6 @@
-import { arrow, offset, shift, useFloating } from "@floating-ui/react";
 import type { UserAITranslationInfo } from "@prisma/client";
 import { Link } from "@remix-run/react";
 import { Hash, Loader2, SquarePen } from "lucide-react";
-import { useRef, useState } from "react";
-import { useCallback } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -12,7 +9,6 @@ import type {
 	SourceTextWithTranslations,
 } from "../types";
 import { MemoizedParsedContent } from "./ParsedContent";
-import { AddAndVoteTranslations } from "./sourceTextAndTranslationSection/AddAndVoteTranslations";
 import { SourceTextAndTranslationSection } from "./sourceTextAndTranslationSection/SourceTextAndTranslationSection";
 import { TranslateButton } from "./translateButton/TranslateButton";
 
@@ -38,36 +34,7 @@ export function ContentWithTranslations({
 	showTranslation = true,
 }: ContentWithTranslationsProps) {
 	const isHydrated = useHydrated();
-	const arrowRef = useRef(null);
-	const ARROW_HEIGHT = 10;
-	const GAP = -2;
-	const { refs: floatingRefs, floatingStyles } = useFloating({
-		middleware: [
-			shift(),
-			offset(ARROW_HEIGHT + GAP),
-			arrow({
-				element: arrowRef,
-			}),
-		],
-	});
-	const [selectedSourceTextId, setSelectedSourceTextId] = useState<
-		number | null
-	>(null);
 
-	const handleOpenAddAndVoteTranslations = useCallback(
-		(sourceTextId: number) => {
-			setSelectedSourceTextId(sourceTextId);
-		},
-		[],
-	);
-	const handleCloseAddAndVoteTranslations = useCallback(() => {
-		setSelectedSourceTextId(null);
-	}, []);
-
-	const selectedSourceTextWithTranslations =
-		pageWithTranslations.sourceTextWithTranslations.find(
-			(stw) => stw.sourceText.id === selectedSourceTextId,
-		);
 	return (
 		<>
 			<div className="flex items-center">
@@ -77,13 +44,9 @@ export function ContentWithTranslations({
 							sourceTextWithTranslations={sourceTitleWithTranslations}
 							isPublished={pageWithTranslations.page.isPublished}
 							elements={sourceTitleWithTranslations.sourceText.text}
-							sourceLanguage={pageWithTranslations.page.sourceLanguage}
-							targetLanguage={targetLanguage}
-							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 							showOriginal={showOriginal}
 							showTranslation={showTranslation}
-							floatingRefs={floatingRefs}
-							selectedSourceTextId={selectedSourceTextId}
+							currentUserName={currentUserName}
 						/>
 					)}
 				</h1>
@@ -150,34 +113,14 @@ export function ContentWithTranslations({
 					<Loader2 className="w-10 h-10 animate-spin" />
 				</div>
 			) : (
-				<>
-					<MemoizedParsedContent
-						pageWithTranslations={pageWithTranslations}
-						sourceLanguage={pageWithTranslations.page.sourceLanguage}
-						targetLanguage={targetLanguage}
-						currentUserName={currentUserName}
-						onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
-						showOriginal={showOriginal}
-						showTranslation={showTranslation}
-						floatingRefs={floatingRefs}
-						selectedSourceTextId={selectedSourceTextId}
-					/>
-					{selectedSourceTextWithTranslations && (
-						<AddAndVoteTranslations
-							key={`add-and-vote-translations-${selectedSourceTextWithTranslations.sourceText.id}`}
-							open={true}
-							onOpenChange={(open) => {
-								if (!open) {
-									handleCloseAddAndVoteTranslations();
-								}
-							}}
-							currentUserName={currentUserName}
-							sourceTextWithTranslations={selectedSourceTextWithTranslations}
-							floatingRefs={floatingRefs}
-							floatingStyles={floatingStyles}
-						/>
-					)}
-				</>
+				<MemoizedParsedContent
+					pageWithTranslations={pageWithTranslations}
+					sourceLanguage={pageWithTranslations.page.sourceLanguage}
+					targetLanguage={targetLanguage}
+					currentUserName={currentUserName}
+					showOriginal={showOriginal}
+					showTranslation={showTranslation}
+				/>
 			)}
 		</>
 	);
