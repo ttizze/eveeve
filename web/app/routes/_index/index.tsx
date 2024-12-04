@@ -63,8 +63,6 @@ export default function Index() {
 							sourceTextWithTranslations={heroTitle}
 							sourceTextClassName="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text !text-transparent mb-2"
 							elements={heroTitle.sourceText.text}
-							sourceLanguage={sourceLanguage}
-							targetLanguage={targetLanguage}
 							currentUserName={currentUser?.userName}
 							showOriginal={true}
 							showTranslation={true}
@@ -76,8 +74,6 @@ export default function Index() {
 							sourceTextWithTranslations={heroText}
 							sourceTextClassName="mb-2"
 							elements={heroText.sourceText.text}
-							sourceLanguage={sourceLanguage}
-							targetLanguage={targetLanguage}
 							showOriginal={true}
 							showTranslation={true}
 							currentUserName={currentUser?.userName}
