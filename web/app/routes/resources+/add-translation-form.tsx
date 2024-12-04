@@ -2,7 +2,7 @@ import { getFormProps, getTextareaProps, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { getZodConstraint } from "@conform-to/zod";
 import type { ActionFunctionArgs } from "@remix-run/node";
-import { useFetcher, useNavigate } from "@remix-run/react";
+import { useFetcher } from "@remix-run/react";
 import { ArrowUpFromLine } from "lucide-react";
 import TextareaAutosize from "react-textarea-autosize";
 import { z } from "zod";
@@ -55,7 +55,6 @@ export function AddTranslationForm({
 	currentUserName,
 }: AddTranslationFormProps) {
 	const fetcher = useFetcher<typeof action>();
-	const navigate = useNavigate();
 	const [form, fields] = useForm({
 		lastResult: fetcher.data?.lastResult,
 		id: `add-translation-form-${sourceTextId}`,

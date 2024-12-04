@@ -3,6 +3,8 @@ import { useEffect, useRef } from "react";
 import { useHydrated } from "remix-utils/use-hydrated";
 import type { SourceTextWithTranslations } from "../../types";
 import { sanitizeAndParseText } from "../../utils/sanitize-and-parse-text.client";
+import { Link } from "@remix-run/react";
+import { VoteButtons } from "~/routes/resources+/vote-buttons";
 
 interface TranslationSectionProps {
 	sourceTextWithTranslations: SourceTextWithTranslations;
@@ -23,17 +25,17 @@ export function TranslationSection({
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	const { bestTranslationWithVote, sourceText } = sourceTextWithTranslations;
-	const sanitizedAndParsedText = bestTranslationWithVote ? (
-		isHydrated ? (
-			sanitizeAndParseText(bestTranslationWithVote.translateText.text)
-		) : (
-			bestTranslationWithVote.translateText.text
-		)
+	if (!bestTranslationWithVote)
+		return (
+			<span className="flex items-center gap-2">
+				<Plus size={24} />
+				<Languages size={24} />
+			</span>
+		);
+	const sanitizedAndParsedText = isHydrated ? (
+		sanitizeAndParseText(bestTranslationWithVote.translateText.text)
 	) : (
-		<span className="flex items-center gap-2">
-			<Plus size={24} />
-			<Languages size={24} />
-		</span>
+		bestTranslationWithVote.translateText.text
 	);
 
 	useEffect(() => {
@@ -45,13 +47,10 @@ export function TranslationSection({
 	return (
 		<div
 			ref={contentRef}
-			className={`group relative ${
-				isSelected ? "bg-gray-50 dark:bg-gray-800 rounded-lg" : ""
-			}`}
+			className={"group relative"}
 			style={{
 				display: "grid",
 				gridTemplateRows: isSelected ? "1fr auto" : "1fr 0fr",
-				transition: "grid-template-rows 0.2s, background-color 0.2s",
 			}}
 		>
 			<span
@@ -64,7 +63,19 @@ export function TranslationSection({
 			>
 				{sanitizedAndParsedText}
 			</span>
-			<div style={{ overflow: "hidden" }} />
+			{isSelected &&
+				<div className="flex items-center justify-end">
+					<Link
+						to={`/${bestTranslationWithVote?.user.userName}`}
+						className="!no-underline mr-2"
+					>
+						<p className="text-sm text-gray-500 text-right flex justify-end items-center  ">
+							by: {bestTranslationWithVote?.user.displayName}
+						</p>
+					</Link>
+					<VoteButtons translationWithVote={bestTranslationWithVote} />
+				</div>
+			}
 		</div>
 	);
 }

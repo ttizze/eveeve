@@ -38,18 +38,11 @@ export function AddAndVoteTranslations({
 	if (!open) return null;
 
 	return (
-		<div className="w-full bg-background border rounded-lg p-4">
-			<div className="flex items-center gap-2 mb-4">
-				<Languages className="text-gray-500 w-4 h-4" />
-				<p className="text-xl">{sourceText.text}</p>
+		<div className="w-full bg-background ">
+			<div className="flex items-center text-gray-500 text-sm">
+				<Languages className="w-4 h-4 mr-1" /> Other translations:
 			</div>
 			<div>
-				{bestTranslationWithVote && (
-					<TranslationListItem
-						translation={bestTranslationWithVote}
-						currentUserName={currentUserName}
-					/>
-				)}
 				<div>
 					{displayedTranslations.map((displayedTranslation) => (
 						<TranslationListItem
