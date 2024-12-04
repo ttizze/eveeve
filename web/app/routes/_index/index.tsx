@@ -94,6 +94,7 @@ export default function Index() {
 							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 							showOriginal={true}
 							showTranslation={true}
+							floatingRefs={floatingRefs}
 							selectedSourceTextId={selectedSourceTextId}
 						/>
 					</h1>
@@ -108,6 +109,7 @@ export default function Index() {
 							onOpenAddAndVoteTranslations={handleOpenAddAndVoteTranslations}
 							showOriginal={true}
 							showTranslation={true}
+							floatingRefs={floatingRefs}
 							selectedSourceTextId={selectedSourceTextId}
 						/>
 					</span>
