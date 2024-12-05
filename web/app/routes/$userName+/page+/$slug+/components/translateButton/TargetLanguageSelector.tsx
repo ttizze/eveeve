@@ -45,7 +45,7 @@ export default function TargetLanguageSelector({
 				<Button
 					variant="outline"
 					aria-expanded={open}
-					className="w-full justify-between"
+					className="w-full justify-between rounded-xl"
 				>
 					<span className="truncate">
 						{currentLanguage

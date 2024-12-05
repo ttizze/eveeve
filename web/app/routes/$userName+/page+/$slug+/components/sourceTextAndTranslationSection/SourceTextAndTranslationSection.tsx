@@ -1,8 +1,7 @@
-import { Link } from "@remix-run/react";
+import { NavLink } from "@remix-run/react";
 import { Lock } from "lucide-react";
 import { SquarePen } from "lucide-react";
 import type { ReactNode } from "react";
-import { Button } from "~/components/ui/button";
 import type { SourceTextWithTranslations } from "../../types";
 import { TranslationSection } from "./TranslationSection";
 interface SourceTextAndTranslationSectionProps {
@@ -43,24 +42,28 @@ export function SourceTextAndTranslationSection({
 						{isPublished === false && <Lock className="h-6 w-6 mr-1 inline" />}
 						{elements}
 					</span>
-					{isOwner && (
+					{isOwner && slug && (
 						<div className="ml-auto">
-							<Button asChild variant="ghost">
-								<Link to={`/${currentUserName}/page/${slug}/edit`}>
-									<SquarePen className="w-5 h-5" />
-								</Link>
-							</Button>
+							<NavLink
+								to={`/${currentUserName}/page/${slug}/edit`}
+								className={({ isPending }) =>
+									isPending ? "opacity-50" : "opacity-100"
+								}
+							>
+								<SquarePen className="w-5 h-5" />
+							</NavLink>
 						</div>
 					)}
 				</div>
 			)}
-			{showTranslation && (
-				<TranslationSection
-					key={`translation-${sourceTextWithTranslations.sourceText.id}`}
-					sourceTextWithTranslations={sourceTextWithTranslations}
-					currentUserName={currentUserName}
-				/>
-			)}
+			{showTranslation &&
+				sourceTextWithTranslations.translationsWithVotes.length > 0 && (
+					<TranslationSection
+						key={`translation-${sourceTextWithTranslations.sourceText.id}`}
+						sourceTextWithTranslations={sourceTextWithTranslations}
+						currentUserName={currentUserName}
+					/>
+				)}
 		</>
 	);
 }

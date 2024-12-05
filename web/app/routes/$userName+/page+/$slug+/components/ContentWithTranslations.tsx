@@ -93,7 +93,6 @@ export function ContentWithTranslations({
 				userAITranslationInfo={userAITranslationInfo}
 				hasGeminiApiKey={hasGeminiApiKey}
 				targetLanguage={targetLanguage}
-				availableTranslations={["test", "test2"]}
 			/>
 			{!isHydrated ? (
 				<div className="w-full h-full flex items-center justify-center">

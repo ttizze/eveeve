@@ -1,3 +1,4 @@
+import type { UserAITranslationInfo } from "@prisma/client";
 import { Form } from "@remix-run/react";
 import { useNavigation } from "@remix-run/react";
 import { useState } from "react";
@@ -9,15 +10,24 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "~/components/ui/dialog";
+import { Label } from "~/components/ui/label";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "~/components/ui/select";
 import { GeminiApiKeyDialog } from "~/routes/resources+/gemini-api-key-dialog";
 import TargetLanguageSelector from "./TargetLanguageSelector";
-
+import { UserAITranslationStatus } from "./UserAITranslationStatus";
 type TranslateSettingsDialogProps = {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	pageId: number;
 	targetLanguage: string;
 	hasGeminiApiKey: boolean;
+	userAITranslationInfo: UserAITranslationInfo | null;
 };
 
 export function TranslateSettingsDialog({
@@ -26,6 +36,7 @@ export function TranslateSettingsDialog({
 	pageId,
 	targetLanguage,
 	hasGeminiApiKey,
+	userAITranslationInfo,
 }: TranslateSettingsDialogProps) {
 	const [selectedModel, setSelectedModel] = useState("gemini-1.5-flash");
 	const navigation = useNavigation();
@@ -34,27 +45,35 @@ export function TranslateSettingsDialog({
 	return (
 		<>
 			<Dialog open={open} onOpenChange={onOpenChange}>
-				<DialogContent>
+				<DialogContent className="rounded-xl">
 					<DialogHeader>
-						<DialogTitle>New Translation Settings</DialogTitle>
+						<DialogTitle>Add New Translation</DialogTitle>
 					</DialogHeader>
 					<Form method="post" className="space-y-4">
 						<input type="hidden" name="pageId" value={pageId} />
 						<input type="hidden" name="aiModel" value={selectedModel} />
 
 						<div className="space-y-2">
+							<Label htmlFor="target-language">Language</Label>
 							<TargetLanguageSelector targetLanguage={targetLanguage} />
 						</div>
 
 						<div className="space-y-2">
-							<select
-								className="w-full rounded-md border"
+							<Label htmlFor="ai-model">AI Model</Label>
+							<Select
 								value={selectedModel}
-								onChange={(e) => setSelectedModel(e.target.value)}
+								onValueChange={(value) => setSelectedModel(value)}
 							>
-								<option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-								<option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
-							</select>
+								<SelectTrigger className="rounded-xl">
+									<SelectValue placeholder="Select a model" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="gemini-1.5-flash">
+										Gemini 1.5 Flash
+									</SelectItem>
+									<SelectItem value="gemini-1.5-pro">Gemini 1.5 Pro</SelectItem>
+								</SelectContent>
+							</Select>
 						</div>
 
 						{hasGeminiApiKey ? (
@@ -81,6 +100,9 @@ export function TranslateSettingsDialog({
 							</Button>
 						)}
 					</Form>
+					<UserAITranslationStatus
+						userAITranslationInfo={userAITranslationInfo}
+					/>
 				</DialogContent>
 			</Dialog>
 
