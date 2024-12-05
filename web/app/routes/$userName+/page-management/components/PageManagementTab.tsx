@@ -77,7 +77,7 @@ export function PageManagementTab({
 	const handleDelete = () => {
 		fetcher.submit(
 			{ intent: "archive", pageIds: selectedPages.join(",") },
-			{ method: "post" }
+			{ method: "post" },
 		);
 		setDialogOpen(false);
 		setSelectedPages([]);
