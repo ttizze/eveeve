@@ -3,12 +3,10 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Link } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
-import { useNavigate } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
 import { useSearchParams } from "@remix-run/react";
 import Linkify from "linkify-react";
-import { Lock, MoreVertical, Settings } from "lucide-react";
-import { BookOpen, Trash } from "lucide-react";
+import { Lock, Settings } from "lucide-react";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -20,20 +18,6 @@ import {
 	CardTitle,
 } from "~/components/ui/card";
 import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "~/components/ui/dialog";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
-import {
 	Pagination,
 	PaginationContent,
 	PaginationItem,
@@ -44,6 +28,8 @@ import {
 import i18nServer from "~/i18n.server";
 import { LikeButton } from "~/routes/resources+/like-button";
 import { authenticator } from "~/utils/auth.server";
+import { DeletePageDialog } from "./components/DeletePageDialog";
+import { PageActionsDropdown } from "./components/PageActionsDropdown";
 import {
 	archivePage,
 	togglePagePublicStatus,
@@ -74,7 +60,6 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
 	const sanitizedUserWithPages = await fetchSanitizedUserWithPages(
 		userName,
-		isOwner,
 		page,
 		pageSize,
 	);
@@ -124,7 +109,6 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function UserPage() {
-	const navigate = useNavigate();
 	const { sanitizedUserWithPages, isOwner, totalPages, currentPage } =
 		useLoaderData<typeof loader>();
 	const [dialogOpen, setDialogOpen] = useState(false);
@@ -144,6 +128,7 @@ export default function UserPage() {
 		setPageToDelete(pageId);
 		setDialogOpen(true);
 	};
+
 	const confirmArchive = () => {
 		if (pageToDelete) {
 			fetcher.submit(
@@ -152,6 +137,7 @@ export default function UserPage() {
 			);
 		}
 		setDialogOpen(false);
+		setPageToDelete(null);
 	};
 
 	const handlePageChange = (newPage: number) => {
@@ -203,36 +189,14 @@ export default function UserPage() {
 						className="h-full relative  w-full overflow-hidden"
 					>
 						{isOwner && (
-							<DropdownMenu modal={false}>
-								<DropdownMenuTrigger asChild>
-									<Button
-										variant="ghost"
-										className="h-8 w-8 p-0 absolute top-2 right-2"
-										aria-label="More options"
-									>
-										<MoreVertical className="h-4 w-4" />
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end">
-									<DropdownMenuItem
-										onSelect={() =>
-											navigate(
-												`/${sanitizedUserWithPages.userName}/page/${page.slug}/edit`,
-											)
-										}
-									>
-										Edit
-									</DropdownMenuItem>
-									<DropdownMenuItem
-										onSelect={() => togglePagePublicStatus(page.id)}
-									>
-										{page.isPublished ? "Make Private" : "Make Public"}
-									</DropdownMenuItem>
-									<DropdownMenuItem onSelect={() => handleArchive(page.id)}>
-										Delete
-									</DropdownMenuItem>
-								</DropdownMenuContent>
-							</DropdownMenu>
+							<div className="absolute top-2 right-2">
+								<PageActionsDropdown
+									editPath={`/${sanitizedUserWithPages.userName}/page/${page.slug}/edit`}
+									onTogglePublic={() => togglePagePublicStatus(page.id)}
+									onDelete={() => handleArchive(page.id)}
+									isPublished={page.isPublished}
+								/>
+							</div>
 						)}
 						<CardHeader>
 							<Link
@@ -298,29 +262,12 @@ export default function UserPage() {
 					{isOwner ? "You haven't created any pages yet." : "No pages yet."}
 				</p>
 			)}
-			<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle className="flex items-center">
-							<Trash className="w-4 h-4 mr-2" />
-							<BookOpen className="w-4 h-4 mr-2" />
-						</DialogTitle>
-						<DialogDescription>
-							This action cannot be undone. Are you sure you want to delete this
-							page?
-						</DialogDescription>
-					</DialogHeader>
-					<DialogFooter>
-						<Button variant="outline" onClick={() => setDialogOpen(false)}>
-							Cancel
-						</Button>
-						<Button variant="destructive" onClick={confirmArchive}>
-							<Trash className="w-4 h-4 mr-2" />
-							Delete
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
+
+			<DeletePageDialog
+				open={dialogOpen}
+				onOpenChange={setDialogOpen}
+				onConfirm={confirmArchive}
+			/>
 		</div>
 	);
 }

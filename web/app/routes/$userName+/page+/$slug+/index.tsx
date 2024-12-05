@@ -136,58 +136,50 @@ export async function action({ request }: ActionFunctionArgs) {
 	if (submission.status !== "success") {
 		return { intent: null, lastResult: submission.reply(), slug: null };
 	}
-	const { intent } = submission.value;
-	switch (intent) {
-		case "translate": {
-			if (!nonSanitizedUser?.geminiApiKey) {
-				return {
-					lastResult: submission.reply({
-						formErrors: ["Gemini API key is not set"],
-					}),
-					intent: null,
-					slug: null,
-				};
-			}
-			const pageWithSourceTexts = await fetchPageWithSourceTexts(
-				submission.value.pageId,
-			);
-			if (!pageWithSourceTexts) {
-				return {
-					lastResult: submission.reply({
-						formErrors: ["Page not found"],
-					}),
-					intent: null,
-					slug: null,
-				};
-			}
-			const userAITranslationInfo = await createUserAITranslationInfo(
-				nonSanitizedUser.id,
-				pageWithSourceTexts.id,
-				submission.value.aiModel,
-				targetLanguage,
-			);
-
-			const queue = getTranslateUserQueue(nonSanitizedUser.id);
-			const job = await queue.add(`translate-${nonSanitizedUser.id}`, {
-				userAITranslationInfoId: userAITranslationInfo.id,
-				geminiApiKey: nonSanitizedUser.geminiApiKey,
-				aiModel: submission.value.aiModel,
-				userId: nonSanitizedUser.id,
-				pageId: pageWithSourceTexts.id,
-				targetLanguage,
-				title: pageWithSourceTexts.title,
-				numberedContent: pageWithSourceTexts.content,
-				numberedElements: pageWithSourceTexts.sourceTexts,
-			});
-			return {
-				intent,
-				lastResult: submission.reply({ resetForm: true }),
-				slug: pageWithSourceTexts.slug,
-			};
-		}
-		default:
-			throw new Error("Invalid Intent");
+	if (!nonSanitizedUser?.geminiApiKey) {
+		return {
+			lastResult: submission.reply({
+				formErrors: ["Gemini API key is not set"],
+			}),
+			intent: null,
+			slug: null,
+		};
 	}
+	const pageWithSourceTexts = await fetchPageWithSourceTexts(
+		submission.value.pageId,
+	);
+	if (!pageWithSourceTexts) {
+		return {
+			lastResult: submission.reply({
+				formErrors: ["Page not found"],
+			}),
+			intent: null,
+			slug: null,
+		};
+	}
+	const userAITranslationInfo = await createUserAITranslationInfo(
+		nonSanitizedUser.id,
+		pageWithSourceTexts.id,
+		submission.value.aiModel,
+		targetLanguage,
+	);
+
+	const queue = getTranslateUserQueue(nonSanitizedUser.id);
+	await queue.add(`translate-${nonSanitizedUser.id}`, {
+		userAITranslationInfoId: userAITranslationInfo.id,
+		geminiApiKey: nonSanitizedUser.geminiApiKey,
+		aiModel: submission.value.aiModel,
+		userId: nonSanitizedUser.id,
+		pageId: pageWithSourceTexts.id,
+		targetLanguage,
+		title: pageWithSourceTexts.title,
+		numberedContent: pageWithSourceTexts.content,
+		numberedElements: pageWithSourceTexts.sourceTexts,
+	});
+	return {
+		lastResult: submission.reply({ resetForm: true }),
+		slug: pageWithSourceTexts.slug,
+	};
 }
 
 export default function Page() {

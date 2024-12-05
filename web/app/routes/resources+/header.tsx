@@ -104,11 +104,11 @@ export function Header({ currentUser }: HeaderProps) {
 									<DropdownMenuSeparator className="my-0" />
 									<DropdownMenuItem asChild>
 										<Link
-											to={`/${currentUser.userName}/settings`}
+											to={`/${currentUser.userName}/page-management`}
 											className="w-full rounded-none flex items-center gap-2 justify-start  text-left px-4 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
 										>
 											<SettingsIcon className="w-4 h-4" />
-											Settings
+											Page Management
 										</Link>
 									</DropdownMenuItem>
 									<DropdownMenuItem asChild>
