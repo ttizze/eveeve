@@ -14,7 +14,14 @@ export const translationInputSchema = z
 
 export type PageWithTitle = Omit<
 	Page,
-	"content" | "sourceTexts" | "translations" | "userId" | "sourceLanguage" | "isArchived" | "createdAt" | "updatedAt"
+	| "content"
+	| "sourceTexts"
+	| "translations"
+	| "userId"
+	| "sourceLanguage"
+	| "isArchived"
+	| "createdAt"
+	| "updatedAt"
 > & {
 	title: string;
 	createdAt: string;

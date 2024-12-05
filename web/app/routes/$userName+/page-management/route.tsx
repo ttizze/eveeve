@@ -11,13 +11,13 @@ import { authenticator } from "~/utils/auth.server";
 import { FolderUploadTab } from "./components/FolderUploadTab";
 import { GitHubIntegrationTab } from "./components/GitHubIntegrationTab";
 import { PageManagementTab } from "./components/PageManagementTab";
-import { fetchPaginatedOwnPages } from "./functions/queries.server";
 import { archivePages } from "./functions/mutations.server";
+import { fetchPaginatedOwnPages } from "./functions/queries.server";
 import { translationInputSchema } from "./types";
 import { processFolder } from "./utils/process-folder";
 
 const archiveSchema = z.object({
-  pageIds: z.string().transform((val) => val.split(",").map(Number)),
+	pageIds: z.string().transform((val) => val.split(",").map(Number)),
 	intent: z.literal("archive"),
 });
 
@@ -35,7 +35,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const page = Number(url.searchParams.get("page") || "1");
 	const search = url.searchParams.get("search") || "";
 	const { pagesWithTitle, totalPages, currentPage } =
-		await fetchPaginatedOwnPages(currentUser.id, targetLanguage, page, 10, search);
+		await fetchPaginatedOwnPages(
+			currentUser.id,
+			targetLanguage,
+			page,
+			10,
+			search,
+		);
 	return {
 		currentUser,
 		hasGeminiApiKey,
@@ -44,7 +50,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		currentPage,
 	};
 }
-
 
 export async function action({ request }: ActionFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
