@@ -9,9 +9,9 @@ import { authenticator } from "~/utils/auth.server";
 import { FolderUploadTab } from "./components/FolderUploadTab";
 import { GitHubIntegrationTab } from "./components/GitHubIntegrationTab";
 import { PageManagementTab } from "./components/PageManagementTab";
+import { fetchPaginatedOwnPages } from "./functions/queries.server";
 import { translationInputSchema } from "./types";
 import { processFolder } from "./utils/process-folder";
-import { fetchPaginatedOwnPages } from "./functions/queries.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
@@ -27,12 +27,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const page = Number(url.searchParams.get("page") || "1");
 	const search = url.searchParams.get("search") || "";
 
-	const { pagesWithTitle, totalPages, currentPage } = await fetchPaginatedOwnPages(
-		currentUser.id,
-		page,
-		10,
-		search,
-	);
+	const { pagesWithTitle, totalPages, currentPage } =
+		await fetchPaginatedOwnPages(currentUser.id, page, 10, search);
 	return {
 		currentUser,
 		targetLanguage,
@@ -98,7 +94,13 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	let slugs: string[] = [];
 	if (submission.value.folder) {
-		slugs = await processFolder(submission.value.folder, nonSanitizedUser, submission.value.aiModel, targetLanguage, queue);
+		slugs = await processFolder(
+			submission.value.folder,
+			nonSanitizedUser,
+			submission.value.aiModel,
+			targetLanguage,
+			queue,
+		);
 	} else {
 		return {
 			lastResult: submission.reply({
@@ -115,7 +117,8 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function TranslatePage() {
-	const { hasGeminiApiKey, pagesWithTitle, totalPages, currentPage } = useLoaderData<typeof loader>();
+	const { hasGeminiApiKey, pagesWithTitle, totalPages, currentPage } =
+		useLoaderData<typeof loader>();
 
 	return (
 		<div className="mx-auto max-w-4xl py-10">
@@ -123,9 +126,7 @@ export default function TranslatePage() {
 				<TabsList className="grid w-full grid-cols-3">
 					<TabsTrigger value="page-management">Management</TabsTrigger>
 					<TabsTrigger value="folder-upload">Folder</TabsTrigger>
-					<TabsTrigger value="github-integration">
-						GitHub
-					</TabsTrigger>
+					<TabsTrigger value="github-integration">GitHub</TabsTrigger>
 				</TabsList>
 
 				<TabsContent value="page-management">

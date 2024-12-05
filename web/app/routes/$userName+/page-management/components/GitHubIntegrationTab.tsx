@@ -12,7 +12,6 @@ import { Label } from "~/components/ui/label";
 export function GitHubIntegrationTab() {
 	return (
 		<div className="space-y-6">
-
 			<div className="grid gap-6">
 				<Card>
 					<CardHeader>

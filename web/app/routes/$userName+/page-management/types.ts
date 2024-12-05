@@ -1,5 +1,5 @@
-import { z } from "zod";
 import type { Page } from "@prisma/client";
+import { z } from "zod";
 
 export const translationInputSchema = z
 	.object({
@@ -12,9 +12,9 @@ export const translationInputSchema = z
 			"URLまたはフォルダ（1つ以上のファイル）のいずれかを指定してください",
 	});
 
-	export type PageWithTitle = Omit<
-  Page,
-  'content' | 'sourceTexts' | 'translations' | 'userId' | 'sourceLanguage'
+export type PageWithTitle = Omit<
+	Page,
+	"content" | "sourceTexts" | "translations" | "userId" | "sourceLanguage"
 > & {
-  title: string;
+	title: string;
 };

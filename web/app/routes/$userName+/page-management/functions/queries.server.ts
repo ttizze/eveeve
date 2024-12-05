@@ -3,7 +3,6 @@ export const getDbUser = async (userId: number) => {
 	return await prisma.user.findUnique({ where: { id: userId } });
 };
 
-
 export async function fetchPaginatedOwnPages(
 	userId: number,
 	page = 1,
