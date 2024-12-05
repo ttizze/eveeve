@@ -7,7 +7,7 @@ import { useNavigate } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
 import { useSearchParams } from "@remix-run/react";
 import Linkify from "linkify-react";
-import { Lock, MoreVertical, Settings } from "lucide-react";
+import { Lock, Settings } from "lucide-react";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -18,12 +18,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "~/components/ui/card";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
 import {
 	Pagination,
 	PaginationContent,
@@ -36,6 +30,7 @@ import i18nServer from "~/i18n.server";
 import { LikeButton } from "~/routes/resources+/like-button";
 import { authenticator } from "~/utils/auth.server";
 import { DeletePageDialog } from "./components/DeletePageDialog";
+import { PageActionsDropdown } from "./components/PageActionsDropdown";
 import {
 	archivePage,
 	togglePagePublicStatus,
@@ -44,7 +39,6 @@ import {
 	fetchPageById,
 	fetchSanitizedUserWithPages,
 } from "./functions/queries.server";
-import { PageActionsDropdown } from "./components/PageActionsDropdown";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	if (!data) {
@@ -199,12 +193,12 @@ export default function UserPage() {
 						{isOwner && (
 							<div className="absolute top-2 right-2">
 								<PageActionsDropdown
-								editPath={`/${sanitizedUserWithPages.userName}/page/${page.slug}/edit`}
-								onTogglePublic={() => togglePagePublicStatus(page.id)}
-								onDelete={() => handleArchive(page.id)}
-								isPublished={page.isPublished}
+									editPath={`/${sanitizedUserWithPages.userName}/page/${page.slug}/edit`}
+									onTogglePublic={() => togglePagePublicStatus(page.id)}
+									onDelete={() => handleArchive(page.id)}
+									isPublished={page.isPublished}
 								/>
-								</div>
+							</div>
 						)}
 						<CardHeader>
 							<Link

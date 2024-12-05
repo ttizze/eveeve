@@ -1,7 +1,6 @@
 import { useSearchParams } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import { PageActionsDropdown } from "../../components/PageActionsDropdown";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -23,6 +22,7 @@ import {
 	TableRow,
 } from "~/components/ui/table";
 import { DeletePageDialog } from "../../components/DeletePageDialog";
+import { PageActionsDropdown } from "../../components/PageActionsDropdown";
 import type { PageWithTitle } from "../types";
 
 interface PageManagementTabProps {
