@@ -23,3 +23,12 @@ export async function createUserAITranslationInfo(
 		throw error;
 	}
 }
+
+export async function archivePages(pageIds: number[]) {
+	return prisma.page.updateMany	({
+		where: { id: { in: pageIds } },
+		data: {
+			isArchived: true,
+		},
+	});
+}

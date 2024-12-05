@@ -1,6 +1,8 @@
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { data } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { z } from "zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import i18nServer from "~/i18n.server";
@@ -10,8 +12,14 @@ import { FolderUploadTab } from "./components/FolderUploadTab";
 import { GitHubIntegrationTab } from "./components/GitHubIntegrationTab";
 import { PageManagementTab } from "./components/PageManagementTab";
 import { fetchPaginatedOwnPages } from "./functions/queries.server";
+import { archivePages } from "./functions/mutations.server";
 import { translationInputSchema } from "./types";
 import { processFolder } from "./utils/process-folder";
+
+const archiveSchema = z.object({
+  pageIds: z.string().transform((val) => val.split(",").map(Number)),
+	intent: z.literal("archive"),
+});
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
@@ -26,18 +34,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
 	const page = Number(url.searchParams.get("page") || "1");
 	const search = url.searchParams.get("search") || "";
-
 	const { pagesWithTitle, totalPages, currentPage } =
-		await fetchPaginatedOwnPages(currentUser.id, page, 10, search);
+		await fetchPaginatedOwnPages(currentUser.id, targetLanguage, page, 10, search);
 	return {
 		currentUser,
-		targetLanguage,
 		hasGeminiApiKey,
 		pagesWithTitle,
 		totalPages,
 		currentPage,
 	};
 }
+
 
 export async function action({ request }: ActionFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
@@ -47,6 +54,25 @@ export async function action({ request }: ActionFunctionArgs) {
 		currentUser.userName,
 	);
 	const formData = await request.formData();
+
+	if (formData.get("intent") === "archive") {
+		const submission = parseWithZod(formData, {
+			schema: archiveSchema,
+		});
+
+		if (submission.status !== "success") {
+			return data(
+				{ error: "Invalid submission" },
+				{
+					status: 400,
+				},
+			);
+		}
+
+		await archivePages(submission.value.pageIds);
+		return data({ success: true });
+	}
+
 	const submission = parseWithZod(formData, {
 		schema: translationInputSchema,
 	});

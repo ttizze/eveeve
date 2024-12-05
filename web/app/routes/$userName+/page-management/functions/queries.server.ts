@@ -5,6 +5,7 @@ export const getDbUser = async (userId: number) => {
 
 export async function fetchPaginatedOwnPages(
 	userId: number,
+	targetLanguage: string,
 	page = 1,
 	pageSize = 10,
 	searchTerm = "",
@@ -12,6 +13,7 @@ export async function fetchPaginatedOwnPages(
 	const skip = (page - 1) * pageSize;
 	const whereClause = {
 		userId,
+		isArchived: false,
 		sourceTexts: {
 			some: {
 				number: 0,
@@ -37,7 +39,6 @@ export async function fetchPaginatedOwnPages(
 				updatedAt: true,
 				createdAt: true,
 				isPublished: true,
-				isArchived: true,
 				sourceTexts: {
 					where: {
 						number: 0,
@@ -56,6 +57,8 @@ export async function fetchPaginatedOwnPages(
 
 	const pagesWithTitle = pages.map((page) => ({
 		...page,
+		createdAt: page.createdAt.toLocaleString(targetLanguage),
+		updatedAt: page.updatedAt.toLocaleString(targetLanguage),
 		title: page.sourceTexts.filter((item) => item.number === 0)[0].text,
 	}));
 	return {
