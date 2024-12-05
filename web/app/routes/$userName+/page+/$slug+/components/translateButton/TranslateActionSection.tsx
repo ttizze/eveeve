@@ -1,8 +1,8 @@
-import type { UserAITranslationInfo } from '@prisma/client';
-import { Languages } from 'lucide-react';
-import { useState } from 'react';
-import { TranslateSettingsDialog } from './TranslateSettingsDialog';
-import TargetLanguageSelector from './TargetLanguageSelector';
+import type { UserAITranslationInfo } from "@prisma/client";
+import { Languages } from "lucide-react";
+import { useState } from "react";
+import TargetLanguageSelector from "./TargetLanguageSelector";
+import { TranslateSettingsDialog } from "./TranslateSettingsDialog";
 
 type TranslateActionSectionProps = {
 	pageId: number;
@@ -22,10 +22,7 @@ export function TranslateActionSection({
 	return (
 		<div className="flex items-center pt-3 md:max-w-48">
 			<Languages className="w-4 h-4 mr-2" />
-			<TargetLanguageSelector 
-				targetLanguage={targetLanguage} 
-				onClick={() => setIsSettingsOpen(true)}
-			/>
+			<TargetLanguageSelector targetLanguage={targetLanguage} />
 
 			<TranslateSettingsDialog
 				open={isSettingsOpen}
