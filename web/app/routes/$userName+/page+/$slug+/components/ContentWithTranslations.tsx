@@ -9,7 +9,7 @@ import type {
 } from "../types";
 import { MemoizedParsedContent } from "./ParsedContent";
 import { SourceTextAndTranslationSection } from "./sourceTextAndTranslationSection/SourceTextAndTranslationSection";
-import { TranslateButton } from "./translateButton/TranslateButton";
+import { TranslateActionSection } from "./translateButton/TranslateActionSection";
 
 interface ContentWithTranslationsProps {
 	pageWithTranslations: PageWithTranslations;
@@ -88,11 +88,12 @@ export function ContentWithTranslations({
 					</div>
 				</Link>
 			</div>
-			<TranslateButton
+			<TranslateActionSection
 				pageId={pageWithTranslations.page.id}
 				userAITranslationInfo={userAITranslationInfo}
 				hasGeminiApiKey={hasGeminiApiKey}
 				targetLanguage={targetLanguage}
+				availableTranslations={["test", "test2"]}
 			/>
 			{!isHydrated ? (
 				<div className="w-full h-full flex items-center justify-center">
