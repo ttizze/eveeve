@@ -17,6 +17,7 @@ import type { SanitizedUser } from "~/types";
 import { authenticator } from "~/utils/auth.server";
 import { ModeToggle } from "../../components/ModeToggle";
 import { NewPageButton } from "./components/NewPageButton";
+import { NavLink } from "@remix-run/react";
 interface HeaderProps {
 	currentUser: SanitizedUser | null;
 }
@@ -57,12 +58,16 @@ export function Header({ currentUser }: HeaderProps) {
 				<div
 					className={`grid ${currentUser ? "grid-cols-3" : "grid-cols-2"} gap-3 items-center mr-2`}
 				>
-					<Link
+					<NavLink
 						to="/search"
-						className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white justify-self-end"
+						className={({ isPending }) =>
+							isPending
+								? "opacity-50"
+								: "opacity-100 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white justify-self-end"
+						}
 					>
 						<Search className="w-6 h-6 " />
-					</Link>
+					</NavLink>
 					{currentUser ? (
 						<>
 							<NewPageButton userName={currentUser.userName} />
@@ -80,9 +85,13 @@ export function Header({ currentUser }: HeaderProps) {
 								</DropdownMenuTrigger>
 								<DropdownMenuContent className="m-2 p-0 rounded-xl min-w-40">
 									<DropdownMenuItem asChild>
-										<Link
+										<NavLink
 											to={`/${currentUser.userName}`}
-											className="w-full rounded-none  px-4 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+											className={({ isPending }) =>
+												isPending
+													? "opacity-50"
+													: "opacity-100 w-full  px-4 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+												}
 										>
 											<div className="flex flex-col items-start">
 												{currentUser.displayName}
@@ -90,7 +99,7 @@ export function Header({ currentUser }: HeaderProps) {
 													@{currentUser.userName}
 												</span>
 											</div>
-										</Link>
+										</NavLink>
 									</DropdownMenuItem>
 									<DropdownMenuSeparator className="my-0" />
 									<DropdownMenuItem asChild>
