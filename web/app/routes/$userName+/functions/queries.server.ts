@@ -3,7 +3,6 @@ import { sanitizeUser } from "~/utils/sanitizeUser";
 
 export async function fetchSanitizedUserWithPages(
 	userName: string,
-	isOwnProfile: boolean,
 	page = 1,
 	pageSize = 9,
 ) {
@@ -43,7 +42,7 @@ export async function fetchSanitizedUserWithPages(
 					},
 					where: {
 						isArchived: false,
-						...(isOwnProfile ? {} : { isPublished: true }),
+						isPublished: true,
 					},
 					orderBy: { createdAt: "desc" },
 					skip,
@@ -55,7 +54,7 @@ export async function fetchSanitizedUserWithPages(
 			where: {
 				user: { userName },
 				isArchived: false,
-				...(isOwnProfile ? {} : { isPublished: true }),
+				isPublished: true,
 			},
 		}),
 	]);

@@ -12,15 +12,6 @@ import { Label } from "~/components/ui/label";
 export function GitHubIntegrationTab() {
 	return (
 		<div className="space-y-6">
-			<div className="flex flex-col space-y-4">
-				<h2 className="text-2xl font-bold tracking-tight">
-					GitHub Integration
-				</h2>
-				<p className="text-muted-foreground">
-					Connect your GitHub repository to automatically sync and translate
-					your markdown content.
-				</p>
-			</div>
 
 			<div className="grid gap-6">
 				<Card>

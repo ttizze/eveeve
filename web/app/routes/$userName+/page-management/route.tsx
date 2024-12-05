@@ -1,32 +1,21 @@
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { marked } from "marked";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import i18nServer from "~/i18n.server";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
 import { authenticator } from "~/utils/auth.server";
-import { createOrUpdateSourceTexts } from "../page+/$slug+/edit/functions/mutations.server";
-import { createOrUpdatePage } from "../page+/$slug+/edit/functions/mutations.server";
-import { getTitleSourceTextId } from "../page+/$slug+/edit/functions/queries.server";
-import { addNumbersToContent } from "../page+/$slug+/edit/utils/addNumbersToContent";
-import { addSourceTextIdToContent } from "../page+/$slug+/edit/utils/addSourceTextIdToContent";
-import { extractArticle } from "../page+/$slug+/edit/utils/extractArticle";
-import { extractTextElementInfo } from "../page+/$slug+/edit/utils/extractTextElementInfo";
-import { getPageSourceLanguage } from "../page+/$slug+/edit/utils/getPageSourceLanguage";
 import { FolderUploadTab } from "./components/FolderUploadTab";
 import { GitHubIntegrationTab } from "./components/GitHubIntegrationTab";
 import { PageManagementTab } from "./components/PageManagementTab";
-import { createUserAITranslationInfo } from "./functions/mutations.server";
 import { translationInputSchema } from "./types";
-import { generateMarkdownFromDirectory } from "./utils/generate-markdown";
-import { generateSlug } from "./utils/generate-slug.server";
-import { processUploadedFolder } from "./utils/process-uploaded-folder";
+import { processFolder } from "./utils/process-folder";
+import { fetchPaginatedOwnPages } from "./functions/queries.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
-		failureRedirect: "/fail",
+		failureRedirect: "/auth/login",
 	});
 
 	const nonSanitizedUser = await getNonSanitizedUserbyUserName(
@@ -34,11 +23,23 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	);
 	const hasGeminiApiKey = !!nonSanitizedUser?.geminiApiKey;
 	const targetLanguage = await i18nServer.getLocale(request);
+	const url = new URL(request.url);
+	const page = Number(url.searchParams.get("page") || "1");
+	const search = url.searchParams.get("search") || "";
 
+	const { pagesWithTitle, totalPages, currentPage } = await fetchPaginatedOwnPages(
+		currentUser.id,
+		page,
+		10,
+		search,
+	);
 	return {
 		currentUser,
 		targetLanguage,
 		hasGeminiApiKey,
+		pagesWithTitle,
+		totalPages,
+		currentPage,
 	};
 }
 
@@ -66,11 +67,8 @@ export async function action({ request }: ActionFunctionArgs) {
 		};
 	}
 
-	const geminiApiKey = nonSanitizedUser.geminiApiKey;
-
 	const targetLanguage = await i18nServer.getLocale(request);
 	const queue = getTranslateUserQueue(nonSanitizedUser.id);
-	const slugs: string[] = [];
 
 	function generateLinkArticle(
 		userId: number,
@@ -98,126 +96,16 @@ export async function action({ request }: ActionFunctionArgs) {
 		return article;
 	}
 
-	const processFolder = async (folder: File[]) => {
-		const folderStructure = processUploadedFolder(folder);
-
-		for (const [folderPath, fileList] of Object.entries(folderStructure)) {
-			const folderSlug = await generateSlug(folderPath);
-			const fileInfoPromises = fileList.map(async (file) => ({
-				name: file.name,
-				slug: await generateSlug(file.name),
-			}));
-			const fileInfos = await Promise.all(fileInfoPromises);
-
-			for (const [index, file] of fileList.entries()) {
-				const fileSlug = fileInfos[index].slug;
-
-				const markdown = await file.text();
-				const html = await marked.parse(markdown);
-
-				const titleMatch = markdown.match(/^#\s+(.*)/);
-				const title = titleMatch ? titleMatch[1] : "Untitled";
-
-				const { content } = extractArticle(html);
-				const numberedContent = addNumbersToContent(content);
-				const titleSourceTextId = await getTitleSourceTextId(fileSlug);
-				const numberedElements = await extractTextElementInfo(
-					numberedContent,
-					title,
-					titleSourceTextId,
-				);
-
-				const sourceLanguage = await getPageSourceLanguage(
-					numberedContent,
-					title,
-				);
-				const page = await createOrUpdatePage(
-					nonSanitizedUser.id,
-					fileSlug,
-					title,
-					numberedContent,
-					true,
-					sourceLanguage,
-				);
-				const sourceTextsIdWithNumber = await createOrUpdateSourceTexts(
-					numberedElements,
-					page.id,
-				);
-				const contentWithSourceTextId = addSourceTextIdToContent(
-					numberedContent,
-					sourceTextsIdWithNumber,
-				);
-				await createOrUpdatePage(
-					currentUser.id,
-					fileSlug,
-					title,
-					contentWithSourceTextId,
-					true,
-					sourceLanguage,
-				);
-				const userAITranslationInfo = await createUserAITranslationInfo(
-					nonSanitizedUser.id,
-					page.id,
-					submission.value.aiModel,
-					targetLanguage,
-				);
-
-				await queue.add(`translate-${nonSanitizedUser.id}`, {
-					userAITranslationInfoId: userAITranslationInfo.id,
-					geminiApiKey: geminiApiKey,
-					aiModel: submission.value.aiModel,
-					userId: nonSanitizedUser.id,
-					targetLanguage,
-					pageId: page.id,
-					title,
-					numberedContent,
-					numberedElements,
-				});
-			}
-
-			// ディレクトリ構造を反映したMarkdownを生成
-			const directoryMarkdown = generateMarkdownFromDirectory(
-				folderPath,
-				fileInfos,
-			);
-			const markdownSlug = await generateSlug(`${folderPath}-index`);
-			const directoryHtml = await marked.parse(directoryMarkdown);
-			const page = await createOrUpdatePage(
-				nonSanitizedUser.id,
-				markdownSlug,
-				folderPath,
-				directoryHtml,
-				true,
-				"en",
-			);
-			const numberedElements = await extractTextElementInfo(
-				directoryHtml,
-				folderPath,
-				page.id,
-			);
-			const sourceTextsIdWithNumber = await createOrUpdateSourceTexts(
-				numberedElements,
-				page.id,
-			);
-			const contentWithSourceTextId = addSourceTextIdToContent(
-				directoryHtml,
-				sourceTextsIdWithNumber,
-			);
-			await createOrUpdatePage(
-				nonSanitizedUser.id,
-				markdownSlug,
-				folderPath,
-				contentWithSourceTextId,
-				true,
-				"en",
-			);
-
-			slugs.push(folderSlug);
-		}
-	};
-
+	let slugs: string[] = [];
 	if (submission.value.folder) {
-		await processFolder(submission.value.folder);
+		slugs = await processFolder(submission.value.folder, nonSanitizedUser, submission.value.aiModel, targetLanguage, queue);
+	} else {
+		return {
+			lastResult: submission.reply({
+				formErrors: ["Folder is not selected"],
+			}),
+			slugs: [],
+		};
 	}
 
 	return {
@@ -227,21 +115,25 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function TranslatePage() {
-	const { hasGeminiApiKey } = useLoaderData<typeof loader>();
+	const { hasGeminiApiKey, pagesWithTitle, totalPages, currentPage } = useLoaderData<typeof loader>();
 
 	return (
-		<div className="container mx-auto max-w-4xl py-10">
+		<div className="mx-auto max-w-4xl py-10">
 			<Tabs defaultValue="page-management" className="w-full">
 				<TabsList className="grid w-full grid-cols-3">
-					<TabsTrigger value="page-management">Page Management</TabsTrigger>
-					<TabsTrigger value="folder-upload">Folder Upload</TabsTrigger>
+					<TabsTrigger value="page-management">Management</TabsTrigger>
+					<TabsTrigger value="folder-upload">Folder</TabsTrigger>
 					<TabsTrigger value="github-integration">
-						GitHub Integration
+						GitHub
 					</TabsTrigger>
 				</TabsList>
 
 				<TabsContent value="page-management">
-					<PageManagementTab />
+					<PageManagementTab
+						pagesWithTitle={pagesWithTitle}
+						totalPages={totalPages}
+						currentPage={currentPage}
+					/>
 				</TabsContent>
 
 				<TabsContent value="folder-upload">

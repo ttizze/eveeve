@@ -74,7 +74,6 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
 	const sanitizedUserWithPages = await fetchSanitizedUserWithPages(
 		userName,
-		isOwner,
 		page,
 		pageSize,
 	);
