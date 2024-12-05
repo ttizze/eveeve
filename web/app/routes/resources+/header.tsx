@@ -3,6 +3,7 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { Form } from "@remix-run/react";
+import { NavLink } from "@remix-run/react";
 import { LogOutIcon, Search, SettingsIcon } from "lucide-react";
 import { StartButton } from "~/components/StartButton";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -17,7 +18,6 @@ import type { SanitizedUser } from "~/types";
 import { authenticator } from "~/utils/auth.server";
 import { ModeToggle } from "../../components/ModeToggle";
 import { NewPageButton } from "./components/NewPageButton";
-import { NavLink } from "@remix-run/react";
 interface HeaderProps {
 	currentUser: SanitizedUser | null;
 }
@@ -91,7 +91,7 @@ export function Header({ currentUser }: HeaderProps) {
 												isPending
 													? "opacity-50"
 													: "opacity-100 w-full  px-4 py-3 cursor-pointer hover:bg-accent hover:text-accent-foreground"
-												}
+											}
 										>
 											<div className="flex flex-col items-start">
 												{currentUser.displayName}
