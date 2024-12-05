@@ -14,7 +14,6 @@ export function TranslationInputForm() {
 	const navigation = useNavigation();
 	const [selectedModel, setSelectedModel] = useState("gemini-1.5-flash");
 	const actionData = useActionData<typeof action>();
-	const [inputType, setInputType] = useState<"url" | "file">("url");
 
 	const [form, fields] = useForm({
 		lastResult: actionData?.lastResult,
