@@ -8,7 +8,6 @@ import type { MetaFunction } from "@remix-run/react";
 import { useSearchParams } from "@remix-run/react";
 import Linkify from "linkify-react";
 import { Lock, MoreVertical, Settings } from "lucide-react";
-import { BookOpen, Trash } from "lucide-react";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -19,14 +18,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "~/components/ui/card";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "~/components/ui/dialog";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -44,6 +35,7 @@ import {
 import i18nServer from "~/i18n.server";
 import { LikeButton } from "~/routes/resources+/like-button";
 import { authenticator } from "~/utils/auth.server";
+import { DeletePageDialog } from "./components/DeletePageDialog";
 import {
 	archivePage,
 	togglePagePublicStatus,
@@ -143,6 +135,7 @@ export default function UserPage() {
 		setPageToDelete(pageId);
 		setDialogOpen(true);
 	};
+
 	const confirmArchive = () => {
 		if (pageToDelete) {
 			fetcher.submit(
@@ -151,6 +144,7 @@ export default function UserPage() {
 			);
 		}
 		setDialogOpen(false);
+		setPageToDelete(null);
 	};
 
 	const handlePageChange = (newPage: number) => {
@@ -297,29 +291,12 @@ export default function UserPage() {
 					{isOwner ? "You haven't created any pages yet." : "No pages yet."}
 				</p>
 			)}
-			<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle className="flex items-center">
-							<Trash className="w-4 h-4 mr-2" />
-							<BookOpen className="w-4 h-4 mr-2" />
-						</DialogTitle>
-						<DialogDescription>
-							This action cannot be undone. Are you sure you want to delete this
-							page?
-						</DialogDescription>
-					</DialogHeader>
-					<DialogFooter>
-						<Button variant="outline" onClick={() => setDialogOpen(false)}>
-							Cancel
-						</Button>
-						<Button variant="destructive" onClick={confirmArchive}>
-							<Trash className="w-4 h-4 mr-2" />
-							Delete
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
+
+			<DeletePageDialog
+				open={dialogOpen}
+				onOpenChange={setDialogOpen}
+				onConfirm={confirmArchive}
+			/>
 		</div>
 	);
 }

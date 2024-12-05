@@ -21,6 +21,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "~/components/ui/table";
+import { DeletePageDialog } from "../../components/DeletePageDialog";
 import type { PageWithTitle } from "../types";
 
 interface PageManagementTabProps {
@@ -37,6 +38,7 @@ export function PageManagementTab({
 	const [selectedPages, setSelectedPages] = useState<number[]>([]);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [searchParams, setSearchParams] = useSearchParams();
+	const [dialogOpen, setDialogOpen] = useState(false);
 	const fetcher = useFetcher();
 
 	useEffect(() => {
@@ -72,6 +74,15 @@ export function PageManagementTab({
 		}
 	};
 
+	const handleDelete = () => {
+		fetcher.submit(
+			{ intent: "archive", pageIds: selectedPages.join(",") },
+			{ method: "post" }
+		);
+		setDialogOpen(false);
+		setSelectedPages([]);
+	};
+
 	const getStatusBadge = (isPublished: boolean) => {
 		if (isPublished) {
 			return <Badge variant="default">Published</Badge>;
@@ -96,22 +107,13 @@ export function PageManagementTab({
 					>
 						Clear Selection ({selectedPages.length})
 					</Button>
-					<fetcher.Form method="post" action="/$userName/page-management">
-						<input
-							type="hidden"
-							name="pageIds"
-							value={selectedPages.join(",")}
-						/>
-						<Button
-							type="submit"
-							variant="destructive"
-							name="intent"
-							value="archive"
-							disabled={selectedPages.length === 0}
-						>
-							Delete Selected
-						</Button>
-					</fetcher.Form>
+					<Button
+						variant="destructive"
+						onClick={() => setDialogOpen(true)}
+						disabled={selectedPages.length === 0}
+					>
+						Delete Selected
+					</Button>
 				</div>
 			</div>
 
@@ -192,6 +194,12 @@ export function PageManagementTab({
 					</PaginationContent>
 				</Pagination>
 			</div>
+
+			<DeletePageDialog
+				open={dialogOpen}
+				onOpenChange={setDialogOpen}
+				onConfirm={handleDelete}
+			/>
 		</div>
 	);
 }
