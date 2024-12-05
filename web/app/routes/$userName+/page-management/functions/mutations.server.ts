@@ -33,7 +33,6 @@ export async function archivePages(pageIds: number[]) {
 	});
 }
 
-
 export async function togglePagePublicStatus(pageId: number) {
 	const page = await prisma.page.findUnique({ where: { id: pageId } });
 	if (!page) {
