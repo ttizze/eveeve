@@ -44,6 +44,7 @@ import {
 	fetchPageById,
 	fetchSanitizedUserWithPages,
 } from "./functions/queries.server";
+import { PageActionsDropdown } from "./components/PageActionsDropdown";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	if (!data) {
@@ -196,36 +197,14 @@ export default function UserPage() {
 						className="h-full relative  w-full overflow-hidden"
 					>
 						{isOwner && (
-							<DropdownMenu modal={false}>
-								<DropdownMenuTrigger asChild>
-									<Button
-										variant="ghost"
-										className="h-8 w-8 p-0 absolute top-2 right-2"
-										aria-label="More options"
-									>
-										<MoreVertical className="h-4 w-4" />
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end">
-									<DropdownMenuItem
-										onSelect={() =>
-											navigate(
-												`/${sanitizedUserWithPages.userName}/page/${page.slug}/edit`,
-											)
-										}
-									>
-										Edit
-									</DropdownMenuItem>
-									<DropdownMenuItem
-										onSelect={() => togglePagePublicStatus(page.id)}
-									>
-										{page.isPublished ? "Make Private" : "Make Public"}
-									</DropdownMenuItem>
-									<DropdownMenuItem onSelect={() => handleArchive(page.id)}>
-										Delete
-									</DropdownMenuItem>
-								</DropdownMenuContent>
-							</DropdownMenu>
+							<div className="absolute top-2 right-2">
+								<PageActionsDropdown
+								editPath={`/${sanitizedUserWithPages.userName}/page/${page.slug}/edit`}
+								onTogglePublic={() => togglePagePublicStatus(page.id)}
+								onDelete={() => handleArchive(page.id)}
+								isPublished={page.isPublished}
+								/>
+								</div>
 						)}
 						<CardHeader>
 							<Link

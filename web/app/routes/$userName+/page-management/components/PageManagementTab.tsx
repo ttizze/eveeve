@@ -1,7 +1,7 @@
 import { useSearchParams } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import { PageActionsDropdown } from "~/components/PageActionsDropdown";
+import { PageActionsDropdown } from "../../components/PageActionsDropdown";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
