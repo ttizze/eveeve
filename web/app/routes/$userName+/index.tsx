@@ -3,7 +3,6 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Link } from "@remix-run/react";
 import { useFetcher } from "@remix-run/react";
-import { useNavigate } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
 import { useSearchParams } from "@remix-run/react";
 import Linkify from "linkify-react";
@@ -110,7 +109,6 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function UserPage() {
-	const navigate = useNavigate();
 	const { sanitizedUserWithPages, isOwner, totalPages, currentPage } =
 		useLoaderData<typeof loader>();
 	const [dialogOpen, setDialogOpen] = useState(false);
