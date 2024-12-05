@@ -51,6 +51,27 @@ export const handle = {
 
 export const links: LinksFunction = () => [
 	{ rel: "stylesheet", href: tailwind },
+	{
+		rel: "preconnect",
+		href: "https://fonts.googleapis.com",
+	},
+	{
+		rel: "preconnect",
+		href: "https://fonts.gstatic.com",
+		crossOrigin: "anonymous",
+	},
+	{
+		rel: "preload",
+		as: "style",
+		href: "https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=BIZ+UDPGothic:wght@400;700&display=swap",
+		fetchpriority: "high",
+	},
+	{
+		rel: "stylesheet",
+		href: "https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=BIZ+UDPGothic:wght@400;700&display=swap",
+		media: "print",
+		onLoad: "this.media='all'",
+	},
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

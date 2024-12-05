@@ -6,10 +6,10 @@ export const ModeToggle = forwardRef<HTMLButtonElement, { showText?: boolean }>(
 	(props, ref) => {
 		const { showText = true } = props;
 		const { theme, setTheme } = useTheme();
-		const isDark = theme === "dark";
+		const isLight = theme === "light";
 
 		function toggleTheme() {
-			setTheme(isDark ? "light" : "dark");
+			setTheme(isLight ? "dark" : "light");
 		}
 
 		return (
@@ -20,12 +20,12 @@ export const ModeToggle = forwardRef<HTMLButtonElement, { showText?: boolean }>(
 				className="w-full gap-2 flex cursor-pointer items-center px-4 py-3 text-sm hover:bg-accent hover:text-accent-foreground"
 			>
 				<Sun
-					className={`w-4 h-4  ${isDark ? "rotate-0 scale-100 " : "hidden"}`}
+					className={`w-4 h-4  ${isLight ? "rotate-0 scale-100 " : "hidden"}`}
 				/>
 				<Moon
-					className={`w-4 h-4 ${isDark ? "hidden" : "rotate-0 scale-100 text-gray-800"}`}
+					className={`w-4 h-4 ${isLight ? "hidden" : "rotate-0 scale-100"}`}
 				/>
-				{showText && <span>{isDark ? "Light Theme" : "Dark Theme"}</span>}
+				{showText && <span>{isLight ? "Light Theme" : "Dark Theme"}</span>}
 			</button>
 		);
 	},
