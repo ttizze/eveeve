@@ -22,6 +22,7 @@ import i18nServer from "~/i18n.server";
 import { LikeButton } from "~/routes/resources+/like-button";
 import { authenticator } from "~/utils/auth.server";
 import { fetchPaginatedPublicPages } from "./functions/queries.server";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 
 export const meta: MetaFunction = () => {
 	return [{ title: "Home - Latest Pages" }];
@@ -80,25 +81,16 @@ export default function Home() {
 						</CardHeader>
 						<CardContent>
 							<div className="flex justify-between items-center">
-								<Link
-									to={`/${page.user.userName}`}
-									className="flex items-center"
-								>
-									<div className="w-8 h-8 rounded-full overflow-hidden mr-2">
-										{page.user.icon ? (
-											<img
-												src={page.user.icon}
-												alt={page.user.displayName}
-												className="w-full h-full object-cover"
-											/>
-										) : (
-											<div className="w-full h-full bg-gray-200 flex items-center justify-center">
-												<span className="text-sm font-bold text-gray-500">
-													{page.user.displayName.charAt(0).toUpperCase()}
-												</span>
-											</div>
-										)}
-									</div>
+								<Link to={`${page.user.icon}`} className="flex items-center">
+									<Avatar className="w-6 h-6 mr-2">
+										<AvatarImage
+											src={page.user.icon}
+											alt={page.user.displayName}
+										/>
+										<AvatarFallback>
+											{page.user.displayName.charAt(0).toUpperCase()}
+										</AvatarFallback>
+									</Avatar>
 									<span className="text-sm text-gray-600">
 										{page.user.displayName}
 									</span>

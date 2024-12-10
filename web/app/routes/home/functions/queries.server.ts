@@ -60,9 +60,10 @@ export async function fetchPaginatedPublicPages(
 		}),
 	]);
 	const pagesWithTitle = pages.map((page) => {
+		const titleSourceText = page.sourceTexts.find((item) => item.number === 0);
 		return {
 			...page,
-			title: page.sourceTexts.filter((item) => item.number === 0)[0].text,
+			title: titleSourceText?.text ?? 'Untitled', // デフォルト値を設定
 		};
 	});
 
