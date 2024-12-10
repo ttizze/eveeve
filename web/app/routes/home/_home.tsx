@@ -3,6 +3,7 @@ import { data } from "@remix-run/node";
 import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
 import { CalendarPlus } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
 	Card,
 	CardContent,
@@ -22,7 +23,6 @@ import i18nServer from "~/i18n.server";
 import { LikeButton } from "~/routes/resources+/like-button";
 import { authenticator } from "~/utils/auth.server";
 import { fetchPaginatedPublicPages } from "./functions/queries.server";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 
 export const meta: MetaFunction = () => {
 	return [{ title: "Home - Latest Pages" }];

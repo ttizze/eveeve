@@ -1,9 +1,10 @@
 import { Octokit } from "@octokit/rest";
+import slugify from "@sindresorhus/slugify";
 import fm from "front-matter";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
-import slugify from "@sindresorhus/slugify";
+import unidecode from "unidecode";
 import { getUserByUserName } from "~/routes/$userName+/edit/functions/queries.server";
 import {
 	createOrUpdatePage,
@@ -19,7 +20,6 @@ import { addSourceTextIdToContent } from "~/routes/$userName+/page+/$slug+/edit/
 import { extractTextElementInfo } from "~/routes/$userName+/page+/$slug+/edit/utils/extractTextElementInfo";
 import { getPageSourceLanguage } from "~/routes/$userName+/page+/$slug+/edit/utils/getPageSourceLanguage";
 import { removeSourceTextIdDuplicatesAndEmptyElements } from "~/routes/$userName+/page+/$slug+/edit/utils/removeSourceTextIdDuplicates";
-import unidecode from "unidecode";
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN ?? "";
 const GITHUB_REPO = process.env.GITHUB_REPO ?? "";
