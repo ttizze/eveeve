@@ -77,7 +77,7 @@ export function ParsedContent({
 						src={src}
 						alt={alt || ""}
 						height={height || "auto"}
-						className="aspect-ratio-img max-w-full "
+						className="aspect-ratio-img max-w-full"
 						{...otherAttribs}
 					/>
 				);
