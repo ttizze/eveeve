@@ -3,6 +3,7 @@ import { data } from "@remix-run/node";
 import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
 import { CalendarPlus } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
 	Card,
 	CardContent,
@@ -84,21 +85,15 @@ export default function Home() {
 									to={`/${page.user.userName}`}
 									className="flex items-center"
 								>
-									<div className="w-8 h-8 rounded-full overflow-hidden mr-2">
-										{page.user.icon ? (
-											<img
-												src={page.user.icon}
-												alt={page.user.displayName}
-												className="w-full h-full object-cover"
-											/>
-										) : (
-											<div className="w-full h-full bg-gray-200 flex items-center justify-center">
-												<span className="text-sm font-bold text-gray-500">
-													{page.user.displayName.charAt(0).toUpperCase()}
-												</span>
-											</div>
-										)}
-									</div>
+									<Avatar className="w-6 h-6 mr-2">
+										<AvatarImage
+											src={page.user.icon}
+											alt={page.user.displayName}
+										/>
+										<AvatarFallback>
+											{page.user.displayName.charAt(0).toUpperCase()}
+										</AvatarFallback>
+									</Avatar>
 									<span className="text-sm text-gray-600">
 										{page.user.displayName}
 									</span>

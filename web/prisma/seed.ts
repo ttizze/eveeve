@@ -81,7 +81,7 @@ async function addRequiredData() {
 async function createUserAndPages() {
 	const evame = await prisma.user.upsert({
 		where: { userName: "evame" },
-		update: {},
+		update: { provider: "Admin" },
 		create: {
 			userName: "evame",
 			displayName: "evame",

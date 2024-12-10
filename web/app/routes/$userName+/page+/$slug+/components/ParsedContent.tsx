@@ -76,9 +76,8 @@ export function ParsedContent({
 					<img
 						src={src}
 						alt={alt || ""}
-						width={width || "100%"}
 						height={height || "auto"}
-						className="aspect-ratio-img"
+						className="aspect-ratio-img max-w-full"
 						{...otherAttribs}
 					/>
 				);

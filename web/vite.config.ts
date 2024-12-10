@@ -1,6 +1,5 @@
 import { vitePlugin as remix } from "@remix-run/dev";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
-import { remixDevTools } from "remix-development-tools";
 import { flatRoutes } from "remix-flat-routes";
 import { defineConfig } from "vite";
 import { envOnlyMacros } from "vite-env-only";
@@ -18,7 +17,6 @@ export default defineConfig({
 		sourcemap: true,
 	},
 	plugins: [
-		remixDevTools(),
 		envOnlyMacros(),
 		remix({
 			future: {

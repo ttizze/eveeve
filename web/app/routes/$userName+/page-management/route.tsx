@@ -3,13 +3,10 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { data } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { z } from "zod";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import i18nServer from "~/i18n.server";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
 import { authenticator } from "~/utils/auth.server";
-import { FolderUploadTab } from "./components/FolderUploadTab";
-import { GitHubIntegrationTab } from "./components/GitHubIntegrationTab";
 import { PageManagementTab } from "./components/PageManagementTab";
 import {
 	archivePages,
@@ -184,23 +181,23 @@ export default function TranslatePage() {
 
 	return (
 		<div className="mx-auto max-w-4xl py-10">
-			<Tabs defaultValue="page-management" className="w-full">
+			{/* <Tabs defaultValue="page-management" className="w-full">
 				<TabsList className="grid w-full grid-cols-3">
 					<TabsTrigger value="page-management">Management</TabsTrigger>
 					<TabsTrigger value="folder-upload">Folder</TabsTrigger>
 					<TabsTrigger value="github-integration">GitHub</TabsTrigger>
-				</TabsList>
+				</TabsList> */}
 
-				<TabsContent value="page-management">
-					<PageManagementTab
-						pagesWithTitle={pagesWithTitle}
-						totalPages={totalPages}
-						currentPage={currentPage}
-						userName={currentUser.userName}
-					/>
-				</TabsContent>
+			{/* <TabsContent value="page-management"> */}
+			<PageManagementTab
+				pagesWithTitle={pagesWithTitle}
+				totalPages={totalPages}
+				currentPage={currentPage}
+				userName={currentUser.userName}
+			/>
+			{/* </TabsContent> */}
 
-				<TabsContent value="folder-upload">
+			{/* <TabsContent value="folder-upload">
 					{hasGeminiApiKey ? (
 						<FolderUploadTab />
 					) : (
@@ -212,8 +209,8 @@ export default function TranslatePage() {
 
 				<TabsContent value="github-integration">
 					<GitHubIntegrationTab />
-				</TabsContent>
-			</Tabs>
+				</TabsContent> */}
+			{/* </Tabs> */}
 		</div>
 	);
 }
