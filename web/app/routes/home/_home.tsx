@@ -81,7 +81,10 @@ export default function Home() {
 						</CardHeader>
 						<CardContent>
 							<div className="flex justify-between items-center">
-								<Link to={`/${page.user.userName}`} className="flex items-center">
+								<Link
+									to={`/${page.user.userName}`}
+									className="flex items-center"
+								>
 									<Avatar className="w-6 h-6 mr-2">
 										<AvatarImage
 											src={page.user.icon}
