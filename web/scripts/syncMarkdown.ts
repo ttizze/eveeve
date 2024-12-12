@@ -1,6 +1,6 @@
+import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import { execSync } from "node:child_process";
 import fm from "front-matter";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
@@ -34,7 +34,6 @@ if (!GITHUB_TOKEN || !GITHUB_REPO || !GITHUB_OWNER) {
 const REPO_URL = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}.git`;
 const CLONE_DIR = path.join(process.cwd(), "temp-repo");
 const SKIP_FILES = ["readme.md"];
-
 
 async function syncMarkdown() {
 	try {
