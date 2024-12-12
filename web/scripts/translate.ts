@@ -1,7 +1,7 @@
-import { prisma } from "~/utils/prisma"; 
-import { createUserAITranslationInfo } from "~/routes/$userName+/page+/$slug+/functions/mutations.server";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
+import { createUserAITranslationInfo } from "~/routes/$userName+/page+/$slug+/functions/mutations.server";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
+import { prisma } from "~/utils/prisma";
 
 // 実際にはgetAllPagesByUserIdを何らかの形で用意する必要がある
 // ここでは例としてprismaでpagesを取得する処理を記述
@@ -30,7 +30,6 @@ async function getAllPagesByUserId(userId: number) {
 			process.exit(1);
 		}
 
-
 		const pages = await getAllPagesByUserId(nonSanitizedUser.id);
 		if (pages.length === 0) {
 			console.log("No pages found for user:", USER_NAME);
@@ -42,14 +41,12 @@ async function getAllPagesByUserId(userId: number) {
 
 		// 全ページに対してキュー追加
 		for (const page of pages) {
-
 			if (!page.sourceTexts || page.sourceTexts.length === 0) {
 				console.log(`Skip page ${page.slug} because no sourceTexts found.`);
 				continue;
 			}
-			const title = page.sourceTexts.filter(
-				(item) => item.number === 0,
-			)[0].text;
+			const title = page.sourceTexts.filter((item) => item.number === 0)[0]
+				.text;
 
 			// UserAITranslationInfoを作成
 			const userAITranslationInfo = await createUserAITranslationInfo(
