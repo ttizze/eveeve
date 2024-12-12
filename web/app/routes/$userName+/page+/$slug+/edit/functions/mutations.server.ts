@@ -75,7 +75,7 @@ export async function createOrUpdateSourceTexts(
 				}));
 			},
 			{
-				timeout: 30000, // 30秒まで待つ
+				timeout: 1000000, // 30秒まで待つ
 			},
 		);
 	} catch (error) {
@@ -85,7 +85,10 @@ export async function createOrUpdateSourceTexts(
 }
 
 export async function upsertTags(tags: string[], pageId: number) {
-	const upsertPromises = tags.map(async (tagName) => {
+	// 重複タグを除去
+	const uniqueTags = Array.from(new Set(tags));
+
+	const upsertPromises = uniqueTags.map(async (tagName) => {
 		const upsertedTag = await prisma.tag.upsert({
 			where: { name: tagName },
 			update: {},

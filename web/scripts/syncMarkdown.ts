@@ -147,7 +147,7 @@ async function syncMarkdown() {
 						const tags = attributes.tags?.map((tag) => `NDC${tag}`);
 
 						const existPage = await getPageBySlug(slug);
-						if (existPage) {
+						if (existPage && existPage.sourceTexts.length > 0) {
 							if (tags) {
 								await upsertTags(tags, existPage.id);
 							}

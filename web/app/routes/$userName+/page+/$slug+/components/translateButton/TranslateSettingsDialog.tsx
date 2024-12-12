@@ -72,6 +72,9 @@ export function TranslateSettingsDialog({
 										Gemini 1.5 Flash
 									</SelectItem>
 									<SelectItem value="gemini-1.5-pro">Gemini 1.5 Pro</SelectItem>
+									<SelectItem value="gemini-2.0-flash-exp">
+										gemini-2.0-flash-exp
+									</SelectItem>
 								</SelectContent>
 							</Select>
 						</div>

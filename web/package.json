@@ -11,7 +11,8 @@
 		"check": "bunx @biomejs/biome check --write .",
 		"seed": "prisma db seed",
 		"test": "DATABASE_URL=postgresql://postgres:password@localhost:5433/postgres?schema=public bunx prisma migrate dev && bunx prisma migrate deploy && vitest",
-		"sync-markdown": "tsx scripts/syncMarkdown.ts"
+		"sync-markdown": "tsx scripts/syncMarkdown.ts",
+		"translate": "tsx scripts/translate.ts"
 	},
 	"prisma": {
 		"seed": "tsx prisma/seed.ts"
