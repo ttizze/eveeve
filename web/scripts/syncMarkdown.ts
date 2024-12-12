@@ -149,9 +149,6 @@ async function syncMarkdown() {
 			} catch (error) {
 				console.error(`❌ エラー (${filePath}):`, error);
 			}
-
-			// レートリミット対策の待機
-			await new Promise((resolve) => setTimeout(resolve, 1000));
 		}
 	} catch (error) {
 		console.error("エラー:", error);
