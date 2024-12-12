@@ -47,8 +47,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Index() {
-	const { currentUser, heroTitle, heroText } =
-		useLoaderData<typeof loader>();
+	const { currentUser, heroTitle, heroText } = useLoaderData<typeof loader>();
 
 	return (
 		<div className="flex flex-col justify-between">
