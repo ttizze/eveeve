@@ -21,11 +21,10 @@ import { extractTextElementInfo } from "~/routes/$userName+/page+/$slug+/edit/ut
 import { getPageSourceLanguage } from "~/routes/$userName+/page+/$slug+/edit/utils/getPageSourceLanguage";
 import { removeSourceTextIdDuplicatesAndEmptyElements } from "~/routes/$userName+/page+/$slug+/edit/utils/removeSourceTextIdDuplicates";
 
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN ?? "";
 const GITHUB_REPO = process.env.GITHUB_REPO ?? "";
 const GITHUB_OWNER = process.env.GITHUB_OWNER ?? "";
 
-if (!GITHUB_TOKEN || !GITHUB_REPO || !GITHUB_OWNER) {
+if (!GITHUB_REPO || !GITHUB_OWNER) {
 	throw new Error(
 		"GitHub環境変数(GITHUB_TOKEN, GITHUB_REPO, GITHUB_OWNER)が設定されていません",
 	);
@@ -70,7 +69,6 @@ async function syncMarkdown() {
 
 				const tags = attributes.tags?.map((tag) => `NDC${tag}`);
 				const title = path.basename(filePath, ".md");
-				const author = attributes.author;
 				const slug = attributes.slug;
 
 				const existPage = await getPageBySlug(slug);
@@ -81,15 +79,13 @@ async function syncMarkdown() {
 					}
 					console.log("既存ページ:", slug, "更新なし");
 				} else {
-					const authorHeader = author ? `## author:${author}\n\n` : "";
-					const modifiedBody = authorHeader + body;
 
 					const titleSourceTextId = await getTitleSourceTextId(slug);
 
 					const processed = await remark()
 						.use(remarkGfm)
 						.use(remarkHtml)
-						.process(modifiedBody);
+						.process(body);
 					const htmlContent = processed.toString();
 
 					const numberedContent =
