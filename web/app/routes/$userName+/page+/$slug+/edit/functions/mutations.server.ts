@@ -35,44 +35,49 @@ export async function createOrUpdateSourceTexts(
 	pageId: number,
 ): Promise<Array<{ number: number; sourceTextId: number }>> {
 	try {
-		return await prisma.$transaction(async (tx) => {
-			// numberの重複を避けるため、一旦既存のsourceTextのnumberを-1倍にする
-			await tx.sourceText.updateMany({
-				where: { pageId },
-				data: { number: { multiply: -1 } },
-			});
+		return await prisma.$transaction(
+			async (tx) => {
+				// numberの重複を避けるため、一旦既存のsourceTextのnumberを-1倍にする
+				await tx.sourceText.updateMany({
+					where: { pageId },
+					data: { number: { multiply: -1 } },
+				});
 
-			const upsertPromises = textElements.map((element) =>
-				tx.sourceText.upsert({
-					where: { id: element.sourceTextId ?? 0 },
-					update: {
-						number: element.number,
-						text: element.text,
-					},
-					create: {
+				const upsertPromises = textElements.map((element) =>
+					tx.sourceText.upsert({
+						where: { id: element.sourceTextId ?? 0 },
+						update: {
+							number: element.number,
+							text: element.text,
+						},
+						create: {
+							pageId,
+							number: element.number,
+							text: element.text,
+						},
+					}),
+				);
+
+				const updatedOrCreatedSourceTexts = await Promise.all(upsertPromises);
+				const upsertedIds = updatedOrCreatedSourceTexts.map((st) => st.id);
+
+				// 作成または更新したsourceText以外を削除
+				await tx.sourceText.deleteMany({
+					where: {
 						pageId,
-						number: element.number,
-						text: element.text,
+						id: { notIn: upsertedIds },
 					},
-				}),
-			);
+				});
 
-			const updatedOrCreatedSourceTexts = await Promise.all(upsertPromises);
-			const upsertedIds = updatedOrCreatedSourceTexts.map((st) => st.id);
-
-			// 作成または更新したsourceText以外を削除
-			await tx.sourceText.deleteMany({
-				where: {
-					pageId,
-					id: { notIn: upsertedIds },
-				},
-			});
-
-			return updatedOrCreatedSourceTexts.map((st) => ({
-				number: st.number,
-				sourceTextId: st.id,
-			}));
-		});
+				return updatedOrCreatedSourceTexts.map((st) => ({
+					number: st.number,
+					sourceTextId: st.id,
+				}));
+			},
+			{
+				timeout: 1000000, // 30秒まで待つ
+			},
+		);
 	} catch (error) {
 		console.error("Error in createOrUpdateSourceTexts:", error);
 		throw error;
@@ -80,7 +85,10 @@ export async function createOrUpdateSourceTexts(
 }
 
 export async function upsertTags(tags: string[], pageId: number) {
-	const upsertPromises = tags.map(async (tagName) => {
+	// 重複タグを除去
+	const uniqueTags = Array.from(new Set(tags));
+
+	const upsertPromises = uniqueTags.map(async (tagName) => {
 		const upsertedTag = await prisma.tag.upsert({
 			where: { name: tagName },
 			update: {},

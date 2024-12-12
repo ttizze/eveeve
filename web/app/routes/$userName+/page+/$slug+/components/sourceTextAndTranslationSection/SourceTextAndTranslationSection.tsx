@@ -35,8 +35,8 @@ export function SourceTextAndTranslationSection({
 						className={`inline-block ${
 							sourceTextWithTranslations.translationsWithVotes.length === 0 ||
 							!showTranslation
-								? "text-gray-700 dark:text-gray-200"
-								: "text-gray-300 dark:text-gray-600"
+								? "text-gray-700 dark:text-gray-200 [&>a]:text-gray-700 dark:[&>a]:text-gray-200"
+								: "text-gray-300 dark:text-gray-600 [&>a]:text-gray-300 dark:[&>a]:text-gray-600"
 						} ${sourceTextClassName}`}
 					>
 						{isPublished === false && <Lock className="h-6 w-6 mr-1 inline" />}

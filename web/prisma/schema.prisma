@@ -34,6 +34,8 @@ model User {
   likePages             LikePage[]
 
   @@map("users")
+  @@index([userName])
+  @@index([email])
 }
 
 model UserAITranslationInfo {
@@ -49,6 +51,7 @@ model UserAITranslationInfo {
   page                  Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([pageId])
   @@index([pageId, targetLanguage])
   @@map("user_ai_translation_info")
 }
@@ -64,6 +67,8 @@ model UserReadHistory {
 
   @@unique([userId, pageId])
   @@map("user_read_history")
+  @@index([userId])
+  @@index([pageId])
 }
 
 model PageTranslationInfo {
@@ -75,6 +80,8 @@ model PageTranslationInfo {
 
   @@unique([pageId, targetLanguage])
   @@map("page_translation_info")
+  @@index([pageId])
+  @@index([targetLanguage])
 }
 
 model Page {
@@ -97,6 +104,9 @@ model Page {
   likePages             LikePage[]
 
   @@map("pages")
+  @@index([createdAt])
+  @@index([userId])
+  @@index([slug])
 }
 
 model LikePage {
@@ -109,6 +119,8 @@ model LikePage {
 
   @@unique([userId, pageId])
   @@map("like_pages")
+  @@index([userId])
+  @@index([pageId])
 }
 
 model Genre {
@@ -117,6 +129,7 @@ model Genre {
   pages GenrePage[]
 
   @@map("genres")
+  @@index([name])
 }
 
 model GenrePage {
@@ -127,13 +140,17 @@ model GenrePage {
 
   @@id([genreId, pageId])
   @@map("genre_pages")
+  @@index([genreId])
+  @@index([pageId])
 }
+
 model Tag {
   id    Int       @id @default(autoincrement())
   name  String    @unique
   pages TagPage[]
 
   @@map("tags")
+  @@index([name])
 }
 
 model TagPage {
@@ -144,6 +161,8 @@ model TagPage {
 
   @@id([tagId, pageId])
   @@map("tag_pages")
+  @@index([tagId])
+  @@index([pageId])
 }
 
 model SourceText {
@@ -157,6 +176,8 @@ model SourceText {
 
   @@unique([pageId, number])
   @@map("source_texts")
+  @@index([pageId])
+  @@index([number])
 }
 
 model TranslateText {
@@ -173,6 +194,9 @@ model TranslateText {
   votes          Vote[]
 
   @@map("translate_texts")
+  @@index([sourceTextId])
+  @@index([userId])
+  @@index([targetLanguage])
 }
 
 model Vote {
@@ -187,6 +211,8 @@ model Vote {
 
   @@unique([translateTextId, userId])
   @@map("votes")
+  @@index([translateTextId])
+  @@index([userId])
 }
 
 model ApiUsage {
@@ -197,6 +223,8 @@ model ApiUsage {
   user       User     @relation(fields: [userId], references: [id])
 
   @@map("api_usage")
+  @@index([userId])
+  @@index([dateTime])
 }
 
 model CustomAIModel {
@@ -210,4 +238,6 @@ model CustomAIModel {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, name])
+  @@index([userId])
+  @@index([name])
 }
