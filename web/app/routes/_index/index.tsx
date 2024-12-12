@@ -30,8 +30,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	if (!topPageWithTranslations) {
 		throw new Response("Not Found", { status: 404 });
 	}
-	const sourceLanguage = topPageWithTranslations.page.sourceLanguage;
-
 	const [heroTitle, heroText] =
 		topPageWithTranslations.sourceTextWithTranslations
 			.filter((st) => st.sourceText.number === 0 || st.sourceText.number === 1)
@@ -45,14 +43,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		topPageWithTranslations,
 		heroTitle,
 		heroText,
-		sourceLanguage,
-		targetLanguage,
 	};
 }
 
 export default function Index() {
-	const { currentUser, heroTitle, heroText, sourceLanguage, targetLanguage } =
-		useLoaderData<typeof loader>();
+	const { currentUser, heroTitle, heroText } = useLoaderData<typeof loader>();
 
 	return (
 		<div className="flex flex-col justify-between">
@@ -61,7 +56,7 @@ export default function Index() {
 					<h1 className="text-7xl font-bold mb-20 text-center">
 						<SourceTextAndTranslationSection
 							sourceTextWithTranslations={heroTitle}
-							sourceTextClassName="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text !text-transparent mb-2"
+							sourceTextClassName="w-full bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text !text-transparent mb-2"
 							elements={heroTitle.sourceText.text}
 							currentUserName={currentUser?.userName}
 							showOriginal={true}
