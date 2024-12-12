@@ -14,6 +14,7 @@ import {
 import {
 	Pagination,
 	PaginationContent,
+	PaginationEllipsis,
 	PaginationItem,
 	PaginationLink,
 	PaginationNext,
@@ -110,34 +111,58 @@ export default function Home() {
 				))}
 			</div>
 			<div className="mt-8 flex justify-center">
-				<Pagination>
-					<PaginationContent>
-						{currentPage > 1 && (
-							<PaginationItem>
-								<PaginationPrevious
-									onClick={() => handlePageChange(currentPage - 1)}
-								/>
-							</PaginationItem>
-						)}
-						{Array.from({ length: totalPages }, (_, i) => i + 1).map(
-							(pageNum) => (
-								<PaginationItem key={pageNum}>
-									<PaginationLink
-										onClick={() => handlePageChange(pageNum)}
-										isActive={pageNum === currentPage}
-									>
-										{pageNum}
-									</PaginationLink>
-								</PaginationItem>
-							),
-						)}
-						{currentPage < totalPages && (
-							<PaginationItem>
-								<PaginationNext
-									onClick={() => handlePageChange(currentPage + 1)}
-								/>
-							</PaginationItem>
-						)}
+				<Pagination className="mt-4">
+					<PaginationContent className="w-full justify-between">
+						<PaginationItem>
+							<PaginationPrevious
+								onClick={() => handlePageChange(currentPage - 1)}
+								className={`${
+									currentPage === 1 ? "pointer-events-none opacity-50" : ""
+								}`}
+							/>
+						</PaginationItem>
+						<div className="flex items-center space-x-2">
+							{Array.from({ length: totalPages }, (_, i) => i + 1).map(
+								(pageNumber) => {
+									if (
+										pageNumber === 1 ||
+										pageNumber === totalPages ||
+										(pageNumber >= currentPage - 1 &&
+											pageNumber <= currentPage + 1)
+									) {
+										return (
+											<PaginationItem key={`page-${pageNumber}`}>
+												<PaginationLink
+													onClick={() => handlePageChange(pageNumber)}
+													isActive={currentPage === pageNumber}
+												>
+													{pageNumber}
+												</PaginationLink>
+											</PaginationItem>
+										);
+									}
+									if (
+										pageNumber === currentPage - 2 ||
+										pageNumber === currentPage + 2
+									) {
+										return (
+											<PaginationEllipsis key={`ellipsis-${pageNumber}`} />
+										);
+									}
+									return null;
+								},
+							)}
+						</div>
+						<PaginationItem>
+							<PaginationNext
+								onClick={() => handlePageChange(currentPage + 1)}
+								className={
+									currentPage === totalPages
+										? "pointer-events-none opacity-50"
+										: ""
+								}
+							/>
+						</PaginationItem>
 					</PaginationContent>
 				</Pagination>
 			</div>
