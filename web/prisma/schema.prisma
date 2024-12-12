@@ -96,6 +96,8 @@ model Page {
   tagPages              TagPage[]
   likePages             LikePage[]
 
+  @@index([createdAt])
+  @@index([userId])
   @@map("pages")
 }
 
@@ -128,6 +130,7 @@ model GenrePage {
   @@id([genreId, pageId])
   @@map("genre_pages")
 }
+
 model Tag {
   id    Int       @id @default(autoincrement())
   name  String    @unique
@@ -156,6 +159,7 @@ model SourceText {
   createdAt      DateTime        @default(now()) @map("created_at")
 
   @@unique([pageId, number])
+  @@index([pageId])
   @@map("source_texts")
 }
 
@@ -172,6 +176,8 @@ model TranslateText {
   user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   votes          Vote[]
 
+  @@index([sourceTextId])
+  @@index([userId])
   @@map("translate_texts")
 }
 
@@ -196,6 +202,7 @@ model ApiUsage {
   amountUsed Int      @map("amount_used")
   user       User     @relation(fields: [userId], references: [id])
 
+  @@index([userId])
   @@map("api_usage")
 }
 
@@ -210,4 +217,5 @@ model CustomAIModel {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, name])
+  @@index([userId])
 }
