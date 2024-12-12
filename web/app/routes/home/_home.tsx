@@ -116,8 +116,9 @@ export default function Home() {
 						<PaginationItem>
 							<PaginationPrevious
 								onClick={() => handlePageChange(currentPage - 1)}
-								className={`${currentPage === 1 ? "pointer-events-none opacity-50" : ""
-									}`}
+								className={`${
+									currentPage === 1 ? "pointer-events-none opacity-50" : ""
+								}`}
 							/>
 						</PaginationItem>
 						<div className="flex items-center space-x-2">

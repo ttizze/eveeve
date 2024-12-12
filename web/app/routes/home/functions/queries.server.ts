@@ -13,9 +13,9 @@ export async function fetchPaginatedPublicPages(
 				isArchived: false,
 				sourceTexts: {
 					some: {
-						number: 0
-					}
-				}
+						number: 0,
+					},
+				},
 			},
 			orderBy: {
 				createdAt: "desc",

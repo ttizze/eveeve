@@ -79,7 +79,6 @@ async function syncMarkdown() {
 					}
 					console.log("既存ページ:", slug, "更新なし");
 				} else {
-
 					const titleSourceTextId = await getTitleSourceTextId(slug);
 
 					const processed = await remark()
