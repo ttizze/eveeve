@@ -34,6 +34,8 @@ model User {
   likePages             LikePage[]
 
   @@map("users")
+  @@index([userName])
+  @@index([email])
 }
 
 model UserAITranslationInfo {
@@ -49,6 +51,7 @@ model UserAITranslationInfo {
   page                  Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([pageId])
   @@index([pageId, targetLanguage])
   @@map("user_ai_translation_info")
 }
@@ -64,6 +67,8 @@ model UserReadHistory {
 
   @@unique([userId, pageId])
   @@map("user_read_history")
+  @@index([userId])
+  @@index([pageId])
 }
 
 model PageTranslationInfo {
@@ -75,6 +80,8 @@ model PageTranslationInfo {
 
   @@unique([pageId, targetLanguage])
   @@map("page_translation_info")
+  @@index([pageId])
+  @@index([targetLanguage])
 }
 
 model Page {
@@ -96,9 +103,10 @@ model Page {
   tagPages              TagPage[]
   likePages             LikePage[]
 
+  @@map("pages")
   @@index([createdAt])
   @@index([userId])
-  @@map("pages")
+  @@index([slug])
 }
 
 model LikePage {
@@ -111,6 +119,8 @@ model LikePage {
 
   @@unique([userId, pageId])
   @@map("like_pages")
+  @@index([userId])
+  @@index([pageId])
 }
 
 model Genre {
@@ -119,6 +129,7 @@ model Genre {
   pages GenrePage[]
 
   @@map("genres")
+  @@index([name])
 }
 
 model GenrePage {
@@ -129,6 +140,8 @@ model GenrePage {
 
   @@id([genreId, pageId])
   @@map("genre_pages")
+  @@index([genreId])
+  @@index([pageId])
 }
 
 model Tag {
@@ -137,6 +150,7 @@ model Tag {
   pages TagPage[]
 
   @@map("tags")
+  @@index([name])
 }
 
 model TagPage {
@@ -147,6 +161,8 @@ model TagPage {
 
   @@id([tagId, pageId])
   @@map("tag_pages")
+  @@index([tagId])
+  @@index([pageId])
 }
 
 model SourceText {
@@ -159,8 +175,9 @@ model SourceText {
   createdAt      DateTime        @default(now()) @map("created_at")
 
   @@unique([pageId, number])
-  @@index([pageId])
   @@map("source_texts")
+  @@index([pageId])
+  @@index([number])
 }
 
 model TranslateText {
@@ -176,9 +193,10 @@ model TranslateText {
   user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   votes          Vote[]
 
+  @@map("translate_texts")
   @@index([sourceTextId])
   @@index([userId])
-  @@map("translate_texts")
+  @@index([targetLanguage])
 }
 
 model Vote {
@@ -193,6 +211,8 @@ model Vote {
 
   @@unique([translateTextId, userId])
   @@map("votes")
+  @@index([translateTextId])
+  @@index([userId])
 }
 
 model ApiUsage {
@@ -202,8 +222,9 @@ model ApiUsage {
   amountUsed Int      @map("amount_used")
   user       User     @relation(fields: [userId], references: [id])
 
-  @@index([userId])
   @@map("api_usage")
+  @@index([userId])
+  @@index([dateTime])
 }
 
 model CustomAIModel {
@@ -218,4 +239,5 @@ model CustomAIModel {
 
   @@unique([userId, name])
   @@index([userId])
+  @@index([name])
 }
