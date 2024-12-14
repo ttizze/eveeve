@@ -50,7 +50,7 @@ export function rehypeAddDataId(pageId: number): Plugin<[], Root> {
 			interface BlockInfo {
 				element: Element;
 				text: string;
-				hash: string;
+				textAndOccurrenceHash: string;
 			}
 
 			const blocks: BlockInfo[] = [];
@@ -69,14 +69,14 @@ export function rehypeAddDataId(pageId: number): Plugin<[], Root> {
 					blocks.push({
 						element: node,
 						text: blockText,
-						hash: hash,
+						textAndOccurrenceHash: hash,
 					});
 				}
 			});
 
 			const allTextsForDb = blocks.map((block, index) => ({
 				text: block.text,
-				hash: block.hash,
+				textAndOccurrenceHash: block.textAndOccurrenceHash,
 				number: index + 1,
 			}));
 
@@ -84,7 +84,7 @@ export function rehypeAddDataId(pageId: number): Plugin<[], Root> {
 
 			// 各ブロック要素を<span data-id="...">で子要素全体を包む
 			for (const block of blocks) {
-				const sourceTextId = hashToId.get(block.hash);
+				const sourceTextId = hashToId.get(block.textAndOccurrenceHash);
 				if (!sourceTextId) continue;
 
 				const spanNode: Element = {
@@ -102,6 +102,8 @@ export function rehypeAddDataId(pageId: number): Plugin<[], Root> {
 	};
 }
 
+//編集後も翻訳との結びつきを維持するために､textAndOccurrenceHashをキーにしてsourceTextsを更新する
+//表示時はsourceTextIdをkeyにしてsourceTextsを取得する
 export async function processHtmlContent(
 	title: string,
 	htmlInput: string,
@@ -125,7 +127,7 @@ export async function processHtmlContent(
 		.use(rehypeRemark) // HAST→MDAST
 		.use(remarkGfm) // GFM拡張
 		.use(remarkRehype, { allowDangerousHtml: true }) // MDAST→HAST
-		.use(rehypeAddDataId(page.id)) // HAST上でdata-idを付与
+		.use(rehypeAddDataId(page.id))
 		.use(rehypeRaw) // 生HTMLを処理
 		.use(rehypeStringify, { allowDangerousHtml: true }) // HAST→HTML
 		.process(htmlInput);

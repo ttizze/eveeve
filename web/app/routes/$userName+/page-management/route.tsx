@@ -98,7 +98,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	return null;
 }
 
-export default function TranslatePage() {
+export default function PageManagementPage() {
 	const { pagesWithTitle, totalPages, currentPage, currentUser } =
 		useLoaderData<typeof loader>();
 

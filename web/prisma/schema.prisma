@@ -169,17 +169,18 @@ model SourceText {
   id             Int             @id @default(autoincrement())
   text           String
   number         Int
-  hash           String?
+  textAndOccurrenceHash String? @map("text_and_occurrence_hash")
   translateTexts TranslateText[]
   page           Page            @relation(fields: [pageId], references: [id], onDelete: Cascade)
   pageId         Int             @map("page_id")
   createdAt      DateTime        @default(now()) @map("created_at")
 
   @@unique([pageId, number])
-  @@unique([pageId, hash])
+  @@unique([pageId, textAndOccurrenceHash])
   @@map("source_texts")
   @@index([pageId])
   @@index([number])
+  @@index([textAndOccurrenceHash])
 }
 
 model TranslateText {

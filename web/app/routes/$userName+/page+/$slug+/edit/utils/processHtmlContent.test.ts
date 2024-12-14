@@ -58,7 +58,7 @@ describe("processHtmlContent", () => {
 
 		// hashが設定されているか
 		for (const st of sortedTexts) {
-			expect(st.hash).not.toBeNull();
+			expect(st.textAndOccurrenceHash).not.toBeNull();
 		}
 	});
 

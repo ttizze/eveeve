@@ -26,9 +26,9 @@ export async function upsertTitle(pageSlug: string, title: string) {
 	if (!page) return;
 	const titleHash = generateHashForText(title, 1);
 	return await prisma.sourceText.upsert({
-		where: { pageId_hash: { pageId: page.id, hash: titleHash } },
+		where: { pageId_textAndOccurrenceHash: { pageId: page.id, textAndOccurrenceHash: titleHash } },
 		update: { text: title },
-		create: { pageId: page.id, hash: titleHash, text: title, number: 0 },
+		create: { pageId: page.id, textAndOccurrenceHash: titleHash, text: title, number: 0 },
 	});
 }
 
@@ -77,7 +77,7 @@ export async function synchronizePageSourceTexts(
 	pageId: number,
 	allTextsData: {
 		text: string;
-		hash: string;
+		textAndOccurrenceHash: string;
 		number: number;
 	}[],
 ): Promise<Map<string, number>> {
@@ -85,22 +85,22 @@ export async function synchronizePageSourceTexts(
 		// 1. 現在のDB上のソーステキストを取得
 		const existingSourceTexts = await tx.sourceText.findMany({
 			where: { pageId },
-			select: { id: true, hash: true, number: true }, // 必要なフィールドのみ選択
+			select: { id: true, textAndOccurrenceHash: true, number: true }, // 必要なフィールドのみ選択
 		});
 
 		// 2. existingMap を部分オブジェクトで初期化
 		const existingMap: Map<string, { id: number; number: number }> = new Map(
 			existingSourceTexts.map((t) => [
-				t.hash as string,
+				t.textAndOccurrenceHash as string,
 				{ id: t.id, number: t.number },
 			]),
 		);
 
-		const newHashes = new Set(allTextsData.map((t) => t.hash));
+		const newHashes = new Set(allTextsData.map((t) => t.textAndOccurrenceHash));
 
 		// 3. 不要テキストの一括削除
 		const hashesToDelete = existingSourceTexts
-			.filter((t) => !newHashes.has(t.hash as string))
+			.filter((t) => !newHashes.has(t.textAndOccurrenceHash as string))
 			.map((t) => t.id);
 
 		if (hashesToDelete.length > 0) {
@@ -122,10 +122,10 @@ export async function synchronizePageSourceTexts(
 
 		// 5. 既存テキストのnumberフィールドを更新
 		const updatePromises = allTextsData
-			.filter((t) => existingMap.has(t.hash))
+			.filter((t) => existingMap.has(t.textAndOccurrenceHash))
 			.map((t) =>
 				tx.sourceText.update({
-					where: { id: existingMap.get(t.hash)?.id },
+					where: { id: existingMap.get(t.textAndOccurrenceHash)?.id },
 					data: { number: t.number },
 				}),
 			);
@@ -136,10 +136,10 @@ export async function synchronizePageSourceTexts(
 
 		// 6. 新規テキストの一括挿入
 		const newInserts = allTextsData
-			.filter((t) => !existingMap.has(t.hash))
+			.filter((t) => !existingMap.has(t.textAndOccurrenceHash))
 			.map((t) => ({
 				pageId,
-				hash: t.hash,
+				textAndOccurrenceHash: t.textAndOccurrenceHash,
 				text: t.text,
 				number: t.number,
 			}));
@@ -154,14 +154,19 @@ export async function synchronizePageSourceTexts(
 			const insertedSourceTexts = await tx.sourceText.findMany({
 				where: {
 					pageId,
-					hash: { in: newInserts.map((insert) => insert.hash) },
+					textAndOccurrenceHash: {
+						in: newInserts.map((insert) => insert.textAndOccurrenceHash),
+					},
 				},
-				select: { hash: true, id: true },
+				select: { textAndOccurrenceHash: true, id: true },
 			});
 
 			for (const sourceText of insertedSourceTexts) {
-				if (!sourceText.hash) continue;
-				existingMap.set(sourceText.hash, { id: sourceText.id, number: 0 });
+				if (!sourceText.textAndOccurrenceHash) continue;
+				existingMap.set(sourceText.textAndOccurrenceHash, {
+					id: sourceText.id,
+					number: 0,
+				});
 			}
 		}
 

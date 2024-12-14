@@ -71,8 +71,8 @@ This is another test.
 		expect(sortedTexts[1].number).toBe(1);
 
 		// hashが設定されているか
-		expect(sortedTexts[0].hash).not.toBeNull();
-		expect(sortedTexts[1].hash).not.toBeNull();
+		expect(sortedTexts[0].textAndOccurrenceHash).not.toBeNull();
+		expect(sortedTexts[1].textAndOccurrenceHash).not.toBeNull();
 	});
 
 	test("should retain sourceTextId after minor edit", async () => {
