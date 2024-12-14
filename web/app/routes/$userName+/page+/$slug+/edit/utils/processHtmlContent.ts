@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import type { Element, Root, RootContent, Text, Properties } from "hast";
+import type { Element, Properties, Root, RootContent, Text } from "hast";
 import rehypeParse from "rehype-parse";
 import rehypeRaw from "rehype-raw";
 import rehypeRemark from "rehype-remark";

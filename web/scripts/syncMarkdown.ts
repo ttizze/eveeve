@@ -1,14 +1,11 @@
 import crypto from "node:crypto";
 import type { Element, Root, RootContent, Text } from "hast";
 import type { Properties } from "hast";
-import rehypeParse from "rehype-parse";
 import rehypeRaw from "rehype-raw";
-import rehypeRemark from "rehype-remark";
 import rehypeStringify from "rehype-stringify";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
-import { unified } from "unified";
 import type { Plugin } from "unified";
 import type { Parent } from "unist";
 import { visit } from "unist-util-visit";
