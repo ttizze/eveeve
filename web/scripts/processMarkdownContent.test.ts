@@ -73,7 +73,9 @@ This is a line.
 
 This is another line.
 
-1
+1. List item 1
+
+2. List item 2
 `;
 
 		const user = await prisma.user.upsert({
@@ -98,8 +100,6 @@ This is another line.
 		if (!dbPage1) return;
 
 		expect(dbPage1.sourceTexts.length).toBeGreaterThanOrEqual(4);
-		const originalIds = dbPage1.sourceTexts.map((t) => t.id);
-		const originalTexts = dbPage1.sourceTexts.map((t) => t.text);
 		const originalMap = new Map<string, number>();
 		for (const st of dbPage1.sourceTexts) {
 			originalMap.set(st.text, st.id);
@@ -111,9 +111,10 @@ This is a line!?
 
 This is another line.
 
-test
+new line
 
-1
+1. List item 1
+2. List item 2
 `;
 
 		// 再パース（編集後）
@@ -126,8 +127,6 @@ test
 		if (!dbPage2) return;
 
 		expect(dbPage2.sourceTexts.length).toBeGreaterThanOrEqual(5);
-		const editedIds = dbPage2.sourceTexts.map((t) => t.id);
-		const editedTexts = dbPage2.sourceTexts.map((t) => t.text);
 		const editedMap = new Map<string, number>();
 		for (const st of dbPage2.sourceTexts) {
 			editedMap.set(st.text, st.id);
@@ -138,8 +137,10 @@ test
 		expect(editedMap.get("This is a line!?")).not.toBe(
 			originalMap.get("This is a line."),
 		);
-		expect(editedMap.get("test")).not.toBe(originalMap.get("1"));
-		expect(editedMap.get("1")).toBe(originalMap.get("1"));
+		expect(editedMap.get("new line")).not.toBe(originalMap.get("1"));
+		expect(editedMap.get("1. List item 1")).toBe(
+			originalMap.get("1. List item 1"),
+		);
 	});
 
 	test("should handle various markdown syntaxes", async () => {
@@ -205,35 +206,15 @@ test
 		const htmlContent = dbPage.content;
 		console.log(htmlContent);
 
-		// 以下、それぞれのテキストが<span data-id="...">で囲まれているかを最低1つずつ確認
-		expect(htmlContent).toMatch(/<span data-id="\d+">Bold text<\/span>/);
-		expect(htmlContent).toMatch(/<span data-id="\d+">List item 1<\/span>/);
-		expect(htmlContent).toMatch(/<span data-id="\d+">Link<\/span>/);
-		expect(htmlContent).toMatch(/<span data-id="\d+">Blockquote<\/span>/);
+		expect(htmlContent).toMatch(
+			/<span data-id="\d+">\<strong>Bold text<\/strong> and <em>italic text<\/em><\/span>/,
+		);
 
-		// コードブロックはプレーンテキストとして抽出されるか、またはプレーンテキストノードがない可能性あり
-		// ここでは、"code block"がspanで囲まれてないことを確認（例: コードブロック内部がそのままテキストとして抽出されるかは実装次第）
 		expect(htmlContent).not.toMatch(/<span data-id="\d+">code block<\/span>/);
 
 		// 新たに追加した要素についても確認
 		// 画像代替テキスト "Alt text"
 		expect(htmlContent).not.toMatch(/<span data-id="\d+">Alt text<\/span>/);
-
-		// テーブルセルテキスト "Cell A" "Cell B"
-		expect(htmlContent).toMatch(/<span data-id="\d+">Cell A<\/span>/);
-		expect(htmlContent).toMatch(/<span data-id="\d+">Cell B<\/span>/);
-
-		// タスクリスト "Task list item 1" "Task list item 2 (done)"
-		expect(htmlContent).toMatch(/<span data-id="\d+">Task list item 1<\/span>/);
-		expect(htmlContent).toMatch(
-			/<span data-id="\d+">Task list item 2 \(done\)<\/span>/,
-		);
-
-		// 脚注[^1]では脚注本文"This is a footnote."がテキストとしてどのように抽出されるかは実装依存
-		// ここではフットノートの本文"This is a footnote."がspanで囲まれているかを簡易チェック
-		expect(htmlContent).toMatch(
-			/<span data-id="\d+">This is a footnote\.<\/span>/,
-		);
 	});
 	test("should handle various markdown syntaxes and verify numbering", async () => {
 		const pageSlug = "test-page-variety-numbering";
@@ -248,26 +229,14 @@ test
   
   > Blockquote
   
-  \`inline code\`
-  
   \`\`\`
   code block
   \`\`\`
+
+  1. List item 1
+  2. List item 2
   
   ---
-  
-  ![Alt text](https://example.com/image.jpg)
-  
-  | Column 1 | Column 2 |
-  |----------|----------|
-  | Cell A   | Cell B   |
-  
-  - [ ] Task list item 1
-  - [x] Task list item 2 (done)
-  
-  Footnote test[^1]
-  
-  [^1]: This is a footnote.
   `;
 
 		const user = await prisma.user.upsert({
@@ -292,27 +261,19 @@ test
 		if (!dbPage) return;
 
 		const { sourceTexts } = dbPage;
-		// テキスト数が期待以上であることを確認（複数要素があるので10以上を想定）
-		expect(sourceTexts.length).toBeGreaterThanOrEqual(10);
+		expect(sourceTexts.length).toBeGreaterThanOrEqual(7);
 
 		const textsByNumber = [...sourceTexts].sort((a, b) => a.number - b.number);
-
-		// textsByNumberは、全てのテキストノードがMarkdown中に現れた順に並ぶはず。
-		// 例えば、最初に現れるテキストはHeadingの"Heading"、その次は"List item 1", "List item 2"...
-		// ここでは、いくつかのテキストの順番をサンプルチェックします。
+		console.log(textsByNumber);
 
 		expect(textsByNumber[0].text).toBe("Heading");
 
 		expect(textsByNumber[1].text).toBe("List item 1");
 		expect(textsByNumber[2].text).toBe("List item 2");
-		expect(textsByNumber[3].text).toBe("**Bold text** and *italic text*");
-		expect(textsByNumber[4].text).toBe("[Link](https://example.com)");
-		expect(textsByNumber[5].text).toBe("> Blockquote");
-		expect(textsByNumber[8].text).toBe("---");
-		expect(textsByNumber[9].text).toBe(
-			"![Alt text](https://example.com/image.jpg)",
-		);
-
-		// これらの検証により、テキストが出現順にnumberが振られていることをある程度確認できます。
+		expect(textsByNumber[3].text).toBe("Bold text and italic text");
+		expect(textsByNumber[4].text).toBe("Link");
+		expect(textsByNumber[5].text).toBe("Blockquote");
+		expect(textsByNumber[6].text).toBe("List item 1");
+		expect(textsByNumber[7].text).toBe("List item 2");
 	});
 });

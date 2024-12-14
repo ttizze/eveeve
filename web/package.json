@@ -13,7 +13,7 @@
 		"test": "DATABASE_URL=postgresql://postgres:password@localhost:5433/postgres?schema=public bunx prisma migrate dev && bunx prisma migrate deploy && vitest",
 		"sync-markdown": "tsx scripts/syncMarkdown.ts",
 		"translate": "tsx scripts/translate.ts",
-		"test-sync-github": " vitest run scripts/SyncGithub.test.ts"
+		"test-process-markdown": "vitest run scripts/processMarkdownContent.test.ts"
 	},
 	"prisma": {
 		"seed": "tsx prisma/seed.ts"
@@ -122,6 +122,7 @@
 		"@testing-library/react": "16.0.1",
 		"@testing-library/user-event": "14.5.2",
 		"@types/bcryptjs": "2.4.6",
+		"@types/hast": "^3.0.4",
 		"@types/jsdom": "21.1.7",
 		"@types/react": "18.3.12",
 		"@types/react-dom": "18.3.1",

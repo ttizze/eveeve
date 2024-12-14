@@ -25,8 +25,8 @@ function generateHashForText(text: string, occurrence: number) {
 
 async function fullReparseUpdate(
 	pageId: number,
-	allTexts: {
-		originalText: string;
+	allTextsData: {
+		text: string;
 		hash: string;
 		number: number;
 	}[],
@@ -42,7 +42,7 @@ async function fullReparseUpdate(
 		);
 
 		// 今回のパース結果
-		const newHashes = new Set(allTexts.map((t) => t.hash));
+		const newHashes = new Set(allTextsData.map((t) => t.hash));
 
 		// 1. 不要テキスト削除
 		for (const [h, ex] of existingMap) {
@@ -53,32 +53,32 @@ async function fullReparseUpdate(
 		}
 
 		const hashToId = new Map<string, number>();
-
 		// 2. 既存テキストUPDATE（既に存在するhashはnumberを更新）
-		for (const text of allTexts) {
-			const ex = existingMap.get(text.hash);
+		for (const textData of allTextsData) {
+			const ex = existingMap.get(textData.hash);
 			if (ex) {
+				console.log("update", ex.id, textData.number, textData.text);
 				await tx.sourceText.update({
 					where: { id: ex.id },
-					data: { number: text.number },
+					data: { number: textData.number },
 				});
-				hashToId.set(text.hash, ex.id);
+				hashToId.set(textData.hash, ex.id);
 			}
 		}
 
 		// 3. 新規テキストINSERT（既存にないhashは新規作成）
-		for (const text of allTexts) {
-			if (!hashToId.has(text.hash)) {
+		for (const textData of allTextsData) {
+			if (!hashToId.has(textData.hash)) {
 				const st = await tx.sourceText.create({
 					data: {
 						pageId,
-						hash: text.hash,
-						text: text.originalText,
-						number: text.number,
+						hash: textData.hash,
+						text: textData.text,
+						number: textData.number,
 					},
 					select: { id: true },
 				});
-				hashToId.set(text.hash, st.id);
+				hashToId.set(textData.hash, st.id);
 			}
 		}
 
@@ -90,11 +90,19 @@ async function upsertPageWithHtml(
 	pageSlug: string,
 	html: string,
 	userId: number,
+	sourceLanguage: string,
+	isPublished: boolean,
 ) {
 	return await prisma.page.upsert({
 		where: { slug: pageSlug },
-		update: { content: html },
-		create: { slug: pageSlug, content: html, userId, isPublished: true },
+		update: { content: html, sourceLanguage, isPublished },
+		create: {
+			slug: pageSlug,
+			content: html,
+			userId,
+			isPublished,
+			sourceLanguage,
+		},
 	});
 }
 
@@ -163,7 +171,7 @@ export function rehypeAddDataId(pageId: number): Plugin<[], Root> {
 			});
 
 			const allTextsForDb = blocks.map((b, i) => ({
-				originalText: b.text,
+				text: b.text,
 				hash: b.hash,
 				number: i + 1,
 			}));
@@ -178,7 +186,7 @@ export function rehypeAddDataId(pageId: number): Plugin<[], Root> {
 				const spanNode: Element = {
 					type: "element",
 					tagName: "span",
-					properties: { "data-id": sourceTextId.toString() } as Properties,
+					properties: { "data-source-text-id": sourceTextId.toString() } as Properties,
 					children: b.element.children,
 				};
 
@@ -196,8 +204,16 @@ export async function processMarkdownContent(
 	body: string,
 	pageSlug: string,
 	userId: number,
+	sourceLanguage: string,
+	isPublished: boolean,
 ) {
-	const page = await upsertPageWithHtml(pageSlug, body, userId);
+	const page = await upsertPageWithHtml(
+		pageSlug,
+		body,
+		userId,
+		sourceLanguage,
+		isPublished,
+	);
 
 	const file = await remark()
 		.use(remarkGfm)
@@ -209,7 +225,13 @@ export async function processMarkdownContent(
 
 	const htmlContent = String(file);
 
-	await upsertPageWithHtml(pageSlug, htmlContent, userId);
+	await upsertPageWithHtml(
+		pageSlug,
+		htmlContent,
+		userId,
+		sourceLanguage,
+		isPublished,
+	);
 	return page;
 }
 
@@ -217,23 +239,36 @@ export async function processHtmlContent(
 	htmlInput: string,
 	pageSlug: string,
 	userId: number,
+	sourceLanguage: string,
+	isPublished: boolean,
 ) {
 	// HTML入力に対応するpageレコードを作成・更新
-	const page = await upsertPageWithHtml(pageSlug, htmlInput, userId);
-
+	const page = await upsertPageWithHtml(
+		pageSlug,
+		htmlInput,
+		userId,
+		sourceLanguage,
+		isPublished,
+	);
 	// HTML → HAST → MDAST → remarkAddDataId適用 → HTMLへの変換
 	const file = await unified()
-		.use(rehypeParse, { fragment: true })
-		.use(rehypeRemark)
-		.use(remarkGfm)
-		.use(rehypeAddDataId(page.id))
-		.use(remarkRehype, { allowDangerousHtml: true })
-		.use(rehypeRaw)
-		.use(rehypeStringify, { allowDangerousHtml: true })
+		.use(rehypeParse, { fragment: true }) // HTMLをHASTに
+		.use(rehypeRemark) // HAST→MDAST
+		.use(remarkGfm) // GFM拡張
+		.use(remarkRehype, { allowDangerousHtml: true }) // MDAST→HAST
+		.use(rehypeAddDataId(page.id)) // HAST上でdata-idを付与
+		.use(rehypeRaw) // 生HTMLを処理
+		.use(rehypeStringify, { allowDangerousHtml: true }) // HAST→HTML
 		.process(htmlInput);
 
 	const htmlContent = String(file);
-
-	await upsertPageWithHtml(pageSlug, htmlContent, userId);
+	console.log(htmlContent);
+	await upsertPageWithHtml(
+		pageSlug,
+		htmlContent,
+		userId,
+		sourceLanguage,
+		isPublished,
+	);
 	return page;
 }
