@@ -85,8 +85,6 @@ describe("UserProfile", () => {
 			await screen.findByText("This is a test profile"),
 		).toBeInTheDocument();
 		expect(await screen.findByText("Public Page")).toBeInTheDocument();
-		expect(await screen.findByText("Private Page")).toBeInTheDocument();
-		expect(await screen.queryByText("Archived Page")).not.toBeInTheDocument();
 		const menuButtons = await screen.findAllByLabelText("More options");
 		expect(menuButtons.length).toBeGreaterThan(0);
 

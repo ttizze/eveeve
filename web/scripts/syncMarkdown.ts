@@ -192,12 +192,21 @@ export function rehypeAddDataId(pageId: number): Plugin<[], Root> {
  * Markdownからテキストノードを抽出し、hash計算、DBとの同期を行い、
  * 結果としてHTMLに<span data-id="...">...</span>を挿入する。
  */
+
 export async function processMarkdownContent(
 	body: string,
 	pageSlug: string,
 	userId: number,
+	sourceLanguage: string,
+	isPublished: boolean,
 ) {
-	const page = await upsertPageWithHtml(pageSlug, body, userId);
+	const page = await upsertPageWithHtml(
+		pageSlug,
+		body,
+		userId,
+		sourceLanguage,
+		isPublished,
+	);
 
 	const file = await remark()
 		.use(remarkGfm)
@@ -209,31 +218,12 @@ export async function processMarkdownContent(
 
 	const htmlContent = String(file);
 
-	await upsertPageWithHtml(pageSlug, htmlContent, userId);
-	return page;
-}
-
-export async function processHtmlContent(
-	htmlInput: string,
-	pageSlug: string,
-	userId: number,
-) {
-	// HTML入力に対応するpageレコードを作成・更新
-	const page = await upsertPageWithHtml(pageSlug, htmlInput, userId);
-
-	// HTML → HAST → MDAST → remarkAddDataId適用 → HTMLへの変換
-	const file = await unified()
-		.use(rehypeParse, { fragment: true })
-		.use(rehypeRemark)
-		.use(remarkGfm)
-		.use(rehypeAddDataId(page.id))
-		.use(remarkRehype, { allowDangerousHtml: true })
-		.use(rehypeRaw)
-		.use(rehypeStringify, { allowDangerousHtml: true })
-		.process(htmlInput);
-
-	const htmlContent = String(file);
-
-	await upsertPageWithHtml(pageSlug, htmlContent, userId);
+	await upsertPageWithHtml(
+		pageSlug,
+		htmlContent,
+		userId,
+		sourceLanguage,
+		isPublished,
+	);
 	return page;
 }

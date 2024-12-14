@@ -5,8 +5,8 @@ import { processHtmlContent } from "./processHtmlContent";
 describe("processHtmlContent", () => {
 	test("HTML入力を処理し、source_texts挿入とdata-id付きspanが生成されるかテスト", async () => {
 		const pageSlug = "html-test-page";
+		const title = "Title";
 		const htmlInput = `
-      <h1>Title</h1>
       <p>This is a test.</p>
       <p>This is another test.</p>
     `;
@@ -24,7 +24,7 @@ describe("processHtmlContent", () => {
 		});
 
 		// HTMLを処理
-		await processHtmlContent(htmlInput, pageSlug, user.id, "en", true);
+		await processHtmlContent(title, htmlInput, pageSlug, user.id, "en", true);
 
 		// ページがDBに存在し、HTMLが変換されているか確認
 		const dbPage = await prisma.page.findUnique({
@@ -33,7 +33,7 @@ describe("processHtmlContent", () => {
 		});
 		expect(dbPage).not.toBeNull();
 		if (!dbPage) return;
-		expect(dbPage.sourceTexts.length).toBeGreaterThanOrEqual(3);
+		expect(dbPage.sourceTexts.length).toBeGreaterThanOrEqual(2);
 
 		// ページHTMLがdata-id付きspanを含むか確認
 		const updatedPage = await prisma.page.findUnique({
@@ -44,10 +44,6 @@ describe("processHtmlContent", () => {
 		if (!updatedPage) return;
 		const htmlContent = updatedPage.content;
 
-		// タイトルや本文が<span data-id="...">でラップされているか
-		expect(htmlContent).toMatch(
-			/<span data-source-text-id="\d+">Title<\/span>/,
-		);
 		expect(htmlContent).toMatch(
 			/<span data-source-text-id="\d+">This is a test\.<\/span>/,
 		);
@@ -57,9 +53,8 @@ describe("processHtmlContent", () => {
 
 		// source_textsのnumberが連番になっているか
 		const sortedTexts = dbPage.sourceTexts.sort((a, b) => a.number - b.number);
-		expect(sortedTexts[0].number).toBe(1);
-		expect(sortedTexts[1].number).toBe(2);
-		expect(sortedTexts[2].number).toBe(3);
+		expect(sortedTexts[0].number).toBe(0);
+		expect(sortedTexts[1].number).toBe(1);
 
 		// hashが設定されているか
 		for (const st of sortedTexts) {
@@ -69,8 +64,8 @@ describe("processHtmlContent", () => {
 
 	test("HTML入力を編集後再度処理し、IDが保持・追加・変更されるか確認", async () => {
 		const pageSlug = "html-test-page-edit";
+		const originalTitle = " <h1>Title</h1>";
 		const originalHtml = `
-      <h1>Title</h1>
       <p>This is a line.</p>
       <p>This is another line.</p>
       <ul>
@@ -92,7 +87,14 @@ describe("processHtmlContent", () => {
 		});
 
 		// 初回処理
-		await processHtmlContent(originalHtml, pageSlug, user.id, "en", true);
+		await processHtmlContent(
+			originalTitle,
+			originalHtml,
+			pageSlug,
+			user.id,
+			"en",
+			true,
+		);
 
 		const dbPage1 = await prisma.page.findUnique({
 			where: { slug: pageSlug },
@@ -108,8 +110,8 @@ describe("processHtmlContent", () => {
 		}
 
 		// HTML変更
+		const editedTitle = " <h1>Edited Title</h1>";
 		const editedHtml = `
-      <h1>Title</h1>
       <p>This is a line!?</p>
       <p>This is another line.</p>
       <p>new line</p>
@@ -120,7 +122,14 @@ describe("processHtmlContent", () => {
     `;
 
 		// 再処理
-		await processHtmlContent(editedHtml, pageSlug, user.id, "en", true);
+		await processHtmlContent(
+			editedTitle,
+			editedHtml,
+			pageSlug,
+			user.id,
+			"en",
+			true,
+		);
 
 		const dbPage2 = await prisma.page.findUnique({
 			where: { slug: pageSlug },

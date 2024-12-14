@@ -95,6 +95,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 	const isPublishedBool = isPublished === "true";
 	const sourceLanguage = await getPageSourceLanguage(pageContent, title);
 	const page = await processHtmlContent(
+		title,
 		pageContent,
 		slug,
 		currentUser.id,

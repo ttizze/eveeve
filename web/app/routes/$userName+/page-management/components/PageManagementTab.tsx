@@ -24,7 +24,7 @@ import {
 import { DeletePageDialog } from "../../components/DeletePageDialog";
 import { PageActionsDropdown } from "../../components/PageActionsDropdown";
 import type { PageWithTitle } from "../types";
-
+import { Link } from "@remix-run/react";
 interface PageManagementTabProps {
 	pagesWithTitle: PageWithTitle[];
 	totalPages: number;
@@ -183,7 +183,9 @@ export function PageManagementTab({
 									/>
 								</TableCell>
 								<TableCell className="font-medium">
-									{pageWithTitle.title}
+									<Link to={`/${userName}/page/${pageWithTitle.slug}`}>
+										{pageWithTitle.title}
+									</Link>
 								</TableCell>
 								<TableCell>
 									{getStatusBadge(pageWithTitle.isPublished)}

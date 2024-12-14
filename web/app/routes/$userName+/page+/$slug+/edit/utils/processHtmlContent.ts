@@ -1,11 +1,9 @@
 import crypto from "node:crypto";
-import type { Element, Root, RootContent, Text } from "hast";
-import type { Properties } from "hast";
+import type { Element, Root, RootContent, Text, Properties } from "hast";
 import rehypeParse from "rehype-parse";
 import rehypeRaw from "rehype-raw";
 import rehypeRemark from "rehype-remark";
 import rehypeStringify from "rehype-stringify";
-import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
@@ -15,12 +13,11 @@ import { visit } from "unist-util-visit";
 import type { VFile } from "vfile";
 import { prisma } from "~/utils/prisma";
 
-function generateHashForText(text: string, occurrence: number) {
-	const hash = crypto
+function generateHashForText(text: string, occurrence: number): string {
+	return crypto
 		.createHash("sha256")
 		.update(`${text}|${occurrence}`)
 		.digest("hex");
-	return hash;
 }
 
 async function fullReparseUpdate(
@@ -41,46 +38,77 @@ async function fullReparseUpdate(
 			existingSourceTexts.map((t) => [t.hash as string, t]),
 		);
 
-		// 今回のパース結果
 		const newHashes = new Set(allTextsData.map((t) => t.hash));
 
 		// 1. 不要テキスト削除
+		const deletions = [];
 		for (const [h, ex] of existingMap) {
 			if (!newHashes.has(h)) {
-				await tx.sourceText.delete({ where: { id: ex.id } });
+				deletions.push(tx.sourceText.delete({ where: { id: ex.id } }));
 				existingMap.delete(h);
 			}
 		}
+		if (deletions.length > 0) {
+			await Promise.all(deletions);
+		}
 
 		const hashToId = new Map<string, number>();
-		// 2. 既存テキストUPDATE（既に存在するhashはnumberを更新）
+
+		// 2. 一時的なオフセットを適用して既存テキストのnumberを変更
+		const OFFSET = 1_000_000;
+		const updateTemporary = Array.from(existingMap.values()).map((ex) =>
+			tx.sourceText.update({
+				where: { id: ex.id },
+				data: { number: ex.number + OFFSET },
+			}),
+		);
+		await Promise.all(updateTemporary);
+
+		// 3. 既存テキストUPDATE（既に存在するhashはnumberを更新）
+		const updates = [];
 		for (const textData of allTextsData) {
-			const ex = existingMap.get(textData.hash);
-			if (ex) {
-				console.log("update", ex.id, textData.number, textData.text);
-				await tx.sourceText.update({
-					where: { id: ex.id },
-					data: { number: textData.number },
-				});
-				hashToId.set(textData.hash, ex.id);
+			const existingText = existingMap.get(textData.hash);
+			if (existingText) {
+				updates.push(
+					tx.sourceText.update({
+						where: { id: existingText.id },
+						data: { number: textData.number },
+					}),
+				);
+				hashToId.set(textData.hash, existingText.id);
+			}
+		}
+		if (updates.length > 0) {
+			try {
+				await Promise.all(updates);
+			} catch (error) {
+				console.error("Error during updating sourceTexts:", error);
+				throw error;
 			}
 		}
 
-		// 3. 新規テキストINSERT（既存にないhashは新規作成）
+		// 4. 新規テキストINSERT（既存にないhashは新規作成）
+		const inserts = [];
 		for (const textData of allTextsData) {
 			if (!hashToId.has(textData.hash)) {
-				const st = await tx.sourceText.create({
-					data: {
-						pageId,
-						hash: textData.hash,
-						text: textData.text,
-						number: textData.number,
-					},
-					select: { id: true },
-				});
-				hashToId.set(textData.hash, st.id);
+				inserts.push(
+					tx.sourceText.create({
+						data: {
+							pageId,
+							hash: textData.hash,
+							text: textData.text,
+							number: textData.number,
+						},
+						select: { id: true },
+					}),
+				);
 			}
 		}
+		const insertedTexts = await Promise.all(inserts);
+		insertedTexts.forEach((sourceText, index) => {
+			const hash = allTextsData[inserts.length - index - 1].hash;
+			hashToId.set(hash, sourceText.id);
+		});
 
 		return hashToId;
 	});
@@ -106,7 +134,7 @@ async function upsertPageWithHtml(
 	});
 }
 
-const blockLevelTags = new Set([
+const BLOCK_LEVEL_TAGS = new Set([
 	"p",
 	"h1",
 	"h2",
@@ -121,23 +149,16 @@ const blockLevelTags = new Set([
 
 function extractTextFromHAST(node: Parent): string {
 	let result = "";
-	visit(
-		node,
-		"text",
-		(node: RootContent, index: number | null, parent: Parent | null) => {
-			if (node.type === "text") {
-				const textNode = node as Text;
-				const t = textNode.value.trim();
-				if (t) {
-					if (result) result += " ";
-					result += t;
-				}
+	visit(node, "text", (textNode: RootContent) => {
+		if (textNode.type === "text") {
+			const trimmedText = (textNode as Text).value.trim();
+			if (trimmedText) {
+				result += result ? ` ${trimmedText}` : trimmedText;
 			}
-		},
-	);
+		}
+	});
 	return result;
 }
-
 export function rehypeAddDataId(pageId: number): Plugin<[], Root> {
 	return function attacher() {
 		return async (tree: Root, file: VFile) => {
@@ -153,7 +174,7 @@ export function rehypeAddDataId(pageId: number): Plugin<[], Root> {
 
 			// 全ての"element"ノードを訪問
 			visit(tree, "element", (node: Element) => {
-				if (blockLevelTags.has(node.tagName)) {
+				if (BLOCK_LEVEL_TAGS.has(node.tagName)) {
 					const blockText = extractTextFromHAST(node);
 					if (!blockText) return;
 
@@ -170,17 +191,17 @@ export function rehypeAddDataId(pageId: number): Plugin<[], Root> {
 				}
 			});
 
-			const allTextsForDb = blocks.map((b, i) => ({
-				text: b.text,
-				hash: b.hash,
-				number: i + 1,
+			const allTextsForDb = blocks.map((block, index) => ({
+				text: block.text,
+				hash: block.hash,
+				number: index + 1,
 			}));
 
 			const hashToId = await fullReparseUpdate(pageId, allTextsForDb);
 
 			// 各ブロック要素を<span data-id="...">で子要素全体を包む
-			for (const b of blocks) {
-				const sourceTextId = hashToId.get(b.hash);
+			for (const block of blocks) {
+				const sourceTextId = hashToId.get(block.hash);
 				if (!sourceTextId) continue;
 
 				const spanNode: Element = {
@@ -189,55 +210,28 @@ export function rehypeAddDataId(pageId: number): Plugin<[], Root> {
 					properties: {
 						"data-source-text-id": sourceTextId.toString(),
 					} as Properties,
-					children: b.element.children,
+					children: block.element.children,
 				};
 
-				b.element.children = [spanNode];
+				block.element.children = [spanNode];
 			}
 		};
 	};
 }
 
-/**
- * Markdownからテキストノードを抽出し、hash計算、DBとの同期を行い、
- * 結果としてHTMLに<span data-id="...">...</span>を挿入する。
- */
-export async function processMarkdownContent(
-	body: string,
-	pageSlug: string,
-	userId: number,
-	sourceLanguage: string,
-	isPublished: boolean,
-) {
-	const page = await upsertPageWithHtml(
-		pageSlug,
-		body,
-		userId,
-		sourceLanguage,
-		isPublished,
-	);
-
-	const file = await remark()
-		.use(remarkGfm)
-		.use(remarkRehype)
-		.use(rehypeAddDataId(page.id))
-		.use(rehypeRaw)
-		.use(rehypeStringify, { allowDangerousHtml: true })
-		.process(body);
-
-	const htmlContent = String(file);
-
-	await upsertPageWithHtml(
-		pageSlug,
-		htmlContent,
-		userId,
-		sourceLanguage,
-		isPublished,
-	);
-	return page;
-}
+const upsertTitle = async (pageSlug: string, title: string) => {
+	const page = await prisma.page.findUnique({ where: { slug: pageSlug } });
+	if (!page) return;
+	const titleHash = generateHashForText(title, 1);
+	return await prisma.sourceText.upsert({
+		where: { pageId_hash: { pageId: page.id, hash: titleHash } },
+		update: { text: title },
+		create: { pageId: page.id, hash: titleHash, text: title, number: 0 },
+	});
+};
 
 export async function processHtmlContent(
+	title: string,
 	htmlInput: string,
 	pageSlug: string,
 	userId: number,
@@ -253,6 +247,7 @@ export async function processHtmlContent(
 		isPublished,
 	);
 	// HTML → HAST → MDAST → remarkAddDataId適用 → HTMLへの変換
+
 	const file = await unified()
 		.use(rehypeParse, { fragment: true }) // HTMLをHASTに
 		.use(rehypeRemark) // HAST→MDAST
@@ -264,7 +259,6 @@ export async function processHtmlContent(
 		.process(htmlInput);
 
 	const htmlContent = String(file);
-	console.log(htmlContent);
 	await upsertPageWithHtml(
 		pageSlug,
 		htmlContent,
@@ -272,5 +266,6 @@ export async function processHtmlContent(
 		sourceLanguage,
 		isPublished,
 	);
+	const titleSourceText = await upsertTitle(pageSlug, title);
 	return page;
 }
