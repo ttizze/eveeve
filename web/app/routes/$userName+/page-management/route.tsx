@@ -3,7 +3,6 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { data } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { z } from "zod";
-import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import i18nServer from "~/i18n.server";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
 import { authenticator } from "~/utils/auth.server";
@@ -13,8 +12,6 @@ import {
 	togglePagePublicStatus,
 } from "./functions/mutations.server";
 import { fetchPaginatedOwnPages } from "./functions/queries.server";
-import { translationInputSchema } from "./types";
-import { processFolder } from "./utils/process-folder";
 
 const archiveSchema = z.object({
 	pageIds: z.string().transform((val) => val.split(",").map(Number)),
@@ -60,9 +57,6 @@ export async function action({ request }: ActionFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request, {
 		failureRedirect: "/",
 	});
-	const nonSanitizedUser = await getNonSanitizedUserbyUserName(
-		currentUser.userName,
-	);
 	const formData = await request.formData();
 
 	if (formData.get("intent") === "archive") {
@@ -101,83 +95,12 @@ export async function action({ request }: ActionFunctionArgs) {
 		return data({ success: true });
 	}
 
-	const submission = parseWithZod(formData, {
-		schema: translationInputSchema,
-	});
-	if (submission.status !== "success") {
-		return { lastResult: submission.reply() };
-	}
-
-	if (!nonSanitizedUser?.geminiApiKey) {
-		return {
-			lastResult: submission.reply({
-				formErrors: ["Gemini API key is not set"],
-			}),
-			slugs: [],
-		};
-	}
-
-	const targetLanguage = await i18nServer.getLocale(request);
-	const queue = getTranslateUserQueue(nonSanitizedUser.id);
-
-	function generateLinkArticle(
-		userId: number,
-		folderPath: string,
-		files: { name: string; slug: string }[],
-	): string {
-		let article = `
-      # ${folderPath}
-      <ul>
-    `;
-
-		for (const file of files) {
-			article += `
-        <li>
-          <a href="/${userId}/page/${file.slug}">${file.name}</a>
-          <a href="/${userId}/page/${file.slug}/edit" class="edit-link">[edit]</a>
-        </li>
-      `;
-		}
-
-		article += `
-      </ul>
-    `;
-
-		return article;
-	}
-
-	let slugs: string[] = [];
-	if (submission.value.folder) {
-		slugs = await processFolder(
-			submission.value.folder,
-			nonSanitizedUser,
-			submission.value.aiModel,
-			targetLanguage,
-			queue,
-		);
-	} else {
-		return {
-			lastResult: submission.reply({
-				formErrors: ["Folder is not selected"],
-			}),
-			slugs: [],
-		};
-	}
-
-	return {
-		lastResult: submission.reply({ resetForm: true }),
-		slugs,
-	};
+	return null;
 }
 
 export default function TranslatePage() {
-	const {
-		hasGeminiApiKey,
-		pagesWithTitle,
-		totalPages,
-		currentPage,
-		currentUser,
-	} = useLoaderData<typeof loader>();
+	const { pagesWithTitle, totalPages, currentPage, currentUser } =
+		useLoaderData<typeof loader>();
 
 	return (
 		<div className="mx-auto max-w-4xl py-10">

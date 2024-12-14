@@ -1,4 +1,3 @@
-import crypto from "node:crypto";
 import type { Element, Properties, Root, RootContent, Text } from "hast";
 import rehypeParse from "rehype-parse";
 import rehypeRaw from "rehype-raw";
@@ -11,128 +10,12 @@ import type { Plugin } from "unified";
 import type { Parent } from "unist";
 import { visit } from "unist-util-visit";
 import type { VFile } from "vfile";
-import { prisma } from "~/utils/prisma";
-
-function generateHashForText(text: string, occurrence: number): string {
-	return crypto
-		.createHash("sha256")
-		.update(`${text}|${occurrence}`)
-		.digest("hex");
-}
-
-async function fullReparseUpdate(
-	pageId: number,
-	allTextsData: {
-		text: string;
-		hash: string;
-		number: number;
-	}[],
-) {
-	return await prisma.$transaction(async (tx) => {
-		// 現在のDB上のソーステキストを取得
-		const existingSourceTexts = await tx.sourceText.findMany({
-			where: { pageId },
-		});
-
-		const existingMap = new Map(
-			existingSourceTexts.map((t) => [t.hash as string, t]),
-		);
-
-		const newHashes = new Set(allTextsData.map((t) => t.hash));
-
-		// 1. 不要テキスト削除
-		const deletions = [];
-		for (const [h, ex] of existingMap) {
-			if (!newHashes.has(h)) {
-				deletions.push(tx.sourceText.delete({ where: { id: ex.id } }));
-				existingMap.delete(h);
-			}
-		}
-		if (deletions.length > 0) {
-			await Promise.all(deletions);
-		}
-
-		const hashToId = new Map<string, number>();
-
-		// 2. 一時的なオフセットを適用して既存テキストのnumberを変更
-		const OFFSET = 1_000_000;
-		const updateTemporary = Array.from(existingMap.values()).map((ex) =>
-			tx.sourceText.update({
-				where: { id: ex.id },
-				data: { number: ex.number + OFFSET },
-			}),
-		);
-		await Promise.all(updateTemporary);
-
-		// 3. 既存テキストUPDATE（既に存在するhashはnumberを更新）
-		const updates = [];
-		for (const textData of allTextsData) {
-			const existingText = existingMap.get(textData.hash);
-			if (existingText) {
-				updates.push(
-					tx.sourceText.update({
-						where: { id: existingText.id },
-						data: { number: textData.number },
-					}),
-				);
-				hashToId.set(textData.hash, existingText.id);
-			}
-		}
-		if (updates.length > 0) {
-			try {
-				await Promise.all(updates);
-			} catch (error) {
-				console.error("Error during updating sourceTexts:", error);
-				throw error;
-			}
-		}
-
-		// 4. 新規テキストINSERT（既存にないhashは新規作成）
-		const inserts = [];
-		for (const textData of allTextsData) {
-			if (!hashToId.has(textData.hash)) {
-				inserts.push(
-					tx.sourceText.create({
-						data: {
-							pageId,
-							hash: textData.hash,
-							text: textData.text,
-							number: textData.number,
-						},
-						select: { id: true },
-					}),
-				);
-			}
-		}
-		const insertedTexts = await Promise.all(inserts);
-		insertedTexts.forEach((sourceText, index) => {
-			const hash = allTextsData[inserts.length - index - 1].hash;
-			hashToId.set(hash, sourceText.id);
-		});
-
-		return hashToId;
-	});
-}
-
-async function upsertPageWithHtml(
-	pageSlug: string,
-	html: string,
-	userId: number,
-	sourceLanguage: string,
-	isPublished: boolean,
-) {
-	return await prisma.page.upsert({
-		where: { slug: pageSlug },
-		update: { content: html, sourceLanguage, isPublished },
-		create: {
-			slug: pageSlug,
-			content: html,
-			userId,
-			isPublished,
-			sourceLanguage,
-		},
-	});
-}
+import {
+	synchronizePageSourceTexts,
+	upsertPageWithHtml,
+	upsertTitle,
+} from "../functions/mutations.server";
+import { generateHashForText } from "./generateHashForText";
 
 const BLOCK_LEVEL_TAGS = new Set([
 	"p",
@@ -197,7 +80,7 @@ export function rehypeAddDataId(pageId: number): Plugin<[], Root> {
 				number: index + 1,
 			}));
 
-			const hashToId = await fullReparseUpdate(pageId, allTextsForDb);
+			const hashToId = await synchronizePageSourceTexts(pageId, allTextsForDb);
 
 			// 各ブロック要素を<span data-id="...">で子要素全体を包む
 			for (const block of blocks) {
@@ -218,17 +101,6 @@ export function rehypeAddDataId(pageId: number): Plugin<[], Root> {
 		};
 	};
 }
-
-const upsertTitle = async (pageSlug: string, title: string) => {
-	const page = await prisma.page.findUnique({ where: { slug: pageSlug } });
-	if (!page) return;
-	const titleHash = generateHashForText(title, 1);
-	return await prisma.sourceText.upsert({
-		where: { pageId_hash: { pageId: page.id, hash: titleHash } },
-		update: { text: title },
-		create: { pageId: page.id, hash: titleHash, text: title, number: 0 },
-	});
-};
 
 export async function processHtmlContent(
 	title: string,
@@ -266,6 +138,6 @@ export async function processHtmlContent(
 		sourceLanguage,
 		isPublished,
 	);
-	const titleSourceText = await upsertTitle(pageSlug, title);
+	await upsertTitle(pageSlug, title);
 	return page;
 }

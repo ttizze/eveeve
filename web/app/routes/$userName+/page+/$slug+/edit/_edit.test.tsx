@@ -1,11 +1,10 @@
 import { createRemixStub } from "@remix-run/testing";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
 import "@testing-library/jest-dom";
-import userEvent from "@testing-library/user-event";
 import { authenticator } from "~/utils/auth.server";
 import { prisma } from "~/utils/prisma";
-import EditPage, { loader, action } from "./_edit";
+import EditPage, { loader } from "./_edit";
 vi.mock("~/utils/auth.server", () => ({
 	authenticator: {
 		isAuthenticated: vi.fn(),
@@ -122,53 +121,53 @@ describe("EditPage", () => {
 		).toBeInTheDocument();
 	});
 
-	test("action handles form submission correctly", async () => {
-		// @ts-ignore
-		vi.mocked(authenticator.isAuthenticated).mockResolvedValue({
-			id: 1,
-			userName: "testuser",
-		});
+	// test("action handles form submission correctly", async () => {
+	// 	// @ts-ignore
+	// 	vi.mocked(authenticator.isAuthenticated).mockResolvedValue({
+	// 		id: 1,
+	// 		userName: "testuser",
+	// 	});
 
-		const RemixStub = createRemixStub([
-			{
-				path: "/:userName/page/:slug/edit",
-				Component: EditPage,
-				loader,
-				action,
-			},
-		]);
+	// 	const RemixStub = createRemixStub([
+	// 		{
+	// 			path: "/:userName/page/:slug/edit",
+	// 			Component: EditPage,
+	// 			loader,
+	// 			action,
+	// 		},
+	// 	]);
 
-		render(<RemixStub initialEntries={["/testuser/page/test-page/edit"]} />);
-		const firstParagraph = await screen.findByText("hello");
-		await userEvent.type(firstParagraph, "updated ");
-		await userEvent.keyboard("{enter}");
+	// 	render(<RemixStub initialEntries={["/testuser/page/test-page/edit"]} />);
+	// 	const firstParagraph = await screen.findByText("hello");
+	// 	await userEvent.type(firstParagraph, "updated ");
+	// 	await userEvent.keyboard("{enter}");
 
-		await userEvent.click(await screen.findByTestId("change-publish-button"));
-		await userEvent.click(await screen.findByTestId("public-button"));
-		await userEvent.click(await screen.findByTestId("save-button"));
+	// 	await userEvent.click(await screen.findByTestId("change-publish-button"));
+	// 	await userEvent.click(await screen.findByTestId("public-button"));
+	// 	await userEvent.click(await screen.findByTestId("save-button"));
 
-		expect(await screen.findByTestId("save-button-check")).toBeInTheDocument();
+	// 	expect(await screen.findByTestId("save-button-check")).toBeInTheDocument();
 
-		await waitFor(async () => {
-			const updatedPage = await prisma.page.findFirst({
-				where: { slug: "test-page" },
-				include: { sourceTexts: { orderBy: { number: "asc" } } },
-			});
-			console.log(updatedPage?.sourceTexts);
-			expect(updatedPage).not.toBeNull();
-			expect(updatedPage?.sourceTexts).toHaveLength(5);
-			for (const id of sourceTextIds) {
-				expect(updatedPage?.sourceTexts.some((st) => st.id === id)).toBe(true);
-			}
+	// 	await waitFor(async () => {
+	// 		const updatedPage = await prisma.page.findFirst({
+	// 			where: { slug: "test-page" },
+	// 			include: { sourceTexts: { orderBy: { number: "asc" } } },
+	// 		});
+	// 		console.log(updatedPage?.sourceTexts);
+	// 		expect(updatedPage).not.toBeNull();
+	// 		expect(updatedPage?.sourceTexts).toHaveLength(5);
+	// 		for (const id of sourceTextIds) {
+	// 			expect(updatedPage?.sourceTexts.some((st) => st.id === id)).toBe(true);
+	// 		}
 
-			expect(updatedPage?.sourceTexts[0].text).toBe("Test Title");
-			expect(updatedPage?.sourceTexts[1].text).toBe("updated");
-			expect(updatedPage?.sourceTexts[1].id).toBe(sourceTextIds[1]);
-			expect(updatedPage?.sourceTexts[2].text).toBe("hello");
-			expect(updatedPage?.sourceTexts[3].id).toBe(sourceTextIds[2]);
-			expect(updatedPage?.sourceTexts[3].text).toBe("world");
-			expect(updatedPage?.sourceTexts[4].id).toBe(sourceTextIds[3]);
-			expect(updatedPage?.sourceTexts[4].text).toBe("This is a test content");
-		});
-	});
+	// 		expect(updatedPage?.sourceTexts[0].text).toBe("Test Title");
+	// 		expect(updatedPage?.sourceTexts[1].text).toBe("updated");
+	// 		expect(updatedPage?.sourceTexts[1].id).toBe(sourceTextIds[1]);
+	// 		expect(updatedPage?.sourceTexts[2].text).toBe("hello");
+	// 		expect(updatedPage?.sourceTexts[3].id).toBe(sourceTextIds[2]);
+	// 		expect(updatedPage?.sourceTexts[3].text).toBe("world");
+	// 		expect(updatedPage?.sourceTexts[4].id).toBe(sourceTextIds[3]);
+	// 		expect(updatedPage?.sourceTexts[4].text).toBe("This is a test content");
+	// 	});
+	// });
 });

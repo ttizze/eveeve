@@ -1,11 +1,12 @@
 import { describe, expect, test } from "vitest";
 import { prisma } from "~/utils/prisma";
-import { processMarkdownContent } from "./syncMarkdown";
+import { processMarkdownContent } from "./processMarkdownContent";
 
 describe("processMarkdownContent", () => {
 	test("should parse markdown, insert source_texts, and return a page with data-id spans", async () => {
 		const pageSlug = "test-page";
-		const markdown = `# Title
+		const title = "Title";
+		const markdown = `
 
 This is a test.
 
@@ -24,7 +25,14 @@ This is another test.
 			},
 			update: {},
 		});
-		const page = await processMarkdownContent(markdown, pageSlug, user.id);
+		await processMarkdownContent(
+			title,
+			markdown,
+			pageSlug,
+			user.id,
+			"en",
+			true,
+		);
 
 		// ページがDBに存在し、HTMLが変換されているか確認
 		const dbPage = await prisma.page.findUnique({
@@ -50,15 +58,17 @@ This is another test.
 
 		const htmlContent = updatedPage.content;
 		// <span data-id="...">This is a test.</span> がHTML内に挿入されることを期待
-		expect(htmlContent).toMatch(/<span data-id="\d+">This is a test\.<\/span>/);
 		expect(htmlContent).toMatch(
-			/<span data-id="\d+">This is another test\.<\/span>/,
+			/<span data-source-text-id="\d+">This is a test\.<\/span>/,
+		);
+		expect(htmlContent).toMatch(
+			/<span data-source-text-id="\d+">This is another test\.<\/span>/,
 		);
 
 		// source_textsのnumberが連番になっているかチェック
 		const sortedTexts = dbPage.sourceTexts.sort((a, b) => a.number - b.number);
-		expect(sortedTexts[0].number).toBe(1);
-		expect(sortedTexts[1].number).toBe(2);
+		expect(sortedTexts[0].number).toBe(0);
+		expect(sortedTexts[1].number).toBe(1);
 
 		// hashが設定されているか
 		expect(sortedTexts[0].hash).not.toBeNull();
@@ -67,6 +77,7 @@ This is another test.
 
 	test("should retain sourceTextId after minor edit", async () => {
 		const pageSlug = "test-page-edit";
+		const title = "Title";
 		const originalMarkdown = `# Title
 
 This is a line.
@@ -91,7 +102,14 @@ This is another line.
 		});
 
 		// 初回登録
-		await processMarkdownContent(originalMarkdown, pageSlug, user.id);
+		await processMarkdownContent(
+			title,
+			originalMarkdown,
+			pageSlug,
+			user.id,
+			"en",
+			true,
+		);
 		const dbPage1 = await prisma.page.findUnique({
 			where: { slug: pageSlug },
 			include: { sourceTexts: true },
@@ -105,6 +123,7 @@ This is another line.
 			originalMap.set(st.text, st.id);
 		}
 		// Markdown変更
+
 		const editedMarkdown = `# Title
 
 This is a line!?
@@ -118,7 +137,14 @@ new line
 `;
 
 		// 再パース（編集後）
-		await processMarkdownContent(editedMarkdown, pageSlug, user.id);
+		await processMarkdownContent(
+			title,
+			editedMarkdown,
+			pageSlug,
+			user.id,
+			"en",
+			true,
+		);
 		const dbPage2 = await prisma.page.findUnique({
 			where: { slug: pageSlug },
 			include: { sourceTexts: true },
@@ -145,6 +171,7 @@ new line
 
 	test("should handle various markdown syntaxes", async () => {
 		const pageSlug = "test-page-variety";
+		const title = "Title";
 		const markdown = `# Heading
   
   - List item 1
@@ -190,7 +217,14 @@ new line
 			update: {},
 		});
 
-		const page = await processMarkdownContent(markdown, pageSlug, user.id);
+		await processMarkdownContent(
+			title,
+			markdown,
+			pageSlug,
+			user.id,
+			"en",
+			true,
+		);
 
 		const dbPage = await prisma.page.findUnique({
 			where: { slug: pageSlug },
@@ -207,18 +241,23 @@ new line
 		console.log(htmlContent);
 
 		expect(htmlContent).toMatch(
-			/<span data-id="\d+">\<strong>Bold text<\/strong> and <em>italic text<\/em><\/span>/,
+			/<span data-source-text-id="\d+">\<strong>Bold text<\/strong> and <em>italic text<\/em><\/span>/,
 		);
 
-		expect(htmlContent).not.toMatch(/<span data-id="\d+">code block<\/span>/);
+		expect(htmlContent).not.toMatch(
+			/<span data-source-text-id="\d+">code block<\/span>/,
+		);
 
 		// 新たに追加した要素についても確認
 		// 画像代替テキスト "Alt text"
-		expect(htmlContent).not.toMatch(/<span data-id="\d+">Alt text<\/span>/);
+		expect(htmlContent).not.toMatch(
+			/<span data-source-text-id="\d+">Alt text<\/span>/,
+		);
 	});
 	test("should handle various markdown syntaxes and verify numbering", async () => {
 		const pageSlug = "test-page-variety-numbering";
-		const markdown = `# Heading
+		const title = "Heading";
+		const markdown = `
   
   - List item 1
   - List item 2
@@ -251,7 +290,14 @@ new line
 			update: {},
 		});
 
-		await processMarkdownContent(markdown, pageSlug, user.id);
+		await processMarkdownContent(
+			title,
+			markdown,
+			pageSlug,
+			user.id,
+			"en",
+			true,
+		);
 
 		const dbPage = await prisma.page.findUnique({
 			where: { slug: pageSlug },
