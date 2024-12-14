@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { dirname, join } from "node:path";
@@ -33,10 +33,10 @@ async function cloneOrUpdateRepo() {
 	try {
 		if (!(await directoryExists(CLONE_DIR))) {
 			console.log("リポジトリをクローン中...");
-			execSync(`git clone ${REPO_URL} ${CLONE_DIR}`, { stdio: "inherit" });
+			execFileSync("git", ["clone", REPO_URL, CLONE_DIR], { stdio: "inherit" });
 		} else {
 			console.log("既にリポジトリが存在します。最新化中...");
-			execSync(`git -C ${CLONE_DIR} pull`, { stdio: "inherit" });
+			execFileSync("git", ["-C", CLONE_DIR, "pull"], { stdio: "inherit" });
 		}
 	} catch (error) {
 		console.error(
