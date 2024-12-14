@@ -1,17 +1,17 @@
 import crypto from "node:crypto";
 import type { Parent, Root } from "mdast";
+import rehypeParse from "rehype-parse";
+import rehypeRaw from "rehype-raw";
+import rehypeRemark from "rehype-remark";
+import rehypeStringify from "rehype-stringify";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
+import remarkRehype from "remark-rehype";
 import type { Plugin } from "unified";
+import { unified } from "unified";
 import { visit } from "unist-util-visit";
 import type { VFile } from "vfile";
 import { prisma } from "~/utils/prisma";
-import { unified } from "unified";
-import rehypeParse from "rehype-parse";
-import rehypeRemark from "rehype-remark";
-import rehypeRaw from "rehype-raw";
-import rehypeStringify from "rehype-stringify";
-import remarkRehype from "remark-rehype";
 /**
  * テキストと発生順(occurrence)からhashを生成する
  */
@@ -84,7 +84,11 @@ async function fullReparseUpdate(
 		return hashToId;
 	});
 }
-async function upsertPageWithHtml(pageSlug: string, html: string, userId: number) {
+async function upsertPageWithHtml(
+	pageSlug: string,
+	html: string,
+	userId: number,
+) {
 	return await prisma.page.upsert({
 		where: { slug: pageSlug },
 		update: { content: html },
@@ -163,16 +167,20 @@ function remarkAddDataId(pageId: number): Plugin<[], Root, Root> {
  * Markdownからテキストノードを抽出し、hash計算、DBとの同期を行い、
  * 結果としてHTMLに<span data-id="...">...</span>を挿入する。
  */
-export async function processMarkdownContent(body: string, pageSlug: string, userId: number) {
+export async function processMarkdownContent(
+	body: string,
+	pageSlug: string,
+	userId: number,
+) {
 	const page = await upsertPageWithHtml(pageSlug, body, userId);
 
 	const file = await remark()
-  .use(remarkGfm)
-  .use(remarkAddDataId(page.id)) // ここでtype: "html"ノードを挿入
-  .use(remarkRehype, { allowDangerousHtml: true })
-  .use(rehypeRaw) // raw HTMLをHASTに取り込む
-  .use(rehypeStringify, { allowDangerousHtml: true }) // HASTをHTMLへ
-  .process(body);
+		.use(remarkGfm)
+		.use(remarkAddDataId(page.id)) // ここでtype: "html"ノードを挿入
+		.use(remarkRehype, { allowDangerousHtml: true })
+		.use(rehypeRaw) // raw HTMLをHASTに取り込む
+		.use(rehypeStringify, { allowDangerousHtml: true }) // HASTをHTMLへ
+		.process(body);
 
 	const htmlContent = String(file);
 
@@ -180,24 +188,27 @@ export async function processMarkdownContent(body: string, pageSlug: string, use
 	return page;
 }
 
-export async function processHtmlContent(htmlInput: string, pageSlug: string, userId: number) {
-  // HTML入力に対応するpageレコードを作成・更新
-  const page = await upsertPageWithHtml(pageSlug, htmlInput, userId);
+export async function processHtmlContent(
+	htmlInput: string,
+	pageSlug: string,
+	userId: number,
+) {
+	// HTML入力に対応するpageレコードを作成・更新
+	const page = await upsertPageWithHtml(pageSlug, htmlInput, userId);
 
-  // HTML → HAST → MDAST → remarkAddDataId適用 → HTMLへの変換
-  const file = await unified()
-    .use(rehypeParse, { fragment: true })  // HTMLをHASTにパース
-    .use(rehypeRemark)                     // HASTからMDASTへ変換
-    .use(remarkGfm)
-    .use(remarkAddDataId(page.id))         // 前と同じプラグインを適用
-    .use(remarkRehype, { allowDangerousHtml: true })
-    .use(rehypeRaw)
-    .use(rehypeStringify, { allowDangerousHtml: true })
-    .process(htmlInput);
+	// HTML → HAST → MDAST → remarkAddDataId適用 → HTMLへの変換
+	const file = await unified()
+		.use(rehypeParse, { fragment: true }) // HTMLをHASTにパース
+		.use(rehypeRemark) // HASTからMDASTへ変換
+		.use(remarkGfm)
+		.use(remarkAddDataId(page.id)) // 前と同じプラグインを適用
+		.use(remarkRehype, { allowDangerousHtml: true })
+		.use(rehypeRaw)
+		.use(rehypeStringify, { allowDangerousHtml: true })
+		.process(htmlInput);
 
-  const htmlContent = String(file);
+	const htmlContent = String(file);
 
-  await upsertPageWithHtml(pageSlug, htmlContent, userId);
-  return page;
+	await upsertPageWithHtml(pageSlug, htmlContent, userId);
+	return page;
 }
-

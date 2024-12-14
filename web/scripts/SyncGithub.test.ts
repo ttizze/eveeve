@@ -1,4 +1,4 @@
-import { describe, test, expect } from "vitest";
+import { describe, expect, test } from "vitest";
 import { prisma } from "~/utils/prisma";
 import { processMarkdownContent } from "./syncMarkdown";
 
@@ -309,7 +309,9 @@ test
 		expect(textsByNumber[4].text).toBe("[Link](https://example.com)");
 		expect(textsByNumber[5].text).toBe("> Blockquote");
 		expect(textsByNumber[8].text).toBe("---");
-		expect(textsByNumber[9].text).toBe("![Alt text](https://example.com/image.jpg)");
+		expect(textsByNumber[9].text).toBe(
+			"![Alt text](https://example.com/image.jpg)",
+		);
 
 		// これらの検証により、テキストが出現順にnumberが振られていることをある程度確認できます。
 	});
