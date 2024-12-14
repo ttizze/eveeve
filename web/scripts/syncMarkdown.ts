@@ -1,306 +1,203 @@
-import { execSync } from "node:child_process";
-import fs from "node:fs";
-import path from "node:path";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-import fm from "front-matter";
-import { JSDOM } from "jsdom"; // HTMLパース用
-import pLimit from "p-limit";
+import crypto from "node:crypto";
+import type { Parent, Root } from "mdast";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
-import remarkHtml from "remark-html";
-
-import { getUserByUserName } from "~/routes/$userName+/edit/functions/queries.server";
-import {
-	createOrUpdatePage,
-	createOrUpdateSourceTexts,
-	upsertTags,
-} from "~/routes/$userName+/page+/$slug+/edit/functions/mutations.server";
-import {
-	getPageBySlug,
-	getTitleSourceTextId,
-} from "~/routes/$userName+/page+/$slug+/edit/functions/queries.server";
-import { addNumbersToContent } from "~/routes/$userName+/page+/$slug+/edit/utils/addNumbersToContent";
-import { addSourceTextIdToContent } from "~/routes/$userName+/page+/$slug+/edit/utils/addSourceTextIdToContent";
-import { extractTextElementInfo } from "~/routes/$userName+/page+/$slug+/edit/utils/extractTextElementInfo";
-import { getPageSourceLanguage } from "~/routes/$userName+/page+/$slug+/edit/utils/getPageSourceLanguage";
-import { removeSourceTextIdDuplicatesAndEmptyElements } from "~/routes/$userName+/page+/$slug+/edit/utils/removeSourceTextIdDuplicates";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const GITHUB_REPO = process.env.GITHUB_REPO ?? "";
-const GITHUB_OWNER = process.env.GITHUB_OWNER ?? "";
-
-if (!GITHUB_REPO || !GITHUB_OWNER) {
-	throw new Error(
-		"GitHub環境変数(GITHUB_TOKEN, GITHUB_REPO, GITHUB_OWNER)が設定されていません",
-	);
+import type { Plugin } from "unified";
+import { visit } from "unist-util-visit";
+import type { VFile } from "vfile";
+import { prisma } from "~/utils/prisma";
+import { unified } from "unified";
+import rehypeParse from "rehype-parse";
+import rehypeRemark from "rehype-remark";
+import rehypeRaw from "rehype-raw";
+import rehypeStringify from "rehype-stringify";
+import remarkRehype from "remark-rehype";
+/**
+ * テキストと発生順(occurrence)からhashを生成する
+ */
+function generateHashForText(text: string, occurrence: number) {
+	const hash = crypto
+		.createHash("sha256")
+		.update(`${text}|${occurrence}`)
+		.digest("hex");
+	return hash;
 }
+async function fullReparseUpdate(
+	pageId: number,
+	allTexts: {
+		originalText: string;
+		hash: string;
+		number: number;
+	}[],
+) {
+	return await prisma.$transaction(async (tx) => {
+		// 現在のDB上のソーステキストを取得
+		const existingSourceTexts = await tx.sourceText.findMany({
+			where: { pageId },
+		});
 
-const REPO_URL = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}.git`;
-const CLONE_DIR = path.join(process.cwd(), "temp-repo");
-const SKIP_FILES = ["readme.md"];
-
-type RankingEntry = {
-	rank: number;
-	title: string;
-	author: string;
-	link: string;
-};
-
-function getRankingEntries(htmlFilePath: string): RankingEntry[] {
-	const htmlContent = fs.readFileSync(htmlFilePath, "utf-8");
-	const dom = new JSDOM(htmlContent);
-	const document = dom.window.document;
-	const rows = Array.from(document.querySelectorAll("table.list tr")).slice(1);
-	const entries: RankingEntry[] = [];
-	for (const row of rows) {
-		const tds = Array.from(row.querySelectorAll("td.normal"));
-		if (tds.length < 4) continue;
-		const rankText = tds[0].textContent?.trim() ?? "";
-		const aEl = tds[1].querySelector("a[target=_blank]");
-		const titleText =
-			aEl?.textContent?.trim().replace(/\r?\n/g, "").trim() ?? "";
-		const link = aEl?.getAttribute("href") ?? "";
-		const authorA = tds[2].querySelector("a");
-		const authorText = authorA?.textContent?.trim() ?? "";
-
-		const rankNum = Number.parseInt(rankText, 10);
-		if (!Number.isNaN(rankNum) && titleText) {
-			entries.push({
-				rank: rankNum,
-				title: titleText,
-				author: authorText,
-				link,
-			});
-		}
-	}
-	return entries;
-}
-
-function getAllMarkdownFiles(dir: string): string[] {
-	let results: string[] = [];
-	const list = fs.readdirSync(dir, { withFileTypes: true });
-	for (const file of list) {
-		const fullPath = path.join(dir, file.name);
-		if (file.isDirectory()) {
-			results = results.concat(getAllMarkdownFiles(fullPath));
-		} else if (file.name.endsWith(".md")) {
-			results.push(fullPath);
-		}
-	}
-	return results;
-}
-
-async function syncMarkdown() {
-	// タイトル→slugマップ
-	const titleToSlugMap = new Map<string, string>();
-
-	try {
-		const htmlFilePath = join(__dirname, "ranking.html");
-		if (!fs.existsSync(htmlFilePath)) {
-			throw new Error("ranking.htmlが見つかりません");
-		}
-		const rankingEntries = getRankingEntries(htmlFilePath);
-		const titlesFromHtml = new Set(rankingEntries.map((e) => e.title));
-
-		if (!fs.existsSync(CLONE_DIR)) {
-			console.log("リポジトリをクローン中...");
-			execSync(`git clone ${REPO_URL} ${CLONE_DIR}`, { stdio: "inherit" });
-		} else {
-			console.log("既にリポジトリが存在します:", CLONE_DIR);
-		}
-
-		const markdownFiles = getAllMarkdownFiles(CLONE_DIR);
-		console.log(`${markdownFiles.length} 個のMarkdownファイルを検出`);
-
-		const limit = pLimit(10);
-		await Promise.all(
-			markdownFiles.map((filePath) =>
-				limit(async () => {
-					const fileName = path.basename(filePath).toLowerCase();
-					if (SKIP_FILES.includes(fileName)) {
-						return;
-					}
-
-					try {
-						const rawMarkdown = fs.readFileSync(filePath, "utf-8");
-						const { attributes, body } = fm<{
-							tags?: string[];
-							slug: string;
-							author?: string;
-						}>(rawMarkdown);
-
-						if (!attributes.slug) {
-							console.error("slugがありません:", filePath);
-							return;
-						}
-
-						const title = path.basename(filePath, ".md");
-						if (!titlesFromHtml.has(title)) {
-							return;
-						}
-						const slug = attributes.slug;
-						titleToSlugMap.set(title, slug);
-
-						const tags = attributes.tags?.map((tag) => `NDC${tag}`);
-
-						const existPage = await getPageBySlug(slug);
-						if (existPage && existPage.sourceTexts.length > 0) {
-							if (tags) {
-								await upsertTags(tags, existPage.id);
-							}
-							console.log("既存ページ:", slug, "更新なし");
-						} else {
-							const titleSourceTextId = await getTitleSourceTextId(slug);
-
-							const processed = await remark()
-								.use(remarkGfm)
-								.use(remarkHtml)
-								.process(body);
-							const htmlContent = processed.toString();
-
-							const numberedContent =
-								await removeSourceTextIdDuplicatesAndEmptyElements(
-									addNumbersToContent(htmlContent),
-								);
-
-							const textElements = await extractTextElementInfo(
-								numberedContent,
-								title,
-								titleSourceTextId,
-							);
-							const sourceLanguage = await getPageSourceLanguage(
-								numberedContent,
-								title,
-							);
-							const adminUser = await getUserByUserName("evame");
-							if (!adminUser) {
-								throw new Error("管理者ユーザーが見つかりません");
-							}
-
-							const page = await createOrUpdatePage(
-								adminUser.id,
-								slug,
-								title,
-								numberedContent,
-								true,
-								sourceLanguage,
-							);
-
-							if (tags) {
-								await upsertTags(tags, page.id);
-							}
-
-							const sourceTextsIdWithNumber = await createOrUpdateSourceTexts(
-								textElements,
-								page.id,
-							);
-							const contentWithSourceTextId = addSourceTextIdToContent(
-								numberedContent,
-								sourceTextsIdWithNumber,
-							);
-
-							await createOrUpdatePage(
-								adminUser.id,
-								slug,
-								title,
-								contentWithSourceTextId,
-								true,
-								sourceLanguage,
-							);
-
-							console.log("新規ページを作成:", slug);
-						}
-					} catch (error) {
-						console.error(`❌ エラー (${filePath}):`, error);
-					}
-				}),
-			),
+		const existingMap = new Map(
+			existingSourceTexts.map((t) => [t.hash as string, t]),
 		);
 
-		// ランキングページMarkdown生成
-		// タイトルや他ページのslugリンクをMarkdown形式で記述
-		const rankingPageSlug = "aozorabunko-popularity-ranking";
-		const rankingTitle = "人気ランキングページ";
-		// Markdown例:
-		// # 人気ランキングページ
-		// 1. [作品タイトル](https://example.com/pages/SLUG) - 著者名
-		// 2. [作品タイトル](...)
-		// ...
-		let rankingMarkdown = `## ${rankingTitle}\n\n`;
-		for (const entry of rankingEntries) {
-			const pageSlug = titleToSlugMap.get(entry.title);
-			if (pageSlug) {
-				// 内部リンクの場合: /pages/${pageSlug}
-				// HTML化後は <a href="/pages/${pageSlug}">...</a> になる
-				rankingMarkdown += `${entry.rank}. [${entry.title}](/evame/page/${pageSlug}) - ${entry.author}\n`;
-			} else {
-				// slug未登録作品はリンクなし
-				rankingMarkdown += `${entry.rank}. ${entry.title} - ${entry.author}\n`;
+		// 今回のパース結果
+		const newHashes = new Set(allTexts.map((t) => t.hash));
+
+		// 1. 不要テキスト削除
+		for (const [h, ex] of existingMap) {
+			if (!newHashes.has(h)) {
+				await tx.sourceText.delete({ where: { id: ex.id } });
+				existingMap.delete(h);
 			}
 		}
 
-		const adminUser = await getUserByUserName("evame");
-		if (!adminUser) {
-			throw new Error("管理者ユーザーが見つかりません(ランキングページ生成時)");
+		const hashToId = new Map<string, number>();
+
+		// 2. 既存テキストUPDATE（既に存在するhashはnumberを更新）
+		for (const text of allTexts) {
+			const ex = existingMap.get(text.hash);
+			if (ex) {
+				await tx.sourceText.update({
+					where: { id: ex.id },
+					data: { number: text.number },
+				});
+				hashToId.set(text.hash, ex.id);
+			}
 		}
 
-		const titleSourceTextId = await getTitleSourceTextId(rankingPageSlug);
-		const processedRanking = await remark()
-			.use(remarkGfm)
-			.use(remarkHtml)
-			.process(rankingMarkdown);
-		const rankingHtmlContent = processedRanking.toString();
+		// 3. 新規テキストINSERT（既存にないhashは新規作成）
+		for (const text of allTexts) {
+			if (!hashToId.has(text.hash)) {
+				const st = await tx.sourceText.create({
+					data: {
+						pageId,
+						hash: text.hash,
+						text: text.originalText,
+						number: text.number,
+					},
+					select: { id: true },
+				});
+				hashToId.set(text.hash, st.id);
+			}
+		}
 
-		const numberedContentForRanking =
-			await removeSourceTextIdDuplicatesAndEmptyElements(
-				addNumbersToContent(rankingHtmlContent),
-			);
-
-		const textElementsForRanking = await extractTextElementInfo(
-			numberedContentForRanking,
-			rankingTitle,
-			titleSourceTextId,
-		);
-		const sourceLanguage = "ja";
-
-		const rankingPage = await createOrUpdatePage(
-			adminUser.id,
-			rankingPageSlug,
-			rankingTitle,
-			numberedContentForRanking,
-			true,
-			sourceLanguage,
-		);
-
-		const sourceTextsIdWithNumberRanking = await createOrUpdateSourceTexts(
-			textElementsForRanking,
-			rankingPage.id,
-		);
-		const contentWithSourceTextIdRanking = addSourceTextIdToContent(
-			numberedContentForRanking,
-			sourceTextsIdWithNumberRanking,
-		);
-
-		await createOrUpdatePage(
-			adminUser.id,
-			rankingPageSlug,
-			rankingTitle,
-			contentWithSourceTextIdRanking,
-			true,
-			sourceLanguage,
-		);
-
-		console.log("ランキングページを作成しました:", rankingPageSlug);
-	} catch (error) {
-		console.error("エラー:", error);
-	} finally {
-		console.log("クローンリポジトリは保持されます:", CLONE_DIR);
-	}
+		return hashToId;
+	});
+}
+async function upsertPageWithHtml(pageSlug: string, html: string, userId: number) {
+	return await prisma.page.upsert({
+		where: { slug: pageSlug },
+		update: { content: html },
+		create: { slug: pageSlug, content: html, userId, isPublished: true },
+	});
 }
 
-(async () => {
-	await syncMarkdown();
-})();
+/**
+ * remark用プラグイン
+/**
+ * remark用プラグイン
+ * MarkdownのASTを巡回し、Textノードをdb参照・hash生成しながら
+ * <span data-id="...">...</span>のHTMLノードに変換する。
+ * pageIdを引数で受け取りclosureで利用するようにする。
+ */
+function remarkAddDataId(pageId: number): Plugin<[], Root, Root> {
+	return function attacher() {
+		return async (tree: Root, file: VFile) => {
+			const textOccurrenceMap = new Map<string, number>();
+
+			// 一時的にテキスト情報を蓄える
+			// parent, indexも保持しておくことで後でASTを更新可能
+			const collected: {
+				originalText: string;
+				parent: Parent;
+				index: number;
+				occurrence: number;
+				hash: string;
+			}[] = [];
+
+			visit(tree, "text", (node, index, parent) => {
+				if (!parent || typeof index !== "number") return;
+				const originalText = node.value.trim();
+				if (!originalText) return;
+
+				const currentOccurrence =
+					(textOccurrenceMap.get(originalText) ?? 0) + 1;
+				textOccurrenceMap.set(originalText, currentOccurrence);
+
+				const hash = generateHashForText(originalText, currentOccurrence);
+
+				collected.push({
+					originalText,
+					parent,
+					index,
+					occurrence: currentOccurrence,
+					hash,
+				});
+			});
+
+			// ここでcollectedには全てのテキストノードが出現順に入っている
+			// numberを1から振り直し
+			const allTextsForDb = collected.map((c, i) => ({
+				originalText: c.originalText,
+				hash: c.hash,
+				number: i + 1,
+			}));
+
+			// トランザクション内で一括処理してhash->idマップを取得
+			const hashToId = await fullReparseUpdate(pageId, allTextsForDb);
+
+			// hashToIdを用いてASTを更新
+			collected.forEach((c, i) => {
+				const sourceTextId = hashToId.get(c.hash);
+				if (!sourceTextId) return;
+				c.parent.children[c.index] = {
+					type: "html",
+					value: `<span data-id="${sourceTextId}">${c.originalText}</span>`,
+				};
+			});
+		};
+	};
+}
+
+/**
+ * Markdownからテキストノードを抽出し、hash計算、DBとの同期を行い、
+ * 結果としてHTMLに<span data-id="...">...</span>を挿入する。
+ */
+export async function processMarkdownContent(body: string, pageSlug: string, userId: number) {
+	const page = await upsertPageWithHtml(pageSlug, body, userId);
+
+	const file = await remark()
+  .use(remarkGfm)
+  .use(remarkAddDataId(page.id)) // ここでtype: "html"ノードを挿入
+  .use(remarkRehype, { allowDangerousHtml: true })
+  .use(rehypeRaw) // raw HTMLをHASTに取り込む
+  .use(rehypeStringify, { allowDangerousHtml: true }) // HASTをHTMLへ
+  .process(body);
+
+	const htmlContent = String(file);
+
+	await upsertPageWithHtml(pageSlug, htmlContent, userId);
+	return page;
+}
+
+export async function processHtmlContent(htmlInput: string, pageSlug: string, userId: number) {
+  // HTML入力に対応するpageレコードを作成・更新
+  const page = await upsertPageWithHtml(pageSlug, htmlInput, userId);
+
+  // HTML → HAST → MDAST → remarkAddDataId適用 → HTMLへの変換
+  const file = await unified()
+    .use(rehypeParse, { fragment: true })  // HTMLをHASTにパース
+    .use(rehypeRemark)                     // HASTからMDASTへ変換
+    .use(remarkGfm)
+    .use(remarkAddDataId(page.id))         // 前と同じプラグインを適用
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeRaw)
+    .use(rehypeStringify, { allowDangerousHtml: true })
+    .process(htmlInput);
+
+  const htmlContent = String(file);
+
+  await upsertPageWithHtml(pageSlug, htmlContent, userId);
+  return page;
+}
+
