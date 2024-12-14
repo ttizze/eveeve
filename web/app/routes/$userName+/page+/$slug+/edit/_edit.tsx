@@ -20,13 +20,8 @@ import { EditHeader } from "./components/EditHeader";
 import { TagInput } from "./components/TagInput";
 import { Editor } from "./components/editor/Editor";
 import { EditorKeyboardMenu } from "./components/editor/EditorKeyboardMenu";
-import {
-	upsertTags,
-} from "./functions/mutations.server";
-import {
-	getAllTags,
-	getPageBySlug,
-} from "./functions/queries.server";
+import { upsertTags } from "./functions/mutations.server";
+import { getAllTags, getPageBySlug } from "./functions/queries.server";
 import { useKeyboardVisible } from "./hooks/useKeyboardVisible";
 import { getPageSourceLanguage } from "./utils/getPageSourceLanguage";
 import { processHtmlContent } from "./utils/processHtmlContent";

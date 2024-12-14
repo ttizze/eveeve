@@ -1,4 +1,6 @@
 import crypto from "node:crypto";
+import type { Element, Root, RootContent, Text } from "hast";
+import type { Properties } from "hast";
 import rehypeParse from "rehype-parse";
 import rehypeRaw from "rehype-raw";
 import rehypeRemark from "rehype-remark";
@@ -7,13 +9,11 @@ import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
-import { prisma } from "~/utils/prisma";
-import type { Root, Element, Text, RootContent } from "hast";
 import type { Plugin } from "unified";
+import type { Parent } from "unist";
 import { visit } from "unist-util-visit";
 import type { VFile } from "vfile";
-import type { Properties } from "hast";
-import type { Parent } from "unist";
+import { prisma } from "~/utils/prisma";
 
 function generateHashForText(text: string, occurrence: number) {
 	const hash = crypto

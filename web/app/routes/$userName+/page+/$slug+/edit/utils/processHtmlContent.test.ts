@@ -24,13 +24,7 @@ describe("processHtmlContent", () => {
 		});
 
 		// HTMLを処理
-		await processHtmlContent(
-			htmlInput,
-			pageSlug,
-			user.id,
-			"en",
-			true
-		);
+		await processHtmlContent(htmlInput, pageSlug, user.id, "en", true);
 
 		// ページがDBに存在し、HTMLが変換されているか確認
 		const dbPage = await prisma.page.findUnique({
@@ -51,10 +45,14 @@ describe("processHtmlContent", () => {
 		const htmlContent = updatedPage.content;
 
 		// タイトルや本文が<span data-id="...">でラップされているか
-		expect(htmlContent).toMatch(/<span data-source-text-id="\d+">Title<\/span>/);
-		expect(htmlContent).toMatch(/<span data-source-text-id="\d+">This is a test\.<\/span>/);
 		expect(htmlContent).toMatch(
-			/<span data-source-text-id="\d+">This is another test\.<\/span>/
+			/<span data-source-text-id="\d+">Title<\/span>/,
+		);
+		expect(htmlContent).toMatch(
+			/<span data-source-text-id="\d+">This is a test\.<\/span>/,
+		);
+		expect(htmlContent).toMatch(
+			/<span data-source-text-id="\d+">This is another test\.<\/span>/,
 		);
 
 		// source_textsのnumberが連番になっているか
@@ -94,13 +92,7 @@ describe("processHtmlContent", () => {
 		});
 
 		// 初回処理
-		await processHtmlContent(
-			originalHtml,
-			pageSlug,
-			user.id,
-			"en",
-			true
-		);
+		await processHtmlContent(originalHtml, pageSlug, user.id, "en", true);
 
 		const dbPage1 = await prisma.page.findUnique({
 			where: { slug: pageSlug },
@@ -128,13 +120,7 @@ describe("processHtmlContent", () => {
     `;
 
 		// 再処理
-		await processHtmlContent(
-			editedHtml,
-			pageSlug,
-			user.id,
-			"en",
-			true
-		);
+		await processHtmlContent(editedHtml, pageSlug, user.id, "en", true);
 
 		const dbPage2 = await prisma.page.findUnique({
 			where: { slug: pageSlug },
@@ -151,20 +137,18 @@ describe("processHtmlContent", () => {
 
 		// 変更無しテキストは同じIDを維持
 		expect(editedMap.get("This is another line.")).toBe(
-			originalMap.get("This is another line.")
+			originalMap.get("This is another line."),
 		);
 
 		// 変更後テキストは新ID
 		expect(editedMap.get("This is a line!?")).not.toBe(
-			originalMap.get("This is a line.")
+			originalMap.get("This is a line."),
 		);
 
 		// 新規テキストは新IDであること
 		expect(editedMap.get("new line")).not.toBe(originalMap.get("1"));
 
 		// 既存リストアイテムはテキストが同じならID維持
-		expect(editedMap.get("List item 1")).toBe(
-			originalMap.get("List item 1")
-		);
+		expect(editedMap.get("List item 1")).toBe(originalMap.get("List item 1"));
 	});
 });
