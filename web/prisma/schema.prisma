@@ -87,6 +87,7 @@ model PageTranslationInfo {
 model Page {
   id                    Int                     @id @default(autoincrement())
   slug                  String                  @unique
+  title                 String                  @default("")
   content               String
   sourceLanguage        String                  @default("unknown")
   isPublished           Boolean                 @default(false) @map("is_published")

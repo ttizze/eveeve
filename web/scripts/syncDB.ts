@@ -32,6 +32,13 @@ try {
 				continue;
 			}
 
+			await prisma.page.update({
+				where: { id: page.id },
+				data: {
+					title: title,
+				},
+			});
+
 			await processHtmlContent(
 				title,
 				pageContent,

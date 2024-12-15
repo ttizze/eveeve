@@ -25,6 +25,10 @@ export async function upsertTitle(pageSlug: string, title: string) {
 	const page = await prisma.page.findUnique({ where: { slug: pageSlug } });
 	if (!page) return;
 	const titleHash = generateHashForText(title, 1);
+	await prisma.page.update({
+		where: { id: page.id },
+		data: { title: title },
+	});
 	return await prisma.sourceText.upsert({
 		where: {
 			pageId_textAndOccurrenceHash: {
