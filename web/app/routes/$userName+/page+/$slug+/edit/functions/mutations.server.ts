@@ -119,7 +119,10 @@ export async function synchronizePageSourceTexts(
 		// 不要テキスト削除
 		if (hashesToDelete.length > 0) {
 			await tx.sourceText.deleteMany({
-				where: { id: { in: hashesToDelete } },
+				where: {
+					pageId,
+					id: { in: hashesToDelete },
+				},
 			});
 		}
 
@@ -127,7 +130,10 @@ export async function synchronizePageSourceTexts(
 		const existingIds = existingSourceTexts.map((t) => t.id);
 		if (existingIds.length > 0) {
 			await tx.sourceText.updateMany({
-				where: { id: { in: existingIds } },
+				where: {
+					pageId,
+					id: { in: existingIds },
+				},
 				data: { number: { increment: OFFSET } },
 			});
 		}
@@ -151,7 +157,7 @@ export async function synchronizePageSourceTexts(
 					throw new Error(`No ID found for hash: ${t.textAndOccurrenceHash}`);
 				}
 				return prisma.sourceText.update({
-					where: { id },
+					where: { pageId, id },
 					data: { number: t.number },
 				});
 			}),

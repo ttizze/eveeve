@@ -81,13 +81,16 @@ async function addRequiredData() {
 async function createUserAndPages() {
 	const evame = await prisma.user.upsert({
 		where: { userName: "evame" },
-		update: { provider: "Admin" },
+		update: {
+			provider: "Admin",
+			icon: "https://evame.tech/favicon.svg",
+		},
 		create: {
 			userName: "evame",
 			displayName: "evame",
 			email: "evame@example.com",
 			provider: "Admin",
-			icon: " ",
+			icon: "https://evame.tech/favicon.svg",
 		},
 	});
 
