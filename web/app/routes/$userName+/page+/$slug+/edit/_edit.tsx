@@ -20,22 +20,11 @@ import { EditHeader } from "./components/EditHeader";
 import { TagInput } from "./components/TagInput";
 import { Editor } from "./components/editor/Editor";
 import { EditorKeyboardMenu } from "./components/editor/EditorKeyboardMenu";
-import {
-	createOrUpdatePage,
-	createOrUpdateSourceTexts,
-	upsertTags,
-} from "./functions/mutations.server";
-import {
-	getAllTags,
-	getPageBySlug,
-	getTitleSourceTextId,
-} from "./functions/queries.server";
+import { upsertTags } from "./functions/mutations.server";
+import { getAllTags, getPageBySlug } from "./functions/queries.server";
 import { useKeyboardVisible } from "./hooks/useKeyboardVisible";
-import { addNumbersToContent } from "./utils/addNumbersToContent";
-import { addSourceTextIdToContent } from "./utils/addSourceTextIdToContent";
-import { extractTextElementInfo } from "./utils/extractTextElementInfo";
 import { getPageSourceLanguage } from "./utils/getPageSourceLanguage";
-import { removeSourceTextIdDuplicatesAndEmptyElements } from "./utils/removeSourceTextIdDuplicates";
+import { processHtmlContent } from "./utils/processHtmlContent";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	if (!data) {
@@ -104,44 +93,18 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
 	const { title, pageContent, isPublished, tags } = submission.value;
 	const isPublishedBool = isPublished === "true";
-	const titleSourceTextId = await getTitleSourceTextId(slug);
-	const numberedContent = await removeSourceTextIdDuplicatesAndEmptyElements(
-		addNumbersToContent(pageContent),
-	);
-	const textElements = await extractTextElementInfo(
-		numberedContent,
+	const sourceLanguage = await getPageSourceLanguage(pageContent, title);
+	const page = await processHtmlContent(
 		title,
-		titleSourceTextId,
-	);
-
-	const sourceLanguage = await getPageSourceLanguage(numberedContent, title);
-	const page = await createOrUpdatePage(
-		currentUser.id,
+		pageContent,
 		slug,
-		title,
-		numberedContent,
-		isPublishedBool,
+		currentUser.id,
 		sourceLanguage,
+		isPublishedBool,
 	);
 	if (tags) {
 		await upsertTags(tags, page.id);
 	}
-	const sourceTextsIdWithNumber = await createOrUpdateSourceTexts(
-		textElements,
-		page.id,
-	);
-	const contentWithSourceTextId = addSourceTextIdToContent(
-		numberedContent,
-		sourceTextsIdWithNumber,
-	);
-	await createOrUpdatePage(
-		currentUser.id,
-		slug,
-		title,
-		contentWithSourceTextId,
-		isPublishedBool,
-		sourceLanguage,
-	);
 	return null;
 }
 

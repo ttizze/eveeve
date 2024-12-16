@@ -3,7 +3,6 @@ import { Image } from "@tiptap/extension-image";
 import { Link } from "@tiptap/extension-link";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { StarterKit } from "@tiptap/starter-kit";
-import { CustomDataAttribute } from "./customDataAttribute";
 import { handleFileUpload } from "./useFileUpload";
 export function configureEditor(initialContent: string) {
 	return {
@@ -45,7 +44,6 @@ export function configureEditor(initialContent: string) {
 					}
 				},
 			}),
-			CustomDataAttribute,
 		],
 		content: initialContent,
 		editorProps: {
