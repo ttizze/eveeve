@@ -103,7 +103,7 @@ export function rehypeAddDataId(pageId: number): Plugin<[], Root> {
 }
 
 //編集後も翻訳との結びつきを維持するために､textAndOccurrenceHashをキーにしてsourceTextsを更新する
-//表示時はsourceTextIdをkeyにしてsourceTextsを取得する
+//表示時はhtmlに埋め込まれたdata-source-text-idをkeyにしてsourceTextsを取得する
 export async function processHtmlContent(
 	title: string,
 	htmlInput: string,

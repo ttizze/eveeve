@@ -24,7 +24,7 @@ export async function upsertPageWithHtml(
 export async function upsertTitle(pageSlug: string, title: string) {
 	const page = await prisma.page.findUnique({ where: { slug: pageSlug } });
 	if (!page) return;
-	const titleHash = generateHashForText(title, 1);
+	const titleHash = generateHashForText(title, 0);
 	await prisma.page.update({
 		where: { id: page.id },
 		data: { title: title },
@@ -95,101 +95,109 @@ export async function synchronizePageSourceTexts(
 		number: number;
 	}[],
 ): Promise<Map<string, number>> {
-	return await prisma.$transaction(async (tx) => {
-		// 1. 現在のDB上のソーステキストを取得
-		const existingSourceTexts = await tx.sourceText.findMany({
-			where: { pageId },
-			select: { id: true, textAndOccurrenceHash: true, number: true }, // 必要なフィールドのみ選択
-		});
+	const BATCH_SIZE = 1000;
+	const OFFSET = 1_000_000;
 
-		// 2. existingMap を部分オブジェクトで初期化
-		const existingMap: Map<string, { id: number; number: number }> = new Map(
-			existingSourceTexts.map((t) => [
-				t.textAndOccurrenceHash as string,
-				{ id: t.id, number: t.number },
-			]),
-		);
+	// 1. 既存のテキスト取得
+	const existingSourceTexts = await prisma.sourceText.findMany({
+		where: { pageId },
+		select: { id: true, textAndOccurrenceHash: true, number: true },
+	});
 
-		const newHashes = new Set(allTextsData.map((t) => t.textAndOccurrenceHash));
+	const hashToId = new Map<string, number>(
+		existingSourceTexts.map((t) => [t.textAndOccurrenceHash as string, t.id]),
+	);
+	const newHashes = new Set(allTextsData.map((t) => t.textAndOccurrenceHash));
 
-		// 3. 不要テキストの一括削除
-		const hashesToDelete = existingSourceTexts
-			.filter((t) => !newHashes.has(t.textAndOccurrenceHash as string))
-			.map((t) => t.id);
+	// 不要テキストID特定
+	const hashesToDelete = existingSourceTexts
+		.filter((t) => !newHashes.has(t.textAndOccurrenceHash as string))
+		.map((t) => t.id);
 
+	// (トランザクション1)
+	await prisma.$transaction(async (tx) => {
+		// 不要テキスト削除
 		if (hashesToDelete.length > 0) {
 			await tx.sourceText.deleteMany({
 				where: { id: { in: hashesToDelete } },
 			});
 		}
 
-		// 4. 既存テキストのnumberフィールドにオフセットを適用
-		const OFFSET = 1_000_000;
+		// 既存テキストオフセット
 		const existingIds = existingSourceTexts.map((t) => t.id);
-
 		if (existingIds.length > 0) {
 			await tx.sourceText.updateMany({
 				where: { id: { in: existingIds } },
 				data: { number: { increment: OFFSET } },
 			});
 		}
+	});
+	// トランザクション1終了
 
-		// 5. 既存テキストのnumberフィールドを更新
-		const updatePromises = allTextsData
-			.filter((t) => existingMap.has(t.textAndOccurrenceHash))
-			.map((t) =>
-				tx.sourceText.update({
-					where: { id: existingMap.get(t.textAndOccurrenceHash)?.id },
+	// 2. 既存テキストのnumberを更新
+	// 4. 既存テキストのnumberを直列で更新
+	const updates = allTextsData.filter((t) =>
+		hashToId.has(t.textAndOccurrenceHash),
+	);
+
+	// バッチサイズで分けて並列処理（トランザクションなし）
+	for (let i = 0; i < updates.length; i += BATCH_SIZE) {
+		const batch = updates.slice(i, i + BATCH_SIZE);
+		// Promise.allで並列実行
+		await Promise.all(
+			batch.map((t) => {
+				const id = hashToId.get(t.textAndOccurrenceHash);
+				if (id === undefined) {
+					throw new Error(`No ID found for hash: ${t.textAndOccurrenceHash}`);
+				}
+				return prisma.sourceText.update({
+					where: { id },
 					data: { number: t.number },
-				}),
-			);
+				});
+			}),
+		);
+	}
 
-		if (updatePromises.length > 0) {
-			await Promise.all(updatePromises);
-		}
+	// 3. 新規テキスト挿入
+	const newInserts = allTextsData
+		.filter((t) => !hashToId.has(t.textAndOccurrenceHash))
+		.map((t) => ({
+			pageId,
+			textAndOccurrenceHash: t.textAndOccurrenceHash,
+			text: t.text,
+			number: t.number,
+		}));
 
-		// 6. 新規テキストの一括挿入
-		const newInserts = allTextsData
-			.filter((t) => !existingMap.has(t.textAndOccurrenceHash))
-			.map((t) => ({
-				pageId,
-				textAndOccurrenceHash: t.textAndOccurrenceHash,
-				text: t.text,
-				number: t.number,
-			}));
-
-		if (newInserts.length > 0) {
-			await tx.sourceText.createMany({
-				data: newInserts,
-				skipDuplicates: true, // 必要に応じて重複をスキップ
-			});
-
-			// 挿入されたデータを再取得して existingMap を更新
-			const insertedSourceTexts = await tx.sourceText.findMany({
-				where: {
-					pageId,
-					textAndOccurrenceHash: {
-						in: newInserts.map((insert) => insert.textAndOccurrenceHash),
-					},
-				},
-				select: { textAndOccurrenceHash: true, id: true },
-			});
-
-			for (const sourceText of insertedSourceTexts) {
-				if (!sourceText.textAndOccurrenceHash) continue;
-				existingMap.set(sourceText.textAndOccurrenceHash, {
-					id: sourceText.id,
-					number: 0,
+	if (newInserts.length > 0) {
+		// (トランザクション3)
+		await prisma.$transaction(async (tx) => {
+			for (let i = 0; i < newInserts.length; i += BATCH_SIZE) {
+				const batch = newInserts.slice(i, i + BATCH_SIZE);
+				await tx.sourceText.createMany({
+					data: batch,
+					skipDuplicates: true,
 				});
 			}
-		}
+		});
+		// トランザクション3終了
 
-		// 7. hashToId の構築
-		const hashToId = new Map<string, number>();
-		existingMap.forEach((value, key) => {
-			hashToId.set(key, value.id);
+		// 挿入後のID再取得 (トランザクション外でも可)
+		const insertedSourceTexts = await prisma.sourceText.findMany({
+			where: {
+				pageId,
+				textAndOccurrenceHash: {
+					in: newInserts.map((insert) => insert.textAndOccurrenceHash),
+				},
+			},
+			select: { textAndOccurrenceHash: true, id: true },
 		});
 
-		return hashToId;
-	});
+		for (const sourceText of insertedSourceTexts) {
+			if (sourceText.textAndOccurrenceHash) {
+				hashToId.set(sourceText.textAndOccurrenceHash, sourceText.id);
+			}
+		}
+	}
+
+	return hashToId;
 }

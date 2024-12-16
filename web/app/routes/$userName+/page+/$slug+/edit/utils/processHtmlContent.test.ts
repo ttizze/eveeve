@@ -160,4 +160,83 @@ describe("processHtmlContent", () => {
 		// 既存リストアイテムはテキストが同じならID維持
 		expect(editedMap.get("List item 1")).toBe(originalMap.get("List item 1"));
 	});
+
+	test("タイトルと同じ文章が本文に含まれている場合に正しく処理されるかテスト", async () => {
+		const pageSlug = "html-title-duplicate-test-page";
+		const title = "Unique Title";
+		const htmlInput = `
+      <h1>${title}</h1>
+      <p>This is a paragraph with the Unique Title embedded.</p>
+      <p>Another paragraph.</p>
+    `;
+
+		const user = await prisma.user.upsert({
+			where: { id: 12 },
+			create: {
+				id: 12,
+				userName: "titleduplicateuser",
+				email: "titleduplicateuser@example.com",
+				displayName: "titleduplicateuser",
+				icon: "titleduplicateuser",
+			},
+			update: {},
+		});
+
+		// HTMLを処理
+		await processHtmlContent(title, htmlInput, pageSlug, user.id, "en", true);
+
+		// ページがDBに存在し、HTMLが変換されているか確認
+		const dbPage = await prisma.page.findUnique({
+			where: { slug: pageSlug },
+			include: { sourceTexts: true },
+		});
+		expect(dbPage).not.toBeNull();
+		if (!dbPage) return;
+
+		// source_textsが適切に挿入されているか確認
+		expect(dbPage.sourceTexts.length).toBeGreaterThanOrEqual(3); // title + 2 paragraphs
+
+		// ページHTMLがdata-id付きspanを含むか確認
+		const updatedPage = await prisma.page.findUnique({
+			where: { slug: pageSlug },
+		});
+
+		expect(updatedPage).not.toBeNull();
+		if (!updatedPage) return;
+		const htmlContent = updatedPage.content;
+
+		// タイトル部分のspanを確認
+		expect(htmlContent).toMatch(
+			new RegExp(`<h1><span data-source-text-id="\\d+">${title}</span></h1>`),
+		);
+
+		// 本文中のタイトルのspanを確認
+		expect(htmlContent).toMatch(
+			new RegExp(`<span data-source-text-id="\\d+">${title}</span>`),
+		);
+
+		// その他の本文のspanを確認
+		expect(htmlContent).toMatch(
+			/<span data-source-text-id="\d+">This is a paragraph with the Unique Title embedded\.<\/span>/,
+		);
+		expect(htmlContent).toMatch(
+			/<span data-source-text-id="\d+">Another paragraph\.<\/span>/,
+		);
+
+		// source_textsのnumberが連番になっているか
+		const sortedTexts = dbPage.sourceTexts.sort((a, b) => a.number - b.number);
+		sortedTexts.forEach((st, index) => {
+			expect(st.number).toBe(index);
+			expect(st.textAndOccurrenceHash).not.toBeNull();
+		});
+
+		// タイトルと本文で同じテキストが異なるsource_textsとして扱われているか
+		const titleOccurrences = dbPage.sourceTexts.filter(
+			(st) => st.text === title,
+		);
+		expect(titleOccurrences.length).toBe(2); // One in title, one in content
+
+		// 各タイトル occurrence が異なる ID を持つことを確認
+		expect(titleOccurrences[0].id).not.toBe(titleOccurrences[1].id);
+	});
 });
