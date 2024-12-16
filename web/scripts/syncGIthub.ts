@@ -5,8 +5,8 @@ import path from "node:path";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import fm from "front-matter";
-import pLimit from "p-limit";
 import { JSDOM } from "jsdom"; // HTMLパース用
+import pLimit from "p-limit";
 
 // プロジェクト固有のインポート
 import { upsertTags } from "~/routes/$userName+/page+/$slug+/edit/functions/mutations.server";
@@ -42,7 +42,9 @@ type RankingEntry = {
  * ranking.htmlを解析してランキングエントリを抽出する
  * @param htmlFilePath ranking.htmlのパス
  */
-async function getRankingEntries(htmlFilePath: string): Promise<RankingEntry[]> {
+async function getRankingEntries(
+	htmlFilePath: string,
+): Promise<RankingEntry[]> {
 	const htmlContent = await fs.readFile(htmlFilePath, "utf-8");
 	const dom = new JSDOM(htmlContent);
 	const document = dom.window.document;
