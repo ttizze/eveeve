@@ -42,7 +42,10 @@ function extractTextFromHAST(node: Parent): string {
 	});
 	return result;
 }
-export function rehypeAddDataId(pageId: number): Plugin<[], Root> {
+export function rehypeAddDataId(
+	pageId: number,
+	title: string,
+): Plugin<[], Root> {
 	return function attacher() {
 		return async (tree: Root, file: VFile) => {
 			const textOccurrenceMap = new Map<string, number>();
@@ -79,6 +82,12 @@ export function rehypeAddDataId(pageId: number): Plugin<[], Root> {
 				textAndOccurrenceHash: block.textAndOccurrenceHash,
 				number: index + 1,
 			}));
+
+			allTextsForDb.push({
+				text: title,
+				textAndOccurrenceHash: generateHashForText(title, 0),
+				number: 0,
+			});
 
 			const hashToId = await synchronizePageSourceTexts(pageId, allTextsForDb);
 
@@ -127,7 +136,7 @@ export async function processHtmlContent(
 		.use(rehypeRemark) // HAST→MDAST
 		.use(remarkGfm) // GFM拡張
 		.use(remarkRehype, { allowDangerousHtml: true }) // MDAST→HAST
-		.use(rehypeAddDataId(page.id))
+		.use(rehypeAddDataId(page.id, title))
 		.use(rehypeRaw) // 生HTMLを処理
 		.use(rehypeStringify, { allowDangerousHtml: true }) // HAST→HTML
 		.process(htmlInput);

@@ -28,7 +28,7 @@ export async function processMarkdownContent(
 	const file = await remark()
 		.use(remarkGfm)
 		.use(remarkRehype)
-		.use(rehypeAddDataId(page.id))
+		.use(rehypeAddDataId(page.id, title))
 		.use(rehypeRaw)
 		.use(rehypeStringify, { allowDangerousHtml: true })
 		.process(body);
