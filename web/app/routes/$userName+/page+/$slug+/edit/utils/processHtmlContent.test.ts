@@ -239,4 +239,68 @@ describe("processHtmlContent", () => {
 		// 各タイトル occurrence が異なる ID を持つことを確認
 		expect(titleOccurrences[0].id).not.toBe(titleOccurrences[1].id);
 	});
+
+	test("同一HTMLを再度処理した場合に、編集していない箇所のsource_textsが維持されるか確認", async () => {
+		const pageSlug = "html-no-edit-test-page";
+		const title = "No Edit Title";
+		const htmlInput = `
+			<p>Line A</p>
+			<p>Line B</p>
+			<p>Line C</p>
+		`;
+	
+		const user = await prisma.user.upsert({
+			where: { id: 13 },
+			create: {
+				id: 13,
+				userName: "noedit",
+				email: "noedit@example.com",
+				displayName: "noedit",
+				icon: "noedit",
+			},
+			update: {},
+		});
+	
+		// 初回処理
+		await processHtmlContent(title, htmlInput, pageSlug, user.id, "en", true);
+	
+		const dbPage1 = await prisma.page.findUnique({
+			where: { slug: pageSlug },
+			include: { sourceTexts: true },
+		});
+		expect(dbPage1).not.toBeNull();
+		if (!dbPage1) return;
+	
+		// 初回処理時のIDを記憶
+		const originalTextIdMap = new Map<string, number>();
+		for (const st of dbPage1.sourceTexts) {
+			originalTextIdMap.set(st.text, st.id);
+		}
+		expect(originalTextIdMap.size).toBeGreaterThanOrEqual(3);
+	
+		// 変更なしで再度同一HTMLを処理
+		await processHtmlContent(title, htmlInput, pageSlug, user.id, "en", true);
+	
+		const dbPage2 = await prisma.page.findUnique({
+			where: { slug: pageSlug },
+			include: { sourceTexts: true },
+		});
+		expect(dbPage2).not.toBeNull();
+		if (!dbPage2) return;
+	
+		// 再処理後のIDマッピングを取得
+		const afterTextIdMap = new Map<string, number>();
+		for (const st of dbPage2.sourceTexts) {
+			afterTextIdMap.set(st.text, st.id);
+		}
+	
+		// 全てのテキストでIDが変わっていないことを確認
+		for (const [text, originalId] of originalTextIdMap.entries()) {
+			console.log(text, originalId);
+			expect(afterTextIdMap.get(text)).toBe(originalId);
+		}
+	
+		// source_textsの数が増減していないこと（無駄な消去がないこと）
+		expect(dbPage2.sourceTexts.length).toBe(dbPage1.sourceTexts.length);
+	});
 });

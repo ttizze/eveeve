@@ -1,5 +1,4 @@
 import { prisma } from "~/utils/prisma";
-import { generateHashForText } from "../utils/generateHashForText";
 
 export async function upsertPageWithHtml(
 	pageSlug: string,
@@ -24,25 +23,9 @@ export async function upsertPageWithHtml(
 export async function upsertTitle(pageSlug: string, title: string) {
 	const page = await prisma.page.findUnique({ where: { slug: pageSlug } });
 	if (!page) return;
-	const titleHash = generateHashForText(title, 0);
 	await prisma.page.update({
 		where: { id: page.id },
 		data: { title: title },
-	});
-	return await prisma.sourceText.upsert({
-		where: {
-			pageId_textAndOccurrenceHash: {
-				pageId: page.id,
-				textAndOccurrenceHash: titleHash,
-			},
-		},
-		update: { text: title },
-		create: {
-			pageId: page.id,
-			textAndOccurrenceHash: titleHash,
-			text: title,
-			number: 0,
-		},
 	});
 }
 
