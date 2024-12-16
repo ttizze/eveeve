@@ -248,7 +248,7 @@ describe("processHtmlContent", () => {
 			<p>Line B</p>
 			<p>Line C</p>
 		`;
-	
+
 		const user = await prisma.user.upsert({
 			where: { id: 13 },
 			create: {
@@ -260,46 +260,46 @@ describe("processHtmlContent", () => {
 			},
 			update: {},
 		});
-	
+
 		// 初回処理
 		await processHtmlContent(title, htmlInput, pageSlug, user.id, "en", true);
-	
+
 		const dbPage1 = await prisma.page.findUnique({
 			where: { slug: pageSlug },
 			include: { sourceTexts: true },
 		});
 		expect(dbPage1).not.toBeNull();
 		if (!dbPage1) return;
-	
+
 		// 初回処理時のIDを記憶
 		const originalTextIdMap = new Map<string, number>();
 		for (const st of dbPage1.sourceTexts) {
 			originalTextIdMap.set(st.text, st.id);
 		}
 		expect(originalTextIdMap.size).toBeGreaterThanOrEqual(3);
-	
+
 		// 変更なしで再度同一HTMLを処理
 		await processHtmlContent(title, htmlInput, pageSlug, user.id, "en", true);
-	
+
 		const dbPage2 = await prisma.page.findUnique({
 			where: { slug: pageSlug },
 			include: { sourceTexts: true },
 		});
 		expect(dbPage2).not.toBeNull();
 		if (!dbPage2) return;
-	
+
 		// 再処理後のIDマッピングを取得
 		const afterTextIdMap = new Map<string, number>();
 		for (const st of dbPage2.sourceTexts) {
 			afterTextIdMap.set(st.text, st.id);
 		}
-	
+
 		// 全てのテキストでIDが変わっていないことを確認
 		for (const [text, originalId] of originalTextIdMap.entries()) {
 			console.log(text, originalId);
 			expect(afterTextIdMap.get(text)).toBe(originalId);
 		}
-	
+
 		// source_textsの数が増減していないこと（無駄な消去がないこと）
 		expect(dbPage2.sourceTexts.length).toBe(dbPage1.sourceTexts.length);
 	});

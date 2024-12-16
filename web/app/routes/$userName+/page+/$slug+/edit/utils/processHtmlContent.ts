@@ -42,7 +42,10 @@ function extractTextFromHAST(node: Parent): string {
 	});
 	return result;
 }
-export function rehypeAddDataId(pageId: number, title: string): Plugin<[], Root> {
+export function rehypeAddDataId(
+	pageId: number,
+	title: string,
+): Plugin<[], Root> {
 	return function attacher() {
 		return async (tree: Root, file: VFile) => {
 			const textOccurrenceMap = new Map<string, number>();
@@ -74,13 +77,12 @@ export function rehypeAddDataId(pageId: number, title: string): Plugin<[], Root>
 				}
 			});
 
-
 			const allTextsForDb = blocks.map((block, index) => ({
 				text: block.text,
 				textAndOccurrenceHash: block.textAndOccurrenceHash,
 				number: index + 1,
-			}))
-	
+			}));
+
 			allTextsForDb.push({
 				text: title,
 				textAndOccurrenceHash: generateHashForText(title, 0),
