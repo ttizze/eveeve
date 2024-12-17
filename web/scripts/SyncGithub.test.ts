@@ -1,7 +1,8 @@
-// import { describe, expect, test } from "vitest";
-// import { prisma } from "~/utils/prisma";
-// import { processMarkdownContent } from "./processMarkdownContent";
+import { describe, expect, test } from "vitest";
 
-// describe("processMarkdownContent", () => {
-
-// });
+describe("SyncGithub", () => {
+	test("SyncGithub", () => {
+		const markdown = "Hello, world!";
+		expect(markdown).toBe("Hello, world!");
+	});
+});

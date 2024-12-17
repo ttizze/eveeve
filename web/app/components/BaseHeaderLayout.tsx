@@ -51,7 +51,7 @@ export function BaseHeaderLayout({
 										alt={currentUser.displayName}
 									/>
 									<AvatarFallback>
-										{currentUser.displayName.charAt(0).toUpperCase()}
+										{currentUser.userName.charAt(0).toUpperCase()}
 									</AvatarFallback>
 								</Avatar>
 							</DropdownMenuTrigger>
