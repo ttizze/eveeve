@@ -3,6 +3,7 @@ import rehypeParse from "rehype-parse";
 import rehypeRaw from "rehype-raw";
 import rehypeRemark from "rehype-remark";
 import rehypeStringify from "rehype-stringify";
+import rehypeUnwrapImages from "rehype-unwrap-images";
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
@@ -42,6 +43,7 @@ function extractTextFromHAST(node: Parent): string {
 	});
 	return result;
 }
+
 export function rehypeAddDataId(
 	pageId: number,
 	title: string,
@@ -137,7 +139,8 @@ export async function processHtmlContent(
 		.use(remarkGfm) // GFM拡張
 		.use(remarkRehype, { allowDangerousHtml: true }) // MDAST→HAST
 		.use(rehypeAddDataId(page.id, title))
-		.use(rehypeRaw) // 生HTMLを処理
+		.use(rehypeRaw)
+		.use(rehypeUnwrapImages)
 		.use(rehypeStringify, { allowDangerousHtml: true }) // HAST→HTML
 		.process(htmlInput);
 
