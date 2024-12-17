@@ -3,11 +3,11 @@
 // Gemini側が途中で失敗した場合（空レスポンス等で翻訳ができない）のテストケースを追加している。
 // Prismaは実際にはテスト用DB等が必要だが、この例ではあくまで構成例である。
 
-import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { prisma } from "~/utils/prisma";
 import { translate } from "../lib/translate.server"; // テスト対象となるtranslate関数
 import { getGeminiModelResponse } from "../services/gemini";
 import type { TranslateJobParams } from "../types";
-import { prisma } from "~/utils/prisma";
 
 // geminiのみモック
 vi.mock("../services/gemini", () => ({
