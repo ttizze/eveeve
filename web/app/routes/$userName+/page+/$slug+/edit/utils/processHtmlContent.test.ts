@@ -347,7 +347,9 @@ describe("processHtmlContent", () => {
 		expect(htmlContent).not.toMatch(/<p><img[^>]*><\/p>/);
 
 		// 念のため、<img>タグが存在することを確認
-		expect(htmlContent).toMatch(/<img [^>]*src="http:\/\/localhost:9000\/evame\/uploads\/sample-image\.png"[^>]*>/);
+		expect(htmlContent).toMatch(
+			/<img [^>]*src="http:\/\/localhost:9000\/evame\/uploads\/sample-image\.png"[^>]*>/,
+		);
 
 		// また、<img>タグにもdata-source-text-id付きspanが適用されていないことを確認する
 		// 基本的に画像そのものにはdata-source-text-idは付与されないが、パース時に問題なければこのままで良い。
