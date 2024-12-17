@@ -56,7 +56,6 @@ export function EditHeader({
 				name="isPublished"
 				value={isPublished ? "true" : "false"}
 			/>
-
 		</>
 	);
 	const rightExtra = (
