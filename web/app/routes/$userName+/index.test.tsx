@@ -32,6 +32,7 @@ describe("UserProfile", () => {
 								create: {
 									number: 0,
 									text: "Public Page",
+									textAndOccurrenceHash: "hash0",
 								},
 							},
 						},
@@ -43,6 +44,7 @@ describe("UserProfile", () => {
 								create: {
 									number: 0,
 									text: "Private Page",
+									textAndOccurrenceHash: "hash1",
 								},
 							},
 						},
@@ -54,6 +56,7 @@ describe("UserProfile", () => {
 								create: {
 									number: 0,
 									text: "Archived Page",
+									textAndOccurrenceHash: "hash2",
 								},
 							},
 						},
