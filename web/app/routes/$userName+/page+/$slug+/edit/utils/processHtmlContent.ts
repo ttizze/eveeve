@@ -16,6 +16,7 @@ import {
 	upsertTitle,
 } from "../functions/mutations.server";
 import { generateHashForText } from "./generateHashForText";
+import rehypeUnwrapImages from "rehype-unwrap-images";
 
 const BLOCK_LEVEL_TAGS = new Set([
 	"p",
@@ -42,6 +43,7 @@ function extractTextFromHAST(node: Parent): string {
 	});
 	return result;
 }
+
 export function rehypeAddDataId(
 	pageId: number,
 	title: string,
@@ -137,7 +139,8 @@ export async function processHtmlContent(
 		.use(remarkGfm) // GFM拡張
 		.use(remarkRehype, { allowDangerousHtml: true }) // MDAST→HAST
 		.use(rehypeAddDataId(page.id, title))
-		.use(rehypeRaw) // 生HTMLを処理
+		.use(rehypeRaw)
+		.use(rehypeUnwrapImages)
 		.use(rehypeStringify, { allowDangerousHtml: true }) // HAST→HTML
 		.process(htmlInput);
 
