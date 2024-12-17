@@ -19,9 +19,7 @@ export function extractTranslations(
 	const translations: { number: number; text: string }[] = [];
 	const regex =
 		/{\s*"number"\s*:\s*(\d+)\s*,\s*"text"\s*:\s*"((?:\\.|[^"\\])*)"\s*}/g;
-	let match: RegExpExecArray | null;
-	match = regex.exec(text);
-
+	let match = regex.exec(text);
 	while (match !== null) {
 		translations.push({
 			number: Number.parseInt(match[1], 10),
