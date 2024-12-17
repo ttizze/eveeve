@@ -170,7 +170,7 @@ model SourceText {
   id             Int             @id @default(autoincrement())
   text           String
   number         Int
-  textAndOccurrenceHash String? @map("text_and_occurrence_hash")
+  textAndOccurrenceHash String @map("text_and_occurrence_hash")
   translateTexts TranslateText[]
   page           Page            @relation(fields: [pageId], references: [id], onDelete: Cascade)
   pageId         Int             @map("page_id")
