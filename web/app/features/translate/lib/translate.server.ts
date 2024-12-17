@@ -71,7 +71,7 @@ async function translateChunk(
 	let attempt = 0;
 
 	// 全部翻訳が終わるか、リトライ上限まで試す
-	while (pendingElements.length > 0  && attempt < maxRetries) {
+	while (pendingElements.length > 0 && attempt < maxRetries) {
 		attempt++;
 
 		const translatedText = await getTranslatedText(
