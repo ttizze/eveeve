@@ -1,9 +1,9 @@
-export type supportedLocales  = {
+export type supportedLocales = {
 	code: string;
 	name: string;
 };
 
-export const supportedLocales: supportedLocales [] = [
+export const supportedLocales: supportedLocales[] = [
 	{ code: "ab", name: "Аҧсуа" },
 	{ code: "aa", name: "Afaraf" },
 	{ code: "af", name: "Afrikaans" },

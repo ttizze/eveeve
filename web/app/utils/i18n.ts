@@ -1,5 +1,7 @@
 import { supportedLocales } from "~/constants/languages";
-export const supportedLocalesCodes = supportedLocales.map((locale) => locale.code);
+export const supportedLocalesCodes = supportedLocales.map(
+	(locale) => locale.code,
+);
 export const fallbackLocale = "en";
 export const defaultNS = "translation";
 

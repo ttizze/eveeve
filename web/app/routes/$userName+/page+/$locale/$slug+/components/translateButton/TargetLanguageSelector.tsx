@@ -49,8 +49,9 @@ export default function TargetLanguageSelector({
 				>
 					<span className="truncate">
 						{currentLanguage
-							? supportedLocales.find((locale) => locale.code === currentLanguage)
-									?.name
+							? supportedLocales.find(
+									(locale) => locale.code === currentLanguage,
+								)?.name
 							: "select"}
 					</span>
 					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
