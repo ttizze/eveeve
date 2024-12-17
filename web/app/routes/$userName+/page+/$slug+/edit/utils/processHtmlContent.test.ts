@@ -296,7 +296,6 @@ describe("processHtmlContent", () => {
 
 		// 全てのテキストでIDが変わっていないことを確認
 		for (const [text, originalId] of originalTextIdMap.entries()) {
-			console.log(text, originalId);
 			expect(afterTextIdMap.get(text)).toBe(originalId);
 		}
 

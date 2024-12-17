@@ -238,7 +238,6 @@ new line
 		expect(dbPage.sourceTexts.length).toBeGreaterThanOrEqual(10);
 
 		const htmlContent = dbPage.content;
-		console.log(htmlContent);
 
 		expect(htmlContent).toMatch(
 			/<span data-source-text-id="\d+">\<strong>Bold text<\/strong> and <em>italic text<\/em><\/span>/,
@@ -310,7 +309,6 @@ new line
 		expect(sourceTexts.length).toBeGreaterThanOrEqual(7);
 
 		const textsByNumber = [...sourceTexts].sort((a, b) => a.number - b.number);
-		console.log(textsByNumber);
 
 		expect(textsByNumber[0].text).toBe("Heading");
 
