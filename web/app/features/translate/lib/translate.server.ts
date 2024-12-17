@@ -55,7 +55,7 @@ export async function translate(params: TranslateJobParams) {
 	}
 }
 
-export async function translateChunk(
+async function translateChunk(
 	geminiApiKey: string,
 	aiModel: string,
 	numberedElements: NumberedElement[],
@@ -64,22 +64,53 @@ export async function translateChunk(
 	title: string,
 ) {
 	const sourceTexts = await getLatestSourceTexts(pageId);
-	const translatedText = await getTranslatedText(
-		geminiApiKey,
-		aiModel,
-		numberedElements,
-		targetLanguage,
-		title,
-	);
 
-	const extractedTranslations = extractTranslations(translatedText);
+	// まだ翻訳が完了していない要素
+	let pendingElements = [...numberedElements];
+	const maxRetries = 3;
+	let attempt = 0;
 
-	await saveTranslations(
-		extractedTranslations,
-		sourceTexts,
-		targetLanguage,
-		aiModel,
-	);
+	// 全部翻訳が終わるか、リトライ上限まで試す
+	while (pendingElements.length > 0 && maxRetries > attempt) {
+		attempt++;
+
+		const translatedText = await getTranslatedText(
+			geminiApiKey,
+			aiModel,
+			pendingElements,
+			targetLanguage,
+			title,
+		);
+
+		// extractTranslationsでJSONパースを試し、失敗時は正規表現抽出
+		const partialTranslations = extractTranslations(translatedText);
+
+		if (partialTranslations.length > 0) {
+			// 部分的にでも取得できた翻訳結果を保存
+			await saveTranslations(
+				partialTranslations,
+				sourceTexts,
+				targetLanguage,
+				aiModel,
+			);
+			// 成功した要素をpendingElementsから除去
+			const translatedNumbers = new Set(
+				partialTranslations.map((e) => e.number),
+			);
+			pendingElements = pendingElements.filter(
+				(el) => !translatedNumbers.has(el.number),
+			);
+		} else {
+			console.error("今回の試行では翻訳を抽出できませんでした。");
+			// 部分的な翻訳が全く得られなかった場合でもリトライ回数以内なら繰り返す
+		}
+	}
+
+	if (pendingElements.length > 0) {
+		// リトライ回数超過後も未翻訳要素が残っている場合はエラー処理
+		console.error("一部要素は翻訳できませんでした:", pendingElements);
+		throw new Error("部分的な翻訳のみ完了し、残存要素は翻訳失敗しました。");
+	}
 }
 
 async function getTranslatedText(
