@@ -30,11 +30,11 @@ export function BaseHeaderLayout({
 		<header className="z-10 w-full">
 			<div className="max-w-7xl mx-auto py-2 md:py-4 px-2 md:px-6 lg:px-8 flex justify-between items-center">
 				<div className="flex items-center gap-4">
-					<Link to="/home">
+					<Link to="/home" className="flex items-center">
 						<img
 							src="/logo.svg"
 							alt="Evame"
-							className="h-8 w-auto dark:invert"
+							className="h-8 w-20 dark:invert"
 							aria-label="Evame Logo"
 						/>
 					</Link>

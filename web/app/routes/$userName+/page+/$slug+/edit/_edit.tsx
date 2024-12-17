@@ -179,7 +179,6 @@ export default function EditPage() {
 					<EditHeader
 						currentUser={currentUser}
 						initialIsPublished={page?.isPublished}
-						fetcher={fetcher}
 						hasUnsavedChanges={hasUnsavedChanges}
 						onPublishChange={(isPublished) => {
 							setCurrentIsPublished(isPublished);

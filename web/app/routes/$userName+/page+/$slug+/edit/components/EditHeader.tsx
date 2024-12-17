@@ -12,7 +12,7 @@ import type { SanitizedUser } from "~/types";
 
 interface EditHeaderProps {
 	currentUser: SanitizedUser;
-	initialIsPublished: boolean;
+	initialIsPublished: boolean | undefined;
 	hasUnsavedChanges: boolean;
 	onPublishChange: (isPublished: boolean) => void;
 }
