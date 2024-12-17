@@ -2,7 +2,7 @@ import type { UserAITranslationInfo } from "@prisma/client";
 import { ChevronsUpDown, Languages } from "lucide-react";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
-import { targetLanguages } from "~/constants/languages";
+import { supportedLocales } from "~/constants/languages";
 import { cn } from "~/utils/cn";
 import { TranslateSettingsDialog } from "./TranslateSettingsDialog";
 
@@ -10,14 +10,14 @@ type TranslateActionSectionProps = {
 	pageId: number;
 	userAITranslationInfo: UserAITranslationInfo | null;
 	hasGeminiApiKey: boolean;
-	targetLanguage: string;
+	locale: string;
 };
 
 export function TranslateActionSection({
 	pageId,
 	userAITranslationInfo,
 	hasGeminiApiKey,
-	targetLanguage,
+	locale,
 }: TranslateActionSectionProps) {
 	const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -34,8 +34,7 @@ export function TranslateActionSection({
 					onClick={() => setIsSettingsOpen(true)}
 				>
 					<span className="md:w-auto">
-						{targetLanguages.find((lang) => lang.code === targetLanguage)
-							?.name || targetLanguage}
+						{supportedLocales.find((l) => l.code === locale	)?.name || locale}
 					</span>
 					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 				</Button>
@@ -44,7 +43,7 @@ export function TranslateActionSection({
 				open={isSettingsOpen}
 				onOpenChange={setIsSettingsOpen}
 				pageId={pageId}
-				targetLanguage={targetLanguage}
+				locale={locale}
 				hasGeminiApiKey={hasGeminiApiKey}
 				userAITranslationInfo={userAITranslationInfo}
 			/>

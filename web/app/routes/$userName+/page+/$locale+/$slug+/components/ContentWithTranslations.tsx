@@ -17,7 +17,7 @@ interface ContentWithTranslationsProps {
 	currentUserName: string | undefined;
 	hasGeminiApiKey: boolean;
 	userAITranslationInfo: UserAITranslationInfo | null;
-	targetLanguage: string;
+	locale: string;
 	showOriginal: boolean;
 	showTranslation: boolean;
 }
@@ -28,7 +28,7 @@ export function ContentWithTranslations({
 	currentUserName,
 	hasGeminiApiKey,
 	userAITranslationInfo,
-	targetLanguage,
+	locale,
 	showOriginal = true,
 	showTranslation = true,
 }: ContentWithTranslationsProps) {
@@ -92,7 +92,7 @@ export function ContentWithTranslations({
 				pageId={pageWithTranslations.page.id}
 				userAITranslationInfo={userAITranslationInfo}
 				hasGeminiApiKey={hasGeminiApiKey}
-				targetLanguage={targetLanguage}
+				locale={locale}
 			/>
 			{!isHydrated ? (
 				<div className="w-full h-full flex items-center justify-center">
@@ -101,8 +101,6 @@ export function ContentWithTranslations({
 			) : (
 				<MemoizedParsedContent
 					pageWithTranslations={pageWithTranslations}
-					sourceLanguage={pageWithTranslations.page.sourceLanguage}
-					targetLanguage={targetLanguage}
 					currentUserName={currentUserName}
 					showOriginal={showOriginal}
 					showTranslation={showTranslation}

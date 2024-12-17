@@ -23,7 +23,9 @@ import {
 } from "./functions/queries.server";
 import { actionSchema } from "./types";
 import { getBestTranslation } from "./utils/getBestTranslation";
-
+import { supportedLocales } from "~/constants/languages";
+import { redirect } from "@remix-run/node";
+import { fallbackLocale } from "~/utils/i18n";
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	if (!data) {
 		return [{ title: "Page Not Found" }];
@@ -57,22 +59,23 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 };
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
-	const { slug } = params;
-
+	const { locale, slug } = params;
 	if (!slug) {
 		throw new Response("Missing URL parameter", { status: 400 });
 	}
 
 	const currentUser = await authenticator.isAuthenticated(request);
+	if (!locale || !supportedLocales.find((l) => l.code === locale)) {
+		return redirect(`/${currentUser?.userName}/page/${fallbackLocale}/${slug}`);
+	}
 	const nonSanitizedUser = await getNonSanitizedUserbyUserName(
 		currentUser?.userName ?? "",
 	);
 	const hasGeminiApiKey = !!nonSanitizedUser?.geminiApiKey;
-	const targetLanguage = await i18nServer.getLocale(request);
 	const pageWithTranslations = await fetchPageWithTranslations(
 		slug,
 		currentUser?.id ?? 0,
-		targetLanguage,
+		locale,
 	);
 
 	if (!pageWithTranslations) {
@@ -95,7 +98,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 	const userAITranslationInfo = await fetchLatestUserAITranslationInfo(
 		pageWithTranslations.page.id,
 		nonSanitizedUser?.id ?? 0,
-		targetLanguage,
+		locale,
 	);
 	const sourceTitleWithBestTranslationTitle = bestTranslationTitle
 		? `${sourceTitleWithTranslations.sourceText.text} - ${bestTranslationTitle.translateText.text}`
@@ -106,7 +109,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		currentUser?.id ?? 0,
 	);
 	return {
-		targetLanguage,
+		locale,
 		pageWithTranslations,
 		currentUser,
 		hasGeminiApiKey,
@@ -190,7 +193,7 @@ export default function Page() {
 		userAITranslationInfo,
 		sourceTitleWithTranslations,
 		sourceTitleWithBestTranslationTitle,
-		targetLanguage,
+		locale,
 		likeCount,
 		isLikedByUser,
 	} = useLoaderData<typeof loader>();
@@ -212,7 +215,7 @@ export default function Page() {
 					currentUserName={currentUser?.userName}
 					hasGeminiApiKey={hasGeminiApiKey}
 					userAITranslationInfo={userAITranslationInfo}
-					targetLanguage={targetLanguage}
+					locale={locale}
 					showOriginal={showOriginal}
 					showTranslation={showTranslation}
 				/>

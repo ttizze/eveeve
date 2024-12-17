@@ -25,7 +25,7 @@ type TranslateSettingsDialogProps = {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	pageId: number;
-	targetLanguage: string;
+	locale: string;
 	hasGeminiApiKey: boolean;
 	userAITranslationInfo: UserAITranslationInfo | null;
 };
@@ -34,7 +34,7 @@ export function TranslateSettingsDialog({
 	open,
 	onOpenChange,
 	pageId,
-	targetLanguage,
+	locale,
 	hasGeminiApiKey,
 	userAITranslationInfo,
 }: TranslateSettingsDialogProps) {
@@ -55,7 +55,7 @@ export function TranslateSettingsDialog({
 
 						<div className="space-y-2">
 							<Label htmlFor="target-language">Language</Label>
-							<TargetLanguageSelector targetLanguage={targetLanguage} />
+							<TargetLanguageSelector locale={locale} />
 						</div>
 
 						<div className="space-y-2">

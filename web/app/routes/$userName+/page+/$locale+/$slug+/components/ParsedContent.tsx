@@ -10,8 +10,6 @@ import { SourceTextAndTranslationSection } from "./sourceTextAndTranslationSecti
 
 interface ParsedContentProps {
 	pageWithTranslations: PageWithTranslations;
-	sourceLanguage: string;
-	targetLanguage: string;
 	currentUserName: string | undefined;
 	showOriginal: boolean;
 	showTranslation: boolean;
@@ -21,8 +19,6 @@ export const MemoizedParsedContent = memo(ParsedContent);
 
 export function ParsedContent({
 	pageWithTranslations,
-	sourceLanguage,
-	targetLanguage,
 	showOriginal = true,
 	showTranslation = true,
 	currentUserName,
