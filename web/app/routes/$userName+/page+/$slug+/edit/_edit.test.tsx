@@ -67,10 +67,18 @@ describe("EditPage", () => {
 								"<p data-number='1'>hello</p><p data-number='2'>world</p><p data-number='3'>This is a test content</p>",
 							sourceTexts: {
 								create: [
-									{ number: 0, text: "Test Title", textAndOccurrenceHash: "hash0" },
+									{
+										number: 0,
+										text: "Test Title",
+										textAndOccurrenceHash: "hash0",
+									},
 									{ number: 1, text: "hello", textAndOccurrenceHash: "hash1" },
 									{ number: 2, text: "world", textAndOccurrenceHash: "hash2" },
-									{ number: 3, text: "This is a test content", textAndOccurrenceHash: "hash3" },
+									{
+										number: 3,
+										text: "This is a test content",
+										textAndOccurrenceHash: "hash3",
+									},
 								],
 							},
 						},

@@ -54,7 +54,7 @@ describe("UserProfile", () => {
 							content: "This is a test content3",
 							sourceTexts: {
 								create: {
-									number: 0,	
+									number: 0,
 									text: "Archived Page",
 									textAndOccurrenceHash: "hash2",
 								},
