@@ -142,8 +142,8 @@ export default function EditPage() {
 
 	const handleAutoSave = useCallback(() => {
 		const formData = new FormData();
-		formData.set("title", fields.title.value as string);
-		formData.set("pageContent", fields.pageContent.value as string);
+		formData.set("title", fields.title.value ?? "");
+		formData.set("pageContent", fields.pageContent.value ?? "");
 		formData.set("isPublished", currentIsPublished?.toString() || "false");
 		currentTags.forEach((tag, index) => {
 			formData.set(`${fields.tags.name}[${index}]`, tag);
