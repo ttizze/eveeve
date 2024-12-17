@@ -1,11 +1,22 @@
+import { useParams } from "@remix-run/react";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
+import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from "~/components/ui/command";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "~/components/ui/popover";
 import { supportedLocales } from "~/constants/languages";
-import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
-import { Command, CommandGroup, CommandItem, CommandList, CommandInput, CommandEmpty } from "~/components/ui/command";
-import { ChevronsUpDown, Check } from "lucide-react";
 import { cn } from "~/utils/cn";
-import { useParams } from "@remix-run/react";
 
 interface LocaleSelectorProps {
 	locale: string;
@@ -30,7 +41,8 @@ export default function LocaleSelector({ locale }: LocaleSelectorProps) {
 			<PopoverTrigger asChild>
 				<Button variant="outline" className="w-full justify-between rounded-xl">
 					<span className="truncate">
-						{supportedLocales.find((locale) => locale.code === currentLocale)?.name ?? "Select"}
+						{supportedLocales.find((locale) => locale.code === currentLocale)
+							?.name ?? "Select"}
 					</span>
 					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 				</Button>
@@ -50,7 +62,9 @@ export default function LocaleSelector({ locale }: LocaleSelectorProps) {
 									<Check
 										className={cn(
 											"mr-2 h-4 w-4",
-											currentLocale === locale.code ? "opacity-100" : "opacity-0",
+											currentLocale === locale.code
+												? "opacity-100"
+												: "opacity-0",
 										)}
 									/>
 									<span className="truncate">{locale.name}</span>

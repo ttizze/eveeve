@@ -46,11 +46,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		};
 	});
 
-	return data({ pages: pagesLocale, totalPages, currentPage, currentUser,locale });
+	return data({
+		pages: pagesLocale,
+		totalPages,
+		currentPage,
+		currentUser,
+		locale,
+	});
 }
 
 export default function Home() {
-	const { pages, totalPages, currentPage, locale } = useLoaderData<typeof loader>();
+	const { pages, totalPages, currentPage, locale } =
+		useLoaderData<typeof loader>();
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const handlePageChange = (newPage: number) => {

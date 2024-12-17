@@ -34,7 +34,7 @@ export function TranslateActionSection({
 					onClick={() => setIsSettingsOpen(true)}
 				>
 					<span className="md:w-auto">
-						{supportedLocales.find((l) => l.code === locale	)?.name || locale}
+						{supportedLocales.find((l) => l.code === locale)?.name || locale}
 					</span>
 					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 				</Button>
