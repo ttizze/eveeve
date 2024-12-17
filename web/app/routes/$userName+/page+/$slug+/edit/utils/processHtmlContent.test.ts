@@ -303,4 +303,56 @@ describe("processHtmlContent", () => {
 		// source_textsの数が増減していないこと（無駄な消去がないこと）
 		expect(dbPage2.sourceTexts.length).toBe(dbPage1.sourceTexts.length);
 	});
+	test("画像が<p>タグで囲まれずに出力されるか確認", async () => {
+		const pageSlug = "html-image-test-page";
+		const title = "Image Test Title";
+		// 初期HTML内に画像を含める。画像はpタグ内に置いてみる
+		const htmlInput = `
+      <p>This is a text line.</p>
+      <p><img src="http://localhost:9000/evame/uploads/sample-image.png" alt=""></p>
+      <p>Another text line.</p>
+    `;
+
+		const user = await prisma.user.upsert({
+			where: { id: 14 },
+			create: {
+				id: 14,
+				userName: "imagetester",
+				email: "imagetester@example.com",
+				displayName: "imagetester",
+				icon: "imagetester",
+			},
+			update: {},
+		});
+
+		await processHtmlContent(title, htmlInput, pageSlug, user.id, "en", true);
+
+		const dbPage = await prisma.page.findUnique({
+			where: { slug: pageSlug },
+			include: { sourceTexts: true },
+		});
+		expect(dbPage).not.toBeNull();
+		if (!dbPage) return;
+
+		const updatedPage = await prisma.page.findUnique({
+			where: { slug: pageSlug },
+		});
+		expect(updatedPage).not.toBeNull();
+		if (!updatedPage) return;
+
+		const htmlContent = updatedPage.content;
+		// <p>タグで<img>が囲まれていないことを確認
+		// 理想的には<img>タグが単独で存在、または<span>で囲まれているが<p>で囲まれてはならない
+		// 下記は <p><img のパターンがないことを確認する
+		expect(htmlContent).not.toMatch(/<p><img[^>]*><\/p>/);
+
+		// 念のため、<img>タグが存在することを確認
+		expect(htmlContent).toMatch(
+			/<img [^>]*src="http:\/\/localhost:9000\/evame\/uploads\/sample-image\.png"[^>]*>/,
+		);
+
+		// また、<img>タグにもdata-source-text-id付きspanが適用されていないことを確認する
+		// 基本的に画像そのものにはdata-source-text-idは付与されないが、パース時に問題なければこのままで良い。
+		// もし画像をinline化している場合はここでspan内に<img>があることを確認する処理を書いてもよい。
+	});
 });
