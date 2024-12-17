@@ -3,6 +3,7 @@ import rehypeParse from "rehype-parse";
 import rehypeRaw from "rehype-raw";
 import rehypeRemark from "rehype-remark";
 import rehypeStringify from "rehype-stringify";
+import rehypeUnwrapImages from "rehype-unwrap-images";
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
@@ -16,7 +17,6 @@ import {
 	upsertTitle,
 } from "../functions/mutations.server";
 import { generateHashForText } from "./generateHashForText";
-import rehypeUnwrapImages from "rehype-unwrap-images";
 
 const BLOCK_LEVEL_TAGS = new Set([
 	"p",
