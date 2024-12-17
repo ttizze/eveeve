@@ -15,7 +15,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "~/components/ui/popover";
-import { targetLanguages } from "~/constants/languages";
+import { supportedLocales } from "~/constants/languages";
 import { cn } from "~/utils/cn";
 
 interface TargetLanguageSelectorProps {
@@ -49,7 +49,7 @@ export default function TargetLanguageSelector({
 				>
 					<span className="truncate">
 						{currentLanguage
-							? targetLanguages.find((lang) => lang.code === currentLanguage)
+							? supportedLocales.find((locale) => locale.code === currentLanguage)
 									?.name
 							: "select"}
 					</span>
@@ -62,21 +62,21 @@ export default function TargetLanguageSelector({
 					<CommandList>
 						<CommandEmpty>No languages found.</CommandEmpty>
 						<CommandGroup>
-							{targetLanguages.map((lang) => (
+							{supportedLocales.map((locale) => (
 								<CommandItem
-									key={lang.code}
-									value={lang.code}
+									key={locale.code}
+									value={locale.code}
 									onSelect={handleLanguageChange}
 								>
 									<Check
 										className={cn(
 											"mr-2 h-4 w-4",
-											currentLanguage === lang.code
+											currentLanguage === locale.code
 												? "opacity-100"
 												: "opacity-0",
 										)}
 									/>
-									<span className="truncate">{lang.name}</span>
+									<span className="truncate">{locale.name}</span>
 								</CommandItem>
 							))}
 						</CommandGroup>

@@ -1,6 +1,6 @@
 import type { Editor as TiptapEditor } from "@tiptap/core";
-import { UPLOAD_MESSAGES } from "../../../../../constants";
-import { uploadImage } from "../../../../../utils/uploadImage";
+import { UPLOAD_MESSAGES } from "../../../../../../constants";
+import { uploadImage } from "../../../../../../utils/uploadImage";
 
 export async function handleFileUpload(
 	file: File,

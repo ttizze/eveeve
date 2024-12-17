@@ -10,7 +10,7 @@ import i18nServer from "~/i18n.server";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
 import { LikeButton } from "~/routes/resources+/like-button";
 import { authenticator } from "~/utils/auth.server";
-import { stripHtmlTags } from "../../utils/stripHtmlTags";
+import { stripHtmlTags } from "../../../utils/stripHtmlTags";
 import { ContentWithTranslations } from "./components/ContentWithTranslations";
 import { FloatingControls } from "./components/FloatingControls";
 import { createUserAITranslationInfo } from "./functions/mutations.server";

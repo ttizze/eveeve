@@ -71,7 +71,7 @@ export default function Home() {
 					>
 						<CardHeader>
 							<Link
-								to={`/${page.user.userName}/page/${page.slug}`}
+								to={`/${page.user.userName}/page/$lang/${page.slug}`}
 								className="block"
 							>
 								<CardTitle className="flex items-center pr-3 break-all overflow-wrap-anywhere">
