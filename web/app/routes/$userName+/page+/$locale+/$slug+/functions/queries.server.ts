@@ -44,7 +44,7 @@ export async function fetchPageWithTranslations(
 			sourceTexts: {
 				include: {
 					translateTexts: {
-						where: { targetLanguage:locale, isArchived: false },
+						where: { targetLanguage: locale, isArchived: false },
 						include: {
 							user: true,
 							votes: {

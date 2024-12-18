@@ -2,6 +2,7 @@ import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
+import { data } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
 import { useLoaderData } from "@remix-run/react";
@@ -9,6 +10,7 @@ import { useState } from "react";
 import { supportedLocales } from "~/constants/languages";
 import { getTranslateUserQueue } from "~/features/translate/translate-user-queue";
 import i18nServer from "~/i18n.server";
+import { localeCookie } from "~/i18n.server";
 import { getNonSanitizedUserbyUserName } from "~/routes/functions/queries.server";
 import { LikeButton } from "~/routes/resources+/like-button";
 import { authenticator } from "~/utils/auth.server";
@@ -26,8 +28,6 @@ import {
 } from "./functions/queries.server";
 import { actionSchema } from "./types";
 import { getBestTranslation } from "./utils/getBestTranslation";
-import { data } from "@remix-run/node";
-import { localeCookie } from "~/i18n.server";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	if (!data) {
@@ -111,16 +111,17 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		pageWithTranslations.page.id,
 		currentUser?.id ?? 0,
 	);
-	return data({
-		locale,
-		pageWithTranslations,
-		currentUser,
-		hasGeminiApiKey,
-		userAITranslationInfo,
-		sourceTitleWithTranslations,
-		sourceTitleWithBestTranslationTitle,
-		likeCount,
-		isLikedByUser,
+	return data(
+		{
+			locale,
+			pageWithTranslations,
+			currentUser,
+			hasGeminiApiKey,
+			userAITranslationInfo,
+			sourceTitleWithTranslations,
+			sourceTitleWithBestTranslationTitle,
+			likeCount,
+			isLikedByUser,
 		},
 		{
 			headers: { "Set-Cookie": await localeCookie.serialize(locale) },

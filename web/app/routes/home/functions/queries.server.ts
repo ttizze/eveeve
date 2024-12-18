@@ -77,4 +77,3 @@ export async function fetchPaginatedPublicPages(
 export type FetchPaginatedPublicPagesReturn = Awaited<
 	ReturnType<typeof fetchPaginatedPublicPages>
 >;
-

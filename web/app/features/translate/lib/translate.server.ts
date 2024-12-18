@@ -87,12 +87,7 @@ async function translateChunk(
 
 		if (partialTranslations.length > 0) {
 			// 部分的にでも取得できた翻訳結果を保存
-			await saveTranslations(
-				partialTranslations,
-				sourceTexts,
-				locale,
-				aiModel,
-			);
+			await saveTranslations(partialTranslations, sourceTexts, locale, aiModel);
 			// 成功した要素をpendingElementsから除去
 			const translatedNumbers = new Set(
 				partialTranslations.map((e) => e.number),

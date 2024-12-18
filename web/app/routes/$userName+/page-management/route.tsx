@@ -37,13 +37,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const page = Number(url.searchParams.get("page") || "1");
 	const search = url.searchParams.get("search") || "";
 	const { pagesWithTitle, totalPages, currentPage } =
-		await fetchPaginatedOwnPages(
-			currentUser.id,
-			locale,
-			page,
-			10,
-			search,
-		);
+		await fetchPaginatedOwnPages(currentUser.id, locale, page, 10, search);
 	return {
 		currentUser,
 		hasGeminiApiKey,
