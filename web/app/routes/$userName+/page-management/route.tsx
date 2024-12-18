@@ -32,14 +32,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		currentUser.userName,
 	);
 	const hasGeminiApiKey = !!nonSanitizedUser?.geminiApiKey;
-	const targetLanguage = await i18nServer.getLocale(request);
+	const locale = await i18nServer.getLocale(request);
 	const url = new URL(request.url);
 	const page = Number(url.searchParams.get("page") || "1");
 	const search = url.searchParams.get("search") || "";
 	const { pagesWithTitle, totalPages, currentPage } =
 		await fetchPaginatedOwnPages(
 			currentUser.id,
-			targetLanguage,
+			locale,
 			page,
 			10,
 			search,
@@ -54,7 +54,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-	const currentUser = await authenticator.isAuthenticated(request, {
+	await authenticator.isAuthenticated(request, {
 		failureRedirect: "/",
 	});
 	const formData = await request.formData();

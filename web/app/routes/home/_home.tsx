@@ -34,12 +34,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
 	const page = Number(url.searchParams.get("page") || "1");
 	const currentUser = await authenticator.isAuthenticated(request);
-	const { pages, totalPages, currentPage } = await fetchPaginatedPublicPages(
-		page,
-		9,
-		currentUser?.id,
-	);
-	const pagesLocale = pages.map((page) => {
+	const { pagesWithInfo, totalPages, currentPage } =
+		await fetchPaginatedPublicPages(page, 9, currentUser?.id);
+	const pagesWithInfoAndLocaleDate = pagesWithInfo.map((page) => {
 		return {
 			...page,
 			createdAt: new Date(page.createdAt).toLocaleDateString(locale),
@@ -47,7 +44,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	});
 
 	return data({
-		pages: pagesLocale,
+		pagesWithInfoAndLocaleDate,
 		totalPages,
 		currentPage,
 		currentUser,
@@ -56,7 +53,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Home() {
-	const { pages, totalPages, currentPage, locale } =
+	const { pagesWithInfoAndLocaleDate, totalPages, currentPage, locale } =
 		useLoaderData<typeof loader>();
 	const [searchParams, setSearchParams] = useSearchParams();
 
@@ -71,7 +68,7 @@ export default function Home() {
 				New
 			</h1>
 			<div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-				{pages.map((page) => (
+				{pagesWithInfoAndLocaleDate.map((page) => (
 					<Card
 						key={page.id}
 						className="h-full relative w-full overflow-hidden"

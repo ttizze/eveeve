@@ -35,7 +35,7 @@ export async function fetchPageWithSourceTexts(pageId: number) {
 export async function fetchPageWithTranslations(
 	slug: string,
 	currentUserId: number | null,
-	targetLanguage: string,
+	locale: string,
 ): Promise<PageWithTranslations | null> {
 	const page = await prisma.page.findFirst({
 		where: { slug },
@@ -44,7 +44,7 @@ export async function fetchPageWithTranslations(
 			sourceTexts: {
 				include: {
 					translateTexts: {
-						where: { targetLanguage, isArchived: false },
+						where: { targetLanguage:locale, isArchived: false },
 						include: {
 							user: true,
 							votes: {
@@ -70,7 +70,7 @@ export async function fetchPageWithTranslations(
 	return {
 		page: {
 			...page,
-			createdAt: page.createdAt.toLocaleString(targetLanguage),
+			createdAt: page.createdAt.toLocaleString(locale),
 		},
 		user: sanitizeUser(page.user),
 		tagPages: page.tagPages,
@@ -113,10 +113,10 @@ export async function getLastReadDataNumber(userId: number, pageId: number) {
 export async function fetchLatestUserAITranslationInfo(
 	pageId: number,
 	userId: number,
-	targetLanguage: string,
+	locale: string,
 ) {
 	return await prisma.userAITranslationInfo.findFirst({
-		where: { pageId, userId, targetLanguage },
+		where: { pageId, userId, targetLanguage: locale },
 		orderBy: { createdAt: "desc" },
 	});
 }

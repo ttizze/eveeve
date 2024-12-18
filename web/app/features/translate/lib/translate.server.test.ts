@@ -71,7 +71,7 @@ describe("translate関数テスト (geminiのみモック)", () => {
 			aiModel: "test-model",
 			userId,
 			numberedContent: "dummy-content",
-			targetLanguage: "ja",
+			locale: "ja",
 			pageId,
 			title: "Test Page",
 			numberedElements: [
@@ -113,7 +113,7 @@ describe("translate関数テスト (geminiのみモック)", () => {
 			aiModel: "test-model",
 			userId,
 			numberedContent: "dummy-content",
-			targetLanguage: "ja",
+			locale: "ja",
 			pageId,
 			title: "Test Page",
 			numberedElements: [
@@ -148,7 +148,7 @@ describe("translate関数テスト (geminiのみモック)", () => {
 			aiModel: "test-model",
 			userId,
 			numberedContent: "dummy-content",
-			targetLanguage: "ja",
+			locale: "ja",
 			pageId,
 			title: "Test Page",
 			numberedElements: [

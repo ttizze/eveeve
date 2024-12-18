@@ -8,7 +8,7 @@ export interface TranslateJobParams {
 	geminiApiKey: string;
 	aiModel: string;
 	userId: number;
-	targetLanguage: string;
+	locale: string;
 	pageId: number;
 	title: string;
 	numberedContent: string;

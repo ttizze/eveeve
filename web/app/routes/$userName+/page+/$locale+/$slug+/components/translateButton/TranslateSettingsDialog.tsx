@@ -19,7 +19,7 @@ import {
 	SelectValue,
 } from "~/components/ui/select";
 import { GeminiApiKeyDialog } from "~/routes/resources+/gemini-api-key-dialog";
-import TargetLanguageSelector from "./TargetLanguageSelector";
+import LocaleSelector from "./LocaleSelector";
 import { UserAITranslationStatus } from "./UserAITranslationStatus";
 type TranslateSettingsDialogProps = {
 	open: boolean;
@@ -54,8 +54,8 @@ export function TranslateSettingsDialog({
 						<input type="hidden" name="aiModel" value={selectedModel} />
 
 						<div className="space-y-2">
-							<Label htmlFor="target-language">Language</Label>
-							<TargetLanguageSelector locale={locale} />
+							<Label htmlFor="language">Language</Label>
+							<LocaleSelector locale={locale} />
 						</div>
 
 						<div className="space-y-2">

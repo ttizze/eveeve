@@ -29,7 +29,7 @@ export async function translate(params: TranslateJobParams) {
 				params.geminiApiKey,
 				params.aiModel,
 				chunks[i],
-				params.targetLanguage,
+				params.locale,
 				params.pageId,
 				params.title,
 			);
@@ -59,7 +59,7 @@ async function translateChunk(
 	geminiApiKey: string,
 	aiModel: string,
 	numberedElements: NumberedElement[],
-	targetLanguage: string,
+	locale: string,
 	pageId: number,
 	title: string,
 ) {
@@ -78,7 +78,7 @@ async function translateChunk(
 			geminiApiKey,
 			aiModel,
 			pendingElements,
-			targetLanguage,
+			locale,
 			title,
 		);
 
@@ -90,7 +90,7 @@ async function translateChunk(
 			await saveTranslations(
 				partialTranslations,
 				sourceTexts,
-				targetLanguage,
+				locale,
 				aiModel,
 			);
 			// 成功した要素をpendingElementsから除去
@@ -117,7 +117,7 @@ async function getTranslatedText(
 	geminiApiKey: string,
 	aiModel: string,
 	numberedElements: NumberedElement[],
-	targetLanguage: string,
+	locale: string,
 	title: string,
 ) {
 	const source_text = numberedElements
@@ -128,14 +128,14 @@ async function getTranslatedText(
 		aiModel,
 		title,
 		source_text,
-		targetLanguage,
+		locale,
 	);
 }
 
 async function saveTranslations(
 	extractedTranslations: NumberedElement[],
 	sourceTexts: { id: number; number: number }[],
-	targetLanguage: string,
+	locale: string,
 	aiModel: string,
 ) {
 	const systemUserId = await getOrCreateAIUser(aiModel);
@@ -152,7 +152,7 @@ async function saveTranslations(
 				return null;
 			}
 			return {
-				targetLanguage,
+				targetLanguage: locale,
 				text: translation.text,
 				sourceTextId,
 				userId: systemUserId,

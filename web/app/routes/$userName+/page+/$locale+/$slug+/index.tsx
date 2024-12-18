@@ -26,6 +26,9 @@ import {
 } from "./functions/queries.server";
 import { actionSchema } from "./types";
 import { getBestTranslation } from "./utils/getBestTranslation";
+import { data } from "@remix-run/node";
+import { localeCookie } from "~/i18n.server";
+
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	if (!data) {
 		return [{ title: "Page Not Found" }];
@@ -108,7 +111,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		pageWithTranslations.page.id,
 		currentUser?.id ?? 0,
 	);
-	return {
+	return data({
 		locale,
 		pageWithTranslations,
 		currentUser,
@@ -118,7 +121,11 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		sourceTitleWithBestTranslationTitle,
 		likeCount,
 		isLikedByUser,
-	};
+		},
+		{
+			headers: { "Set-Cookie": await localeCookie.serialize(locale) },
+		},
+	);
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -134,7 +141,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	if (!nonSanitizedUser) {
 		throw new Response("User not found", { status: 404 });
 	}
-	const targetLanguage = await i18nServer.getLocale(request);
+	const locale = await i18nServer.getLocale(request);
 
 	if (submission.status !== "success") {
 		return { intent: null, lastResult: submission.reply(), slug: null };
@@ -164,7 +171,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		nonSanitizedUser.id,
 		pageWithSourceTexts.id,
 		submission.value.aiModel,
-		targetLanguage,
+		locale,
 	);
 
 	const queue = getTranslateUserQueue(nonSanitizedUser.id);
@@ -174,7 +181,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		aiModel: submission.value.aiModel,
 		userId: nonSanitizedUser.id,
 		pageId: pageWithSourceTexts.id,
-		targetLanguage,
+		locale: locale,
 		title: pageWithSourceTexts.title,
 		numberedContent: pageWithSourceTexts.content,
 		numberedElements: pageWithSourceTexts.sourceTexts,

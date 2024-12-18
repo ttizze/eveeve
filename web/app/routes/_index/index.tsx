@@ -20,12 +20,12 @@ export const meta: MetaFunction = () => {
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const currentUser = await authenticator.isAuthenticated(request);
-	const targetLanguage = await i18nServer.getLocale(request);
-	const pageName = targetLanguage === "en" ? "evame-ja" : "evame";
+	const locale = await i18nServer.getLocale(request);
+	const pageName = locale === "en" ? "evame-ja" : "evame";
 	const topPageWithTranslations = await fetchPageWithTranslations(
 		pageName,
 		currentUser?.id ?? 0,
-		targetLanguage,
+		locale,
 	);
 	if (!topPageWithTranslations) {
 		throw new Response("Not Found", { status: 404 });

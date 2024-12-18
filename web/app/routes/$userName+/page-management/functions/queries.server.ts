@@ -5,7 +5,7 @@ export const getDbUser = async (userId: number) => {
 
 export async function fetchPaginatedOwnPages(
 	userId: number,
-	targetLanguage: string,
+	locale: string,
 	page = 1,
 	pageSize = 10,
 	searchTerm = "",
@@ -57,8 +57,8 @@ export async function fetchPaginatedOwnPages(
 
 	const pagesWithTitle = pages.map((page) => ({
 		...page,
-		createdAt: page.createdAt.toLocaleString(targetLanguage),
-		updatedAt: page.updatedAt.toLocaleString(targetLanguage),
+		createdAt: page.createdAt.toLocaleString(locale),
+		updatedAt: page.updatedAt.toLocaleString(locale),
 		title: page.sourceTexts.filter((item) => item.number === 0)[0].text,
 	}));
 	return {

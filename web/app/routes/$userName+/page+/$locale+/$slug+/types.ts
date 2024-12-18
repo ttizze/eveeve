@@ -23,11 +23,11 @@ export type SourceTextWithTranslations = {
 export type TagPageWithTag = TagPage & {
 	tag: Tag;
 };
-export interface PageLocalized extends Omit<Page, "createdAt"> {
+export interface PageLocalizedDate extends Omit<Page, "createdAt"> {
 	createdAt: string;
 }
 export type PageWithTranslations = {
-	page: PageLocalized;
+	page: PageLocalizedDate;
 	user: SanitizedUser;
 	tagPages: TagPageWithTag[];
 	sourceTextWithTranslations: SourceTextWithTranslations[];

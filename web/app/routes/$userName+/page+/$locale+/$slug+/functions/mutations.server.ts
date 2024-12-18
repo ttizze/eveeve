@@ -28,14 +28,14 @@ export async function createUserAITranslationInfo(
 	userId: number,
 	pageId: number,
 	aiModel: string,
-	targetLanguage: string,
+	locale: string,
 ) {
 	try {
 		const userAITranslationInfo = await prisma.userAITranslationInfo.create({
 			data: {
 				userId,
 				pageId,
-				targetLanguage,
+				targetLanguage: locale,
 				aiModel,
 				aiTranslationStatus: "pending",
 				aiTranslationProgress: 0,
