@@ -53,21 +53,21 @@ export function PageCard({
 			</CardHeader>
 			<CardContent>
 				<div className="flex justify-between items-center">
-						<Link to={userLink} className="flex items-center">
-							<Avatar className="w-6 h-6 mr-2">
-								<AvatarImage
-									src={pageCard.user.icon}
-									alt={pageCard.user.displayName}
-								/>
-								<AvatarFallback>
-									{pageCard.user.displayName.charAt(0).toUpperCase()}
-								</AvatarFallback>
-							</Avatar>
-							<span className="text-sm text-gray-600">
-								{pageCard.user.displayName}
-							</span>
-						</Link>
-					
+					<Link to={userLink} className="flex items-center">
+						<Avatar className="w-6 h-6 mr-2">
+							<AvatarImage
+								src={pageCard.user.icon}
+								alt={pageCard.user.displayName}
+							/>
+							<AvatarFallback>
+								{pageCard.user.displayName.charAt(0).toUpperCase()}
+							</AvatarFallback>
+						</Avatar>
+						<span className="text-sm text-gray-600">
+							{pageCard.user.displayName}
+						</span>
+					</Link>
+
 					<LikeButton
 						liked={pageCard.likePages.length > 0}
 						likeCount={pageCard._count.likePages}
